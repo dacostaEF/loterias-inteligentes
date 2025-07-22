@@ -122,7 +122,7 @@
     
     <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
       <!-- Botão 1: Geração Aleatória (GRATUITO) -->
-      <button class="bg-[#00E38C] text-black font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-lg flex items-center gap-2" onclick="gerarNumerosAleatorios()">
+      <button class="bg-[#00E38C] text-black font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-lg flex items-center gap-2" onclick="abrirModalConfiguracao()">
         🎲 Gerar Aleatório
         <span class="bg-black text-[#00E38C] px-2 py-1 rounded text-sm">GRATUITO</span>
       </button>
@@ -154,6 +154,30 @@
       <h2 id="titulo-modal" class="text-2xl font-semibold mb-4">Título do Modal</h2>
       <div id="conteudo-modal" class="text-gray-300">
         Carregando análise...
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Configuração de Aposta -->
+  <div id="modalConfiguracao" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-xl w-96 text-white">
+      <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Configurar Aposta Aleatória</h3>
+
+      <div class="mb-5">
+        <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (6-12)</label>
+        <input type="range" id="sliderNumeros" min="6" max="12" value="8" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
+        <span id="valorNumeros" class="block text-center text-lg font-bold mt-2 text-[#00E38C]">8</span>
+      </div>
+
+      <div class="mb-8">
+        <label for="sliderTrevos" class="block text-gray-300 text-sm font-semibold mb-2">Quantos trevos? (2-6)</label>
+        <input type="range" id="sliderTrevos" min="2" max="6" value="3" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
+        <span id="valorTrevos" class="block text-center text-lg font-bold mt-2 text-[#8B5CF6]">3</span>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <button id="btnCancelarModal" class="bg-gray-600 text-white px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">Cancelar</button>
+        <button id="btnGerarNoModal" class="bg-[#00E38C] text-black px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">Gerar Aposta</button>
       </div>
     </div>
   </div>
@@ -723,6 +747,100 @@
       setTimeout(() => {
         mensagem.remove();
       }, 3000);
+    }
+
+    // ===== MODAL DE CONFIGURAÇÃO DE APOSTA =====
+    
+    // Elementos do modal
+    const modalConfiguracao = document.getElementById('modalConfiguracao');
+    const btnCancelarModal = document.getElementById('btnCancelarModal');
+    const btnGerarNoModal = document.getElementById('btnGerarNoModal');
+    const sliderNumeros = document.getElementById('sliderNumeros');
+    const valorNumeros = document.getElementById('valorNumeros');
+    const sliderTrevos = document.getElementById('sliderTrevos');
+    const valorTrevos = document.getElementById('valorTrevos');
+
+    // Atualiza os valores exibidos pelos sliders
+    sliderNumeros.oninput = () => {
+      valorNumeros.textContent = sliderNumeros.value;
+    };
+    sliderTrevos.oninput = () => {
+      valorTrevos.textContent = sliderTrevos.value;
+    };
+
+    // Abrir o modal
+    function abrirModalConfiguracao() {
+      modalConfiguracao.classList.remove('hidden');
+    }
+
+    // Fechar o modal
+    btnCancelarModal.addEventListener('click', () => {
+      modalConfiguracao.classList.add('hidden');
+    });
+
+    // Gerar aposta ao clicar no botão dentro do modal
+    btnGerarNoModal.addEventListener('click', () => {
+      const qtdeNum = parseInt(sliderNumeros.value);
+      const qtdeTrevo = parseInt(sliderTrevos.value);
+      gerarApostaAleatoria(qtdeNum, qtdeTrevo);
+      modalConfiguracao.classList.add('hidden'); // Fecha o modal após gerar
+    });
+
+    // Função para chamar o backend Flask
+    async function gerarApostaAleatoria(qtdeNum, qtdeTrevo) {
+      try {
+        mostrarMensagem('🎲 Gerando sua aposta...', 'info');
+        
+        const response = await fetch('/api/gerar-aposta-milionaria', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            qtde_num: qtdeNum,
+            qtde_trevo: qtdeTrevo
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Erro HTTP: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Aposta Gerada:", data);
+        
+        // Limpar seleções anteriores
+        limparSelecaoSilenciosa();
+        
+        // Selecionar números aleatórios
+        data.numeros.forEach(numero => {
+          const elementos = document.querySelectorAll('#numeros-container .numero');
+          const elemento = Array.from(elementos).find(el => el.textContent.trim() === numero.toString().padStart(2, '0'));
+          if (elemento) {
+            selecionarNumero(numero, elemento);
+          }
+        });
+        
+        // Selecionar trevo 1
+        const trevo1Elementos = document.querySelectorAll('#trevo1-container .trevo');
+        const trevo1Elemento = Array.from(trevo1Elementos).find(el => el.textContent.trim() === data.trevos[0].toString());
+        if (trevo1Elemento) {
+          selecionarTrevo1(data.trevos[0], trevo1Elemento);
+        }
+        
+        // Selecionar trevo 2
+        const trevo2Elementos = document.querySelectorAll('#trevo2-container .trevo');
+        const trevo2Elemento = Array.from(trevo2Elementos).find(el => el.textContent.trim() === data.trevos[1].toString());
+        if (trevo2Elemento) {
+          selecionarTrevo2(data.trevos[1], trevo2Elemento);
+        }
+        
+        mostrarMensagem(`✅ Aposta gerada com sucesso! ${data.qtde_apostas} combinações`, 'success');
+
+      } catch (error) {
+        console.error("Erro ao gerar aposta:", error);
+        mostrarMensagem(`❌ Erro ao gerar aposta: ${error.message}`, 'error');
+      }
     }
   </script>
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
