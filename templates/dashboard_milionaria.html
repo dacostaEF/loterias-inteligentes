@@ -115,6 +115,38 @@
     </div>
   </section>
 
+  <!-- Seção de Botões Comerciais -->
+  <section class="bg-[#1A1D25] p-8 rounded-2xl shadow-md mb-8">
+    <h2 class="text-2xl font-bold text-center mb-6">🎯 Gerador de Números +Milionária</h2>
+    <p class="text-gray-400 text-center mb-8">Escolha como quer gerar seus números para o próximo concurso</p>
+    
+    <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+      <!-- Botão 1: Geração Aleatória (GRATUITO) -->
+      <button class="bg-[#00E38C] text-black font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-lg flex items-center gap-2" onclick="gerarNumerosAleatorios()">
+        🎲 Gerar Aleatório
+        <span class="bg-black text-[#00E38C] px-2 py-1 rounded text-sm">GRATUITO</span>
+      </button>
+      
+      <!-- Botão 2: Análise Estatística (PAGO) -->
+      <button class="bg-gray-600 text-gray-400 font-bold px-8 py-4 rounded-xl cursor-not-allowed text-lg flex items-center gap-2" disabled>
+        📊 Análise Estatística
+        <span class="bg-[#8B5CF6] text-white px-2 py-1 rounded text-sm">PREMIUM</span>
+      </button>
+      
+      <!-- Botão 3: Limpar Seleção -->
+      <button class="bg-red-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-lg" onclick="limparSelecao()">
+        🗑️ Limpar Tudo
+      </button>
+    </div>
+    
+    <div class="mt-6 text-center">
+      <p class="text-sm text-gray-500">
+        💡 <strong>Dica:</strong> Experimente o gerador aleatório gratuitamente! 
+        Para análises estatísticas avançadas, faça login ou crie uma conta.
+      </p>
+    </div>
+  </section>
+
   <!-- Modal base -->
   <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
     <div class="bg-[#1A1D25] p-8 rounded-2xl w-full max-w-6xl relative modal-content">
@@ -582,6 +614,115 @@
 
     function criarGraficoClusters() {
       console.log('Criando gráfico de clusters...');
+    }
+
+    // Função para gerar números aleatórios (GRATUITO)
+    async function gerarNumerosAleatorios() {
+      // Capturar o botão no início da função
+      const botao = event.target;
+      const textoOriginal = botao.innerHTML;
+      
+      try {
+        // Mostrar loading
+        botao.innerHTML = '🎲 Gerando...';
+        botao.disabled = true;
+        
+        // Chamar API para gerar números aleatórios
+        const response = await fetch('/api/gerar-numeros-aleatorios');
+        const dados = await response.json();
+        
+        if (dados.success) {
+          // Limpar seleções anteriores (sem mostrar mensagem)
+          limparSelecaoSilenciosa();
+          
+          // Selecionar números aleatórios
+          dados.numeros.forEach(numero => {
+            const elementos = document.querySelectorAll('#numeros-container .numero');
+            const elemento = Array.from(elementos).find(el => el.textContent.trim() === numero.toString().padStart(2, '0'));
+            if (elemento) {
+              selecionarNumero(numero, elemento);
+            }
+          });
+          
+          // Selecionar trevo 1
+          const trevo1Elementos = document.querySelectorAll('#trevo1-container .trevo');
+          const trevo1Elemento = Array.from(trevo1Elementos).find(el => el.textContent.trim() === dados.trevo1.toString());
+          if (trevo1Elemento) {
+            selecionarTrevo1(dados.trevo1, trevo1Elemento);
+          }
+          
+          // Selecionar trevo 2
+          const trevo2Elementos = document.querySelectorAll('#trevo2-container .trevo');
+          const trevo2Elemento = Array.from(trevo2Elementos).find(el => el.textContent.trim() === dados.trevo2.toString());
+          if (trevo2Elemento) {
+            selecionarTrevo2(dados.trevo2, trevo2Elemento);
+          }
+          
+          // Mostrar sucesso
+          mostrarMensagem('✅ Números gerados com sucesso!', 'success');
+        } else {
+          throw new Error(dados.error || 'Erro ao gerar números');
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        mostrarMensagem('❌ Erro ao gerar números. Tente novamente.', 'error');
+      } finally {
+        // Restaurar botão usando a referência capturada
+        botao.innerHTML = '🎲 Gerar Aleatório <span class="bg-black text-[#00E38C] px-2 py-1 rounded text-sm">GRATUITO</span>';
+        botao.disabled = false;
+      }
+    }
+
+    // Função para limpar todas as seleções (silenciosa - sem mensagem)
+    function limparSelecaoSilenciosa() {
+      // Limpar números selecionados
+      numerosSelecionados = [];
+      document.querySelectorAll('#numeros-container .numero').forEach(el => {
+        el.classList.remove('selecionado');
+      });
+      
+      // Limpar trevo 1
+      trevo1Selecionado = null;
+      document.querySelectorAll('#trevo1-container .trevo').forEach(el => {
+        el.classList.remove('selecionado');
+      });
+      
+      // Limpar trevo 2
+      trevo2Selecionado = null;
+      document.querySelectorAll('#trevo2-container .trevo').forEach(el => {
+        el.classList.remove('selecionado');
+      });
+      
+      // Atualizar displays
+      atualizarNumerosSelecionados();
+      atualizarTrevo1Selecionado();
+      atualizarTrevo2Selecionado();
+    }
+
+    // Função para limpar todas as seleções (com mensagem)
+    function limparSelecao() {
+      limparSelecaoSilenciosa();
+      mostrarMensagem('🗑️ Seleção limpa com sucesso!', 'info');
+    }
+
+    // Função para mostrar mensagens
+    function mostrarMensagem(texto, tipo) {
+      // Criar elemento de mensagem
+      const mensagem = document.createElement('div');
+      mensagem.className = `fixed top-4 right-4 p-4 rounded-xl text-white font-semibold z-50 transition-all duration-300 ${
+        tipo === 'success' ? 'bg-green-600' :
+        tipo === 'error' ? 'bg-red-600' :
+        'bg-blue-600'
+      }`;
+      mensagem.textContent = texto;
+      
+      // Adicionar ao DOM
+      document.body.appendChild(mensagem);
+      
+      // Remover após 3 segundos
+      setTimeout(() => {
+        mensagem.remove();
+      }, 3000);
     }
   </script>
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>

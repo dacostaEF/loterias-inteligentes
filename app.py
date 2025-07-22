@@ -127,6 +127,36 @@ def get_analise_trevos_da_sorte():
 
 
 # --- Rota para manifestação de interesse em bolões (sem persistência para este exemplo) ---
+@app.route('/api/gerar-numeros-aleatorios', methods=['GET'])
+def gerar_numeros_aleatorios():
+    """Gera números aleatórios para +Milionária (6 números + 2 trevos)."""
+    try:
+        import random
+        
+        # Gerar 6 números únicos entre 1 e 50
+        numeros = sorted(random.sample(range(1, 51), 6))
+        
+        # Gerar 2 trevos únicos entre 1 e 6
+        trevo1 = random.randint(1, 6)
+        trevo2 = random.randint(1, 6)
+        while trevo2 == trevo1:  # Garantir que sejam diferentes
+            trevo2 = random.randint(1, 6)
+        
+        return jsonify({
+            "success": True,
+            "numeros": numeros,
+            "trevo1": trevo1,
+            "trevo2": trevo2,
+            "mensagem": "Números gerados com sucesso!"
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro ao gerar números aleatórios: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
 @app.route('/api/bolao_interesse', methods=['POST'])
 def bolao_interesse():
     data = request.json
