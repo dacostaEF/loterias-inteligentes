@@ -459,6 +459,7 @@ def criar_heatmap_interativo_html(df: pd.DataFrame):
                     title: 'Números',
                     side: 'bottom',
                     tickangle: 0,
+                    range: [0.5, 50.5],
                     tickmode: 'array',
                     tickvals: numerosLabels.filter((_, i) => i % 5 === 0),
                     ticktext: numerosLabels.filter((_, i) => i % 5 === 0)
@@ -466,7 +467,8 @@ def criar_heatmap_interativo_html(df: pd.DataFrame):
                 yaxis: {{
                     title: 'Concurso (mais recente → mais antigo)',
                     side: 'left',
-                    tickangle: 0
+                    tickangle: 0,
+                    autorange: 'reversed'
                 }},
                 width: 1200,
                 height: Math.max(400, concursosMostrados.length * 8),
@@ -496,7 +498,9 @@ def criar_heatmap_interativo_html(df: pd.DataFrame):
                     ticktext: ['Não', 'Sim'],
                     x: 0.45
                 }},
-                name: 'Trevo 1'
+                name: 'Trevo 1',
+                xaxis: 'x',
+                yaxis: 'y'
             }};
 
             const traceTrevo2 = {{
@@ -515,7 +519,9 @@ def criar_heatmap_interativo_html(df: pd.DataFrame):
                     ticktext: ['Não', 'Sim'],
                     x: 1.05
                 }},
-                name: 'Trevo 2'
+                name: 'Trevo 2',
+                xaxis: 'x2',
+                yaxis: 'y2'
             }};
 
             const layoutTrevos = {{
@@ -531,22 +537,32 @@ def criar_heatmap_interativo_html(df: pd.DataFrame):
                 xaxis: {{
                     title: 'Trevo 1 - Números',
                     side: 'bottom',
-                    tickangle: 0
+                    tickangle: 0,
+                    range: [0.5, 6.5],
+                    tickmode: 'array',
+                    tickvals: [1, 2, 3, 4, 5, 6],
+                    ticktext: ['1', '2', '3', '4', '5', '6']
                 }},
                 xaxis2: {{
                     title: 'Trevo 2 - Números',
                     side: 'bottom',
-                    tickangle: 0
+                    tickangle: 0,
+                    range: [0.5, 6.5],
+                    tickmode: 'array',
+                    tickvals: [1, 2, 3, 4, 5, 6],
+                    ticktext: ['1', '2', '3', '4', '5', '6']
                 }},
                 yaxis: {{
                     title: 'Concurso (mais recente → mais antigo)',
                     side: 'left',
-                    tickangle: 0
+                    tickangle: 0,
+                    autorange: 'reversed'
                 }},
                 yaxis2: {{
                     title: 'Concurso (mais recente → mais antigo)',
                     side: 'left',
-                    tickangle: 0
+                    tickangle: 0,
+                    autorange: 'reversed'
                 }},
                 width: 1200,
                 height: Math.max(400, concursosMostrados.length * 8),
