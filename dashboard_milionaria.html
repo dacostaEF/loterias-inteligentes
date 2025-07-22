@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>+Milionária | Dashboard Inteligente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0F1116;
+      color: #ffffff;
+    }
+    .numero {
+      background-color: #2E303A;
+      transition: all 0.3s ease;
+    }
+    .numero:hover {
+      background-color: #00E38C !important;
+      color: #000000 !important;
+      cursor: pointer;
+      transform: scale(1.05);
+    }
+    .numero.selecionado {
+      background-color: #00E38C !important;
+      color: #000000 !important;
+    }
+    .trevo {
+      background-color: #2E303A;
+      transition: all 0.3s ease;
+    }
+    .trevo:hover {
+      background-color: #8B5CF6 !important;
+      color: #ffffff !important;
+      cursor: pointer;
+      transform: scale(1.05);
+    }
+    .trevo.selecionado {
+      background-color: #8B5CF6 !important;
+      color: #ffffff !important;
+    }
+    .modal-content {
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #1A1D25 0%, #2E303A 100%);
+      border: 1px solid #3A3D45;
+    }
+    .chart-container {
+      background-color: #1A1D25;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body class="p-6">
+  <!-- Header -->
+  <header class="flex justify-between items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-white">+Milionária</h1>
+      <p class="text-gray-400">Dashboard Inteligente de Análise Estatística</p>
+    </div>
+    <button class="bg-[#8B5CF6] px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">
+      Login / Criar Conta
+    </button>
+  </header>
+
+  <!-- Cartão de jogo -->
+  <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8">
+    <h2 class="text-xl font-semibold mb-4">🎯 Selecione 6 números entre 50</h2>
+    <div class="grid grid-cols-10 gap-2 mb-6" id="numeros-container">
+      <!-- Números serão gerados dinamicamente -->
+    </div>
+
+    <!-- Trevos -->
+    <div class="mt-6">
+      <h3 class="text-lg mb-2">🍀 Escolha 2 Trevos</h3>
+      <div class="flex gap-4" id="trevos-container">
+        <!-- Trevos serão gerados dinamicamente -->
+      </div>
+    </div>
+
+    <!-- Números selecionados -->
+    <div class="mt-6 p-4 bg-[#2E303A] rounded-xl">
+      <h4 class="text-sm font-semibold mb-2">Números Selecionados:</h4>
+      <div class="flex gap-2 flex-wrap" id="numeros-selecionados">
+        <span class="text-gray-400">Nenhum número selecionado</span>
+      </div>
+      <h4 class="text-sm font-semibold mb-2 mt-4">Trevos Selecionados:</h4>
+      <div class="flex gap-2 flex-wrap" id="trevos-selecionados">
+        <span class="text-gray-400">Nenhum trevo selecionado</span>
+      </div>
+    </div>
+
+    <!-- Botões de análise -->
+    <div class="mt-8 flex flex-wrap gap-4">
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('frequencia')">
+        📊 Frequência
+      </button>
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('distribuicao')">
+        🔢 Distribuição
+      </button>
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('afinidades')">
+        🤝 Afinidades
+      </button>
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('trevos')">
+        🍀 Trevos
+      </button>
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('seca')">
+        🌵 Seca
+      </button>
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('estatisticas')">
+        📈 Estatísticas Avançadas
+      </button>
+    </div>
+  </section>
+
+  <!-- Seção de Estatísticas Rápidas -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="stat-card p-6 rounded-2xl">
+      <h3 class="text-lg font-semibold mb-2">🔥 Números Quentes</h3>
+      <div class="text-sm text-gray-300" id="numeros-quentes">
+        Carregando...
+      </div>
+    </div>
+    <div class="stat-card p-6 rounded-2xl">
+      <h3 class="text-lg font-semibold mb-2">❄️ Números Frios</h3>
+      <div class="text-sm text-gray-300" id="numeros-frios">
+        Carregando...
+      </div>
+    </div>
+    <div class="stat-card p-6 rounded-2xl">
+      <h3 class="text-lg font-semibold mb-2">🍀 Trevos Mais Frequentes</h3>
+      <div class="text-sm text-gray-300" id="trevos-frequentes">
+        Carregando...
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal base -->
+  <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+    <div class="bg-[#1A1D25] p-8 rounded-2xl w-full max-w-6xl relative modal-content">
+      <button class="absolute top-3 right-4 text-white text-xl font-bold hover:text-gray-300 transition-all" onclick="fecharModal()">×</button>
+      <h2 id="titulo-modal" class="text-2xl font-semibold mb-4">Título do Modal</h2>
+      <div id="conteudo-modal" class="text-gray-300">
+        Carregando análise...
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Dados simulados (serão substituídos pelos dados reais)
+    const dadosMilionaria = {
+      frequencia: {
+        numeros: {
+          quentes: [21, 41, 50, 23, 44, 16, 35, 42, 47, 48],
+          frios: [49, 43, 45, 46, 40, 39, 38, 37, 36, 34]
+        },
+        trevos: {
+          frequentes: [2, 4, 1, 6, 3, 5]
+        }
+      },
+      distribuicao: {
+        pares: 3.04,
+        impares: 2.96,
+        faixas: {
+          "1-10": 0.8,
+          "11-20": 1.2,
+          "21-30": 1.1,
+          "31-40": 1.3,
+          "41-50": 1.6
+        }
+      },
+      afinidades: {
+        positivas: [
+          { num1: 21, num2: 22, correlacao: 0.182 },
+          { num1: 17, num2: 46, correlacao: 0.173 },
+          { num1: 4, num2: 38, correlacao: 0.155 }
+        ],
+        negativas: [
+          { num1: 24, num2: 25, correlacao: -0.159 },
+          { num1: 20, num2: 41, correlacao: -0.155 }
+        ]
+      },
+      seca: {
+        maior: [49, 43, 45, 46, 40],
+        recentes: [21, 41, 50, 23, 44]
+      }
+    };
+
+    // Variáveis globais
+    let numerosSelecionados = [];
+    let trevosSelecionados = [];
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      gerarNumeros();
+      gerarTrevos();
+      carregarEstatisticasRapidas();
+    });
+
+    // Gerar números de 1 a 50
+    function gerarNumeros() {
+      const container = document.getElementById('numeros-container');
+      container.innerHTML = '';
+      
+      for (let i = 1; i <= 50; i++) {
+        const div = document.createElement('div');
+        div.className = 'numero p-3 rounded-xl text-center font-semibold';
+        div.textContent = i.toString().padStart(2, '0');
+        div.onclick = () => selecionarNumero(i, div);
+        container.appendChild(div);
+      }
+    }
+
+    // Gerar trevos de 1 a 6
+    function gerarTrevos() {
+      const container = document.getElementById('trevos-container');
+      container.innerHTML = '';
+      
+      for (let i = 1; i <= 6; i++) {
+        const div = document.createElement('div');
+        div.className = 'trevo px-4 py-2 rounded-xl font-semibold';
+        div.textContent = i;
+        div.onclick = () => selecionarTrevo(i, div);
+        container.appendChild(div);
+      }
+    }
+
+    // Selecionar número
+    function selecionarNumero(numero, elemento) {
+      if (numerosSelecionados.includes(numero)) {
+        numerosSelecionados = numerosSelecionados.filter(n => n !== numero);
+        elemento.classList.remove('selecionado');
+      } else if (numerosSelecionados.length < 6) {
+        numerosSelecionados.push(numero);
+        elemento.classList.add('selecionado');
+      } else {
+        alert('Você já selecionou 6 números!');
+        return;
+      }
+      atualizarNumerosSelecionados();
+    }
+
+    // Selecionar trevo
+    function selecionarTrevo(trevo, elemento) {
+      if (trevosSelecionados.includes(trevo)) {
+        trevosSelecionados = trevosSelecionados.filter(t => t !== trevo);
+        elemento.classList.remove('selecionado');
+      } else if (trevosSelecionados.length < 2) {
+        trevosSelecionados.push(trevo);
+        elemento.classList.add('selecionado');
+      } else {
+        alert('Você já selecionou 2 trevos!');
+        return;
+      }
+      atualizarTrevosSelecionados();
+    }
+
+    // Atualizar display dos números selecionados
+    function atualizarNumerosSelecionados() {
+      const container = document.getElementById('numeros-selecionados');
+      if (numerosSelecionados.length === 0) {
+        container.innerHTML = '<span class="text-gray-400">Nenhum número selecionado</span>';
+      } else {
+        container.innerHTML = numerosSelecionados
+          .sort((a, b) => a - b)
+          .map(n => `<span class="bg-[#00E38C] text-black px-2 py-1 rounded font-semibold">${n.toString().padStart(2, '0')}</span>`)
+          .join('');
+      }
+    }
+
+    // Atualizar display dos trevos selecionados
+    function atualizarTrevosSelecionados() {
+      const container = document.getElementById('trevos-selecionados');
+      if (trevosSelecionados.length === 0) {
+        container.innerHTML = '<span class="text-gray-400">Nenhum trevo selecionado</span>';
+      } else {
+        container.innerHTML = trevosSelecionados
+          .sort((a, b) => a - b)
+          .map(t => `<span class="bg-[#8B5CF6] text-white px-2 py-1 rounded font-semibold">${t}</span>`)
+          .join('');
+      }
+    }
+
+    // Carregar estatísticas rápidas
+    function carregarEstatisticasRapidas() {
+      document.getElementById('numeros-quentes').innerHTML = 
+        dadosMilionaria.frequencia.numeros.quentes.slice(0, 5)
+          .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+          .join('');
+
+      document.getElementById('numeros-frios').innerHTML = 
+        dadosMilionaria.frequencia.numeros.frios.slice(0, 5)
+          .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+          .join('');
+
+      document.getElementById('trevos-frequentes').innerHTML = 
+        dadosMilionaria.frequencia.trevos.frequentes.slice(0, 3)
+          .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
+          .join('');
+    }
+
+    // Abrir modal
+    function abrirModal(tipo) {
+      const modal = document.getElementById('modal');
+      const titulo = document.getElementById('titulo-modal');
+      const conteudo = document.getElementById('conteudo-modal');
+      
+      modal.classList.remove('hidden');
+      
+      switch(tipo) {
+        case 'frequencia':
+          titulo.textContent = '📊 Análise de Frequência';
+          carregarAnaliseFrequencia(conteudo);
+          break;
+        case 'distribuicao':
+          titulo.textContent = '🔢 Análise de Distribuição';
+          carregarAnaliseDistribuicao(conteudo);
+          break;
+        case 'afinidades':
+          titulo.textContent = '🤝 Análise de Afinidades';
+          carregarAnaliseAfinidades(conteudo);
+          break;
+        case 'trevos':
+          titulo.textContent = '🍀 Análise dos Trevos';
+          carregarAnaliseTrevos(conteudo);
+          break;
+        case 'seca':
+          titulo.textContent = '🌵 Análise de Seca';
+          carregarAnaliseSeca(conteudo);
+          break;
+        case 'estatisticas':
+          titulo.textContent = '📈 Estatísticas Avançadas';
+          carregarEstatisticasAvancadas(conteudo);
+          break;
+      }
+    }
+
+    // Fechar modal
+    function fecharModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    // Carregar análise de frequência
+    function carregarAnaliseFrequencia(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
+            <div class="grid grid-cols-5 gap-2">
+              ${dadosMilionaria.frequencia.numeros.quentes.map(n => 
+                `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n}</div>`
+              ).join('')}
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
+            <div class="grid grid-cols-5 gap-2">
+              ${dadosMilionaria.frequencia.numeros.frios.map(n => 
+                `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n}</div>`
+              ).join('')}
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência</h3>
+            <div id="grafico-frequencia" style="height: 400px;"></div>
+          </div>
+        </div>
+      `;
+      
+      // Aqui você pode adicionar o gráfico real usando Plotly
+      criarGraficoFrequencia();
+    }
+
+    // Carregar análise de distribuição
+    function carregarAnaliseDistribuicao(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="stat-card p-4">
+              <h4 class="font-semibold mb-2">📊 Distribuição Par/Ímpar</h4>
+              <p class="text-2xl font-bold text-[#00E38C]">${dadosMilionaria.distribuicao.pares.toFixed(2)} / ${dadosMilionaria.distribuicao.impares.toFixed(2)}</p>
+              <p class="text-sm text-gray-400">Pares / Ímpares por concurso</p>
+            </div>
+            <div class="stat-card p-4">
+              <h4 class="font-semibold mb-2">🎯 Distribuição por Faixas</h4>
+              <div class="space-y-1">
+                ${Object.entries(dadosMilionaria.distribuicao.faixas).map(([faixa, media]) => 
+                  `<div class="flex justify-between text-sm">
+                    <span>${faixa}:</span>
+                    <span class="text-[#00E38C]">${media.toFixed(1)}</span>
+                  </div>`
+                ).join('')}
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Distribuição</h3>
+            <div id="grafico-distribuicao" style="height: 400px;"></div>
+          </div>
+        </div>
+      `;
+      
+      criarGraficoDistribuicao();
+    }
+
+    // Carregar análise de afinidades
+    function carregarAnaliseAfinidades(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🤝 Afinidades Positivas</h3>
+              <div class="space-y-2">
+                ${dadosMilionaria.afinidades.positivas.map(afinidade => 
+                  `<div class="flex justify-between items-center p-2 bg-[#2E303A] rounded">
+                    <span class="font-semibold">${afinidade.num1} ↔ ${afinidade.num2}</span>
+                    <span class="text-[#00E38C]">${afinidade.correlacao.toFixed(3)}</span>
+                  </div>`
+                ).join('')}
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🚫 Afinidades Negativas</h3>
+              <div class="space-y-2">
+                ${dadosMilionaria.afinidades.negativas.map(afinidade => 
+                  `<div class="flex justify-between items-center p-2 bg-[#2E303A] rounded">
+                    <span class="font-semibold">${afinidade.num1} ↔ ${afinidade.num2}</span>
+                    <span class="text-red-400">${afinidade.correlacao.toFixed(3)}</span>
+                  </div>`
+                ).join('')}
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">📊 Matriz de Correlação</h3>
+            <div id="grafico-correlacao" style="height: 400px;"></div>
+          </div>
+        </div>
+      `;
+      
+      criarGraficoCorrelacao();
+    }
+
+    // Carregar análise de trevos
+    function carregarAnaliseTrevos(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">🍀 Frequência dos Trevos</h3>
+            <div class="grid grid-cols-6 gap-4">
+              ${dadosMilionaria.frequencia.trevos.frequentes.map((trevo, index) => 
+                `<div class="bg-[#8B5CF6] text-white p-4 rounded text-center">
+                  <div class="text-2xl font-bold">${trevo}</div>
+                  <div class="text-sm">${index + 1}º mais frequente</div>
+                </div>`
+              ).join('')}
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">📊 Gráfico dos Trevos</h3>
+            <div id="grafico-trevos" style="height: 400px;"></div>
+          </div>
+        </div>
+      `;
+      
+      criarGraficoTrevos();
+    }
+
+    // Carregar análise de seca
+    function carregarAnaliseSeca(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🌵 Números em Maior Seca</h3>
+              <div class="space-y-2">
+                ${dadosMilionaria.seca.maior.map((numero, index) => 
+                  `<div class="flex justify-between items-center p-2 bg-[#2E303A] rounded">
+                    <span class="font-semibold">${numero}</span>
+                    <span class="text-red-400">${15 + index} concursos</span>
+                  </div>`
+                ).join('')}
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🎯 Números Recentes</h3>
+              <div class="space-y-2">
+                ${dadosMilionaria.seca.recentes.map((numero, index) => 
+                  `<div class="flex justify-between items-center p-2 bg-[#2E303A] rounded">
+                    <span class="font-semibold">${numero}</span>
+                    <span class="text-[#00E38C]">${index + 1} concurso(s)</span>
+                  </div>`
+                ).join('')}
+              </div>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Seca</h3>
+            <div id="grafico-seca" style="height: 400px;"></div>
+          </div>
+        </div>
+      `;
+      
+      criarGraficoSeca();
+    }
+
+    // Carregar estatísticas avançadas
+    function carregarEstatisticasAvancadas(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-6">
+            <div class="stat-card p-4">
+              <h4 class="font-semibold mb-2">🎲 Teste de Aleatoriedade</h4>
+              <p class="text-lg font-bold text-[#00E38C]">ALEATÓRIO</p>
+              <p class="text-sm text-gray-400">P-valor: 0.9916</p>
+            </div>
+            <div class="stat-card p-4">
+              <h4 class="font-semibold mb-2">📊 Desvio Padrão</h4>
+              <p class="text-lg font-bold text-[#00E38C]">6.11</p>
+              <p class="text-sm text-gray-400">Coeficiente: 18.94%</p>
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">🔗 Análise de Clusters</h3>
+            <div id="grafico-clusters" style="height: 400px;"></div>
+          </div>
+        </div>
+      `;
+      
+      criarGraficoClusters();
+    }
+
+    // Funções para criar gráficos (simuladas)
+    function criarGraficoFrequencia() {
+      // Implementar gráfico real com Plotly
+      console.log('Criando gráfico de frequência...');
+    }
+
+    function criarGraficoDistribuicao() {
+      console.log('Criando gráfico de distribuição...');
+    }
+
+    function criarGraficoCorrelacao() {
+      console.log('Criando gráfico de correlação...');
+    }
+
+    function criarGraficoTrevos() {
+      console.log('Criando gráfico de trevos...');
+    }
+
+    function criarGraficoSeca() {
+      console.log('Criando gráfico de seca...');
+    }
+
+    function criarGraficoClusters() {
+      console.log('Criando gráfico de clusters...');
+    }
+  </script>
+</body>
+</html> 
