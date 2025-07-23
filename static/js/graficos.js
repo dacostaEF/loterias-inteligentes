@@ -26,10 +26,12 @@ const MILIONARIA_COLORS = {
 
 // Configuração padrão do Plotly
 const PLOTLY_CONFIG = {
-    displayModeBar: true,
+    displayModeBar: false, // Remove barra de ferramentas em mobile
     displaylogo: false,
     modeBarButtonsToRemove: ['pan2d', 'lasso2d', 'select2d'],
     responsive: true,
+    autosize: true, // Garante responsividade
+    scrollZoom: false, // Desativa zoom por scroll/pinch em mobile
     toImageButtonOptions: {
         format: 'png',
         filename: 'milionaria_grafico',
@@ -48,16 +50,19 @@ const DEFAULT_LAYOUT = {
     },
     paper_bgcolor: MILIONARIA_COLORS.background,
     plot_bgcolor: MILIONARIA_COLORS.background,
+    autosize: true, // Garante que o gráfico se ajuste ao container
+    responsive: true, // Habilita a responsividade do Plotly
     margin: {
-        l: 60,
-        r: 40,
+        l: 40, // Reduzido para mobile
+        r: 20, // Reduzido para mobile
         t: 40,
-        b: 60,
-        pad: 10
+        b: 40, // Reduzido para mobile
+        pad: 5 // Reduzido para mobile
     },
     xaxis: {
         gridcolor: MILIONARIA_COLORS.surface,
         zerolinecolor: MILIONARIA_COLORS.surface,
+        automargin: true, // Ajuda no ajuste automático de margens
         tickfont: {
             family: 'Inter, sans-serif',
             size: 10,
@@ -72,6 +77,7 @@ const DEFAULT_LAYOUT = {
     yaxis: {
         gridcolor: MILIONARIA_COLORS.surface,
         zerolinecolor: MILIONARIA_COLORS.surface,
+        automargin: true, // Ajuda no ajuste automático de margens
         tickfont: {
             family: 'Inter, sans-serif',
             size: 10,
@@ -85,14 +91,31 @@ const DEFAULT_LAYOUT = {
     },
     showlegend: true,
     legend: {
+        orientation: 'h', // Horizontal (mais compacto para mobile)
+        x: 0, // Posição no eixo X (esquerda)
+        y: 1.02, // Posição no eixo Y (acima do gráfico)
+        xanchor: 'left', // Ancoragem
         font: {
             family: 'Inter, sans-serif',
-            size: 11,
-            color: MILIONARIA_COLORS.text
+            size: 10, // Tamanho menor da fonte da legenda
+            color: MILIONARIA_COLORS.textSecondary
         },
-        bgcolor: MILIONARIA_COLORS.card,
-        bordercolor: MILIONARIA_COLORS.surface
+        bgcolor: 'rgba(0,0,0,0.3)', // Fundo leve para contraste
+        bordercolor: MILIONARIA_COLORS.surface,
+        borderwidth: 1
     }
+};
+
+// Função para detectar se é mobile
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
+// Configuração específica para mobile
+const MOBILE_CONFIG = {
+    ...PLOTLY_CONFIG,
+    scrollZoom: false,
+    displayModeBar: false
 };
 
 /**
@@ -135,10 +158,12 @@ function criarGraficoFrequencia(dados) {
         yaxis: {
             ...DEFAULT_LAYOUT.yaxis,
             title: 'Frequência'
-        }
+        },
+        showlegend: false // Gráfico simples não precisa de legenda
     };
 
-    Plotly.newPlot('grafico-frequencia', [trace], layout, PLOTLY_CONFIG);
+    const config = isMobile() ? MOBILE_CONFIG : PLOTLY_CONFIG;
+    Plotly.newPlot('grafico-frequencia', [trace], layout, config);
 }
 
 /**
@@ -180,10 +205,12 @@ function criarGraficoDistribuicao(dados) {
         yaxis: {
             ...DEFAULT_LAYOUT.yaxis,
             title: 'Média de Números por Concurso'
-        }
+        },
+        showlegend: false // Gráfico simples não precisa de legenda
     };
 
-    Plotly.newPlot('grafico-distribuicao', [trace], layout, PLOTLY_CONFIG);
+    const config = isMobile() ? MOBILE_CONFIG : PLOTLY_CONFIG;
+    Plotly.newPlot('grafico-distribuicao', [trace], layout, config);
 }
 
 /**

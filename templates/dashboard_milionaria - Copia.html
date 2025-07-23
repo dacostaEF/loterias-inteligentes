@@ -8,26 +8,16 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
-  <style>
-    body {
-      background-color: #000000 !important;
-    }
-  </style>
 </head>
-<body class="p-4 sm:p-6">
+<body class="p-6">
+<body class="p-6">
   <!-- Header -->
   <header class="flex justify-between items-center mb-8">
     <div>
-      <h1 class="text-2xl sm:text-3xl font-bold text-white">+Milionária</h1>
-      <p class="text-sm sm:text-base text-gray-400">Dashboard Inteligente de Análise Estatística</p>
+      <h1 class="text-3xl font-bold text-white">+Milionária</h1>
+      <p class="text-gray-400">Dashboard Inteligente de Análise Estatística</p>
     </div>
-    
-    <!-- Logo centralizada -->
-    <div class="flex justify-center items-center">
-      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
-    </div>
-    
-    <button class="bg-[#8B5CF6] px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all text-sm sm:text-base">
+    <button class="bg-[#8B5CF6] px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">
       Login / Criar Conta
     </button>
   </header>
@@ -40,11 +30,11 @@
     </div>
 
     <!-- Dois conjuntos de trevos na mesma linha -->
-    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-8">
+    <div class="mt-6 grid grid-cols-2 gap-8">
       <!-- Conjunto 1: Trevo 1 -->
       <div>
         <h3 class="text-lg mb-2">🍀 Escolha Trevo 1</h3>
-        <div class="flex gap-4 flex-wrap" id="trevo1-container">
+        <div class="flex gap-4" id="trevo1-container">
           <!-- Trevo 1 será gerado dinamicamente -->
         </div>
       </div>
@@ -52,7 +42,7 @@
       <!-- Conjunto 2: Trevo 2 -->
       <div>
         <h3 class="text-lg mb-2">🍀 Escolha Trevo 2</h3>
-        <div class="flex gap-4 flex-wrap" id="trevo2-container">
+        <div class="flex gap-4" id="trevo2-container">
           <!-- Trevo 2 será gerado dinamicamente -->
         </div>
       </div>
@@ -92,22 +82,22 @@
 
     <!-- Botões de análise -->
     <div class="mt-8 flex flex-wrap gap-4">
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('frequencia')">
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('frequencia')">
         📊 Frequência
       </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('distribuicao')">
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('distribuicao')">
         🔢 Distribuição
       </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('afinidades')">
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('afinidades')">
         🤝 Afinidades
       </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('trevos')">
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('trevos')">
         🍀 Trevos
       </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('seca')">
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('seca')">
         🌵 Seca
       </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('estatisticas')">
+      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all" onclick="abrirModal('estatisticas')">
         📈 Estatísticas Avançadas
       </button>
     </div>
@@ -142,19 +132,19 @@
     
     <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
       <!-- Botão 1: Geração Aleatória (GRATUITO) -->
-      <button class="bg-[#00E38C] text-black font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-base sm:text-lg flex items-center gap-2" onclick="abrirModalConfiguracao()">
+      <button class="bg-[#00E38C] text-black font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-lg flex items-center gap-2" onclick="abrirModalConfiguracao()">
         🎲 Gerar Aleatório
         <span class="bg-black text-[#00E38C] px-2 py-1 rounded text-sm">GRATUITO</span>
       </button>
       
       <!-- Botão 2: Análise Estatística (PAGO) -->
-      <button class="bg-gray-600 text-gray-400 font-bold px-8 py-4 rounded-xl cursor-not-allowed text-base sm:text-lg flex items-center gap-2" disabled>
+      <button class="bg-gray-600 text-gray-400 font-bold px-8 py-4 rounded-xl cursor-not-allowed text-lg flex items-center gap-2" disabled>
         📊 Análise Estatística
         <span class="bg-[#8B5CF6] text-white px-2 py-1 rounded text-sm">PREMIUM</span>
       </button>
       
       <!-- Botão 3: Limpar Seleção -->
-      <button class="bg-red-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-base sm:text-lg" onclick="limparSelecao()">
+      <button class="bg-red-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-lg" onclick="limparSelecao()">
         🗑️ Limpar Tudo
       </button>
     </div>
@@ -482,276 +472,37 @@
     }
 
     // Carregar análise de frequência
-    async function carregarAnaliseFrequencia(container) {
-      container.innerHTML = "🔄 Carregando análise de frequência...";
-
-      try {
-        const response = await fetch('/api/analise-frequencia');
-        const data = await response.json();
-
-        if (data.error) {
-          container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
-          return;
-        }
-
-        container.innerHTML = `
-          <div class="space-y-6">
-            <!-- Cabeçalho com título e ajuda -->
-            <div class="flex justify-between items-start">
-              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
-                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
-                <div class="flex flex-wrap gap-3 items-center">
-                  <label class="text-sm text-gray-300">Período:</label>
-                  <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="">Todos os concursos</option>
-                    <option value="25">Últimos 25 concursos</option>
-                    <option value="50">Últimos 50 concursos</option>
-                    <option value="100">Últimos 100 concursos</option>
-                    <option value="200">Últimos 200 concursos</option>
-                  </select>
-                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
-                </div>
-              </div>
-              <button onclick="abrirPopupAjuda()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
-                ❓
-              </button>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
-              <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_quentes.slice(0, 10).map(n => 
-                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
-                ).join('')}
-              </div>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
-              <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_frios.slice(0, 10).map(n => 
-                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
-                ).join('')}
-              </div>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
-              <div id="grafico-frequencia" style="height: 400px;"></div>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Frequência Relativa (%)</h3>
-              <div id="grafico-frequencia-relativa" style="height: 400px;"></div>
+    function carregarAnaliseFrequencia(container) {
+      container.innerHTML = `
+        <div class="space-y-6">
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
+            <div class="grid grid-cols-5 gap-2">
+              ${dadosMilionaria.frequencia.numeros.quentes.map(n => 
+                `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n}</div>`
+              ).join('')}
             </div>
           </div>
-        `;
-        
-        // Criar gráfico absoluto com Plotly
-        const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
-        const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
-
-        Plotly.newPlot('grafico-frequencia', [{
-          x: xNumeros,
-          y: yFreq,
-          type: 'bar',
-          marker: { color: 'deepskyblue' }
-        }], {
-          title: 'Frequência Absoluta dos Números',
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 },
-          xaxis: { automargin: true },
-          yaxis: { automargin: true }
-        }, { displayModeBar: false });
-
-        // Criar gráfico relativo com Plotly
-        const xNumerosRel = data.frequencia_relativa_numeros.map(e => e.numero);
-        const yFreqRel = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperada = Array(50).fill(2); // Linha de referência 2%
-
-        Plotly.newPlot('grafico-frequencia-relativa', [
-          {
-            x: xNumerosRel,
-            y: yFreqRel,
-            type: 'bar',
-            name: 'Frequência Relativa',
-            marker: { color: '#00E38C' }
-          },
-          {
-            x: xNumerosRel,
-            y: linhaEsperada,
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Esperado (2%)',
-            line: { color: 'red', dash: 'dash' }
-          }
-        ], {
-          title: 'Frequência Relativa dos Números (%)',
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          yaxis: { automargin: true }, // Remove título do eixo Y
-          xaxis: { automargin: true }, // Remove título do eixo X
-          showlegend: false, // Remove legenda
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
-        }, { 
-          displayModeBar: false,
-          scrollZoom: false
-        });
-
-      } catch (error) {
-        container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
-      }
-    }
-
-    // Função para atualizar análise quando mudar a janela
-    async function atualizarAnaliseFrequencia() {
-      const janela = document.getElementById('janela-analise').value;
-      const container = document.getElementById('conteudo-modal');
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
+            <div class="grid grid-cols-5 gap-2">
+              ${dadosMilionaria.frequencia.numeros.frios.map(n => 
+                `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n}</div>`
+              ).join('')}
+            </div>
+          </div>
+          
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência</h3>
+            <div id="grafico-frequencia" style="height: 400px;"></div>
+          </div>
+        </div>
+      `;
       
-      container.innerHTML = "🔄 Atualizando análise...";
-
-      try {
-        const url = janela ? `/api/analise-frequencia?qtd_concursos=${janela}` : '/api/analise-frequencia';
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.error) {
-          container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
-          return;
-        }
-
-        // Recriar o conteúdo com os novos dados
-        container.innerHTML = `
-          <div class="space-y-6">
-            <!-- Cabeçalho com título e ajuda -->
-            <div class="flex justify-between items-start">
-              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
-                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise</h3>
-                <div class="flex flex-wrap gap-3 items-center">
-                  <label class="text-sm text-gray-300">Período:</label>
-                  <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="" ${janela === '' ? 'selected' : ''}>Todos os concursos</option>
-                    <option value="25" ${janela === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
-                    <option value="50" ${janela === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
-                    <option value="100" ${janela === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
-                    <option value="200" ${janela === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
-                  </select>
-                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
-                </div>
-              </div>
-              <button onclick="abrirPopupAjuda()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
-                ❓
-              </button>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
-              <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_quentes.slice(0, 10).map(n => 
-                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
-                ).join('')}
-              </div>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
-              <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_frios.slice(0, 10).map(n => 
-                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
-                ).join('')}
-              </div>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
-              <div id="grafico-frequencia" style="height: 400px;"></div>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Frequência Relativa (%)</h3>
-              <div id="grafico-frequencia-relativa" style="height: 400px;"></div>
-            </div>
-          </div>
-        `;
-        
-        // Recriar gráfico absoluto com novos dados
-        const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
-        const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
-
-        Plotly.newPlot('grafico-frequencia', [{
-          x: xNumeros,
-          y: yFreq,
-          type: 'bar',
-          marker: { color: 'deepskyblue' }
-        }], {
-          title: `Frequência Absoluta dos Números ${janela ? `(Últimos ${janela} concursos)` : '(Todos os concursos)'}`,
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 },
-          xaxis: { automargin: true },
-          yaxis: { automargin: true }
-        }, { displayModeBar: false });
-
-        // Recriar gráfico relativo com novos dados
-        const xNumerosRel = data.frequencia_relativa_numeros.map(e => e.numero);
-        const yFreqRel = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperada = Array(50).fill(2); // Linha de referência 2%
-
-        Plotly.newPlot('grafico-frequencia-relativa', [
-          {
-            x: xNumerosRel,
-            y: yFreqRel,
-            type: 'bar',
-            name: 'Frequência Relativa',
-            marker: { color: '#00E38C' }
-          },
-          {
-            x: xNumerosRel,
-            y: linhaEsperada,
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Esperado (2%)',
-            line: { color: 'red', dash: 'dash' }
-          }
-        ], {
-          title: `Frequência Relativa dos Números (%) ${janela ? `(Últimos ${janela} concursos)` : '(Todos os concursos)'}`,
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          yaxis: { automargin: true }, // Remove título do eixo Y
-          xaxis: { automargin: true }, // Remove título do eixo X
-          showlegend: false, // Remove legenda
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
-        }, { 
-          displayModeBar: false,
-          scrollZoom: false
-        });
-
-              } catch (error) {
-          container.innerHTML = `<p style="color: red;">Erro ao atualizar dados: ${error.message}</p>`;
-        }
-      }
-
-      // Funções para o popup de ajuda
-      function abrirPopupAjuda() {
-        document.getElementById("popupAjuda").style.display = "block";
-      }
-
-      function fecharPopupAjuda() {
-        document.getElementById("popupAjuda").style.display = "none";
-      }
+      // Aqui você pode adicionar o gráfico real usando Plotly
+      criarGraficoFrequencia();
+    }
 
     // Carregar análise de distribuição
     function carregarAnaliseDistribuicao(container) {
@@ -1181,185 +932,6 @@
       }
     }
   </script>
-
-
-
-
-
-
-
-  <!-- Popup de Ajuda -->
-  <div id="popupAjuda" class="modal-ajuda">
-    <div class="modal-content">
-      <span class="close" onclick="fecharPopupAjuda()">×</span>
-      <h2>🧠 Entendendo os Gráficos</h2>
-      <p>Esses gráficos mostram padrões que podem te ajudar a escolher seus números com mais estratégia.</p>
-
-      <h3>📊 Frequência Absoluta</h3>
-      <p>
-        Quantas vezes cada número ou trevo foi sorteado.<br>
-        <strong>✔ Útil para:</strong> ver os mais e menos sorteados até hoje.
-      </p>
-
-      <h3>📈 Frequência Relativa</h3>
-      <p>
-        Mostra a frequência em porcentagem, comparando com o esperado em sorteios aleatórios.<br>
-        <strong>✔ Útil para:</strong> saber se um número saiu mais ou menos do que o "normal".
-      </p>
-
-      <h3>🔥 Números Quentes</h3>
-      <p>
-        São os que mais saíram recentemente. Alguns jogadores acreditam que estão em "alta".
-      </p>
-
-      <h3>❄️ Números Frios</h3>
-      <p>
-        São os que há tempos não aparecem. Alguns apostadores preferem dar chance a eles.
-      </p>
-
-      <h3>🕒 Análise Temporal</h3>
-      <p>
-        Compara os números mais frequentes em blocos (últimos 10%, 20%, 30% dos concursos).<br>
-        <strong>✔ Útil para:</strong> detectar tendências mais recentes.
-      </p>
-
-      <p style="margin-top: 20px; font-style: italic;">
-        Estes gráficos <strong>não garantem acertos</strong>, mas ajudam a apostar com mais consciência estatística.
-      </p>
-    </div>
-  </div>
-
-  <!-- CSS para o popup de ajuda e gráficos responsivos -->
-  <style>
-  .modal-ajuda {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.85);
-  }
-
-  /* Gráficos responsivos */
-  .chart-container {
-    padding: 10px;
-    margin: 10px 0;
-  }
-
-  @media (max-width: 768px) {
-    .chart-container {
-      padding: 5px;
-      margin: 5px 0;
-    }
-    
-    .chart-container h3 {
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
-    }
-    
-    .chart-container div[id^="grafico-"] {
-      height: 350px !important; /* Aumenta ainda mais sem títulos de eixo */
-      width: 100% !important;
-    }
-  }
-
-  @media (max-width: 640px) {
-    .chart-container div[id^="grafico-"] {
-      height: 310px !important; /* Aumenta ainda mais sem títulos de eixo */
-    }
-    
-    /* Otimizações específicas para gráficos Plotly em mobile */
-    .js-plotly-plot .plotly .modebar {
-      display: none !important;
-    }
-    
-    /* Esconde legendas em mobile para economizar espaço */
-    .js-plotly-plot .plotly .legend {
-      display: none !important;
-    }
-    
-    .js-plotly-plot .plotly .legend .traces {
-      display: none !important;
-    }
-  }
-
-  /* Mostra legendas em desktop */
-  @media (min-width: 769px) {
-    .js-plotly-plot .plotly .legend {
-      display: block !important;
-      font-size: 11px !important;
-    }
-    
-    .js-plotly-plot .plotly .legend .traces {
-      display: block !important;
-      font-size: 11px !important;
-    }
-  }
-
-  .modal-ajuda .modal-content {
-    background-color: #1c1c1c;
-    color: #eee;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh; /* Limita altura máxima */
-    overflow-y: auto; /* Permite rolagem vertical */
-    -webkit-overflow-scrolling: touch; /* Melhora rolagem em iOS */
-    scroll-behavior: smooth; /* Scroll suave */
-    font-family: 'Inter', sans-serif;
-    box-shadow: 0 0 20px #000;
-  }
-
-  .modal-ajuda .close {
-    color: #aaa;
-    float: right;
-    font-size: 26px;
-    cursor: pointer;
-  }
-
-  .modal-ajuda .close:hover {
-    color: red;
-  }
-
-  .modal-ajuda h2 {
-    color: #00E38C;
-    margin-bottom: 15px;
-  }
-
-  .modal-ajuda h3 {
-    color: #00E38C;
-    margin-top: 20px;
-    margin-bottom: 10px;
-  }
-
-  .modal-ajuda p {
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
-
-  /* Otimizações mobile para modal de ajuda */
-  @media (max-width: 768px) {
-    .modal-ajuda .modal-content {
-      margin: 5% auto; /* Reduz margem superior */
-      width: 95%; /* Ocupa mais largura */
-      padding: 15px; /* Reduz padding */
-    }
-  }
-
-  @media (max-width: 640px) {
-    .modal-ajuda .modal-content {
-      margin: 3% auto; /* Margem ainda menor */
-      width: 98%; /* Quase toda a largura */
-      padding: 12px; /* Padding menor */
-    }
-  }
-  </style>
-
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
 </body>
 </html> 

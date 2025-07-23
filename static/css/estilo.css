@@ -177,23 +177,22 @@ p {
 }
 
 /* Números da loteria */
+/* ✅ Estilo padrão para DESKTOP - ORIGINAL */
 .numero {
     background-color: var(--color-surface);
     color: var(--color-text);
     border: 2px solid transparent;
     border-radius: var(--border-radius-lg);
-    padding: var(--spacing-3);
     font-family: var(--font-family);
     font-size: var(--font-size-sm);
     font-weight: 600;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 48px;
-    min-height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
 }
 
 .numero:hover {
@@ -210,23 +209,22 @@ p {
 }
 
 /* Trevos */
+/* ✅ Estilo padrão para DESKTOP - ORIGINAL */
 .trevo {
     background-color: var(--color-surface);
     color: var(--color-text);
     border: 2px solid transparent;
     border-radius: var(--border-radius-lg);
-    padding: var(--spacing-2) var(--spacing-4);
     font-family: var(--font-family);
     font-size: var(--font-size-sm);
     font-weight: 600;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 40px;
-    min-height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
 }
 
 .trevo:hover {
@@ -271,6 +269,8 @@ p {
     max-width: 90vw;
     max-height: 90vh;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
+    scroll-behavior: smooth; /* Scroll suave */
     position: relative;
     transform: scale(0.9);
     transition: transform 0.3s ease;
@@ -451,26 +451,102 @@ p {
 .bg-surface { background-color: var(--color-surface); }
 
 /* Responsividade */
+/* 📱 Estilo somente para MOBILE */
 @media (max-width: 768px) {
     .modal-content {
-        margin: var(--spacing-4);
-        padding: var(--spacing-6);
+        margin: 5% auto;
+        padding: var(--spacing-4);
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
     }
     
     .stats-grid {
         grid-template-columns: 1fr;
     }
     
-    .numero {
-        min-width: 40px;
-        min-height: 40px;
-        font-size: var(--font-size-xs);
+    /* 📱 Otimizações gerais para mobile */
+    h1 {
+        font-size: 1.5rem !important;
     }
     
-    .trevo {
-        min-width: 36px;
-        min-height: 36px;
-        font-size: var(--font-size-xs);
+    h2 {
+        font-size: 1.1rem !important;
+    }
+    
+    h3 {
+        font-size: 1rem !important;
+    }
+    
+    /* 📱 Botões mais compactos */
+    button {
+        font-size: 0.875rem !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* 📱 Oculta subtítulo em tablets também */
+    header p {
+        display: none !important;
+    }
+    
+    /* 📱 Botão login mais compacto em tablets */
+    header button {
+        font-size: 0.7rem !important;
+        padding: 6px 10px !important;
+        max-width: 110px;
+    }
+}
+
+/* 📱 Otimizações para telas muito pequenas (iPhone SE) */
+@media (max-width: 640px) {
+    /* Otimizações para containers dos trevos */
+    #trevo1-container,
+    #trevo2-container {
+        gap: 8px;
+        justify-content: center;
+    }
+}
+
+/* 🖥️ Garante que o subtítulo apareça apenas no desktop */
+@media (min-width: 769px) {
+    header p {
+        display: block !important;
+    }
+}
+
+/* 📱 Otimizações para telas muito pequenas (Galaxy S20, iPhone SE) */
+@media (max-width: 480px) {
+    /* Reduz o tamanho do texto do título */
+    header h1 {
+        font-size: 1.1rem !important;
+    }
+    
+    /* Oculta o subtítulo no mobile */
+    header p {
+        display: none !important;
+    }
+
+    /* Ajusta o botão Login / Criar Conta - ainda menor */
+    header button {
+        font-size: 0.6rem !important;
+        padding: 4px 8px !important;
+        border-radius: 6px !important;
+        max-width: 100px;
+        white-space: nowrap;
+    }
+
+    /* Espaçamento lateral do header */
+    header {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    /* Se a logo for uma imagem */
+    header img {
+        max-width: 80px !important;
+        height: auto;
     }
 }
 
@@ -536,5 +612,24 @@ p {
 }
 
 ::-webkit-scrollbar-thumb:hover {
+    background: #00D17A;
+}
+
+/* Scrollbar específica para modais */
+.modal-content::-webkit-scrollbar {
+    width: 6px; /* Mais fina para modais */
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
     background: #00D17A;
 } 
