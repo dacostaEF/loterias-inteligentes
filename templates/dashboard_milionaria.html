@@ -497,20 +497,25 @@
 
         container.innerHTML = `
           <div class="space-y-6">
-            <!-- Seletor de Janela de Análise -->
-            <div class="bg-[#2E303A] p-4 rounded-xl">
-              <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise</h3>
-              <div class="flex flex-wrap gap-3 items-center">
-                <label class="text-sm text-gray-300">Período:</label>
-                <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                  <option value="">Todos os concursos</option>
-                  <option value="25">Últimos 25 concursos</option>
-                  <option value="50">Últimos 50 concursos</option>
-                  <option value="100">Últimos 100 concursos</option>
-                  <option value="200">Últimos 200 concursos</option>
-                </select>
-                <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+            <!-- Cabeçalho com título e ajuda -->
+            <div class="flex justify-between items-start">
+              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
+                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
+                <div class="flex flex-wrap gap-3 items-center">
+                  <label class="text-sm text-gray-300">Período:</label>
+                  <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
+                    <option value="">Todos os concursos</option>
+                    <option value="25">Últimos 25 concursos</option>
+                    <option value="50">Últimos 50 concursos</option>
+                    <option value="100">Últimos 100 concursos</option>
+                    <option value="200">Últimos 200 concursos</option>
+                  </select>
+                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+                </div>
               </div>
+              <button onclick="abrirPopupAjuda()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
+                ❓
+              </button>
             </div>
             
             <div class="chart-container">
@@ -615,20 +620,25 @@
         // Recriar o conteúdo com os novos dados
         container.innerHTML = `
           <div class="space-y-6">
-            <!-- Seletor de Janela de Análise -->
-            <div class="bg-[#2E303A] p-4 rounded-xl">
-              <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise</h3>
-              <div class="flex flex-wrap gap-3 items-center">
-                <label class="text-sm text-gray-300">Período:</label>
-                <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                  <option value="" ${janela === '' ? 'selected' : ''}>Todos os concursos</option>
-                  <option value="25" ${janela === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
-                  <option value="50" ${janela === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
-                  <option value="100" ${janela === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
-                  <option value="200" ${janela === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
-                </select>
-                <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+            <!-- Cabeçalho com título e ajuda -->
+            <div class="flex justify-between items-start">
+              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
+                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise</h3>
+                <div class="flex flex-wrap gap-3 items-center">
+                  <label class="text-sm text-gray-300">Período:</label>
+                  <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
+                    <option value="" ${janela === '' ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="25" ${janela === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                    <option value="50" ${janela === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                    <option value="100" ${janela === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                    <option value="200" ${janela === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
+                  </select>
+                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+                </div>
               </div>
+              <button onclick="abrirPopupAjuda()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
+                ❓
+              </button>
             </div>
             
             <div class="chart-container">
@@ -708,10 +718,19 @@
           showlegend: true
         });
 
-      } catch (error) {
-        container.innerHTML = `<p style="color: red;">Erro ao atualizar dados: ${error.message}</p>`;
+              } catch (error) {
+          container.innerHTML = `<p style="color: red;">Erro ao atualizar dados: ${error.message}</p>`;
+        }
       }
-    }
+
+      // Funções para o popup de ajuda
+      function abrirPopupAjuda() {
+        document.getElementById("popupAjuda").style.display = "block";
+      }
+
+      function fecharPopupAjuda() {
+        document.getElementById("popupAjuda").style.display = "none";
+      }
 
     // Carregar análise de distribuição
     function carregarAnaliseDistribuicao(container) {
@@ -1147,6 +1166,101 @@
 
 
 
+
+  <!-- Popup de Ajuda -->
+  <div id="popupAjuda" class="modal-ajuda">
+    <div class="modal-content">
+      <span class="close" onclick="fecharPopupAjuda()">×</span>
+      <h2>🧠 Entendendo os Gráficos</h2>
+      <p>Esses gráficos mostram padrões que podem te ajudar a escolher seus números com mais estratégia.</p>
+
+      <h3>📊 Frequência Absoluta</h3>
+      <p>
+        Quantas vezes cada número ou trevo foi sorteado.<br>
+        <strong>✔ Útil para:</strong> ver os mais e menos sorteados até hoje.
+      </p>
+
+      <h3>📈 Frequência Relativa</h3>
+      <p>
+        Mostra a frequência em porcentagem, comparando com o esperado em sorteios aleatórios.<br>
+        <strong>✔ Útil para:</strong> saber se um número saiu mais ou menos do que o "normal".
+      </p>
+
+      <h3>🔥 Números Quentes</h3>
+      <p>
+        São os que mais saíram recentemente. Alguns jogadores acreditam que estão em "alta".
+      </p>
+
+      <h3>❄️ Números Frios</h3>
+      <p>
+        São os que há tempos não aparecem. Alguns apostadores preferem dar chance a eles.
+      </p>
+
+      <h3>🕒 Análise Temporal</h3>
+      <p>
+        Compara os números mais frequentes em blocos (últimos 10%, 20%, 30% dos concursos).<br>
+        <strong>✔ Útil para:</strong> detectar tendências mais recentes.
+      </p>
+
+      <p style="margin-top: 20px; font-style: italic;">
+        Estes gráficos <strong>não garantem acertos</strong>, mas ajudam a apostar com mais consciência estatística.
+      </p>
+    </div>
+  </div>
+
+  <!-- CSS para o popup de ajuda -->
+  <style>
+  .modal-ajuda {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.85);
+  }
+
+  .modal-ajuda .modal-content {
+    background-color: #1c1c1c;
+    color: #eee;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 0 20px #000;
+  }
+
+  .modal-ajuda .close {
+    color: #aaa;
+    float: right;
+    font-size: 26px;
+    cursor: pointer;
+  }
+
+  .modal-ajuda .close:hover {
+    color: red;
+  }
+
+  .modal-ajuda h2 {
+    color: #00E38C;
+    margin-bottom: 15px;
+  }
+
+  .modal-ajuda h3 {
+    color: #00E38C;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .modal-ajuda p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  </style>
 
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
 </body>
