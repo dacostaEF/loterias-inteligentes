@@ -6,20 +6,35 @@
   <meta name="description" content="Análise estatística avançada para a +Milionária. Tome decisões conscientes com dados reais e inteligência artificial.">
   <title>+Milionária Inteligente - Análise Estatística Científica</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="/static/img/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png">
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: linear-gradient(180deg, #0f0f10, #1c1c1e);
+      background-color: #000000;
       font-family: 'Inter', 'Segoe UI', sans-serif;
       color: #ffffff;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .main-container {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      text-align: center;
+      padding-top: 3rem !important;
+    }
+
+    .logo-container {
+      margin-bottom: 1rem;
+      margin-top: 0 !important;
+    }
+
+    .logo {
+      max-width: 270px;
+      margin-bottom: 0.5rem;
     }
 
     h1 {
@@ -30,17 +45,22 @@
     }
 
     h2 {
-      font-size: 1.3rem;
+      font-size: 1rem;
+      color: #999;
+      margin-bottom: 1rem;
       font-weight: 400;
-      color: #bbbbbb;
-      margin-bottom: 2rem;
+    }
+
+    .portal-highlight {
+      color: #7e5bef;
+      font-weight: 600;
     }
 
     p {
       max-width: 600px;
       font-size: 1rem;
       color: #dddddd;
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
       line-height: 1.6;
     }
 
@@ -48,8 +68,8 @@
       background: rgba(126, 91, 239, 0.1);
       border: 1px solid rgba(126, 91, 239, 0.3);
       border-radius: 12px;
-      padding: 1.5rem;
-      margin: 2rem 0;
+      padding: 1rem;
+      margin: 1rem 0;
       max-width: 600px;
     }
 
@@ -104,14 +124,29 @@
       background: rgba(255, 255, 255, 0.05);
       border-radius: 8px;
       padding: 1rem;
-      margin: 1.5rem 0;
+      margin: 1rem 0;
       max-width: 600px;
+    }
+
+    .selo-confianca {
+      background: linear-gradient(135deg, rgba(126, 91, 239, 0.1), rgba(255, 255, 255, 0.05));
+      border: 1px solid rgba(126, 91, 239, 0.2);
+      border-radius: 12px;
+      padding: 1rem;
+      margin: 1rem 0;
+      max-width: 600px;
+    }
+
+    .selo-confianca .metric {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #7e5bef;
     }
 
     .nota {
       font-size: 0.8rem;
       color: #888;
-      margin-top: 2rem;
+      margin-top: 1rem;
       max-width: 600px;
     }
 
@@ -120,23 +155,74 @@
       font-weight: 600;
     }
 
-    @media (max-width: 600px) {
-      h1 { font-size: 2rem; }
-      h2 { font-size: 1rem; }
-      p  { font-size: 0.9rem; }
-      .cta-button { padding: 12px 24px; font-size: 0.9rem; }
-      .credentials { padding: 1rem; }
+    @media (max-width: 768px) {
+      .main-container {
+        padding-top: 2rem !important;
+      }
+      
+      h1 { 
+        font-size: 2rem; 
+        margin-bottom: 0.4rem;
+      }
+      
+      h2 { 
+        font-size: 0.9rem; 
+        margin-bottom: 0.8rem;
+      }
+      
+      p { 
+        font-size: 0.9rem; 
+        margin-bottom: 0.8rem;
+      }
+      
+      .cta-button { 
+        padding: 12px 24px; 
+        font-size: 0.9rem; 
+        margin-top: 0.8rem;
+      }
+      
+      .credentials { 
+        padding: 0.8rem; 
+        margin: 0.8rem 0;
+      }
+      
+      .selo-confianca {
+        padding: 0.8rem;
+        margin: 0.8rem 0;
+      }
+      
+      .diferencial {
+        padding: 0.8rem;
+        margin: 0.8rem 0;
+      }
+      
+      .logo { 
+        max-width: 210px; 
+      }
+      
+      .nota {
+        margin-top: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
+  <div class="main-container">
+    <div class="logo-container">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="logo">
+    </div>
+
   <h1>+Milionária Inteligente</h1>
-  <h2>A sorte encontra a estatística</h2>
+  <h2>Uma iniciativa do portal <span class="portal-highlight">Loterias Inteligente</span></h2>
   
   <p>
     Cansado de apostar na +Milionária sem lógica? <br/>
     Enquanto muitos oferecem apenas palpites aleatórios, aqui você encontra <span class="highlight">dados reais</span>, <span class="highlight">análises profundas</span> e <span class="highlight">inteligência estatística</span>.
   </p>
+
+  <div class="selo-confianca">
+    <div class="metric">📈 Mais de <span class="highlight">12.000 análises estatísticas</span> geradas nos últimos 6 meses.</div>
+  </div>
 
   <div class="credentials">
     <h3>🎯 Somos um site com fundamentação matemática sólida:</h3>
@@ -164,5 +250,6 @@
   <p class="nota">
     * Loteria é um jogo de azar. Não garantimos prêmios. Aplicamos estatística para reduzir incertezas e tomar decisões mais informadas.
   </p>
+  </div>
 </body>
 </html> 
