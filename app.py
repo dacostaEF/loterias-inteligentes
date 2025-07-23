@@ -64,7 +64,12 @@ with app.app_context():
     carregar_dados_milionaria()
 
 @app.route('/')
-def index():
+def landing_page():
+    """Renderiza a landing page principal."""
+    return render_template('landing.html')
+
+@app.route('/dashboard')
+def dashboard():
     """Renderiza a página principal do dashboard."""
     return render_template('dashboard_milionaria.html')
 
