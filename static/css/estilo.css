@@ -469,7 +469,7 @@ p {
     
     /* 📱 Otimizações gerais para mobile */
     h1 {
-        font-size: 1.5rem !important;
+        font-size: 1.3rem !important;
     }
     
     h2 {
@@ -480,10 +480,25 @@ p {
         font-size: 1rem !important;
     }
     
+    /* 📱 Texto normal menor */
+    p, span, div {
+        font-size: 0.85rem !important;
+    }
+    
     /* 📱 Botões mais compactos */
     button {
-        font-size: 0.875rem !important;
+        font-size: 0.8rem !important;
         padding: 8px 12px !important;
+    }
+    
+    /* 📱 Números da loteria menores */
+    .numero {
+        font-size: 0.8rem !important;
+    }
+    
+    /* 📱 Trevos menores */
+    .trevo {
+        font-size: 0.8rem !important;
     }
     
     /* 📱 Oculta subtítulo em tablets também */
@@ -520,7 +535,7 @@ p {
 @media (max-width: 480px) {
     /* Reduz o tamanho do texto do título */
     header h1 {
-        font-size: 1.1rem !important;
+        font-size: 1rem !important;
     }
     
     /* Oculta o subtítulo no mobile */
@@ -535,6 +550,25 @@ p {
         border-radius: 6px !important;
         max-width: 100px;
         white-space: nowrap;
+    }
+    
+    /* 📱 Texto ainda menor em telas muito pequenas */
+    p, span, div {
+        font-size: 0.75rem !important;
+    }
+    
+    /* 📱 Títulos menores */
+    h2 {
+        font-size: 0.95rem !important;
+    }
+    
+    h3 {
+        font-size: 0.85rem !important;
+    }
+    
+    /* 📱 Números e trevos menores */
+    .numero, .trevo {
+        font-size: 0.7rem !important;
     }
 
     /* Espaçamento lateral do header */
