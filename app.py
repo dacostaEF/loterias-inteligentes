@@ -157,6 +157,41 @@ def gerar_numeros_aleatorios():
             "error": "Erro interno do servidor"
         }), 500
 
+@app.route('/api/gerar-aposta-milionaria', methods=['POST'])
+def gerar_aposta_milionaria_api():
+    """Gera aposta personalizada para +Milionária com quantidade configurável."""
+    try:
+        data = request.get_json()
+        qtde_num = data.get('qtde_num')
+        qtde_trevo1 = data.get('qtde_trevo1')
+        qtde_trevo2 = data.get('qtde_trevo2')
+
+        if qtde_num is None or qtde_trevo1 is None or qtde_trevo2 is None:
+            return jsonify({'error': 'Parâmetros qtde_num, qtde_trevo1 e qtde_trevo2 são obrigatórios.'}), 400
+
+        # Importar a função de geração personalizada
+        from gerarCombinacao_numeros_aleatoriosMilionaria import gerar_aposta_personalizada
+        
+        # Chama a função principal de geração de aposta
+        numeros, trevo1, trevo2, valor, qtde_apostas = gerar_aposta_personalizada(qtde_num, qtde_trevo1, qtde_trevo2)
+
+        return jsonify({
+            'success': True,
+            'numeros': numeros,
+            'trevo1': trevo1,
+            'trevo2': trevo2,
+            'valor': valor,
+            'qtde_apostas': qtde_apostas,
+            'mensagem': 'Aposta gerada com sucesso!'
+        })
+
+    except ValueError as e:
+        logger.error(f"Erro de validação ao gerar aposta: {e}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Erro inesperado ao gerar aposta: {e}")
+        return jsonify({'error': 'Erro interno do servidor ao gerar aposta.'}), 500
+
 @app.route('/api/bolao_interesse', methods=['POST'])
 def bolao_interesse():
     data = request.json

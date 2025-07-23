@@ -39,13 +39,14 @@ TABELA_PRECOS = {
     (12, 6): {"apostas": 13860, "valor": 83160.00}
 }
 
-def gerar_aposta_personalizada(qtde_num, qtde_trevo):
+def gerar_aposta_personalizada(qtde_num, qtde_trevo1, qtde_trevo2):
     """
     Gera uma aposta personalizada com base na quantidade de números e trevos escolhidos
     
     Args:
         qtde_num (int): Quantidade de números principais (6 a 12)
-        qtde_trevo (int): Quantidade de trevos (2 a 6)
+        qtde_trevo1 (int): Quantidade de números para Trevo 1 (1 a 3)
+        qtde_trevo2 (int): Quantidade de números para Trevo 2 (1 a 3)
     
     Returns:
         tuple: (N_milionaria, trevo1, trevo2, valor_aposta, qtde_apostas)
@@ -55,20 +56,28 @@ def gerar_aposta_personalizada(qtde_num, qtde_trevo):
     if qtde_num < 6 or qtde_num > 12:
         raise ValueError("Quantidade de números deve estar entre 6 e 12")
     
-    if qtde_trevo < 2 or qtde_trevo > 6:
-        raise ValueError("Quantidade de trevos deve estar entre 2 e 6")
+    if qtde_trevo1 < 1 or qtde_trevo1 > 3:
+        raise ValueError("Quantidade de números para Trevo 1 deve estar entre 1 e 3")
+    
+    if qtde_trevo2 < 1 or qtde_trevo2 > 3:
+        raise ValueError("Quantidade de números para Trevo 2 deve estar entre 1 e 3")
+    
+    # Calcular total de trevos para verificar na tabela
+    qtde_trevo_total = qtde_trevo1 + qtde_trevo2
     
     # Verificar se a combinação existe na tabela
-    chave = (qtde_num, qtde_trevo)
+    chave = (qtde_num, qtde_trevo_total)
     if chave not in TABELA_PRECOS:
-        raise ValueError(f"Combinação ({qtde_num} números, {qtde_trevo} trevos) não disponível")
+        raise ValueError(f"Combinação ({qtde_num} números, {qtde_trevo_total} trevos) não disponível")
     
     # Gerar números principais únicos entre 1 e 50
     N_milionaria = sorted(random.sample(range(1, 51), qtde_num))
     
-    # Gerar trevos independentes (podem repetir)
-    trevo1 = random.randint(1, 12)  # Trevos vão de 1 a 12
-    trevo2 = random.randint(1, 12)
+    # Gerar múltiplos números para Trevo 1 (1 a 6)
+    trevo1 = sorted(random.sample(range(1, 7), qtde_trevo1))
+    
+    # Gerar múltiplos números para Trevo 2 (1 a 6)
+    trevo2 = sorted(random.sample(range(1, 7), qtde_trevo2))
     
     # Buscar informações da aposta
     info_aposta = TABELA_PRECOS[chave]
