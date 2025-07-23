@@ -10,7 +10,7 @@ import os
 # ou em um subdiretório acessível (no caso, eles estão todos no mesmo nível da pasta +Milionaria/)
 
 # Importa a função de análise de frequência geral
-from funcao_analise_de_frequencia import analise_frequencia_milionaria_completa
+from funcao_analise_de_frequencia import analise_frequencia_milionaria_completa, analise_frequencia
 
 # Importa a função de análise de distribuição
 from funcao_analise_de_distribuicao import analise_distribuicao_milionaria
@@ -33,17 +33,17 @@ from funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
 
-# Caminho para o arquivo CSV
-CSV_FILE = 'Milionária_edt.xlsx - + MILIONÁRIA.csv'
+# Caminho para o arquivo Excel
+EXCEL_FILE = 'Milionária_edt.xlsx'
 df_milionaria = None # Variável global para armazenar o DataFrame
 
 def carregar_dados_milionaria():
-    """Carrega os dados da +Milionária do arquivo CSV."""
+    """Carrega os dados da +Milionária do arquivo Excel."""
     global df_milionaria
     if df_milionaria is None:
-        if os.path.exists(CSV_FILE):
+        if os.path.exists(EXCEL_FILE):
             try:
-                df = pd.read_csv(CSV_FILE)
+                df = pd.read_excel(EXCEL_FILE)
                 # Renomeia as colunas para o padrão esperado pelas funções de análise
                 df.columns = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
                 # Converte os números para tipos numéricos, forçando erros para NaN e depois Int64
@@ -52,10 +52,10 @@ def carregar_dados_milionaria():
                 df_milionaria = df.dropna().reset_index(drop=True) # Remove linhas com NaN após conversão
                 print(f"Dados da +Milionária carregados. Total de concursos: {len(df_milionaria)}")
             except Exception as e:
-                print(f"Erro ao carregar o arquivo CSV: {e}")
+                print(f"Erro ao carregar o arquivo Excel: {e}")
                 df_milionaria = pd.DataFrame() # Retorna DataFrame vazio em caso de erro
         else:
-            print(f"Arquivo CSV não encontrado: {CSV_FILE}")
+            print(f"Arquivo Excel não encontrado: {EXCEL_FILE}")
             df_milionaria = pd.DataFrame() # Retorna DataFrame vazio se o arquivo não existir
     return df_milionaria
 
@@ -88,6 +88,32 @@ def get_analise_frequencia():
     dados_para_analise = df_milionaria.values.tolist()
     resultado = analise_frequencia_milionaria_completa(dados_para_analise, qtd_concursos)
     return jsonify(resultado)
+
+@app.route('/api/analise-frequencia')
+def get_analise_frequencia_nova():
+    """Nova rota para análise de frequência com formato JSON otimizado para frontend."""
+    try:
+        if df_milionaria is None or df_milionaria.empty:
+            return jsonify({'error': 'Dados da +Milionária não carregados.'}), 500
+
+        dados_sorteios_list = df_milionaria[['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']].values.tolist()
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+
+        resultado = analise_frequencia(dados_sorteios_list, qtd_concursos)
+
+        return jsonify({
+            'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
+            'frequencia_absoluta_trevos': [{'trevo': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['trevos'].items())],
+            'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
+            'frequencia_relativa_trevos': [{'trevo': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['trevos'].items())],
+            'numeros_quentes': resultado['numeros_quentes_frios']['numeros_quentes'],
+            'numeros_frios': resultado['numeros_quentes_frios']['numeros_frios'],
+            'trevos_quentes': resultado['numeros_quentes_frios']['trevos_quentes'],
+            'trevos_frios': resultado['numeros_quentes_frios']['trevos_frios'],
+            'analise_temporal': resultado['analise_temporal']
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise_padroes_sequencias', methods=['GET'])
 def get_analise_padroes_sequencias():

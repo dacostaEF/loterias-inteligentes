@@ -8,6 +8,11 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+  <style>
+    body {
+      background-color: #000000 !important;
+    }
+  </style>
 </head>
 <body class="p-6">
 <body class="p-6">
@@ -17,6 +22,12 @@
       <h1 class="text-3xl font-bold text-white">+Milionária</h1>
       <p class="text-gray-400">Dashboard Inteligente de Análise Estatística</p>
     </div>
+    
+    <!-- Logo centralizada -->
+    <div class="flex justify-center items-center">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[180px] md:max-w-[180px]">
+    </div>
+    
     <button class="bg-[#8B5CF6] px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">
       Login / Criar Conta
     </button>
@@ -472,36 +483,64 @@
     }
 
     // Carregar análise de frequência
-    function carregarAnaliseFrequencia(container) {
-      container.innerHTML = `
-        <div class="space-y-6">
-          <div class="chart-container">
-            <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
-            <div class="grid grid-cols-5 gap-2">
-              ${dadosMilionaria.frequencia.numeros.quentes.map(n => 
-                `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n}</div>`
-              ).join('')}
+    async function carregarAnaliseFrequencia(container) {
+      container.innerHTML = "🔄 Carregando análise de frequência...";
+
+      try {
+        const response = await fetch('/api/analise-frequencia');
+        const data = await response.json();
+
+        if (data.error) {
+          container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="space-y-6">
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
+              <div class="grid grid-cols-5 gap-2">
+                ${data.numeros_quentes.slice(0, 10).map(n => 
+                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
+                ).join('')}
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
+              <div class="grid grid-cols-5 gap-2">
+                ${data.numeros_frios.slice(0, 10).map(n => 
+                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
+                ).join('')}
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
+              <div id="grafico-frequencia" style="height: 400px;"></div>
             </div>
           </div>
-          
-          <div class="chart-container">
-            <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
-            <div class="grid grid-cols-5 gap-2">
-              ${dadosMilionaria.frequencia.numeros.frios.map(n => 
-                `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n}</div>`
-              ).join('')}
-            </div>
-          </div>
-          
-          <div class="chart-container">
-            <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência</h3>
-            <div id="grafico-frequencia" style="height: 400px;"></div>
-          </div>
-        </div>
-      `;
-      
-      // Aqui você pode adicionar o gráfico real usando Plotly
-      criarGraficoFrequencia();
+        `;
+        
+        // Criar gráfico com Plotly
+        const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
+        const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
+
+        Plotly.newPlot('grafico-frequencia', [{
+          x: xNumeros,
+          y: yFreq,
+          type: 'bar',
+          marker: { color: 'deepskyblue' }
+        }], {
+          title: 'Frequência Absoluta dos Números',
+          paper_bgcolor: '#1a1a1a',
+          plot_bgcolor: '#1a1a1a',
+          font: { color: 'white' }
+        });
+
+      } catch (error) {
+        container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
+      }
     }
 
     // Carregar análise de distribuição
@@ -932,6 +971,13 @@
       }
     }
   </script>
+
+
+
+
+
+
+
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
 </body>
 </html> 
