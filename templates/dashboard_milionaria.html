@@ -4,15 +4,36 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>+Milionária | Dashboard Inteligente</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
-  <style>
-    body {
-      background-color: #000000 !important;
+
+  <script>
+    tailwind.config = {
+      important: false,
+      corePlugins: {
+        preflight: false,
+      },
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#00E38C',
+            'secondary': '#8B5CF6',
+            'background': '#000000', // Certifique-se que esta é a cor de fundo desejada
+            'card': '#1A1D25',
+            'surface': '#2E303A',
+          }
+        }
+      }
     }
-  </style>
+  </script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 </head>
 <body class="p-4 sm:p-6">
   <!-- Header -->
@@ -254,13 +275,21 @@
     let trevo1Selecionados = [];
     let trevo2Selecionados = [];
 
-    // Inicialização
-    document.addEventListener('DOMContentLoaded', () => {
+    // Inicialização - Aguarda carregamento completo dos estilos
+    function inicializarAplicacao() {
       gerarNumeros();
       gerarTrevo1();
       gerarTrevo2();
       carregarEstatisticasRapidas();
-    });
+    }
+
+    // Aguarda tanto DOM quanto estilos carregados
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', inicializarAplicacao);
+    } else {
+      // DOM já carregado, aguarda estilos
+      window.addEventListener('load', inicializarAplicacao);
+    }
 
     // Gerar números de 1 a 50
     function gerarNumeros() {

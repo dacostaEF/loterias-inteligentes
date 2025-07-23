@@ -7,11 +7,13 @@
   <title>+Milionária Inteligente - Análise Estatística Científica</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png">
+  <link rel="preload" href="{{ url_for('static', filename='css/estilo.css') }}" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}"></noscript>
   <style>
     body {
       margin: 0;
       padding: 0;
-      background-color: #000000;
       font-family: 'Inter', 'Segoe UI', sans-serif;
       color: #ffffff;
       min-height: 100vh;
