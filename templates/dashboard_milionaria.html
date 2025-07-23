@@ -535,10 +535,15 @@
               <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
               <div id="grafico-frequencia" style="height: 400px;"></div>
             </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Frequência Relativa (%)</h3>
+              <div id="grafico-frequencia-relativa" style="height: 400px;"></div>
+            </div>
           </div>
         `;
         
-        // Criar gráfico com Plotly
+        // Criar gráfico absoluto com Plotly
         const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
         const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
 
@@ -552,6 +557,37 @@
           paper_bgcolor: '#1a1a1a',
           plot_bgcolor: '#1a1a1a',
           font: { color: 'white' }
+        });
+
+        // Criar gráfico relativo com Plotly
+        const xNumerosRel = data.frequencia_relativa_numeros.map(e => e.numero);
+        const yFreqRel = data.frequencia_relativa_numeros.map(e => e.frequencia);
+        const linhaEsperada = Array(50).fill(2); // Linha de referência 2%
+
+        Plotly.newPlot('grafico-frequencia-relativa', [
+          {
+            x: xNumerosRel,
+            y: yFreqRel,
+            type: 'bar',
+            name: 'Frequência Relativa',
+            marker: { color: '#00E38C' }
+          },
+          {
+            x: xNumerosRel,
+            y: linhaEsperada,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Esperado (2%)',
+            line: { color: 'red', dash: 'dash' }
+          }
+        ], {
+          title: 'Frequência Relativa dos Números (%)',
+          paper_bgcolor: '#1a1a1a',
+          plot_bgcolor: '#1a1a1a',
+          font: { color: 'white' },
+          yaxis: { title: 'Frequência (%)' },
+          xaxis: { title: 'Números' },
+          showlegend: true
         });
 
       } catch (error) {
@@ -617,10 +653,15 @@
               <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
               <div id="grafico-frequencia" style="height: 400px;"></div>
             </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Frequência Relativa (%)</h3>
+              <div id="grafico-frequencia-relativa" style="height: 400px;"></div>
+            </div>
           </div>
         `;
         
-        // Recriar gráfico com novos dados
+        // Recriar gráfico absoluto com novos dados
         const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
         const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
 
@@ -634,6 +675,37 @@
           paper_bgcolor: '#1a1a1a',
           plot_bgcolor: '#1a1a1a',
           font: { color: 'white' }
+        });
+
+        // Recriar gráfico relativo com novos dados
+        const xNumerosRel = data.frequencia_relativa_numeros.map(e => e.numero);
+        const yFreqRel = data.frequencia_relativa_numeros.map(e => e.frequencia);
+        const linhaEsperada = Array(50).fill(2); // Linha de referência 2%
+
+        Plotly.newPlot('grafico-frequencia-relativa', [
+          {
+            x: xNumerosRel,
+            y: yFreqRel,
+            type: 'bar',
+            name: 'Frequência Relativa',
+            marker: { color: '#00E38C' }
+          },
+          {
+            x: xNumerosRel,
+            y: linhaEsperada,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Esperado (2%)',
+            line: { color: 'red', dash: 'dash' }
+          }
+        ], {
+          title: `Frequência Relativa dos Números (%) ${janela ? `(Últimos ${janela} concursos)` : '(Todos os concursos)'}`,
+          paper_bgcolor: '#1a1a1a',
+          plot_bgcolor: '#1a1a1a',
+          font: { color: 'white' },
+          yaxis: { title: 'Frequência (%)' },
+          xaxis: { title: 'Números' },
+          showlegend: true
         });
 
       } catch (error) {
