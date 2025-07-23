@@ -497,6 +497,22 @@
 
         container.innerHTML = `
           <div class="space-y-6">
+            <!-- Seletor de Janela de Análise -->
+            <div class="bg-[#2E303A] p-4 rounded-xl">
+              <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise</h3>
+              <div class="flex flex-wrap gap-3 items-center">
+                <label class="text-sm text-gray-300">Período:</label>
+                <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
+                  <option value="">Todos os concursos</option>
+                  <option value="25">Últimos 25 concursos</option>
+                  <option value="50">Últimos 50 concursos</option>
+                  <option value="100">Últimos 100 concursos</option>
+                  <option value="200">Últimos 200 concursos</option>
+                </select>
+                <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+              </div>
+            </div>
+            
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
@@ -540,6 +556,88 @@
 
       } catch (error) {
         container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
+      }
+    }
+
+    // Função para atualizar análise quando mudar a janela
+    async function atualizarAnaliseFrequencia() {
+      const janela = document.getElementById('janela-analise').value;
+      const container = document.getElementById('conteudo-modal');
+      
+      container.innerHTML = "🔄 Atualizando análise...";
+
+      try {
+        const url = janela ? `/api/analise-frequencia?qtd_concursos=${janela}` : '/api/analise-frequencia';
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error) {
+          container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
+          return;
+        }
+
+        // Recriar o conteúdo com os novos dados
+        container.innerHTML = `
+          <div class="space-y-6">
+            <!-- Seletor de Janela de Análise -->
+            <div class="bg-[#2E303A] p-4 rounded-xl">
+              <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise</h3>
+              <div class="flex flex-wrap gap-3 items-center">
+                <label class="text-sm text-gray-300">Período:</label>
+                <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
+                  <option value="" ${janela === '' ? 'selected' : ''}>Todos os concursos</option>
+                  <option value="25" ${janela === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                  <option value="50" ${janela === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                  <option value="100" ${janela === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                  <option value="200" ${janela === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
+                </select>
+                <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
+              <div class="grid grid-cols-5 gap-2">
+                ${data.numeros_quentes.slice(0, 10).map(n => 
+                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
+                ).join('')}
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
+              <div class="grid grid-cols-5 gap-2">
+                ${data.numeros_frios.slice(0, 10).map(n => 
+                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
+                ).join('')}
+              </div>
+            </div>
+            
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
+              <div id="grafico-frequencia" style="height: 400px;"></div>
+            </div>
+          </div>
+        `;
+        
+        // Recriar gráfico com novos dados
+        const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
+        const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
+
+        Plotly.newPlot('grafico-frequencia', [{
+          x: xNumeros,
+          y: yFreq,
+          type: 'bar',
+          marker: { color: 'deepskyblue' }
+        }], {
+          title: `Frequência Absoluta dos Números ${janela ? `(Últimos ${janela} concursos)` : '(Todos os concursos)'}`,
+          paper_bgcolor: '#1a1a1a',
+          plot_bgcolor: '#1a1a1a',
+          font: { color: 'white' }
+        });
+
+      } catch (error) {
+        container.innerHTML = `<p style="color: red;">Erro ao atualizar dados: ${error.message}</p>`;
       }
     }
 
