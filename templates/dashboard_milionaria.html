@@ -50,21 +50,31 @@
 
     <!-- Números selecionados -->
     <div class="mt-6 p-4 bg-[#2E303A] rounded-xl">
-      <h4 class="text-sm font-semibold mb-2">Números Selecionados:</h4>
-      <div class="flex gap-2 flex-wrap" id="numeros-selecionados">
-        <span class="text-gray-400">Nenhum número selecionado</span>
-      </div>
-      <div class="grid grid-cols-2 gap-6 mt-4">
+      <div class="grid grid-cols-3 gap-6">
+        <!-- Coluna 1: Números principais -->
+        <div>
+          <h4 class="text-sm font-semibold mb-2">Números Selecionados:</h4>
+          <div class="flex gap-2 flex-wrap" id="numeros-selecionados">
+            <span class="text-gray-400">Nenhum número selecionado</span>
+          </div>
+        </div>
+        
+        <!-- Coluna 2: Trevos -->
         <div>
           <h4 class="text-sm font-semibold mb-2">Trevo 1:</h4>
           <div class="flex gap-2 flex-wrap" id="trevo1-selecionado">
             <span class="text-gray-400">Nenhum trevo selecionado</span>
           </div>
-        </div>
-        <div>
-          <h4 class="text-sm font-semibold mb-2">Trevo 2:</h4>
+          <h4 class="text-sm font-semibold mb-2 mt-4">Trevo 2:</h4>
           <div class="flex gap-2 flex-wrap" id="trevo2-selecionado">
             <span class="text-gray-400">Nenhum trevo selecionado</span>
+          </div>
+        </div>
+        
+        <!-- Coluna 3: Valor da aposta -->
+        <div class="flex flex-col justify-center items-center">
+          <div id="valor-aposta-container" class="text-center">
+            <div class="text-gray-400 text-sm">Aposta não configurada</div>
           </div>
         </div>
       </div>
@@ -374,6 +384,31 @@
           .sort((a, b) => a - b)
           .map(t => `<span class="bg-[#8B5CF6] text-white px-2 py-1 rounded font-semibold">${t}</span>`)
           .join('');
+      }
+    }
+
+    // Atualizar display do valor da aposta
+    function atualizarValorAposta(valor, qtdeApostas, qtdeNum, qtdeTrevo1, qtdeTrevo2) {
+      const container = document.getElementById('valor-aposta-container');
+      if (valor && qtdeApostas) {
+        const valorFormatado = new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(valor);
+        
+        container.innerHTML = `
+          <div class="bg-[#00E38C] text-black p-3 rounded-xl font-bold text-lg mb-2">
+            ${valorFormatado}
+          </div>
+          <div class="text-sm text-gray-300 mb-1">
+            <strong>${qtdeApostas}</strong> combinações
+          </div>
+          <div class="text-xs text-gray-400">
+            ${qtdeNum} números + ${qtdeTrevo1} trevo1 + ${qtdeTrevo2} trevo2
+          </div>
+        `;
+      } else {
+        container.innerHTML = '<div class="text-gray-400 text-sm">Aposta não configurada</div>';
       }
     }
 
@@ -742,6 +777,7 @@
       atualizarNumerosSelecionados();
       atualizarTrevo1Selecionado();
       atualizarTrevo2Selecionado();
+      atualizarValorAposta(null, null, null, null, null);
     }
 
     // Função para limpar todas as seleções (com mensagem)
@@ -884,6 +920,9 @@
             selecionarTrevo2(data.trevo2, trevo2Elemento);
           }
         }
+        
+        // Atualizar valor da aposta
+        atualizarValorAposta(data.valor, data.qtde_apostas, qtdeNum, qtdeTrevo1, qtdeTrevo2);
         
         mostrarMensagem(`✅ Aposta gerada com sucesso! ${data.qtde_apostas} combinações`, 'success');
 
