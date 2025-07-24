@@ -77,6 +77,35 @@ body {
     /* Desktop: posição normal (sem mudanças) */
 }
 
+/* Desktop: Centralizar o gerador de números */
+@media (min-width: 769px) {
+    .gerador-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .gerador-container .botoes-mobile-ajustados {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    /* Centralizar botões de análises estatísticas */
+    .mt-8.flex.flex-wrap.gap-4 {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        gap: 1rem;
+    }
+}
+
 /* Mobile/Tablet: move o gerador para cima */
 @media (max-width: 768px) {
     .gerador-container {
