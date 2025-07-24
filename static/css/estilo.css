@@ -94,6 +94,16 @@ body {
         width: 100%;
     }
     
+    /* Desktop: Uniformizar apenas dimensões dos botões do gerador */
+    .gerador-container .botoes-mobile-ajustados button {
+        width: 180px;
+        height: 60px;
+        padding: 0.75rem 0.5rem;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.2;
+    }
+    
     /* Centralizar botões de análises estatísticas */
     .mt-8.flex.flex-wrap.gap-4 {
         display: flex;
