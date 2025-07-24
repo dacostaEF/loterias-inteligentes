@@ -60,22 +60,11 @@
       <!-- Números serão gerados dinamicamente -->
     </div>
 
-    <!-- Dois conjuntos de trevos na mesma linha -->
-    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-8">
-      <!-- Conjunto 1: Trevo 1 -->
-      <div>
-        <h3 class="text-lg mb-2"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Escolha Trevo 1</h3>
-        <div class="flex gap-4 flex-wrap" id="trevo1-container">
-          <!-- Trevo 1 será gerado dinamicamente -->
-        </div>
-      </div>
-
-      <!-- Conjunto 2: Trevo 2 -->
-      <div>
-        <h3 class="text-lg mb-2"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Escolha Trevo 2</h3>
-        <div class="flex gap-4 flex-wrap" id="trevo2-container">
-          <!-- Trevo 2 será gerado dinamicamente -->
-        </div>
+    <!-- Container único de trevos -->
+    <div class="mt-6">
+      <h3 class="text-lg mb-2 text-center"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Escolha 2 Trevos (1-6)</h3>
+      <div class="flex gap-4 flex-wrap justify-center" id="trevos-container">
+        <!-- Trevos serão gerados dinamicamente -->
       </div>
     </div>
 
@@ -92,12 +81,8 @@
         
         <!-- Coluna 2: Trevos -->
         <div>
-          <h4 class="text-sm font-semibold mb-2">Trevo 1:</h4>
-          <div class="flex gap-2 flex-wrap" id="trevo1-selecionado">
-            <span class="text-gray-400">Nenhum trevo selecionado</span>
-          </div>
-          <h4 class="text-sm font-semibold mb-2 mt-4">Trevo 2:</h4>
-          <div class="flex gap-2 flex-wrap" id="trevo2-selecionado">
+          <h4 class="text-sm font-semibold mb-2">Trevos Selecionados:</h4>
+          <div class="flex gap-2 flex-wrap" id="trevos-selecionados">
             <span class="text-gray-400">Nenhum trevo selecionado</span>
           </div>
         </div>
@@ -268,14 +253,12 @@
 
     // Variáveis globais
     let numerosSelecionados = [];
-    let trevo1Selecionados = [];
-    let trevo2Selecionados = [];
+    let trevosSelecionados = []; // Array único para os 2 trevos selecionados
 
     // Inicialização - Aguarda carregamento completo dos estilos
     function inicializarAplicacao() {
       gerarNumeros();
-      gerarTrevo1();
-      gerarTrevo2();
+      gerarTrevos();
       carregarEstatisticasRapidas();
     }
 
@@ -301,30 +284,16 @@
       }
     }
 
-    // Gerar trevo 1
-    function gerarTrevo1() {
-      const container = document.getElementById('trevo1-container');
+    // Gerar trevos (container único)
+    function gerarTrevos() {
+      const container = document.getElementById('trevos-container');
       container.innerHTML = '';
       
       for (let i = 1; i <= 6; i++) {
         const div = document.createElement('div');
         div.className = 'trevo px-4 py-2 rounded-xl font-semibold';
         div.textContent = i;
-        div.onclick = () => selecionarTrevo1(i, div);
-        container.appendChild(div);
-      }
-    }
-
-    // Gerar trevo 2
-    function gerarTrevo2() {
-      const container = document.getElementById('trevo2-container');
-      container.innerHTML = '';
-      
-      for (let i = 1; i <= 6; i++) {
-        const div = document.createElement('div');
-        div.className = 'trevo px-4 py-2 rounded-xl font-semibold';
-        div.textContent = i;
-        div.onclick = () => selecionarTrevo2(i, div);
+        div.onclick = () => selecionarTrevo(i, div);
         container.appendChild(div);
       }
     }
@@ -353,34 +322,19 @@
       atualizarNumerosSelecionados();
     }
 
-    // Selecionar trevo 1
-    function selecionarTrevo1(trevo, elemento) {
-      if (trevo1Selecionados.includes(trevo)) {
-        trevo1Selecionados = trevo1Selecionados.filter(t => t !== trevo);
+    // Selecionar trevo (validação de máximo 2)
+    function selecionarTrevo(trevo, elemento) {
+      if (trevosSelecionados.includes(trevo)) {
+        trevosSelecionados = trevosSelecionados.filter(t => t !== trevo);
         elemento.classList.remove('selecionado');
-      } else if (trevo1Selecionados.length < 3) {
-        trevo1Selecionados.push(trevo);
+      } else if (trevosSelecionados.length < 2) {
+        trevosSelecionados.push(trevo);
         elemento.classList.add('selecionado');
       } else {
-        alert('Você já selecionou 3 números para Trevo 1!');
+        alert('Você já selecionou 2 trevos! Selecione apenas 2 números de 1 a 6.');
         return;
       }
-      atualizarTrevo1Selecionado();
-    }
-
-    // Selecionar trevo 2
-    function selecionarTrevo2(trevo, elemento) {
-      if (trevo2Selecionados.includes(trevo)) {
-        trevo2Selecionados = trevo2Selecionados.filter(t => t !== trevo);
-        elemento.classList.remove('selecionado');
-      } else if (trevo2Selecionados.length < 3) {
-        trevo2Selecionados.push(trevo);
-        elemento.classList.add('selecionado');
-      } else {
-        alert('Você já selecionou 3 números para Trevo 2!');
-        return;
-      }
-      atualizarTrevo2Selecionado();
+      atualizarTrevosSelecionados();
     }
 
     // Atualizar display dos números selecionados
@@ -396,26 +350,13 @@
       }
     }
 
-    // Atualizar display do trevo 1 selecionado
-    function atualizarTrevo1Selecionado() {
-      const container = document.getElementById('trevo1-selecionado');
-      if (trevo1Selecionados.length === 0) {
+    // Atualizar display dos trevos selecionados
+    function atualizarTrevosSelecionados() {
+      const container = document.getElementById('trevos-selecionados');
+      if (trevosSelecionados.length === 0) {
         container.innerHTML = '<span class="text-gray-400">Nenhum trevo selecionado</span>';
       } else {
-        container.innerHTML = trevo1Selecionados
-          .sort((a, b) => a - b)
-          .map(t => `<span class="bg-[#8B5CF6] text-white px-2 py-1 rounded font-semibold">${t}</span>`)
-          .join('');
-      }
-    }
-
-    // Atualizar display do trevo 2 selecionado
-    function atualizarTrevo2Selecionado() {
-      const container = document.getElementById('trevo2-selecionado');
-      if (trevo2Selecionados.length === 0) {
-        container.innerHTML = '<span class="text-gray-400">Nenhum trevo selecionado</span>';
-      } else {
-        container.innerHTML = trevo2Selecionados
+        container.innerHTML = trevosSelecionados
           .sort((a, b) => a - b)
           .map(t => `<span class="bg-[#8B5CF6] text-white px-2 py-1 rounded font-semibold">${t}</span>`)
           .join('');
@@ -998,18 +939,19 @@
             }
           });
           
-          // Selecionar trevo 1
-          const trevo1Elementos = document.querySelectorAll('#trevo1-container .trevo');
-          const trevo1Elemento = Array.from(trevo1Elementos).find(el => el.textContent.trim() === dados.trevo1.toString());
+          // Selecionar trevos (compatibilidade com backend)
+          const trevoElementos = document.querySelectorAll('#trevos-container .trevo');
+          
+          // Selecionar primeiro trevo
+          const trevo1Elemento = Array.from(trevoElementos).find(el => el.textContent.trim() === dados.trevo1.toString());
           if (trevo1Elemento) {
-            selecionarTrevo1(dados.trevo1, trevo1Elemento);
+            selecionarTrevo(dados.trevo1, trevo1Elemento);
           }
           
-          // Selecionar trevo 2
-          const trevo2Elementos = document.querySelectorAll('#trevo2-container .trevo');
-          const trevo2Elemento = Array.from(trevo2Elementos).find(el => el.textContent.trim() === dados.trevo2.toString());
+          // Selecionar segundo trevo
+          const trevo2Elemento = Array.from(trevoElementos).find(el => el.textContent.trim() === dados.trevo2.toString());
           if (trevo2Elemento) {
-            selecionarTrevo2(dados.trevo2, trevo2Elemento);
+            selecionarTrevo(dados.trevo2, trevo2Elemento);
           }
           
           // Mostrar sucesso
@@ -1035,22 +977,15 @@
         el.classList.remove('selecionado');
       });
       
-      // Limpar trevo 1
-      trevo1Selecionados = [];
-      document.querySelectorAll('#trevo1-container .trevo').forEach(el => {
-        el.classList.remove('selecionado');
-      });
-      
-      // Limpar trevo 2
-      trevo2Selecionados = [];
-      document.querySelectorAll('#trevo2-container .trevo').forEach(el => {
+      // Limpar trevos
+      trevosSelecionados = [];
+      document.querySelectorAll('#trevos-container .trevo').forEach(el => {
         el.classList.remove('selecionado');
       });
       
       // Atualizar displays
       atualizarNumerosSelecionados();
-      atualizarTrevo1Selecionado();
-      atualizarTrevo2Selecionado();
+      atualizarTrevosSelecionados();
       atualizarValorAposta(null, null, null, null, null);
     }
 
@@ -1159,39 +1094,38 @@
           }
         });
         
+        // Selecionar múltiplos números para Trevos (compatibilidade com backend)
+        const trevoElementos = document.querySelectorAll('#trevos-container .trevo');
+        
         // Selecionar múltiplos números para Trevo 1
         if (Array.isArray(data.trevo1)) {
           data.trevo1.forEach(trevo => {
-            const trevo1Elementos = document.querySelectorAll('#trevo1-container .trevo');
-            const trevo1Elemento = Array.from(trevo1Elementos).find(el => el.textContent.trim() === trevo.toString());
-            if (trevo1Elemento) {
-              selecionarTrevo1(trevo, trevo1Elemento);
+            const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === trevo.toString());
+            if (trevoElemento) {
+              selecionarTrevo(trevo, trevoElemento);
             }
           });
         } else {
           // Fallback para compatibilidade (trevo único)
-          const trevo1Elementos = document.querySelectorAll('#trevo1-container .trevo');
-          const trevo1Elemento = Array.from(trevo1Elementos).find(el => el.textContent.trim() === data.trevo1.toString());
-          if (trevo1Elemento) {
-            selecionarTrevo1(data.trevo1, trevo1Elemento);
+          const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === data.trevo1.toString());
+          if (trevoElemento) {
+            selecionarTrevo(data.trevo1, trevoElemento);
           }
         }
         
         // Selecionar múltiplos números para Trevo 2
         if (Array.isArray(data.trevo2)) {
           data.trevo2.forEach(trevo => {
-            const trevo2Elementos = document.querySelectorAll('#trevo2-container .trevo');
-            const trevo2Elemento = Array.from(trevo2Elementos).find(el => el.textContent.trim() === trevo.toString());
-            if (trevo2Elemento) {
-              selecionarTrevo2(trevo, trevo2Elemento);
+            const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === trevo.toString());
+            if (trevoElemento) {
+              selecionarTrevo(trevo, trevoElemento);
             }
           });
         } else {
           // Fallback para compatibilidade (trevo único)
-          const trevo2Elementos = document.querySelectorAll('#trevo2-container .trevo');
-          const trevo2Elemento = Array.from(trevo2Elementos).find(el => el.textContent.trim() === data.trevo2.toString());
-          if (trevo2Elemento) {
-            selecionarTrevo2(data.trevo2, trevo2Elemento);
+          const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === data.trevo2.toString());
+          if (trevoElemento) {
+            selecionarTrevo(data.trevo2, trevoElemento);
           }
         }
         

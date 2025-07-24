@@ -701,9 +701,8 @@ p {
 
 /* 📱 Otimizações para telas muito pequenas (iPhone SE) */
 @media (max-width: 640px) {
-    /* Otimizações para containers dos trevos */
-    #trevo1-container,
-    #trevo2-container {
+    /* Otimizações para container dos trevos */
+    #trevos-container {
         gap: 8px;
         justify-content: center;
     }
