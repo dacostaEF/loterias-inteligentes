@@ -176,7 +176,17 @@ body {
 
     /* Ajuste da margem superior do bloco de texto final dentro do gerador */
     .gerador-container .mt-4 {
-        margin-top: 0.5rem !important; /* Reduz de 1rem (16px) para 0.5rem (8px) */
+        margin-top: 0rem !important; /* Remove completamente a margem superior */
+    }
+
+    /* Reduzir a margem superior da div que contém os botões de análise */
+    .gerador-container .mt-8.flex {
+        margin-top: 1rem !important; /* Reduz de 2rem (32px) para 1rem (16px) */
+    }
+
+    /* Reduzir ainda mais o padding inferior do container do gerador */
+    .gerador-container {
+        padding-bottom: 0.5rem !important; /* Reduzindo de 1rem para 0.5rem (8px) */
     }
 
 
