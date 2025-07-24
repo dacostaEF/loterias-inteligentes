@@ -164,6 +164,21 @@ body {
         font-size: 0.7rem !important; /* Reduz ainda mais a fonte para caber */
     }
 
+    /* Reduzir margem inferior da seção principal do Gerador */
+    section.mb-6 {
+        margin-bottom: 0rem !important; /* Remove completamente a margem inferior */
+    }
+
+    /* Ajuste do padding inferior do container do gerador */
+    .gerador-container {
+        padding-bottom: 0rem !important; /* Zera completamente o padding inferior */
+    }
+
+    /* Ajuste da margem superior do bloco de texto final dentro do gerador */
+    .gerador-container .mt-4 {
+        margin-top: 0.5rem !important; /* Reduz de 1rem (16px) para 0.5rem (8px) */
+    }
+
 
 
 
