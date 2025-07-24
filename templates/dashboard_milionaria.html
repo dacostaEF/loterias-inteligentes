@@ -54,7 +54,7 @@
   </header>
 
   <!-- Cartão de jogo -->
-  <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8">
+  <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8 flex flex-col">
     <h2 class="text-xl font-semibold mb-4">🎯 Selecione 6 números entre 50</h2>
     <div class="grid grid-cols-10 gap-2 mb-6" id="numeros-container">
       <!-- Números serão gerados dinamicamente -->
@@ -111,6 +111,32 @@
       </div>
     </div>
 
+    <!-- Container específico para o Gerador de Números +Milionária -->
+    <div class="gerador-container mt-6 p-6 bg-[#1A1D25] rounded-xl shadow-md">
+      <h3 class="text-lg font-semibold mb-4 text-center">🎯 Gerador de Números +Milionária</h3>
+      <p class="text-gray-400 text-center mb-4 text-sm">Escolha como quer gerar seus números para o próximo concurso</p>
+      
+      <div class="botoes-mobile-ajustados">
+        <button class="bg-[#00E38C] text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="abrirModalConfiguracao()">
+          🎲 Gerar Aleatório<br><small class="texto-gratuito">GRATUITO</small>
+        </button>
+      
+        <button class="bg-gray-600 text-gray-400 font-bold px-6 py-3 rounded-xl cursor-not-allowed text-sm" disabled>
+          📊 Análise Estatística<br><small class="texto-premium">PREMIUM</small>
+        </button>
+      
+        <button class="bg-red-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="limparSelecao()">
+          🗑️ Limpar Tudo
+        </button>
+      </div>
+      
+      <div class="mt-4 text-center">
+        <p class="text-xs text-gray-500">
+          💡 <strong>Dica:</strong> Experimente o gerador aleatório gratuitamente!
+        </p>
+      </div>
+    </div>
+
     <!-- Botões de análise -->
     <div class="mt-8 flex flex-wrap gap-4">
       <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('frequencia')">
@@ -156,37 +182,7 @@
     </div>
   </section>
 
-  <!-- Seção de Botões Comerciais -->
-  <section class="bg-[#1A1D25] p-8 rounded-2xl shadow-md mb-8">
-    <h2 class="text-2xl font-bold text-center mb-6">🎯 Gerador de Números +Milionária</h2>
-    <p class="text-gray-400 text-center mb-8">Escolha como quer gerar seus números para o próximo concurso</p>
-    
-    <div class="flex flex-col md:flex-row gap-4 justify-center items-center">
-      <!-- Botão 1: Geração Aleatória (GRATUITO) -->
-      <button class="bg-[#00E38C] text-black font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-base sm:text-lg flex items-center gap-2" onclick="abrirModalConfiguracao()">
-        🎲 Gerar Aleatório
-        <span class="bg-black text-[#00E38C] px-2 py-1 rounded text-sm">GRATUITO</span>
-      </button>
-      
-      <!-- Botão 2: Análise Estatística (PAGO) -->
-      <button class="bg-gray-600 text-gray-400 font-bold px-8 py-4 rounded-xl cursor-not-allowed text-base sm:text-lg flex items-center gap-2" disabled>
-        📊 Análise Estatística
-        <span class="bg-[#8B5CF6] text-white px-2 py-1 rounded text-sm">PREMIUM</span>
-      </button>
-      
-      <!-- Botão 3: Limpar Seleção -->
-      <button class="bg-red-600 text-white font-bold px-8 py-4 rounded-xl hover:opacity-80 transition-all text-base sm:text-lg" onclick="limparSelecao()">
-        🗑️ Limpar Tudo
-      </button>
-    </div>
-    
-    <div class="mt-6 text-center">
-      <p class="text-sm text-gray-500">
-        💡 <strong>Dica:</strong> Experimente o gerador aleatório gratuitamente! 
-        Para análises estatísticas avançadas, faça login ou crie uma conta.
-      </p>
-    </div>
-  </section>
+
 
   <!-- Modal base -->
   <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
