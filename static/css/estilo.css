@@ -211,6 +211,11 @@ body {
         padding: 0px !important; /* Reduz de 16px para 0px */
     }
 
+    /* Reduzir o padding superior da seção 'Selecione 6 números entre 50' */
+    section.mb-8 {
+        padding-top: 0rem !important; /* Reduz de 1.5rem (24px) para 0rem (0px) */
+    }
+
 
 
 
