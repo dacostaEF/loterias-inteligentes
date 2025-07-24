@@ -910,6 +910,35 @@ p {
     body > *:last-child {
         margin-bottom: 0 !important; /* Garante que o último elemento da body não tenha margem inferior */
     }
+
+    /* Ajustes para os próprios botões de análise (os 6 botões verdes) - SOLUÇÃO UNIVERSAL */
+    /* Seletor mais amplo para pegar todos os botões de análise */
+    button[onclick*="abrirModal"], 
+    button[onclick*="analise"],
+    .bg-\[#00E38C\],
+    .mt-8.flex.flex-wrap.gap-4 button,
+    .flex.flex-wrap.gap-4 button {
+        /* Manter as regras anteriores de font-size e padding */
+        font-size: 0.8rem !important;
+        padding: 0.4rem 0.6rem !important;
+
+        /* -------- NOVAS REGRAS PARA UNIFORMIDADE DE TAMANHO -------- */
+        min-width: 90px !important; /* Define uma largura mínima para todos os botões (ajuste conforme necessário) */
+        height: 40px !important;    /* Define uma altura fixa para todos os botões (ajuste conforme necessário) */
+
+        /* Garantir que o conteúdo (texto) seja centralizado dentro do botão */
+        display: flex !important;
+        flex-direction: column !important; /* Essencial se o texto tiver quebra de linha ou `<small>` */
+        justify-content: center !important; /* Centraliza verticalmente */
+        align-items: center !important;    /* Centraliza horizontalmente */
+        text-align: center !important;     /* Garante centralização do texto */
+        white-space: normal !important;    /* Permite que o texto quebre linha se for muito longo */
+        line-height: 1.2 !important;       /* Ajusta o espaçamento entre linhas para caber o texto */
+
+        /* Opcional: Se 'flex-1' do Tailwind estiver causando problemas de largura
+           apesar do 'min-width', você pode tentar desativá-lo assim: */
+        /* flex: none !important; */
+    }
 }
 
 /* 📱 Otimizações para telas muito pequenas (Galaxy S20, iPhone SE) */
