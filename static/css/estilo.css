@@ -861,6 +861,34 @@ p {
         width: 95% !important;
         font-size: 14px;
     }
+    
+    /* Ajuste do padding interno dos cards de estatísticas */
+    .stat-card {
+        padding: 1rem !important; /* Reduz de 1.5rem (p-6) para 1rem (16px) em todos os lados */
+        /* Se ainda quiser mais compacto, pode tentar: padding: 0.75rem !important; (12px) */
+    }
+
+    /* Centralizar os títulos (h3) dentro dos cards */
+    .stat-card h3 {
+        text-align: center !important;
+    }
+
+    /* Centralizar os números (spans) dentro dos containers de números/trevos */
+    #numeros-quentes,
+    #numeros-frios,
+    #trevos-frequentes {
+        text-align: center !important;
+        /* Se, por algum motivo, não centralizar ou se os spans não quebrarem linha,
+           você pode forçar um comportamento flexbox aqui para ter mais controle:
+           display: flex !important;
+           justify-content: center !important;
+           flex-wrap: wrap !important; */
+    }
+
+    /* Opcional: Se a margem entre a seção e o próximo elemento for muito grande no mobile */
+    /* section.grid.grid-cols-1.md\:grid-cols-3.gap-6.mb-8 {
+        margin-bottom: 1rem !important;
+    } */
 }
 
 /* 📱 Otimizações para telas muito pequenas (Galaxy S20, iPhone SE) */
