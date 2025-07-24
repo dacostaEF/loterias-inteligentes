@@ -145,6 +145,11 @@ body {
         padding: 0.5rem 0 !important;
     }
 
+    /* Ajuste cirúrgico para o margin-bottom do cabeçalho */
+    .mb-8 {
+        margin-bottom: 1rem !important; /* Reduz de 2rem (32px) para 1rem (16px) */
+    }
+
 
 
 
