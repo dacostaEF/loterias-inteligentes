@@ -902,6 +902,12 @@ p {
     header p {
         display: block !important;
     }
+    
+    /* Estilos para o texto "PREMIUM" no desktop */
+    .texto-premium {
+        color: #FF0000 !important; /* Deixa o texto vermelho */
+        font-weight: bold !important; /* Negrito */
+    }
 }
 
 /* 🔧 Ajustes para telas menores que 768px - SOLUÇÃO AGGRESSIVA */
