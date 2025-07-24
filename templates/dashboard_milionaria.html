@@ -804,6 +804,15 @@
         document.getElementById("popupAjuda").style.display = "none";
       }
 
+      // Funções para o popup de ajuda de distribuição
+      function abrirPopupAjudaDistribuicao() {
+        document.getElementById("popupAjudaDistribuicao").style.display = "block";
+      }
+
+      function fecharPopupAjudaDistribuicao() {
+        document.getElementById("popupAjudaDistribuicao").style.display = "none";
+      }
+
     // Carregar análise de distribuição
     async function carregarAnaliseDistribuicao(container) {
       container.innerHTML = "🔄 Carregando análise de distribuição...";
@@ -828,6 +837,17 @@
         // Renderizar gráficos de distribuição
         container.innerHTML = `
           <div class="space-y-6">
+            <!-- Cabeçalho com título e ajuda -->
+            <div class="flex justify-between items-start">
+              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
+                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🔢 Análise de Distribuição Estatística</h3>
+                <p class="text-sm text-gray-300">Análise completa de paridade, somas e amplitude dos números sorteados</p>
+              </div>
+              <button onclick="abrirPopupAjudaDistribuicao()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
+                ❓
+              </button>
+            </div>
+            
             <!-- Gráfico de Paridade - Números Principais -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔢 Paridade - Números Principais</h3>
@@ -883,6 +903,23 @@
                 <p class="text-sm text-gray-400">Moda: <span class="text-[#00E38C]">${data.soma_dos_numeros.trevos.moda}</span></p>
               </div>
             </div>
+            
+            <!-- Gráfico de Amplitude - Números Principais -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">📏 Amplitude dos Números Principais</h3>
+              <div id="grafico-amplitude-numeros" style="height: 400px;"></div>
+            </div>
+            
+            <!-- Estatísticas de Amplitude -->
+            <div class="grid grid-cols-1 gap-4">
+              <div class="stat-card p-4">
+                <h4 class="font-semibold mb-2">📏 Amplitude (Maior - Menor Número)</h4>
+                <p class="text-sm text-gray-400">Mín: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.min}</span></p>
+                <p class="text-sm text-gray-400">Máx: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.max}</span></p>
+                <p class="text-sm text-gray-400">Média: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.media}</span></p>
+                <p class="text-sm text-gray-400">Moda: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.moda}</span></p>
+              </div>
+            </div>
           </div>
         `;
 
@@ -899,6 +936,7 @@
         criarGraficoParidadeTrevos(data.paridade.trevos.distribuicao);
         criarGraficoSomaNumeros(data.soma_dos_numeros.numeros_principais);
         criarGraficoSomaTrevos(data.soma_dos_numeros.trevos);
+        criarGraficoAmplitude(data.amplitude_dos_numeros);
 
         console.log("Dados de distribuição recebidos:", data);
         
@@ -1077,6 +1115,57 @@
       };
 
       Plotly.newPlot('grafico-soma-trevos', data, layout);
+    }
+
+    // Função para criar o Gráfico de Amplitude dos Números Principais
+    function criarGraficoAmplitude(dadosAmplitude) {
+      const amplitudes = dadosAmplitude.amplitudes; // Lista de todas as amplitudes
+      const minAmplitude = dadosAmplitude.min;
+      const maxAmplitude = dadosAmplitude.max;
+      const mediaAmplitude = dadosAmplitude.media;
+      const modaAmplitude = dadosAmplitude.moda;
+
+      const data = [{
+        x: amplitudes,
+        type: 'histogram',
+        marker: {
+          color: '#00BFFF' // Um tom de azul claro
+        },
+        xbins: {
+          size: 2 // Agrupa amplitudes em intervalos de 2, ajuste conforme necessário
+        },
+        opacity: 0.75,
+        name: 'Contagem de Amplitudes'
+      }];
+
+      const layout = {
+        title: 'Distribuição da Amplitude dos 6 Números Principais',
+        xaxis: { title: 'Amplitude (Maior - Menor Número)', automargin: true },
+        yaxis: { title: 'Frequência', automargin: true },
+        plot_bgcolor: '#1a1d25',
+        paper_bgcolor: '#1a1d25',
+        font: {
+          color: '#FFFFFF'
+        },
+        responsive: true,
+        margin: { t: 50, b: 50, l: 50, r: 20 },
+        annotations: [
+          {
+            xref: 'paper', yref: 'paper',
+            x: 0.05, y: 0.95, // Posição superior esquerda
+            text: `Min: ${minAmplitude}<br>Max: ${maxAmplitude}<br>Média: ${mediaAmplitude.toFixed(2)}<br>Moda: ${modaAmplitude}`,
+            showarrow: false,
+            align: 'left',
+            font: { color: '#FFFFFF', size: 10 },
+            bgcolor: 'rgba(0,0,0,0.5)',
+            bordercolor: '#00BFFF',
+            borderwidth: 1,
+            borderpad: 4
+          }
+        ]
+      };
+
+      Plotly.newPlot('grafico-amplitude-numeros', data, layout);
     }
 
     // Carregar análise de afinidades
@@ -1542,6 +1631,62 @@
 
       <p style="margin-top: 20px; font-style: italic;">
         Estes gráficos <strong>não garantem acertos</strong>, mas ajudam a apostar com mais consciência estatística.
+      </p>
+    </div>
+  </div>
+
+  <!-- Popup de Ajuda para Distribuição -->
+  <div id="popupAjudaDistribuicao" class="modal-ajuda">
+    <div class="modal-content">
+      <span class="close" onclick="fecharPopupAjudaDistribuicao()">×</span>
+      <h2>🧠 Entendendo a Análise de Distribuição</h2>
+      <p>Esta análise revela a "forma" como os números e trevos se comportam, mostrando padrões estatísticos, desequilíbrios, aglomerados e dispersão. Compreender esses padrões pode guiar suas escolhas com mais estratégia.</p>
+
+      <h3>📊 Paridade (Pares vs Ímpares)</h3>
+      <p>
+        O que mostra: A frequência de sorteios com diferentes combinações de números pares e ímpares para os números principais e trevos. (Ex: 3 Pares-3 Ímpares, 4 Pares-2 Ímpares, etc.).<br>
+        <strong>✔ Útil para:</strong> Equilibrar sua aposta e identificar padrões comuns ou combinações historicamente raras.<br>
+        <strong>💡 Dica:</strong> A maioria dos sorteios tem 3 números pares e 3 números ímpares.
+      </p>
+
+      <h3>🔢 Distribuição por Faixas Numéricas</h3>
+      <p>
+        O que mostra: Quantas vezes os números sorteados caem em diferentes faixas numéricas (1-10, 11-20, etc.). Também exibe a média e a moda de ocorrências por faixa.<br>
+        <strong>✔ Útil para:</strong> Observar se algumas faixas são historicamente mais sorteadas do que outras.<br>
+        <strong>💡 Dica:</strong> Ajuda a balancear sua aposta para incluir números de faixas mais ativas ou, se preferir, de faixas menos exploradas.
+      </p>
+
+      <h3>➕ Soma dos Números Principais</h3>
+      <p>
+        O que mostra: Um histograma da frequência da soma total dos 6 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
+        <strong>✔ Útil para:</strong> Escolher combinações com somas que estejam dentro da faixa de valores mais comuns historicamente.<br>
+        <strong>💡 Dica:</strong> Evite somas muito altas ou muito baixas, que são estatisticamente menos frequentes.
+      </p>
+
+      <h3>🍀 Soma dos Trevos da Sorte</h3>
+      <p>
+        O que mostra: Um histograma da distribuição das somas dos 2 trevos da sorte. Exibe o mínimo, máximo, média e a(s) moda(s) das somas dos trevos.<br>
+        <strong>✔ Útil para:</strong> Escolher trevos que somem valores que ocorrem com mais frequência nos sorteios.<br>
+        <strong>💡 Dica:</strong> Trevos com soma entre 3 e 7 são historicamente mais comuns.
+      </p>
+
+      <h3>↔️ Amplitude dos Números Principais</h3>
+      <p>
+        O que mostra: Um histograma da frequência da diferença entre o maior e o menor número sorteado em cada concurso. (Ex: Números 1 e 50 = amplitude 49).<br>
+        <strong>✔ Útil para:</strong> Avaliar a "dispersão" dos números sorteados e evitar apostar em números muito próximos ou muito distantes entre si.<br>
+        <strong>💡 Dica:</strong> Amplitudes entre 30 e 45 são as mais frequentes historicamente.
+      </p>
+
+      <h3>🎯 Como Usar na Prática</h3>
+      <p>
+        <strong>Observe os picos nos histogramas:</strong> Eles indicam as faixas de valores mais comuns (para somas e amplitudes).<br>
+        <strong>Busque o equilíbrio:</strong> Evite combinações muito extremas (ex: muitos pares/ímpares, somas muito altas/baixas, amplitudes incomuns) que são menos frequentes historicamente.<br>
+        <strong>Use como referência, não como regra absoluta:</strong> As estatísticas são ferramentas para auxiliar, não garantias.<br>
+        <strong>Combine com outras análises:</strong> Para uma estratégia mais robusta, utilize estas informações em conjunto com a Análise de Frequência e outras ferramentas disponíveis.
+      </p>
+
+      <p style="margin-top: 20px; font-style: italic;">
+        <strong>Importante:</strong> A Loteria é um jogo de azar. Estas análises estatísticas não garantem acertos, mas ajudam você a criar apostas mais equilibradas e estatisticamente mais prováveis, baseadas em dados históricos reais.
       </p>
     </div>
   </div>
