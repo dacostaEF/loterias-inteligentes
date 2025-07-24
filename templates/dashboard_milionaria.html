@@ -298,19 +298,31 @@
       }
     }
 
-    // Selecionar número (manual - limite de 6)
+    // Selecionar número (manual - limite de 12)
     function selecionarNumero(numero, elemento) {
+      // Verificar se já atingiu o limite antes de qualquer ação
+      if (numerosSelecionados.length >= 12 && !numerosSelecionados.includes(numero)) {
+        alert('Você já selecionou 12 números! Limite máximo para seleção manual.');
+        // Garantir que o elemento NÃO seja marcado visualmente
+        elemento.classList.remove('selecionado');
+        // Forçar remoção de qualquer estado temporário
+        elemento.blur();
+        elemento.style.pointerEvents = 'none';
+        setTimeout(() => {
+          elemento.style.pointerEvents = 'auto';
+        }, 100);
+        return;
+      }
+      
       if (numerosSelecionados.includes(numero)) {
         numerosSelecionados = numerosSelecionados.filter(n => n !== numero);
         elemento.classList.remove('selecionado');
-      } else if (numerosSelecionados.length < 6) {
+      } else {
         numerosSelecionados.push(numero);
         elemento.classList.add('selecionado');
-      } else {
-        alert('Você já selecionou 6 números!');
-        return;
       }
       atualizarNumerosSelecionados();
+      calcularEAtualizarValorAposta(); // NOVA: Calcular valor após cada seleção
     }
 
     // Selecionar número automaticamente (sem limite)
@@ -322,25 +334,31 @@
       atualizarNumerosSelecionados();
     }
 
-    // Selecionar trevo (validação dinâmica baseada no modal)
+    // Selecionar trevo (manual - limite de 6 trevos)
     function selecionarTrevo(trevo, elemento) {
+      // Verificar se já atingiu o limite antes de qualquer ação
+      if (trevosSelecionados.length >= 6 && !trevosSelecionados.includes(trevo)) {
+        alert('Você já selecionou 6 trevos! Limite máximo para seleção manual.');
+        // Garantir que o elemento NÃO seja marcado visualmente
+        elemento.classList.remove('selecionado');
+        // Forçar remoção de qualquer estado temporário
+        elemento.blur();
+        elemento.style.pointerEvents = 'none';
+        setTimeout(() => {
+          elemento.style.pointerEvents = 'auto';
+        }, 100);
+        return;
+      }
+      
       if (trevosSelecionados.includes(trevo)) {
         trevosSelecionados = trevosSelecionados.filter(t => t !== trevo);
         elemento.classList.remove('selecionado');
       } else {
-        // Verificar se há limite definido pelo modal
-        const sliderTrevos = document.getElementById('sliderTrevos');
-        const limiteTrevos = sliderTrevos ? parseInt(sliderTrevos.value) : 2;
-        
-        if (trevosSelecionados.length < limiteTrevos) {
-          trevosSelecionados.push(trevo);
-          elemento.classList.add('selecionado');
-        } else {
-          alert(`Você já selecionou ${limiteTrevos} trevos! Limite máximo definido no modal.`);
-          return;
-        }
+        trevosSelecionados.push(trevo);
+        elemento.classList.add('selecionado');
       }
       atualizarTrevosSelecionados();
+      calcularEAtualizarValorAposta(); // NOVA: Calcular valor após cada seleção
     }
 
     // Atualizar display dos números selecionados
@@ -391,6 +409,67 @@
         `;
       } else {
         container.innerHTML = '<div class="text-gray-400 text-sm">Aposta não configurada</div>';
+      }
+    }
+
+    // NOVA: Calcular e atualizar valor da aposta baseado nas seleções manuais
+    function calcularEAtualizarValorAposta() {
+      const qtdeNum = numerosSelecionados.length;
+      const qtdeTrevos = trevosSelecionados.length;
+      
+      // Só calcular se tiver seleção mínima (6 números + 2 trevos)
+      if (qtdeNum >= 6 && qtdeTrevos >= 2) {
+        // Tabela de preços simplificada para seleção manual
+        const tabelaPrecos = {
+          "6,2": {apostas: 1, valor: 6.00},
+          "6,3": {apostas: 3, valor: 18.00},
+          "6,4": {apostas: 6, valor: 36.00},
+          "6,5": {apostas: 10, valor: 60.00},
+          "6,6": {apostas: 15, valor: 90.00},
+          "7,2": {apostas: 7, valor: 42.00},
+          "7,3": {apostas: 21, valor: 126.00},
+          "7,4": {apostas: 42, valor: 252.00},
+          "7,5": {apostas: 70, valor: 420.00},
+          "7,6": {apostas: 105, valor: 630.00},
+          "8,2": {apostas: 28, valor: 168.00},
+          "8,3": {apostas: 84, valor: 504.00},
+          "8,4": {apostas: 168, valor: 1008.00},
+          "8,5": {apostas: 280, valor: 1680.00},
+          "8,6": {apostas: 420, valor: 2520.00},
+          "9,2": {apostas: 84, valor: 504.00},
+          "9,3": {apostas: 252, valor: 1512.00},
+          "9,4": {apostas: 504, valor: 3024.00},
+          "9,5": {apostas: 840, valor: 5040.00},
+          "9,6": {apostas: 1260, valor: 7560.00},
+          "10,2": {apostas: 210, valor: 1260.00},
+          "10,3": {apostas: 630, valor: 3780.00},
+          "10,4": {apostas: 1260, valor: 7560.00},
+          "10,5": {apostas: 2100, valor: 12600.00},
+          "10,6": {apostas: 3150, valor: 18900.00},
+          "11,2": {apostas: 462, valor: 2772.00},
+          "11,3": {apostas: 1386, valor: 8316.00},
+          "11,4": {apostas: 2772, valor: 16632.00},
+          "11,5": {apostas: 4620, valor: 27720.00},
+          "11,6": {apostas: 6930, valor: 41580.00},
+          "12,2": {apostas: 924, valor: 5544.00},
+          "12,3": {apostas: 2772, valor: 16632.00},
+          "12,4": {apostas: 5544, valor: 33264.00},
+          "12,5": {apostas: 9240, valor: 55440.00},
+          "12,6": {apostas: 13860, valor: 83160.00}
+        };
+        
+        const chave = `${qtdeNum},${qtdeTrevos}`;
+        const infoAposta = tabelaPrecos[chave];
+        
+        if (infoAposta) {
+          atualizarValorAposta(infoAposta.valor, infoAposta.apostas, qtdeNum, qtdeTrevos);
+        } else {
+          // Se não encontrar na tabela, mostrar mensagem
+          atualizarValorAposta(null, null, null, null);
+        }
+      } else {
+        // Se não tiver seleção mínima, limpar valor
+        atualizarValorAposta(null, null, null, null);
       }
     }
 
@@ -1005,7 +1084,7 @@
       // Atualizar displays
       atualizarNumerosSelecionados();
       atualizarTrevosSelecionados();
-      atualizarValorAposta(null, null, null, null);
+      calcularEAtualizarValorAposta(); // NOVA: Recalcular valor após limpeza
     }
 
     // Função para limpar todas as seleções (com mensagem)

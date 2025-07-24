@@ -393,6 +393,15 @@ p {
     border-color: var(--color-primary);
 }
 
+/* Garantir que números não selecionados não tenham estados visuais indesejados */
+.numero:not(.selecionado) {
+    background-color: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border-color: transparent !important;
+    transform: scale(1) !important;
+    box-shadow: none !important;
+}
+
 /* Trevos */
 /* ✅ Estilo padrão para DESKTOP - ORIGINAL */
 .trevo {
@@ -493,6 +502,19 @@ p {
         0 0 10px rgba(232, 121, 249, 0.8),
         0 0 20px rgba(232, 121, 249, 0.6) !important; /* Glow lilás */
     transform: scale(1.2) !important; /* Número 20% maior */
+    transition: all 0.3s ease !important;
+}
+
+/* Garantir que trevos não selecionados não tenham estados visuais indesejados */
+.trevo-icon-container:not(.selecionado) .trevo-number {
+    color: #FFFFFF !important; /* Branco para melhor contraste */
+    font-weight: 900 !important;
+    /* Mantém o tamanho original - não força font-size */
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.9),
+        0 0 8px rgba(255, 255, 255, 0.8),
+        0 0 12px rgba(255, 255, 255, 0.6) !important;
+    transform: scale(1) !important;
     transition: all 0.3s ease !important;
 }
 
