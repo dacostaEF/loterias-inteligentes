@@ -204,6 +204,13 @@ body {
         padding: 1rem !important; /* Reduz de 1.5rem para 1rem */
     }
 
+    /* Reduzir margem inferior do gerador para 0px */
+    .gerador-container {
+        margin-bottom: 0px !important; /* Reduz de 20px para 0px */
+        margin-top: 0px !important; /* Reduz de 8px para 0px */
+        padding: 0px !important; /* Reduz de 16px para 0px */
+    }
+
 
 
 
