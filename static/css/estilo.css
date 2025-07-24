@@ -147,7 +147,21 @@ body {
 
     /* Ajuste cirúrgico para o margin-bottom do cabeçalho */
     .mb-8 {
-        margin-bottom: 1rem !important; /* Reduz de 2rem (32px) para 1rem (16px) */
+        margin-bottom: 0.5rem !important; /* Reduzindo para 0.5rem (8px) */
+    }
+
+    /* Ajuste para o texto de instrução do gerador */
+    .gerador-container p.text-lg {
+        font-size: 0.9rem !important; /* Reduz para 0.9rem (aprox. 14.4px) */
+        line-height: 1.2 !important; /* Ajusta a altura da linha para evitar quebras estranhas */
+    }
+
+    /* Garante que a frase do gerador fique em uma única linha no mobile */
+    .gerador-container p.text-xs {
+        white-space: nowrap !important; /* Impede quebra de linha */
+        overflow: hidden !important; /* Esconde conteúdo que ultrapassar */
+        text-overflow: ellipsis !important; /* Adiciona "..." se necessário */
+        font-size: 0.7rem !important; /* Reduz ainda mais a fonte para caber */
     }
 
 
