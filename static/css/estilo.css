@@ -221,6 +221,22 @@ body {
         font-size: 12px !important; /* Reduz de 15px para 12px */
     }
 
+    /* Aplicar mesmo padrão de fonte (12px) para todos os títulos */
+    /* Trevos */
+    section.mb-8 h3.text-lg {
+        font-size: 12px !important; /* Escolha Trevo 1 e Escolha Trevo 2 */
+    }
+
+    /* Números selecionados */
+    section.mb-8 h4.text-sm {
+        font-size: 12px !important; /* Números Selecionados, Trevo 1, Trevo 2 */
+    }
+
+    /* Estatísticas rápidas */
+    .stat-card h3.text-lg {
+        font-size: 12px !important; /* Números Quentes, Números Frios, Trevos Mais Frequentes */
+    }
+
 
 
 
