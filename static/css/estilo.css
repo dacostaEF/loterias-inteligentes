@@ -242,6 +242,11 @@ body {
         padding: 0.5rem !important; /* Reduz o tamanho do quadrado */
     }
 
+    /* Eliminar a margem inferior do container dos números de 1 a 50 */
+    #numeros-container {
+        margin-bottom: 0rem !important; /* Remove completamente a margem inferior */
+    }
+
 
 
 
