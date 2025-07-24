@@ -237,6 +237,11 @@ body {
         font-size: 12px !important; /* Números Quentes, Números Frios, Trevos Mais Frequentes */
     }
 
+    /* Reduzir tamanho dos casulos dos trevos para caberem em uma linha */
+    .trevo {
+        padding: 0.5rem !important; /* Reduz o tamanho do quadrado */
+    }
+
 
 
 
