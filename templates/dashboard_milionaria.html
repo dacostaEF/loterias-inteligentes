@@ -805,36 +805,144 @@
       }
 
     // Carregar análise de distribuição
-    function carregarAnaliseDistribuicao(container) {
-      container.innerHTML = `
-        <div class="space-y-6">
-          <div class="grid grid-cols-2 gap-4">
-            <div class="stat-card p-4">
-              <h4 class="font-semibold mb-2">📊 Distribuição Par/Ímpar</h4>
-              <p class="text-2xl font-bold text-[#00E38C]">${dadosMilionaria.distribuicao.pares.toFixed(2)} / ${dadosMilionaria.distribuicao.impares.toFixed(2)}</p>
-              <p class="text-sm text-gray-400">Pares / Ímpares por concurso</p>
+    async function carregarAnaliseDistribuicao(container) {
+      container.innerHTML = "🔄 Carregando análise de distribuição...";
+
+      try {
+        console.log("Iniciando fetch para /api/analise_de_distribuicao...");
+        const response = await fetch('/api/analise_de_distribuicao');
+        console.log("Response status:", response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log("Dados recebidos:", data);
+
+        if (data.error) {
+          container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
+          return;
+        }
+
+        // Renderizar gráficos de distribuição
+        container.innerHTML = `
+          <div class="space-y-6">
+            <!-- Gráfico de Paridade - Números Principais -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🔢 Paridade - Números Principais</h3>
+              <div id="grafico-paridade-numeros" style="height: 400px;"></div>
             </div>
-            <div class="stat-card p-4">
-              <h4 class="font-semibold mb-2">🎯 Distribuição por Faixas</h4>
-              <div class="space-y-1">
-                ${Object.entries(dadosMilionaria.distribuicao.faixas).map(([faixa, media]) => 
-                  `<div class="flex justify-between text-sm">
-                    <span>${faixa}:</span>
-                    <span class="text-[#00E38C]">${media.toFixed(1)}</span>
-                  </div>`
-                ).join('')}
+            
+            <!-- Gráfico de Paridade - Trevos -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🍀 Paridade - Trevos</h3>
+              <div id="grafico-paridade-trevos" style="height: 400px;"></div>
+            </div>
+            
+            <!-- Estatísticas de Paridade -->
+            <div class="grid grid-cols-2 gap-4">
+              <div class="stat-card p-4">
+                <h4 class="font-semibold mb-2">📊 Números Principais</h4>
+                <p class="text-sm text-gray-400">Média de Pares: <span class="text-[#00E38C]">${data.paridade.numeros_principais.media_pares.toFixed(2)}</span></p>
+                <p class="text-sm text-gray-400">Média de Ímpares: <span class="text-[#00E38C]">${data.paridade.numeros_principais.media_impares.toFixed(2)}</span></p>
+              </div>
+              <div class="stat-card p-4">
+                <h4 class="font-semibold mb-2">🍀 Trevos</h4>
+                <p class="text-sm text-gray-400">Média de Pares: <span class="text-[#00E38C]">${data.paridade.trevos.media_pares.toFixed(2)}</span></p>
+                <p class="text-sm text-gray-400">Média de Ímpares: <span class="text-[#00E38C]">${data.paridade.trevos.media_impares.toFixed(2)}</span></p>
               </div>
             </div>
           </div>
-          
-          <div class="chart-container">
-            <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Distribuição</h3>
-            <div id="grafico-distribuicao" style="height: 400px;"></div>
-          </div>
-        </div>
-      `;
-      
-      criarGraficoDistribuicao();
+        `;
+
+        // Verificar estrutura dos dados
+        console.log("Estrutura dos dados:", {
+          temParidade: !!data.paridade,
+          paridadeKeys: data.paridade ? Object.keys(data.paridade) : 'N/A',
+          numerosPrincipais: data.paridade?.numeros_principais,
+          trevos: data.paridade?.trevos
+        });
+
+        // Criar gráficos
+        criarGraficoParidadeNumeros(data.paridade.numeros_principais.distribuicao);
+        criarGraficoParidadeTrevos(data.paridade.trevos.distribuicao);
+
+        console.log("Dados de distribuição recebidos:", data);
+        
+      } catch (error) {
+        console.error('Erro ao carregar análise de distribuição:', error);
+        container.innerHTML = '<p class="text-center text-red-500 mt-4">Erro ao carregar a análise de distribuição. Verifique o console para detalhes.</p>';
+      }
+    }
+
+    // Função para criar o Gráfico de Barras de Paridade dos Números Principais
+    function criarGraficoParidadeNumeros(dataDistribuicao) {
+      // Converte o objeto de distribuição em arrays para Plotly
+      const labels = Object.keys(dataDistribuicao);
+      const values = Object.values(dataDistribuicao);
+
+      const data = [{
+        x: labels,
+        y: values,
+        type: 'bar',
+        marker: {
+          color: labels.map(label => {
+            // Cores baseadas nas combinações P/I
+            if (label.includes('6P')) return '#4CAF50'; // Mais pares
+            if (label.includes('0P')) return '#F44336'; // Mais ímpares
+            if (label.includes('3P-3I')) return '#2196F3'; // Equilíbrio
+            return '#9C27B0'; // Outros
+          })
+        }
+      }];
+
+      const layout = {
+        title: 'Distribuição de Paridade (Números Principais)',
+        xaxis: { title: 'Combinação Par/Ímpar', automargin: true },
+        yaxis: { title: 'Contagem', automargin: true },
+        plot_bgcolor: '#1a1d25',
+        paper_bgcolor: '#1a1d25',
+        font: {
+          color: '#FFFFFF'
+        },
+        responsive: true,
+        margin: { t: 50, b: 50, l: 50, r: 20 }
+      };
+
+      Plotly.newPlot('grafico-paridade-numeros', data, layout);
+    }
+
+    // Função para criar o Gráfico de Pizza de Paridade dos Trevos
+    function criarGraficoParidadeTrevos(dataDistribuicao) {
+      // Converte o objeto de distribuição em arrays para Plotly
+      const labels = Object.keys(dataDistribuicao);
+      const values = Object.values(dataDistribuicao);
+
+      const data = [{
+        labels: labels,
+        values: values,
+        type: 'pie',
+        marker: {
+          colors: ['#8B5CF6', '#A78BFA', '#C4B5FD', '#DDD6FE']
+        },
+        hoverinfo: 'label+percent',
+        textinfo: 'percent',
+        textposition: 'inside'
+      }];
+
+      const layout = {
+        title: 'Distribuição de Paridade (Trevos da Sorte)',
+        plot_bgcolor: '#1a1d25',
+        paper_bgcolor: '#1a1d25',
+        font: {
+          color: '#FFFFFF'
+        },
+        responsive: true,
+        margin: { t: 50, b: 50, l: 50, r: 20 }
+      };
+
+      Plotly.newPlot('grafico-paridade-trevos', data, layout);
     }
 
     // Carregar análise de afinidades

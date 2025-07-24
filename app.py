@@ -131,8 +131,7 @@ def get_analise_de_distribuicao():
     if df_milionaria.empty:
         return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
-    dados_para_analise = df_milionaria.values.tolist()
-    resultado = analise_distribuicao_milionaria(dados_para_analise)
+    resultado = analise_distribuicao_milionaria(df_milionaria)
     return jsonify(resultado)
 
 @app.route('/api/analise_de_combinacoes', methods=['GET'])
