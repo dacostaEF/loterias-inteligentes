@@ -291,37 +291,31 @@ def analise_distribuicao_milionaria(df_milionaria, qtd_concursos=None):
         Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6, Trevo1, Trevo2
     
     Returns:
-        dict: Resultado da análise de distribuição
+        dict: Dicionário com as análises de distribuição.
     """
-    
-    # Verificação de segurança para DataFrame vazio
-    if df_milionaria is None or df_milionaria.empty:
-        print("⚠️  Aviso: DataFrame da Mais Milionária está vazio ou é None!")
-        return {}
     
     # Verificar se as colunas necessárias existem
     colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
     colunas_faltantes = [col for col in colunas_necessarias if col not in df_milionaria.columns]
     
     if colunas_faltantes:
-        print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
+        print(f"❌ Erro: Colunas necessárias não encontradas: {colunas_faltantes}")
         return {}
     
-    # Converter DataFrame para formato esperado pela função original
-    dados_sorteios = []
-    
+    # Filtrar linhas com valores NaN
+    df_filtrado = df_milionaria.copy()
     for _, row in df_milionaria.iterrows():
-        # Verificar se os dados são válidos
         if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']):
-            continue  # Pular linhas com dados inválidos
-        
-        sorteio = [
+            df_filtrado = df_filtrado.drop(row.name)
+    
+    # Converter para o formato esperado pela função principal
+    dados_sorteios = []
+    for _, row in df_filtrado.iterrows():
+        dados_sorteios.append([
             row['Concurso'],
-            row['Bola1'], row['Bola2'], row['Bola3'], 
-            row['Bola4'], row['Bola5'], row['Bola6'],
+            row['Bola1'], row['Bola2'], row['Bola3'], row['Bola4'], row['Bola5'], row['Bola6'],
             row['Trevo1'], row['Trevo2']
-        ]
-        dados_sorteios.append(sorteio)
+        ])
     
     # Verificação final antes de executar análise
     if not dados_sorteios:

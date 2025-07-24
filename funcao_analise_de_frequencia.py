@@ -49,17 +49,17 @@ def analise_frequencia(dados_sorteios, qtd_concursos=None):
         if len(sorteio) >= 9:  # Garantir que tem todos os dados
             concurso = sorteio[0]
             numeros = sorteio[1:7]  # Bolas 1-6
-            trevo = sorteio[7]      # Trevo apenas
+            trevos = sorteio[7:9]   # Trevos 1-2
             
             # Validação dos dados
             numeros_validos = [n for n in numeros if isinstance(n, (int, float)) and 1 <= n <= 50]
-            trevo_valido = trevo if isinstance(trevo, (int, float)) and 1 <= trevo <= 6 else None
+            trevos_validos = [t for t in trevos if isinstance(t, (int, float)) and 1 <= t <= 6]
             
-            if len(numeros_validos) == 6 and trevo_valido is not None:
+            if len(numeros_validos) == 6 and len(trevos_validos) == 2:
                 historico_por_concurso.append({
                     'concurso': concurso,
                     'numeros': numeros_validos,
-                    'trevo': trevo_valido
+                    'trevos': trevos_validos
                 })
     
     # Verificação adicional após processamento
@@ -80,7 +80,7 @@ def analise_frequencia(dados_sorteios, qtd_concursos=None):
     # Extrair números e trevos do período selecionado
     for sorteio in historico_por_concurso:
         todos_numeros.extend(sorteio['numeros'])
-        todos_trevos.append(sorteio['trevo'])
+        todos_trevos.extend(sorteio['trevos'])
     
     total_sorteios = len(historico_por_concurso)
     
@@ -110,8 +110,8 @@ def analise_frequencia(dados_sorteios, qtd_concursos=None):
         else:
             freq_relativa_numeros[num] = 0
     
-    # Para trevos: cada trevo pode aparecer 1 vez por sorteio  
-    total_posicoes_trevos = total_sorteios * 1
+    # Para trevos: cada trevo pode aparecer 2 vezes por sorteio  
+    total_posicoes_trevos = total_sorteios * 2
     for trevo in range(1, 7):
         # Tratamento seguro para divisão por zero
         if total_posicoes_trevos > 0:
@@ -139,7 +139,7 @@ def analise_frequencia(dados_sorteios, qtd_concursos=None):
         periodo_trevos = []
         for i in range(inicio_idx, n_total):
             periodo_numeros.extend(historico_por_concurso[i]['numeros'])
-            periodo_trevos.append(historico_por_concurso[i]['trevo'])
+            periodo_trevos.extend(historico_por_concurso[i]['trevos'])
         return Counter(periodo_numeros), Counter(periodo_trevos)
     
     # Últimos 30%, 20% e 10% dos concursos (com verificação de segurança)
@@ -165,7 +165,7 @@ def analise_frequencia(dados_sorteios, qtd_concursos=None):
             'numeros': {k: round(v, 2) for k, v in sorted(freq_relativa_numeros.items())},
             'trevos': {k: round(v, 2) for k, v in sorted(freq_relativa_trevos.items())},
             'frequencia_esperada_numero': round(100/50, 2),  # 2% para cada número
-            'frequencia_esperada_trevo': round(100/6, 2)     # 16.67% para cada trevo (1 trevo por sorteio)
+            'frequencia_esperada_trevo': round(100/6, 2)     # 16.67% para cada trevo (2 trevos por sorteio)
         },
         
         'numeros_quentes_frios': {
