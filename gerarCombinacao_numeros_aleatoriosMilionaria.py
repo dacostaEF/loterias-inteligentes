@@ -73,11 +73,20 @@ def gerar_aposta_personalizada(qtde_num, qtde_trevo1, qtde_trevo2):
     # Gerar números principais únicos entre 1 e 50
     N_milionaria = sorted(random.sample(range(1, 51), qtde_num))
     
-    # Gerar múltiplos números para Trevo 1 (1 a 6)
-    trevo1 = sorted(random.sample(range(1, 7), qtde_trevo1))
-    
-    # Gerar múltiplos números para Trevo 2 (1 a 6)
-    trevo2 = sorted(random.sample(range(1, 7), qtde_trevo2))
+    # Lógica especial para quando total de trevos for 6 (todos os números disponíveis)
+    if qtde_trevo_total == 6:
+        # Retornar todos os números 1-6, divididos entre trevo1 e trevo2
+        todos_trevos = list(range(1, 7))  # [1, 2, 3, 4, 5, 6]
+        trevo1 = sorted(todos_trevos[:qtde_trevo1])
+        trevo2 = sorted(todos_trevos[qtde_trevo1:qtde_trevo1 + qtde_trevo2])
+    else:
+        # Gerar múltiplos números para Trevo 1 (1 a 6)
+        trevo1 = sorted(random.sample(range(1, 7), qtde_trevo1))
+        
+        # Gerar múltiplos números para Trevo 2 (1 a 6)
+        # Garantir que não haja números repetidos entre trevo1 e trevo2
+        numeros_disponiveis = [n for n in range(1, 7) if n not in trevo1]
+        trevo2 = sorted(random.sample(numeros_disponiveis, qtde_trevo2))
     
     # Buscar informações da aposta
     info_aposta = TABELA_PRECOS[chave]
