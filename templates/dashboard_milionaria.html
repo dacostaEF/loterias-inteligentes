@@ -103,7 +103,7 @@
       
       <div class="botoes-mobile-ajustados">
         <button class="bg-[#00E38C] text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="abrirModalConfiguracao()">
-          🎲 Gerar Aleatório<br><small class="texto-gratuito">GRATUITO</small>
+          🍀 Gerar Palpite da Sorte
         </button>
       
         <button class="bg-gray-600 text-gray-400 font-bold px-6 py-3 rounded-xl cursor-not-allowed text-sm" disabled>
@@ -278,15 +278,19 @@
       }
     }
 
-    // Gerar trevos (container único)
+    // Gerar trevos (container único) - Versão elegante com ícones
     function gerarTrevos() {
       const container = document.getElementById('trevos-container');
       container.innerHTML = '';
       
       for (let i = 1; i <= 6; i++) {
         const div = document.createElement('div');
-        div.className = 'trevo px-4 py-2 rounded-xl font-semibold';
-        div.textContent = i;
+        div.className = 'trevo-icon-container';
+        div.innerHTML = `
+          <div class="trevo-icon">
+            <span class="trevo-number">${i}</span>
+          </div>
+        `;
         div.onclick = () => selecionarTrevo(i, div);
         container.appendChild(div);
       }
@@ -919,7 +923,7 @@
       
       try {
         // Mostrar loading
-        botao.innerHTML = '🎲 Gerando...';
+        botao.innerHTML = '🍀 Gerando Palpite...';
         botao.disabled = true;
         
         // Chamar API para gerar números aleatórios
@@ -939,8 +943,8 @@
             }
           });
           
-          // Selecionar trevos (compatibilidade com backend)
-          const trevoElementos = document.querySelectorAll('#trevos-container .trevo');
+          // Selecionar trevos (corrigido para usar a nova estrutura)
+          const trevoElementos = document.querySelectorAll('#trevos-container .trevo-icon-container');
           
           // Função para selecionar trevo sem validação de limite (para geração automática)
           function selecionarTrevoAutomatico(trevo, elemento) {
@@ -952,19 +956,23 @@
           }
           
           // Selecionar primeiro trevo
-          const trevo1Elemento = Array.from(trevoElementos).find(el => el.textContent.trim() === dados.trevo1.toString());
+          const trevo1Elemento = Array.from(trevoElementos).find(el => 
+            el.querySelector('.trevo-number').textContent.trim() === dados.trevo1.toString()
+          );
           if (trevo1Elemento) {
             selecionarTrevoAutomatico(dados.trevo1, trevo1Elemento);
           }
           
           // Selecionar segundo trevo
-          const trevo2Elemento = Array.from(trevoElementos).find(el => el.textContent.trim() === dados.trevo2.toString());
+          const trevo2Elemento = Array.from(trevoElementos).find(el => 
+            el.querySelector('.trevo-number').textContent.trim() === dados.trevo2.toString()
+          );
           if (trevo2Elemento) {
             selecionarTrevoAutomatico(dados.trevo2, trevo2Elemento);
           }
           
           // Mostrar sucesso
-          mostrarMensagem('✅ Números gerados com sucesso!', 'success');
+          mostrarMensagem('🍀 Palpite da Sorte gerado com sucesso!', 'success');
         } else {
           throw new Error(dados.error || 'Erro ao gerar números');
         }
@@ -973,7 +981,7 @@
         mostrarMensagem('❌ Erro ao gerar números. Tente novamente.', 'error');
       } finally {
         // Restaurar botão usando a referência capturada
-        botao.innerHTML = '🎲 Gerar Aleatório <span class="bg-black text-[#00E38C] px-2 py-1 rounded text-sm">GRATUITO</span>';
+        botao.innerHTML = '🍀 Gerar Palpite da Sorte';
         botao.disabled = false;
       }
     }
@@ -986,9 +994,9 @@
         el.classList.remove('selecionado');
       });
       
-      // Limpar trevos
+      // Limpar trevos (corrigido para usar a nova classe)
       trevosSelecionados = [];
-      document.querySelectorAll('#trevos-container .trevo').forEach(el => {
+      document.querySelectorAll('#trevos-container .trevo-icon-container').forEach(el => {
         el.classList.remove('selecionado');
       });
       
@@ -1104,8 +1112,8 @@
           }
         });
         
-        // Selecionar múltiplos números para Trevos (compatibilidade com backend)
-        const trevoElementos = document.querySelectorAll('#trevos-container .trevo');
+        // Selecionar múltiplos números para Trevos (corrigido para usar a nova estrutura)
+        const trevoElementos = document.querySelectorAll('#trevos-container .trevo-icon-container');
         
         // Função para selecionar trevo sem validação de limite (para geração automática)
         function selecionarTrevoAutomatico(trevo, elemento) {
@@ -1119,14 +1127,18 @@
         // Selecionar múltiplos números para Trevo 1
         if (Array.isArray(data.trevo1)) {
           data.trevo1.forEach(trevo => {
-            const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === trevo.toString());
+            const trevoElemento = Array.from(trevoElementos).find(el => 
+              el.querySelector('.trevo-number').textContent.trim() === trevo.toString()
+            );
             if (trevoElemento) {
               selecionarTrevoAutomatico(trevo, trevoElemento);
             }
           });
         } else {
           // Fallback para compatibilidade (trevo único)
-          const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === data.trevo1.toString());
+          const trevoElemento = Array.from(trevoElementos).find(el => 
+            el.querySelector('.trevo-number').textContent.trim() === data.trevo1.toString()
+          );
           if (trevoElemento) {
             selecionarTrevoAutomatico(data.trevo1, trevoElemento);
           }
@@ -1135,14 +1147,18 @@
         // Selecionar múltiplos números para Trevo 2
         if (Array.isArray(data.trevo2)) {
           data.trevo2.forEach(trevo => {
-            const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === trevo.toString());
+            const trevoElemento = Array.from(trevoElementos).find(el => 
+              el.querySelector('.trevo-number').textContent.trim() === trevo.toString()
+            );
             if (trevoElemento) {
               selecionarTrevoAutomatico(trevo, trevoElemento);
             }
           });
         } else {
           // Fallback para compatibilidade (trevo único)
-          const trevoElemento = Array.from(trevoElementos).find(el => el.textContent.trim() === data.trevo2.toString());
+          const trevoElemento = Array.from(trevoElementos).find(el => 
+            el.querySelector('.trevo-number').textContent.trim() === data.trevo2.toString()
+          );
           if (trevoElemento) {
             selecionarTrevoAutomatico(data.trevo2, trevoElemento);
           }

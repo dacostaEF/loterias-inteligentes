@@ -425,6 +425,82 @@ p {
     border-color: var(--color-secondary);
 }
 
+/* 🍀 TREVOS ELEGANTES EM FORMA DE ÍCONES - DESKTOP E MOBILE */
+.trevo-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    margin: 4px;
+}
+
+.trevo-icon {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #4ADE80; /* Verde claro para trevo não selecionado */
+    background: transparent;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.trevo-icon::before {
+    content: '🍀';
+    position: absolute;
+    font-size: 48px;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.trevo-number {
+    position: relative;
+    z-index: 2;
+    font-weight: 900;
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.9),
+        0 0 8px rgba(255, 255, 255, 0.8),
+        0 0 12px rgba(255, 255, 255, 0.6);
+    color: #FFFFFF; /* Branco para melhor contraste */
+    transition: all 0.3s ease;
+    font-size: 22px;
+}
+
+/* Hover effect */
+.trevo-icon-container:hover .trevo-icon {
+    transform: scale(1.1);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.trevo-icon-container:hover .trevo-icon::before {
+    filter: brightness(1.2);
+}
+
+/* Selecionado - foca na mudança visual dos números */
+.trevo-icon-container.selecionado .trevo-number {
+    color: #E879F9 !important; /* Lilás intenso */
+    font-weight: 900 !important; /* Extra negrito */
+    font-size: 26px !important; /* Maior */
+    text-shadow: 
+        2px 2px 4px rgba(0, 0, 0, 0.9),
+        0 0 10px rgba(232, 121, 249, 0.8),
+        0 0 20px rgba(232, 121, 249, 0.6) !important; /* Glow lilás */
+    transform: scale(1.2) !important; /* Número 20% maior */
+    transition: all 0.3s ease !important;
+}
+
+.trevo-icon-container.selecionado .trevo-icon {
+    transform: scale(1.05) !important;
+    filter: drop-shadow(0 0 15px rgba(232, 121, 249, 0.6)) !important; /* Glow lilás */
+}
+
 /* Modais */
 .modal {
     position: fixed;
@@ -681,10 +757,7 @@ p {
         font-size: 0.8rem !important;
     }
     
-    /* 📱 Trevos menores */
-    .trevo {
-        font-size: 0.8rem !important;
-    }
+
     
     /* 📱 Oculta subtítulo em tablets também */
     header p {
@@ -699,12 +772,65 @@ p {
     }
 }
 
-/* 📱 Otimizações para telas muito pequenas (iPhone SE) */
+/* 📱 Otimizações para telas médias e pequenas */
 @media (max-width: 640px) {
     /* Otimizações para container dos trevos */
     #trevos-container {
-        gap: 8px;
+        gap: 6px;
         justify-content: center;
+    }
+    
+    /* Reduzir tamanho dos trevos para caber em uma linha */
+    .trevo-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .trevo-icon::before {
+        font-size: 40px;
+    }
+    
+    .trevo-number {
+        font-size: 18px;
+    }
+    
+    /* Trevos selecionados em mobile */
+    .trevo-icon-container.selecionado .trevo-number {
+        font-size: 22px !important;
+    }
+    
+    .trevo-icon-container {
+        margin: 2px;
+    }
+}
+
+/* 📱 Otimizações específicas para telas muito pequenas (Samsung S8, etc.) */
+@media (max-width: 360px) {
+    /* Reduzir ainda mais para telas muito pequenas */
+    .trevo-icon {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .trevo-icon::before {
+        font-size: 35px;
+    }
+    
+    .trevo-number {
+        font-size: 16px;
+    }
+    
+    /* Trevos selecionados em telas muito pequenas */
+    .trevo-icon-container.selecionado .trevo-number {
+        font-size: 20px !important;
+    }
+    
+    .trevo-icon-container {
+        margin: 1px;
+    }
+    
+    #trevos-container {
+        gap: 4px;
     }
 }
 
@@ -770,8 +896,8 @@ p {
         font-size: 0.85rem !important;
     }
     
-    /* 📱 Números e trevos menores */
-    .numero, .trevo {
+    /* 📱 Números menores */
+    .numero {
         font-size: 0.7rem !important;
     }
 
