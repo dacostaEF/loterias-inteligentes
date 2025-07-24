@@ -983,17 +983,7 @@
       const maxSoma = dadosSoma.max;
       const mediaSoma = dadosSoma.media;
       const modaSoma = dadosSoma.moda;
-
-      // Criar dados simulados baseados nas estatísticas (já que não temos a lista completa)
-      const range = maxSoma - minSoma;
-      const somas = [];
-      for (let i = 0; i < 100; i++) {
-        // Simular distribuição normal em torno da média
-        const soma = Math.round(mediaSoma + (Math.random() - 0.5) * range * 0.3);
-        if (soma >= minSoma && soma <= maxSoma) {
-          somas.push(soma);
-        }
-      }
+      const somas = dadosSoma.somas; // Lista real de somas históricas
 
       const data = [{
         x: somas,
@@ -1044,16 +1034,7 @@
       const maxSomaTrevos = dadosSomaTrevos.max;
       const mediaSomaTrevos = dadosSomaTrevos.media;
       const modaSomaTrevos = dadosSomaTrevos.moda;
-
-      // Criar dados simulados baseados nas estatísticas
-      const somasTrevos = [];
-      for (let i = 0; i < 100; i++) {
-        // Simular distribuição em torno da média
-        const soma = Math.round(mediaSomaTrevos + (Math.random() - 0.5) * 4);
-        if (soma >= minSomaTrevos && soma <= maxSomaTrevos) {
-          somasTrevos.push(soma);
-        }
-      }
+      const somasTrevos = dadosSomaTrevos.somas; // Lista real de somas históricas
 
       const data = [{
         x: somasTrevos,

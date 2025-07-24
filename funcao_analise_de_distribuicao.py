@@ -260,20 +260,23 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
                 'min': soma_res['numeros_principais']['min'],
                 'max': soma_res['numeros_principais']['max'],
                 'media': round(soma_res['numeros_principais']['media'], 2) if soma_res['numeros_principais']['media'] is not None else None,
-                'moda': soma_res['numeros_principais']['moda']
+                'moda': soma_res['numeros_principais']['moda'],
+                'somas': soma_res['numeros_principais']['somas']  # Lista completa de somas
             },
             'trevos': {
                 'min': soma_res['trevos']['min'],
                 'max': soma_res['trevos']['max'],
                 'media': round(soma_res['trevos']['media'], 2) if soma_res['trevos']['media'] is not None else None,
-                'moda': soma_res['trevos']['moda']
+                'moda': soma_res['trevos']['moda'],
+                'somas': soma_res['trevos']['somas']  # Lista completa de somas
             }
         },
         'amplitude_dos_numeros': {
             'min': amplitude_res['min'],
             'max': amplitude_res['max'],
             'media': round(amplitude_res['media'], 2) if amplitude_res['media'] is not None else None,
-            'moda': amplitude_res['moda']
+            'moda': amplitude_res['moda'],
+            'amplitudes': amplitude_res['amplitudes']  # Lista completa de amplitudes
         }
     }
 
