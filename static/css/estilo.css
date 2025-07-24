@@ -201,19 +201,24 @@ body {
     
     /* Reduzir padding do gerador */
     .gerador-container.p-6 {
-        padding: 1rem !important; /* Reduz de 1.5rem para 1rem */
+        padding: 0px !important; /* Zera completamente o padding */
     }
 
     /* Reduzir margem inferior do gerador para 0px */
     .gerador-container {
         margin-bottom: 0px !important; /* Reduz de 20px para 0px */
         margin-top: 0px !important; /* Reduz de 8px para 0px */
-        padding: 0px !important; /* Reduz de 16px para 0px */
+        padding: 0px !important; /* Zera completamente o padding */
     }
 
     /* Reduzir o padding superior da seção 'Selecione 6 números entre 50' */
     section.mb-8 {
         padding-top: 0rem !important; /* Reduz de 1.5rem (24px) para 0rem (0px) */
+    }
+
+    /* Reduzir fonte do título 'Selecione 6 números entre 50' */
+    section.mb-8 h2.text-xl {
+        font-size: 12px !important; /* Reduz de 15px para 12px */
     }
 
 
