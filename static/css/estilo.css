@@ -843,7 +843,7 @@ p {
     }
 }
 
-/* 🔧 Ajustes para telas menores que 768px - SOLUÇÃO HOMEOPÁTICA */
+/* 🔧 Ajustes para telas menores que 768px - SOLUÇÃO AGGRESSIVA */
 @media screen and (max-width: 768px) {
     /* Reduz tamanho do título +Milionária */
     header h1 {
@@ -862,10 +862,28 @@ p {
         font-size: 14px;
     }
     
+    /* AJUSTES NO TOPO DA PÁGINA */
+    header {
+        padding-top: 0 !important;   /* Zera o padding superior do cabeçalho */
+        padding-bottom: 0 !important; /* Zera o padding inferior do cabeçalho */
+    }
+
+    /* Reduz ainda mais o padding superior do container mestre */
+    .bg-\[#1A1D25\] {
+        padding-top: 0rem !important; /* Zera o padding superior */
+    }
+
+    /* Zera margens e paddings do gerador no topo */
+    .gerador-container {
+        padding-top: 0px !important;
+        margin-top: 0px !important;
+        padding-bottom: 0px !important;
+    }
+
     /* Ajuste do padding interno dos cards de estatísticas */
     .stat-card {
-        padding: 1rem !important; /* Reduz de 1.5rem (p-6) para 1rem (16px) em todos os lados */
-        /* Se ainda quiser mais compacto, pode tentar: padding: 0.75rem !important; (12px) */
+        padding: 0.5rem !important; /* Reduz de 1rem (16px) para 0.5rem (8px) */
+        /* Se ainda quiser um pouco mais, pode tentar 0.25rem (4px) */
     }
 
     /* Centralizar os títulos (h3) dentro dos cards */
@@ -878,17 +896,20 @@ p {
     #numeros-frios,
     #trevos-frequentes {
         text-align: center !important;
-        /* Se, por algum motivo, não centralizar ou se os spans não quebrarem linha,
-           você pode forçar um comportamento flexbox aqui para ter mais controle:
-           display: flex !important;
-           justify-content: center !important;
-           flex-wrap: wrap !important; */
     }
 
-    /* Opcional: Se a margem entre a seção e o próximo elemento for muito grande no mobile */
-    /* section.grid.grid-cols-1.md\:grid-cols-3.gap-6.mb-8 {
-        margin-bottom: 1rem !important;
-    } */
+    /* AJUSTES NA BASE DA PÁGINA */
+    /* Zera completamente a margem inferior da seção dos Números Quentes/Frios/Trevos Frequentes */
+    section.grid.grid-cols-1.md\:grid-cols-3.gap-6.mb-8 {
+        margin-bottom: 0rem !important;
+        gap: 0.5rem !important; /* Reduz espaçamento entre os 3 cards de 24px para 8px */
+        /* Se quiser ainda menos: gap: 0.25rem !important; (4px) */
+    }
+
+    /* Outra verificação geral para remover margens indesejadas */
+    body > *:last-child {
+        margin-bottom: 0 !important; /* Garante que o último elemento da body não tenha margem inferior */
+    }
 }
 
 /* 📱 Otimizações para telas muito pequenas (Galaxy S20, iPhone SE) */
