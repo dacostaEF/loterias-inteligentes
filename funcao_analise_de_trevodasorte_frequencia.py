@@ -426,7 +426,15 @@ def analise_trevos_da_sorte(df_milionaria, qtd_concursos=None):
             # Garante que a combinação seja contada independentemente da ordem (ex: (1,2) é igual a (2,1))
             combinacao = tuple(sorted((t1, t2)))
             combinacoes_trevos[combinacao] += 1
-    resultados['combinacoes_trevos'] = dict(sorted(combinacoes_trevos.items(), key=lambda item: item[1], reverse=True))
+    
+    # Converter tuplas para strings para compatibilidade com JSON
+    combinacoes_trevos_dict = {}
+    for combinacao, freq in combinacoes_trevos.items():
+        # Converter tupla (1, 2) para string "1,2"
+        combinacao_str = f"{combinacao[0]},{combinacao[1]}"
+        combinacoes_trevos_dict[combinacao_str] = freq
+    
+    resultados['combinacoes_trevos'] = dict(sorted(combinacoes_trevos_dict.items(), key=lambda item: item[1], reverse=True))
 
     # 3. Correlação: relação entre trevos e números principais
     correlacao_trevos_bolas = {}

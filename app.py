@@ -200,13 +200,27 @@ def get_analise_de_combinacoes():
 @app.route('/api/analise_trevos_da_sorte', methods=['GET'])
 def get_analise_trevos_da_sorte():
     """Retorna os dados da análise dos trevos da sorte (frequência, combinações e correlação)."""
-    if df_milionaria.empty:
-        return jsonify({"error": "Dados da +Milionária não carregados."}), 500
+    try:
+        if df_milionaria.empty:
+            return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
-    # Note: A função 'analise_trevos_da_sorte' foi ajustada para aceitar o DataFrame diretamente.
-    qtd_concursos = request.args.get('qtd_concursos', type=int)
-    resultado = analise_trevos_da_sorte(df_milionaria, qtd_concursos)
-    return jsonify(resultado)
+        # Verificar se há parâmetro de quantidade de concursos
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        print(f"🎯 Trevos - Parâmetro qtd_concursos: {qtd_concursos}")
+
+        # Note: A função 'analise_trevos_da_sorte' foi ajustada para aceitar o DataFrame diretamente.
+        resultado = analise_trevos_da_sorte(df_milionaria, qtd_concursos)
+        
+        if not resultado:
+            return jsonify({"error": "Resultado da análise de trevos está vazio."}), 404
+            
+        return jsonify(resultado)
+        
+    except Exception as e:
+        print(f"Erro na API de trevos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
 
 
 # --- Rota para manifestação de interesse em bolões (sem persistência para este exemplo) ---
