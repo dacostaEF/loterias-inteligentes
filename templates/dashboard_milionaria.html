@@ -212,101 +212,7 @@
     </div>
   </div>
 
-  <!-- Modal: Análise de Seca -->
-  <div id="modalSeca" class="modal-ajuda hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-    <div class="modal-content bg-card rounded-lg shadow-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
-      <span class="close absolute top-3 right-3 text-3xl font-bold cursor-pointer text-gray-400 hover:text-red-500" onclick="fecharModal('modalSeca')">&times;</span>
-      <h2 class="text-3xl font-bold text-primary mb-4 text-center">🌵 Análise de Seca</h2>
 
-      <!-- Explicação -->
-      <div class="info-section bg-gray-800 p-4 rounded-lg mb-6 border-l-4 border-primary">
-        <h3 class="text-xl font-semibold text-primary mb-2">Entendendo a Análise de Seca 🌵</h3>
-        <p class="text-gray-300 mb-2">
-          A análise de seca identifica há quantos concursos um determinado número ou trevo não é sorteado.
-        </p>
-        <p class="text-gray-300">
-          <span class="font-bold text-red-400">"Maior Seca"</span> indica os que estão há mais tempo sem aparecer.
-          <span class="font-bold text-green-400">"Recentemente Sorteados"</span> são os que saíram nos últimos concursos.
-        </p>
-      </div>
-
-      <!-- Dropdown -->
-      <div class="flex flex-col md:flex-row gap-6 mb-6">
-        <div class="flex-1">
-          <label for="selectSecaPeriodo" class="block text-gray-300 text-sm font-bold mb-2">Analisar últimos concursos:</label>
-          <select id="selectSecaPeriodo" class="w-full p-2 rounded-md bg-surface text-white border border-gray-600 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" onchange="updateSecaModal()">
-            <option value="">Todos</option>
-            <option value="50">Últimos 50</option>
-            <option value="100">Últimos 100</option>
-            <option value="200">Últimos 200</option>
-          </select>
-          <p class="text-gray-400 text-xs mt-2" id="secaPeriodoDisplay">Análise de todos os concursos disponíveis.</p>
-        </div>
-      </div>
-
-      <!-- Números e Trevos -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <!-- Números -->
-        <div class="bg-surface p-4 rounded-lg shadow">
-          <h3 class="text-xl font-semibold text-primary mb-4 text-center">Números Principais (1-50)</h3>
-          <div id="secaNumerosContainer" class="text-gray-300 mb-4">
-            <p class="mb-2"><strong>Em Maior Seca:</strong> <span id="secaNumerosMaior" class="font-bold text-lg text-red-400">Carregando...</span></p>
-            <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span id="secaNumerosRecentes" class="font-bold text-lg text-green-400">Carregando...</span></p>
-            <div class="mb-2">
-              <strong>Estatísticas:</strong>
-              <ul id="secaNumerosStats" class="list-disc list-inside ml-4 text-sm">
-                <li>Carregando...</li>
-              </ul>
-            </div>
-          </div>
-          <div id="graficoSecaNumeros" class="w-full h-80 bg-gray-700 rounded flex items-center justify-center text-gray-400">Carregando gráfico...</div>
-        </div>
-
-        <!-- Trevos -->
-        <div class="bg-surface p-4 rounded-lg shadow">
-          <h3 class="text-xl font-semibold text-primary mb-4 text-center">Trevos da Sorte (1-6)</h3>
-          <div id="secaTrevosContainer" class="text-gray-300 mb-4">
-            <p class="mb-2"><strong>Em Maior Seca:</strong> <span id="secaTrevosMaior" class="font-bold text-lg text-red-400">Carregando...</span></p>
-            <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span id="secaTrevosRecentes" class="font-bold text-lg text-green-400">Carregando...</span></p>
-            <div class="mb-2">
-              <strong>Estatísticas:</strong>
-              <ul id="secaTrevosStats" class="list-disc list-inside ml-4 text-sm">
-                <li>Carregando...</li>
-              </ul>
-            </div>
-          </div>
-          <div id="graficoSecaTrevos" class="w-full h-80 bg-gray-700 rounded flex items-center justify-center text-gray-400">Carregando gráfico...</div>
-        </div>
-      </div>
-
-      <!-- Interpretação -->
-      <div class="info-section bg-gray-800 p-4 rounded-lg mb-6 border-l-4 border-secondary">
-        <h3 class="text-xl font-semibold text-secondary mb-2">Interpretação dos Gráficos de Seca 📊</h3>
-        <ul class="list-disc list-inside text-gray-300 ml-4">
-          <li><strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).</li>
-          <li><strong>Eixo Y:</strong> Concursos em que estão sem sair.</li>
-          <li><strong>Barras altas:</strong> Maior tempo de seca.</li>
-          <li><strong>Barras baixas:</strong> Sorteados recentemente.</li>
-        </ul>
-      </div>
-
-      <!-- Estratégias -->
-      <div class="info-section bg-gray-800 p-4 rounded-lg mb-6 border-l-4 border-green-400">
-        <h3 class="text-xl font-semibold text-green-400 mb-2">Estratégias com a Seca ✅</h3>
-        <ul class="list-disc list-inside text-gray-300 ml-4">
-          <li><strong>Atrasados:</strong> Apostar nos que estão em seca.</li>
-          <li><strong>Recentes:</strong> Apostar nos que saíram há pouco.</li>
-          <li><strong>Misto:</strong> Combinar os dois.</li>
-          <li><strong>Aleatoriedade:</strong> Não é garantia. Combine com frequência.</li>
-        </ul>
-      </div>
-
-      <!-- Alerta Final -->
-      <div class="mt-8 text-center text-gray-400">
-        <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística histórica. Não garante resultados futuros. Aposte com responsabilidade.</p>
-      </div>
-    </div>
-  </div>
 
   <!-- Scripts -->
   <script>
@@ -599,6 +505,13 @@
 
     // Abrir modal
     function abrirModal(tipo) {
+      // Esconder todos os popups de ajuda primeiro
+      const popups = document.querySelectorAll('.modal-ajuda');
+      popups.forEach(popup => {
+        popup.style.display = 'none';
+      });
+      
+      // Usar modal genérico para todos
       const modal = document.getElementById('modal');
       const titulo = document.getElementById('titulo-modal');
       const conteudo = document.getElementById('conteudo-modal');
@@ -626,7 +539,6 @@
           titulo.textContent = '🌵 Análise de Seca';
           carregarAnaliseSeca(conteudo);
           break;
-
         case 'estatisticas':
           titulo.textContent = '📈 Estatísticas Avançadas';
           carregarEstatisticasAvancadas(conteudo);
@@ -635,8 +547,17 @@
     }
 
     // Fechar modal
-    function fecharModal() {
-      document.getElementById('modal').classList.add('hidden');
+    function fecharModal(modalId = null) {
+      if (modalId) {
+        // Fechar modal específico
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.add('hidden');
+        }
+      } else {
+        // Fechar modal genérico
+        document.getElementById('modal').classList.add('hidden');
+      }
     }
 
     // Carregar análise de frequência
@@ -2201,11 +2122,6 @@
 
         // Carregar análise de seca
     async function carregarAnaliseSeca(container, qtdConcursos = null) {
-      if (!container) {
-        console.error('Container não fornecido para carregarAnaliseSeca');
-        return;
-      }
-      
       container.innerHTML = `<p class="text-center text-gray-400">🔄 Carregando análise de seca...</p>`;
       
         try {
@@ -2218,9 +2134,7 @@
           const data = await response.json();
         
         if (data.error) {
-          if (container) {
-            container.innerHTML = `<p class="text-red-500 text-center">Erro: ${data.error}</p>`;
-          }
+          container.innerHTML = `<p class="text-red-500 text-center">Erro: ${data.error}</p>`;
           return;
         }
         
@@ -2228,9 +2142,7 @@
         const trevosSeca = data.trevos_seca;
         
         if (!numerosSeca || !trevosSeca) {
-          if (container) {
-            container.innerHTML = `<p class="text-red-500 text-center">Dados de seca incompletos ou não encontrados.</p>`;
-          }
+          container.innerHTML = `<p class="text-red-500 text-center">Dados de seca incompletos ou não encontrados.</p>`;
           return;
         }
         
@@ -2251,7 +2163,7 @@
           ? trevosSeca.trevos_recentes.slice(0, 3).join(', ')
           : 'N/A';
         
-        // Criar HTML completo do modal
+        // Criar HTML completo para o modal genérico
         container.innerHTML = `
           <div class="space-y-6">
             <!-- Explicação -->
@@ -2390,19 +2302,11 @@
     function updateSecaModal() {
       const selectElement = document.getElementById('selectSecaPeriodo');
       const selectedQtd = selectElement.value;
+      
+      // Carregar dados no modal genérico
       const conteudo = document.getElementById('conteudo-modal');
       if (conteudo) {
         carregarAnaliseSeca(conteudo, selectedQtd);
-      }
-      
-      // Atualizar display do período
-      const periodoDisplay = document.getElementById('secaPeriodoDisplay');
-      if (periodoDisplay) {
-        if (selectedQtd) {
-          periodoDisplay.textContent = `Análise dos últimos ${selectedQtd} concursos.`;
-        } else {
-          periodoDisplay.textContent = 'Análise de todos os concursos disponíveis.';
-        }
       }
     }
     
@@ -3183,6 +3087,18 @@
     background-color: rgba(0,0,0,0.85);
   }
 
+  .modal-principal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.85);
+  }
+
   /* Gráficos responsivos */
   .chart-container {
     padding: 10px;
@@ -3255,6 +3171,22 @@
     box-shadow: 0 0 20px #000;
   }
 
+  .modal-principal .modal-content {
+    background-color: #1c1c1c;
+    color: #eee;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 12px;
+    width: 95%;
+    max-width: 1200px;
+    max-height: 90vh; /* Limita altura máxima */
+    overflow-y: auto; /* Permite rolagem vertical */
+    -webkit-overflow-scrolling: touch; /* Melhora rolagem em iOS */
+    scroll-behavior: smooth; /* Scroll suave */
+    font-family: 'Inter', sans-serif;
+    box-shadow: 0 0 20px #000;
+  }
+
   .modal-ajuda .close {
     color: #aaa;
     float: right;
@@ -3263,6 +3195,17 @@
   }
 
   .modal-ajuda .close:hover {
+    color: red;
+  }
+
+  .modal-principal .close {
+    color: #aaa;
+    float: right;
+    font-size: 26px;
+    cursor: pointer;
+  }
+
+  .modal-principal .close:hover {
     color: red;
   }
 
@@ -3282,6 +3225,22 @@
     margin-bottom: 10px;
   }
 
+  .modal-principal h2 {
+    color: #00E38C;
+    margin-bottom: 15px;
+  }
+
+  .modal-principal h3 {
+    color: #00E38C;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .modal-principal p {
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
   /* Otimizações mobile para modal de ajuda */
   @media (max-width: 768px) {
     .modal-ajuda .modal-content {
@@ -3295,6 +3254,23 @@
     .modal-ajuda .modal-content {
       margin: 3% auto; /* Margem ainda menor */
       width: 98%; /* Quase toda a largura */
+      padding: 12px; /* Padding menor */
+    }
+  }
+
+  /* Otimizações mobile para modal principal */
+  @media (max-width: 768px) {
+    .modal-principal .modal-content {
+      margin: 3% auto; /* Reduz margem superior */
+      width: 98%; /* Ocupa mais largura */
+      padding: 15px; /* Reduz padding */
+    }
+  }
+
+  @media (max-width: 640px) {
+    .modal-principal .modal-content {
+      margin: 2% auto; /* Margem ainda menor */
+      width: 99%; /* Quase toda a largura */
       padding: 12px; /* Padding menor */
     }
   }
