@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>+Milionária | Dashboard Inteligente</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png">
 
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
@@ -32,14 +37,17 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 
 </head>
 <body class="p-4 sm:p-6">
   <!-- Header -->
   <header class="flex justify-between items-center mb-8">
     <div>
-      <h1 class="text-2xl sm:text-3xl font-bold text-white">+Milionária</h1>
+      <h1 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
+        <img src="/static/img/Favicon_LI.png" alt="Favicon" class="w-8 h-8 sm:w-10 sm:h-10">
+        +Milionária
+      </h1>
       <p class="text-sm sm:text-base text-gray-400">Dashboard Inteligente de Análise Estatística</p>
     </div>
     
