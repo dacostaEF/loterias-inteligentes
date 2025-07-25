@@ -32,6 +32,19 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def limpar_nan_do_dict(d):
+    """Remove valores NaN de dicionários aninhados"""
+    if isinstance(d, dict):
+        return {k: limpar_nan_do_dict(v) for k, v in d.items()}
+    elif isinstance(d, list):
+        return [limpar_nan_do_dict(v) for v in d]
+    elif isinstance(d, (int, float)):
+        if np.isnan(d):
+            return 0.0
+        return d
+    else:
+        return d
+
 class AnaliseEstatisticaAvancada:
     """
     Classe para análises estatísticas avançadas da +Milionária
@@ -89,6 +102,21 @@ class AnaliseEstatisticaAvancada:
         if self.df_validos is None or self.df_validos.empty:
             return {}
         
+        # Verificar se há dados suficientes
+        if len(self.df_validos) < 1:
+            return {
+                'estatisticas_gerais': {
+                    'media_frequencia': 0.0,
+                    'desvio_padrao': 0.0,
+                    'variancia': 0.0,
+                    'coeficiente_variacao': 0.0,
+                    'total_concursos': 0
+                },
+                'numeros_mais_variaveis': [],
+                'numeros_menos_variaveis': [],
+                'frequencia_completa': {}
+            }
+        
         # Extrair todos os números sorteados
         todos_numeros = []
         for _, row in self.df_validos.iterrows():
@@ -98,12 +126,37 @@ class AnaliseEstatisticaAvancada:
         # Calcular frequência de cada número
         frequencia_numeros = Counter(todos_numeros)
         
+        # Garantir que todos os números de 1 a 50 tenham uma frequência (mesmo que 0)
+        for numero in range(1, 51):
+            if numero not in frequencia_numeros:
+                frequencia_numeros[numero] = 0
+        
         # Calcular estatísticas
         valores = list(frequencia_numeros.values())
+        if not valores:
+            return {
+                'estatisticas_gerais': {
+                    'media_frequencia': 0.0,
+                    'desvio_padrao': 0.0,
+                    'variancia': 0.0,
+                    'coeficiente_variacao': 0.0,
+                    'total_concursos': 0
+                },
+                'numeros_mais_variaveis': [],
+                'numeros_menos_variaveis': [],
+                'frequencia_completa': {}
+            }
+        
         media = np.mean(valores)
         desvio_padrao = np.std(valores)
         variancia = np.var(valores)
         coeficiente_variacao = (desvio_padrao / media) * 100 if media > 0 else 0
+        
+        # Converter NaN para valores válidos
+        media = 0.0 if np.isnan(media) else float(media)
+        desvio_padrao = 0.0 if np.isnan(desvio_padrao) else float(desvio_padrao)
+        variancia = 0.0 if np.isnan(variancia) else float(variancia)
+        coeficiente_variacao = 0.0 if np.isnan(coeficiente_variacao) else float(coeficiente_variacao)
         
         # Identificar números com maior e menor variabilidade
         numeros_mais_variaveis = sorted(frequencia_numeros.items(), key=lambda x: abs(x[1] - media), reverse=True)[:10]
@@ -111,11 +164,11 @@ class AnaliseEstatisticaAvancada:
         
         return {
             'estatisticas_gerais': {
-                'media_frequencia': media,
-                'desvio_padrao': desvio_padrao,
-                'variancia': variancia,
-                'coeficiente_variacao': coeficiente_variacao,
-                'total_concursos': len(self.df_validos)
+                'media_frequencia': float(media),
+                'desvio_padrao': float(desvio_padrao),
+                'variancia': float(variancia),
+                'coeficiente_variacao': float(coeficiente_variacao),
+                'total_concursos': int(len(self.df_validos))
             },
             'numeros_mais_variaveis': numeros_mais_variaveis,
             'numeros_menos_variaveis': numeros_menos_variaveis,
@@ -132,6 +185,29 @@ class AnaliseEstatisticaAvancada:
         if self.df_validos is None or self.df_validos.empty:
             return {}
         
+        # Verificar se há dados suficientes
+        if len(self.df_validos) < 2:
+            return {
+                'teste_chi_quadrado': {
+                    'chi2': 0.0,
+                    'p_value': 1.0,
+                    'graus_liberdade': 0,
+                    'aleatorio': True,
+                    'interpretacao': 'Dados Insuficientes'
+                },
+                'teste_sequencias': {
+                    'media_runs': 0.0,
+                    'desvio_runs': 0.0,
+                    'total_concursos': 0
+                },
+                'teste_paridade': {
+                    'media_pares': 0.0,
+                    'desvio_pares': 0.0,
+                    'esperado': 3.0,
+                    'aleatorio_paridade': True
+                }
+            }
+        
         resultados = {}
         
         # 1. Teste Chi-quadrado para uniformidade
@@ -144,6 +220,27 @@ class AnaliseEstatisticaAvancada:
         
         # Frequência esperada (uniforme)
         total_sorteios = len(todos_numeros)
+        if total_sorteios == 0:
+            return {
+                'teste_chi_quadrado': {
+                    'chi2': 0.0,
+                    'p_value': 1.0,
+                    'graus_liberdade': 0,
+                    'aleatorio': True,
+                    'interpretacao': 'Dados Insuficientes'
+                },
+                'teste_sequencias': {
+                    'media_runs': 0.0,
+                    'desvio_runs': 0.0,
+                    'total_concursos': 0
+                },
+                'teste_paridade': {
+                    'media_pares': 0.0,
+                    'desvio_pares': 0.0,
+                    'esperado': 3.0,
+                    'aleatorio_paridade': True
+                }
+            }
         frequencia_esperada = total_sorteios / 50  # 50 números possíveis
         
         # Preparar dados para chi-quadrado
@@ -152,11 +249,16 @@ class AnaliseEstatisticaAvancada:
         
         chi2, p_value, dof, expected = chi2_contingency([obs, esp])
         
+        # Converter NaN para valores válidos
+        chi2 = 0.0 if np.isnan(chi2) else float(chi2)
+        p_value = 1.0 if np.isnan(p_value) else float(p_value)
+        dof = 0 if np.isnan(dof) else int(dof)
+        
         resultados['teste_chi_quadrado'] = {
-            'chi2': chi2,
-            'p_value': p_value,
-            'graus_liberdade': dof,
-            'aleatorio': p_value > 0.05,
+            'chi2': float(chi2),
+            'p_value': float(p_value),
+            'graus_liberdade': int(dof),
+            'aleatorio': bool(p_value > 0.05),
             'interpretacao': 'Aleatório' if p_value > 0.05 else 'Não aleatório'
         }
         
@@ -166,19 +268,30 @@ class AnaliseEstatisticaAvancada:
         for _, row in self.df_validos.iterrows():
             numeros_concurso = sorted([row[col] for col in self.colunas_bolas if pd.notna(row[col])])
             # Contar sequências consecutivas
-            runs = 1
-            for i in range(1, len(numeros_concurso)):
-                if numeros_concurso[i] != numeros_concurso[i-1] + 1:
-                    runs += 1
-            sequencias.append(runs)
+            if len(numeros_concurso) > 1:
+                runs = 1
+                for i in range(1, len(numeros_concurso)):
+                    if numeros_concurso[i] != numeros_concurso[i-1] + 1:
+                        runs += 1
+                sequencias.append(runs)
+            else:
+                sequencias.append(1)  # Se só há um número, há 1 sequência
         
-        media_runs = np.mean(sequencias)
-        desvio_runs = np.std(sequencias)
+        if sequencias:
+            media_runs = np.mean(sequencias)
+            desvio_runs = np.std(sequencias)
+            
+            # Converter NaN para valores válidos
+            media_runs = 0.0 if np.isnan(media_runs) else float(media_runs)
+            desvio_runs = 0.0 if np.isnan(desvio_runs) else float(desvio_runs)
+        else:
+            media_runs = 0.0
+            desvio_runs = 0.0
         
         resultados['teste_sequencias'] = {
-            'media_runs': media_runs,
-            'desvio_runs': desvio_runs,
-            'total_concursos': len(sequencias)
+            'media_runs': float(media_runs),
+            'desvio_runs': float(desvio_runs),
+            'total_concursos': int(len(sequencias))
         }
         
         # 3. Teste de paridade (distribuição par/ímpar)
@@ -191,11 +304,15 @@ class AnaliseEstatisticaAvancada:
         media_pares = np.mean(pares_por_concurso)
         desvio_pares = np.std(pares_por_concurso)
         
+        # Converter NaN para valores válidos
+        media_pares = 0.0 if np.isnan(media_pares) else float(media_pares)
+        desvio_pares = 0.0 if np.isnan(desvio_pares) else float(desvio_pares)
+        
         resultados['teste_paridade'] = {
-            'media_pares': media_pares,
-            'desvio_pares': desvio_pares,
+            'media_pares': float(media_pares),
+            'desvio_pares': float(desvio_pares),
             'esperado': 3.0,  # Esperado: 3 pares em 6 números
-            'aleatorio_paridade': abs(media_pares - 3.0) < 0.5
+            'aleatorio_paridade': bool(abs(media_pares - 3.0) < 0.5)
         }
         
         return resultados
@@ -224,13 +341,14 @@ class AnaliseEstatisticaAvancada:
             ultima_aparicao = 0
             media_aparicoes_concurso = 0
             
-            for idx, row in self.df_validos.iterrows():
+            # Usar enumerate para ter controle sobre o índice
+            for pos, (idx, row) in enumerate(self.df_validos.iterrows()):
                 numeros_concurso = [row[col] for col in self.colunas_bolas if pd.notna(row[col])]
                 if numero in numeros_concurso:
                     freq_total += 1
-                    if idx < len(self.df_validos) * 0.3:  # Últimos 30%
+                    if pos < len(self.df_validos) * 0.3:  # Últimos 30%
                         freq_recente += 1
-                    ultima_aparicao = len(self.df_validos) - idx
+                    ultima_aparicao = len(self.df_validos) - pos
             
             # Calcular média de aparições por concurso
             media_aparicoes_concurso = freq_total / len(self.df_validos) if len(self.df_validos) > 0 else 0
@@ -243,6 +361,25 @@ class AnaliseEstatisticaAvancada:
                 numero  # Incluir o próprio número como característica
             ])
             numeros_analisados.append(numero)
+        
+        # Verificar se há dados suficientes para clustering
+        if len(self.df_validos) < n_clusters:
+            # Se não há dados suficientes, retornar clusters simples
+            return {
+                'clusters': {'cluster_0': list(range(1, 51))},
+                'estatisticas_clusters': {
+                    'cluster_0': {
+                        'numeros': list(range(1, 51)),
+                        'quantidade': 50,
+                        'frequencia_media': 0.0,
+                        'frequencia_recente_media': 0.0,
+                        'ultima_aparicao_media': 0.0,
+                        'tipo': 'Dados Insuficientes'
+                    }
+                },
+                'centroids': [],
+                'inertia': 0.0
+            }
         
         # Normalizar características
         scaler = StandardScaler()
@@ -264,16 +401,26 @@ class AnaliseEstatisticaAvancada:
             if numeros_cluster:
                 # Calcular características médias do cluster
                 caracteristicas_cluster = [caracteristicas[i] for i, c in enumerate(clusters) if c == cluster_id]
-                media_freq = np.mean([c[0] for c in caracteristicas_cluster])
-                media_recente = np.mean([c[1] for c in caracteristicas_cluster])
-                media_ultima = np.mean([c[2] for c in caracteristicas_cluster])
+                if caracteristicas_cluster:
+                    media_freq = np.mean([c[0] for c in caracteristicas_cluster])
+                    media_recente = np.mean([c[1] for c in caracteristicas_cluster])
+                    media_ultima = np.mean([c[2] for c in caracteristicas_cluster])
+                    
+                    # Converter NaN para valores válidos
+                    media_freq = 0.0 if np.isnan(media_freq) else float(media_freq)
+                    media_recente = 0.0 if np.isnan(media_recente) else float(media_recente)
+                    media_ultima = 0.0 if np.isnan(media_ultima) else float(media_ultima)
+                else:
+                    media_freq = 0.0
+                    media_recente = 0.0
+                    media_ultima = 0.0
                 
                 estatisticas_clusters[f'cluster_{cluster_id}'] = {
                     'numeros': numeros_cluster,
-                    'quantidade': len(numeros_cluster),
-                    'frequencia_media': media_freq,
-                    'frequencia_recente_media': media_recente,
-                    'ultima_aparicao_media': media_ultima,
+                    'quantidade': int(len(numeros_cluster)),
+                    'frequencia_media': float(media_freq),
+                    'frequencia_recente_media': float(media_recente),
+                    'ultima_aparicao_media': float(media_ultima),
                     'tipo': self._classificar_cluster(media_freq, media_recente, media_ultima)
                 }
         
@@ -281,7 +428,7 @@ class AnaliseEstatisticaAvancada:
             'clusters': dict(resultados_clusters),
             'estatisticas_clusters': estatisticas_clusters,
             'centroids': kmeans.cluster_centers_.tolist(),
-            'inertia': kmeans.inertia_
+            'inertia': float(kmeans.inertia_)
         }
     
     def _classificar_cluster(self, freq_media, freq_recente, ultima_aparicao):
@@ -310,35 +457,64 @@ class AnaliseEstatisticaAvancada:
         # Criar matriz de presença (concurso x número)
         matriz_presenca = np.zeros((len(self.df_validos), 50))
         
-        for idx, row in self.df_validos.iterrows():
+        for pos, (idx, row) in enumerate(self.df_validos.iterrows()):
             numeros_concurso = [row[col] for col in self.colunas_bolas if pd.notna(row[col])]
             for numero in numeros_concurso:
                 if 1 <= numero <= 50:
-                    matriz_presenca[idx, numero - 1] = 1
+                    matriz_presenca[pos, numero - 1] = 1
+        
+        # Verificar se há dados suficientes para correlação
+        if len(self.df_validos) < 2:
+            return {
+                'matriz_correlacao': [],
+                'correlacoes_positivas': [],
+                'correlacoes_negativas': [],
+                'correlacao_media': 0.0
+            }
         
         # Calcular matriz de correlação
-        matriz_correlacao = np.corrcoef(matriz_presenca.T)
-        
-        # Encontrar pares mais correlacionados
-        pares_correlacionados = []
-        for i in range(50):
-            for j in range(i + 1, 50):
-                correlacao = matriz_correlacao[i, j]
-                if not np.isnan(correlacao):
-                    pares_correlacionados.append((i + 1, j + 1, correlacao))
+        try:
+            matriz_correlacao = np.corrcoef(matriz_presenca.T)
+            
+            # Encontrar pares mais correlacionados
+            pares_correlacionados = []
+            for i in range(50):
+                for j in range(i + 1, 50):
+                    if i < matriz_correlacao.shape[0] and j < matriz_correlacao.shape[1]:
+                        correlacao = matriz_correlacao[i, j]
+                        if not np.isnan(correlacao):
+                            pares_correlacionados.append((i + 1, j + 1, correlacao))
+        except Exception as e:
+            logger.warning(f"Erro ao calcular correlação: {e}")
+            return {
+                'matriz_correlacao': [],
+                'correlacoes_positivas': [],
+                'correlacoes_negativas': [],
+                'correlacao_media': 0.0
+            }
         
         # Ordenar por correlação
         pares_correlacionados.sort(key=lambda x: abs(x[2]), reverse=True)
         
         # Separar correlações positivas e negativas
-        correlacoes_positivas = [p for p in pares_correlacionados if p[2] > 0.1][:10]
-        correlacoes_negativas = [p for p in pares_correlacionados if p[2] < -0.1][:10]
+        correlacoes_positivas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] > 0.1][:10]
+        correlacoes_negativas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] < -0.1][:10]
+        
+        # Calcular correlação média de forma segura
+        try:
+            triu_indices = np.triu_indices(50, k=1)
+            if triu_indices[0].size > 0 and triu_indices[0].max() < matriz_correlacao.shape[0] and triu_indices[1].max() < matriz_correlacao.shape[1]:
+                correlacao_media = float(np.mean(np.abs(matriz_correlacao[triu_indices])))
+            else:
+                correlacao_media = 0.0
+        except:
+            correlacao_media = 0.0
         
         return {
             'matriz_correlacao': matriz_correlacao.tolist(),
             'correlacoes_positivas': correlacoes_positivas,
             'correlacoes_negativas': correlacoes_negativas,
-            'correlacao_media': np.mean(np.abs(matriz_correlacao[np.triu_indices(50, k=1)]))
+            'correlacao_media': correlacao_media
         }
     
     def probabilidades_condicionais(self):
@@ -351,9 +527,21 @@ class AnaliseEstatisticaAvancada:
         if self.df_validos is None or self.df_validos.empty:
             return {}
         
+        # Verificar se há dados suficientes
+        if len(self.df_validos) < 2:
+            return {
+                'probabilidades_completas': {},
+                'dependencias_fortes': [],
+                'total_concursos': 0
+            }
+        
         # Contar ocorrências de cada número
         contagem_numeros = Counter()
         contagem_pares = Counter()
+        
+        # Garantir que todos os números de 1 a 50 tenham uma contagem (mesmo que 0)
+        for numero in range(1, 51):
+            contagem_numeros[numero] = 0
         
         for _, row in self.df_validos.iterrows():
             numeros_concurso = [row[col] for col in self.colunas_bolas if pd.notna(row[col])]
@@ -369,6 +557,13 @@ class AnaliseEstatisticaAvancada:
                     contagem_pares[par] += 1
         
         total_concursos = len(self.df_validos)
+        if total_concursos == 0:
+            return {
+                'probabilidades_completas': {},
+                'dependencias_fortes': [],
+                'total_concursos': 0
+            }
+        
         probabilidades = {}
         
         # Calcular probabilidades condicionais
@@ -380,7 +575,7 @@ class AnaliseEstatisticaAvancada:
                 if numero1 != numero2:
                     # Probabilidade conjunta
                     par = tuple(sorted([numero1, numero2]))
-                    prob_conjunta = contagem_pares[par] / total_concursos
+                    prob_conjunta = contagem_pares[par] / total_concursos if total_concursos > 0 else 0
                     
                     # Probabilidade condicional P(numero2 | numero1)
                     if contagem_numeros[numero1] > 0:
@@ -389,19 +584,20 @@ class AnaliseEstatisticaAvancada:
                         prob_condicional = 0
                     
                     # Medida de dependência
-                    if prob_numero1 > 0:
-                        dependencia = prob_condicional / (contagem_numeros[numero2] / total_concursos)
+                    if prob_numero1 > 0 and total_concursos > 0:
+                        prob_numero2 = contagem_numeros[numero2] / total_concursos
+                        dependencia = prob_condicional / prob_numero2 if prob_numero2 > 0 else 0
                     else:
                         dependencia = 0
                     
                     condicionais[numero2] = {
-                        'probabilidade_condicional': prob_condicional,
-                        'dependencia': dependencia,
-                        'probabilidade_conjunta': prob_conjunta
+                        'probabilidade_condicional': float(prob_condicional),
+                        'dependencia': float(dependencia),
+                        'probabilidade_conjunta': float(prob_conjunta)
                     }
             
             probabilidades[numero1] = {
-                'probabilidade_marginal': prob_numero1,
+                'probabilidade_marginal': float(prob_numero1),
                 'condicionais': condicionais
             }
         
@@ -412,32 +608,50 @@ class AnaliseEstatisticaAvancada:
                 if num1 != num2:
                     dep = probabilidades[num1]['condicionais'][num2]['dependencia']
                     if dep > 1.5:  # Dependência forte
-                        dependencias.append((num1, num2, dep))
+                        dependencias.append((int(num1), int(num2), float(dep)))
         
         dependencias.sort(key=lambda x: x[2], reverse=True)
         
         return {
             'probabilidades_completas': probabilidades,
             'dependencias_fortes': dependencias[:20],
-            'total_concursos': total_concursos
+            'total_concursos': int(total_concursos)
         }
     
-    def executar_analise_completa(self):
+    def executar_analise_completa(self, qtd_concursos=None):
         """
         Executa todas as análises estatísticas avançadas
         
+        Args:
+            qtd_concursos (int, optional): Quantidade de concursos para análise temporal
+            
         Returns:
             dict: Resultados completos de todas as análises
         """
-        logger.info("Iniciando análise estatística avançada completa...")
+        logger.info(f"Iniciando análise estatística avançada completa... (qtd_concursos: {qtd_concursos})")
+        
+        # Filtrar dados por período se especificado
+        df_analise = self.df_validos
+        if qtd_concursos and qtd_concursos > 0:
+            df_analise = self.df_validos.tail(qtd_concursos)
+            logger.info(f"Analisando últimos {qtd_concursos} concursos ({len(df_analise)} encontrados)")
+        
+        # Criar instância temporária com dados filtrados
+        analise_temp = AnaliseEstatisticaAvancada(df_analise)
+        
+        # Ajustar número de clusters baseado no tamanho dos dados
+        n_clusters = min(5, max(2, len(df_analise) // 5))  # Entre 2 e 5 clusters
         
         resultados = {
-            'desvio_padrao': self.calcular_desvio_padrao_distribuicao(),
-            'aleatoriedade': self.teste_aleatoriedade(),
-            'clusters': self.analise_clusters(),
-            'correlacao': self.analise_correlacao_numeros(),
-            'probabilidades_condicionais': self.probabilidades_condicionais()
+            'desvio_padrao_distribuicao': analise_temp.calcular_desvio_padrao_distribuicao(),
+            'teste_aleatoriedade': analise_temp.teste_aleatoriedade(),
+            'analise_clusters': analise_temp.analise_clusters(n_clusters=n_clusters),
+            'analise_correlacao_numeros': analise_temp.analise_correlacao_numeros(),
+            'probabilidades_condicionais': analise_temp.probabilidades_condicionais()
         }
+        
+        # Limpar valores NaN antes de retornar
+        resultados = limpar_nan_do_dict(resultados)
         
         logger.info("Análise estatística avançada concluída!")
         return resultados

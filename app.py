@@ -26,9 +26,8 @@ from funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milio
 from funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
 
 # As funções de 'calculos.py' e a classe 'AnaliseEstatisticaAvancada' de 'analise_estatistica_avancada.py'
-# ainda não foram integradas aos endpoints da API ou ao dashboard, mas estão anotadas para futuras implementações.
 from calculos import calcular_seca_numeros, calcular_seca_trevos
-# from analise_estatistica_avancada import AnaliseEstatisticaAvancada
+from analise_estatistica_avancada import AnaliseEstatisticaAvancada
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -250,6 +249,31 @@ def get_analise_seca():
 
     except Exception as e:
         print(f"Erro na API de seca: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+
+
+@app.route('/api/estatisticas_avancadas', methods=['GET'])
+def get_estatisticas_avancadas():
+    """Retorna os dados das estatísticas avançadas."""
+    try:
+        if df_milionaria is None or df_milionaria.empty:
+            return jsonify({'error': 'Dados da +Milionária não carregados.'}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        print(f"📈 Estatísticas Avançadas - Parâmetro qtd_concursos: {qtd_concursos}")
+
+        # Criar instância da classe de análise
+        analise = AnaliseEstatisticaAvancada(df_milionaria)
+        
+        # Executar análise completa
+        resultado = analise.executar_analise_completa(qtd_concursos)
+
+        return jsonify(resultado)
+
+    except Exception as e:
+        print(f"Erro na API de estatísticas avançadas: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Erro interno: {str(e)}"}), 500

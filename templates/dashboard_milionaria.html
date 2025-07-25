@@ -525,7 +525,7 @@
           break;
         case 'distribuicao':
           titulo.textContent = '🔢 Análise de Distribuição';
-          carregarAnaliseDistribuicao(conteudo);
+          carregarAnaliseDistribuicao(conteudo, null);
           break;
         case 'afinidades':
           titulo.textContent = '🤝 Análise de Afinidades';
@@ -541,7 +541,7 @@
           break;
         case 'estatisticas':
           titulo.textContent = '📈 Estatísticas Avançadas';
-          carregarEstatisticasAvancadas(conteudo);
+          carregarAnaliseEstatisticasAvancadas(conteudo);
           break;
       }
     }
@@ -860,12 +860,13 @@
       }
 
     // Carregar análise de distribuição
-    async function carregarAnaliseDistribuicao(container) {
+    async function carregarAnaliseDistribuicao(container, qtdConcursos = null) {
       container.innerHTML = "🔄 Carregando análise de distribuição...";
 
       try {
         console.log("Iniciando fetch para /api/analise_de_distribuicao...");
-        const response = await fetch('/api/analise_de_distribuicao');
+        const url = qtdConcursos ? `/api/analise_de_distribuicao?qtd_concursos=${qtdConcursos}` : '/api/analise_de_distribuicao';
+        const response = await fetch(url);
         console.log("Response status:", response.status);
         
         if (!response.ok) {
@@ -886,8 +887,22 @@
             <!-- Cabeçalho com título e ajuda -->
             <div class="flex justify-between items-start">
               <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
-                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🔢 Análise de Distribuição Estatística</h3>
-                <p class="text-sm text-gray-300">Análise completa de paridade, somas e amplitude dos números sorteados</p>
+                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
+                <div class="flex flex-wrap gap-3 items-center">
+                  <label class="text-sm text-gray-300">Período:</label>
+                  <select id="selectDistribuicaoPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateDistribuicaoModal()">
+                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
+                    <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                    <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                    <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
+                  </select>
+                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+                </div>
+                <div class="mt-2 text-xs text-gray-400" id="distribuicaoPeriodoDisplay">
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
+                </div>
               </div>
               <button onclick="abrirPopupAjudaDistribuicao()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
                 ❓
@@ -896,25 +911,25 @@
             
             <!-- Gráfico de Paridade - Números Principais -->
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🔢 Paridade - Números Principais</h3>
+              <h3 class="text-lg font-semibold mb-4">🔢 Paridade - Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-paridade-numeros" style="height: 400px;"></div>
             </div>
             
             <!-- Gráfico de Paridade - Trevos -->
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🍀 Paridade - Trevos</h3>
+              <h3 class="text-lg font-semibold mb-4">🍀 Paridade - Trevos${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-paridade-trevos" style="height: 400px;"></div>
             </div>
             
             <!-- Estatísticas de Paridade -->
             <div class="grid grid-cols-2 gap-4">
               <div class="stat-card p-4">
-                <h4 class="font-semibold mb-2">📊 Números Principais</h4>
+                <h4 class="font-semibold mb-2">📊 Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h4>
                 <p class="text-sm text-gray-400">Média de Pares: <span class="text-[#00E38C]">${data.paridade.numeros_principais.media_pares.toFixed(2)}</span></p>
                 <p class="text-sm text-gray-400">Média de Ímpares: <span class="text-[#00E38C]">${data.paridade.numeros_principais.media_impares.toFixed(2)}</span></p>
               </div>
               <div class="stat-card p-4">
-                <h4 class="font-semibold mb-2">🍀 Trevos</h4>
+                <h4 class="font-semibold mb-2">🍀 Trevos${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h4>
                 <p class="text-sm text-gray-400">Média de Pares: <span class="text-[#00E38C]">${data.paridade.trevos.media_pares.toFixed(2)}</span></p>
                 <p class="text-sm text-gray-400">Média de Ímpares: <span class="text-[#00E38C]">${data.paridade.trevos.media_impares.toFixed(2)}</span></p>
               </div>
@@ -922,27 +937,27 @@
             
             <!-- Gráfico de Soma - Números Principais -->
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📊 Soma dos Números Principais</h3>
+              <h3 class="text-lg font-semibold mb-4">📊 Soma dos Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-soma-numeros" style="height: 400px;"></div>
             </div>
             
             <!-- Gráfico de Soma - Trevos -->
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🍀 Soma dos Trevos</h3>
+              <h3 class="text-lg font-semibold mb-4">🍀 Soma dos Trevos${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-soma-trevos" style="height: 400px;"></div>
             </div>
             
             <!-- Estatísticas de Soma -->
             <div class="grid grid-cols-2 gap-4">
               <div class="stat-card p-4">
-                <h4 class="font-semibold mb-2">📊 Soma Números Principais</h4>
+                <h4 class="font-semibold mb-2">📊 Soma Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h4>
                 <p class="text-sm text-gray-400">Mín: <span class="text-[#00E38C]">${data.soma_dos_numeros.numeros_principais.min}</span></p>
                 <p class="text-sm text-gray-400">Máx: <span class="text-[#00E38C]">${data.soma_dos_numeros.numeros_principais.max}</span></p>
                 <p class="text-sm text-gray-400">Média: <span class="text-[#00E38C]">${data.soma_dos_numeros.numeros_principais.media}</span></p>
                 <p class="text-sm text-gray-400">Moda: <span class="text-[#00E38C]">${data.soma_dos_numeros.numeros_principais.moda}</span></p>
               </div>
               <div class="stat-card p-4">
-                <h4 class="font-semibold mb-2">🍀 Soma Trevos</h4>
+                <h4 class="font-semibold mb-2">🍀 Soma Trevos${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h4>
                 <p class="text-sm text-gray-400">Mín: <span class="text-[#00E38C]">${data.soma_dos_numeros.trevos.min}</span></p>
                 <p class="text-sm text-gray-400">Máx: <span class="text-[#00E38C]">${data.soma_dos_numeros.trevos.max}</span></p>
                 <p class="text-sm text-gray-400">Média: <span class="text-[#00E38C]">${data.soma_dos_numeros.trevos.media}</span></p>
@@ -952,7 +967,7 @@
             
             <!-- Gráfico de Amplitude - Números Principais -->
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📏 Amplitude dos Números Principais</h3>
+              <h3 class="text-lg font-semibold mb-4">📏 Amplitude dos Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-amplitude-numeros" style="height: 400px;"></div>
             </div>
             
@@ -2488,31 +2503,135 @@
       });
     }
 
-    // Carregar estatísticas avançadas
-    function carregarEstatisticasAvancadas(container) {
-      container.innerHTML = `
-        <div class="space-y-6">
-          <div class="grid grid-cols-2 gap-6">
-            <div class="stat-card p-4">
-              <h4 class="font-semibold mb-2">🎲 Teste de Aleatoriedade</h4>
-              <p class="text-lg font-bold text-[#00E38C]">ALEATÓRIO</p>
-              <p class="text-sm text-gray-400">P-valor: 0.9916</p>
+    // Carregar análise de estatísticas avançadas
+    async function carregarAnaliseEstatisticasAvancadas(container, qtdConcursos = null) {
+      container.innerHTML = "🔄 Carregando análise de estatísticas avançadas...";
+
+      try {
+        // Construir URL com parâmetro de concursos se fornecido
+        let url = '/api/estatisticas_avancadas';
+        if (qtdConcursos) {
+          url += `?qtd_concursos=${qtdConcursos}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error) {
+          container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
+          return;
+        }
+
+        // Extrair dados das estatísticas
+        const testeAleatoriedade = data.teste_aleatoriedade || {};
+        const desvioPadrao = data.desvio_padrao_distribuicao || {};
+        const clusters = data.analise_clusters || {};
+        const correlacao = data.analise_correlacao_numeros || {};
+        const probabilidades = data.probabilidades_condicionais || {};
+
+        container.innerHTML = `
+          <div class="space-y-6">
+            <!-- Cabeçalho com título e ajuda -->
+            <div class="flex justify-between items-start">
+              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
+                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
+                <div class="flex flex-wrap gap-3 items-center">
+                  <label class="text-sm text-gray-300">Período:</label>
+                  <select id="selectEstatisticasAvancadasPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateEstatisticasAvancadasModal()">
+                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
+                    <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                    <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                    <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
+                  </select>
+                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+                </div>
+                <div class="mt-2 text-xs text-gray-400" id="estatisticasAvancadasPeriodoDisplay">
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
+                </div>
+              </div>
+              <button onclick="abrirPopupAjudaEstatisticasAvancadas()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
+                ❓
+              </button>
             </div>
-            <div class="stat-card p-4">
-              <h4 class="font-semibold mb-2">📊 Desvio Padrão</h4>
-              <p class="text-lg font-bold text-[#00E38C]">6.11</p>
-              <p class="text-sm text-gray-400">Coeficiente: 18.94%</p>
+
+            <!-- Estatísticas Principais -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="stat-card p-4">
+                <h4 class="font-semibold mb-2">🎲 Teste de Aleatoriedade${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h4>
+                <p class="text-lg font-bold text-[#00E38C]">${testeAleatoriedade.teste_chi_quadrado?.interpretacao || 'N/A'}</p>
+                <p class="text-sm text-gray-400">P-valor: ${testeAleatoriedade.teste_chi_quadrado?.p_value?.toFixed(4) || 'N/A'}</p>
+                <p class="text-sm text-gray-400">Chi²: ${testeAleatoriedade.teste_chi_quadrado?.chi2?.toFixed(4) || 'N/A'}</p>
+              </div>
+              <div class="stat-card p-4">
+                <h4 class="font-semibold mb-2">📊 Desvio Padrão da Distribuição${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h4>
+                <p class="text-lg font-bold text-[#00E38C]">${desvioPadrao.estatisticas_gerais?.desvio_padrao?.toFixed(2) || 'N/A'}</p>
+                <p class="text-sm text-gray-400">Coeficiente: ${desvioPadrao.estatisticas_gerais?.coeficiente_variacao?.toFixed(2) || 'N/A'}%</p>
+                <p class="text-sm text-gray-400">Média: ${desvioPadrao.estatisticas_gerais?.media_frequencia?.toFixed(2) || 'N/A'}</p>
+              </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="chart-container">
+                <h3 class="text-lg font-semibold mb-4">🔗 Análise de Clusters${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
+                <div id="grafico-estatisticas-clusters" style="height: 400px;"></div>
+              </div>
+              <div class="chart-container">
+                <h3 class="text-lg font-semibold mb-4">📈 Correlação entre Números${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
+                <div id="grafico-estatisticas-correlacao" style="height: 400px;"></div>
+              </div>
+            </div>
+
+            <!-- Probabilidades Condicionais -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🎯 Probabilidades Condicionais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
+              <div id="grafico-estatisticas-probabilidades" style="height: 400px;"></div>
+            </div>
+
+            <!-- Interpretação -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#8B5CF6]">
+              <h3 class="text-xl font-semibold text-[#8B5CF6] mb-2">Interpretação das Estatísticas Avançadas 📊</h3>
+              <ul class="list-disc list-inside text-gray-300 ml-4">
+                <li><strong>Teste de Aleatoriedade:</strong> Verifica se os sorteios são realmente aleatórios.</li>
+                <li><strong>Desvio Padrão:</strong> Mede a dispersão dos números sorteados.</li>
+                <li><strong>Clusters:</strong> Identifica grupos de números que aparecem juntos.</li>
+                <li><strong>Correlação:</strong> Mostra relações entre diferentes números.</li>
+                <li><strong>Probabilidades Condicionais:</strong> Probabilidade de um número sair dado que outro saiu.</li>
+              </ul>
+            </div>
+
+            <!-- Estratégias -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-green-400">
+              <h3 class="text-xl font-semibold text-green-400 mb-2">Estratégias com Estatísticas Avançadas ✅</h3>
+              <ul class="list-disc list-inside text-gray-300 ml-4">
+                <li><strong>Aleatoriedade:</strong> Se confirmada, use estratégias balanceadas.</li>
+                <li><strong>Clusters:</strong> Evite ou explore grupos de números relacionados.</li>
+                <li><strong>Correlações:</strong> Use pares de números que se relacionam.</li>
+                <li><strong>Probabilidades:</strong> Aproveite as relações condicionais.</li>
+                <li><strong>Combinação:</strong> Integre com análises de frequência e seca.</li>
+              </ul>
+            </div>
+
+            <!-- Alerta Final -->
+            <div class="mt-8 text-center text-gray-400">
+              <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística avançada. Não garante resultados futuros. Aposte com responsabilidade.</p>
             </div>
           </div>
-          
-          <div class="chart-container">
-            <h3 class="text-lg font-semibold mb-4">🔗 Análise de Clusters</h3>
-            <div id="grafico-clusters" style="height: 400px;"></div>
-          </div>
-        </div>
-      `;
-      
-      criarGraficoClusters();
+        `;
+        
+        // Criar gráficos após o HTML ser inserido
+        setTimeout(() => {
+          plotGraficoEstatisticasClusters(clusters, qtdConcursos);
+          plotGraficoEstatisticasCorrelacao(correlacao, qtdConcursos);
+          plotGraficoEstatisticasProbabilidades(probabilidades, qtdConcursos);
+        }, 100);
+        
+      } catch (error) {
+        console.error('Erro ao carregar estatísticas avançadas:', error);
+        container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
+      }
     }
 
     // Funções para criar gráficos (simuladas)
@@ -2535,6 +2654,227 @@
 
     function criarGraficoSeca() {
       console.log('Criando gráfico de seca...');
+    }
+
+    // Função para atualizar o modal quando o filtro de período é alterado
+    function updateEstatisticasAvancadasModal() {
+      const selectElement = document.getElementById('selectEstatisticasAvancadasPeriodo');
+      const selectedQtd = selectElement.value;
+      
+      // Atualizar o texto do período
+      const periodoDisplay = document.getElementById('estatisticasAvancadasPeriodoDisplay');
+      if (periodoDisplay) {
+        if (selectedQtd) {
+          periodoDisplay.textContent = `Análise dos últimos ${selectedQtd} concursos.`;
+        } else {
+          periodoDisplay.textContent = 'Análise de todos os concursos disponíveis.';
+        }
+      }
+      
+      // Carregar dados no modal genérico
+      const conteudo = document.getElementById('conteudo-modal');
+      if (conteudo) {
+        carregarAnaliseEstatisticasAvancadas(conteudo, selectedQtd);
+      }
+    }
+    
+    // Função para abrir popup de ajuda das estatísticas avançadas
+    function abrirPopupAjudaEstatisticasAvancadas() {
+      document.getElementById("popupAjudaEstatisticasAvancadas").style.display = "block";
+    }
+
+    function fecharPopupAjudaEstatisticasAvancadas() {
+      document.getElementById("popupAjudaEstatisticasAvancadas").style.display = "none";
+    }
+    
+    // Função para criar gráfico de clusters
+    function plotGraficoEstatisticasClusters(clusters, periodo = null) {
+      if (!clusters || !clusters.estatisticas_clusters) {
+        console.error('Dados de clusters não disponíveis');
+        return;
+      }
+      
+      const clusterData = clusters.estatisticas_clusters;
+      const labels = Object.keys(clusterData);
+      const valores = Object.values(clusterData).map(cluster => cluster.quantidade);
+      
+      // Criar título com período
+      let titulo = '🔗 Clusters de Números Identificados';
+      if (periodo) {
+        titulo += ` (Últimos ${periodo} concursos)`;
+      }
+      
+      const data = [{
+        x: labels,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: '#00E38C',
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 1
+          }
+        },
+        text: valores.map(val => `${val} números`),
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 10,
+          weight: 'bold'
+        },
+        hovertemplate: '<b>Cluster %{x}</b><br>Números: %{y}<extra></extra>'
+      }];
+      
+      const layout = {
+        title: {
+          text: titulo,
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Cluster',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 12 }
+        },
+        yaxis: { 
+          title: 'Quantidade de Números',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+      };
+      
+      Plotly.newPlot('grafico-estatisticas-clusters', data, layout, { displayModeBar: false });
+    }
+    
+    // Função para criar gráfico de correlação
+    function plotGraficoEstatisticasCorrelacao(correlacao, periodo = null) {
+      if (!correlacao || !correlacao.correlacoes_positivas) {
+        console.error('Dados de correlação não disponíveis');
+        return;
+      }
+      
+      // Combinar correlações positivas e negativas
+      const todasCorrelacoes = [...(correlacao.correlacoes_positivas || []), ...(correlacao.correlacoes_negativas || [])];
+      const pares = todasCorrelacoes.map(pair => `${pair[0]}-${pair[1]}`);
+      const valores = todasCorrelacoes.map(pair => pair[2]);
+      
+      // Criar título com período
+      let titulo = '📈 Correlações Significativas entre Números';
+      if (periodo) {
+        titulo += ` (Últimos ${periodo} concursos)`;
+      }
+      
+      const data = [{
+        x: pares,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: valores.map(val => val > 0 ? '#22C55E' : '#EF4444'),
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 1
+          }
+        },
+        text: valores.map(val => val.toFixed(3)),
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 10,
+          weight: 'bold'
+        },
+        hovertemplate: '<b>%{x}</b><br>Correlação: %{y}<extra></extra>'
+      }];
+      
+      const layout = {
+        title: {
+          text: titulo,
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Pares de Números',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 10 }
+        },
+        yaxis: { 
+          title: 'Coeficiente de Correlação',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+      };
+      
+      Plotly.newPlot('grafico-estatisticas-correlacao', data, layout, { displayModeBar: false });
+    }
+    
+    // Função para criar gráfico de probabilidades condicionais
+    function plotGraficoEstatisticasProbabilidades(probabilidades, periodo = null) {
+      if (!probabilidades || !probabilidades.dependencias_fortes) {
+        console.error('Dados de probabilidades condicionais não disponíveis');
+        return;
+      }
+      
+      const dependencias = probabilidades.dependencias_fortes || [];
+      const pares = dependencias.map(dep => `${dep[0]}-${dep[1]}`);
+      const valores = dependencias.map(dep => dep[2]);
+      
+      // Criar título com período
+      let titulo = '🎯 Probabilidades Condicionais';
+      if (periodo) {
+        titulo += ` (Últimos ${periodo} concursos)`;
+      }
+      
+      const data = [{
+        x: pares,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: '#8B5CF6',
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 1
+          }
+        },
+        text: valores.map(val => `${(val * 100).toFixed(1)}%`),
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 10,
+          weight: 'bold'
+        },
+        hovertemplate: '<b>%{x}</b><br>Probabilidade: %{y}<extra></extra>'
+      }];
+      
+      const layout = {
+        title: {
+          text: titulo,
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Pares de Números',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 10 }
+        },
+        yaxis: { 
+          title: 'Probabilidade',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+      };
+      
+      Plotly.newPlot('grafico-estatisticas-probabilidades', data, layout, { displayModeBar: false });
     }
 
     function criarGraficoClusters() {
@@ -2800,6 +3140,18 @@
         mostrarMensagem(`❌ Erro ao gerar aposta: ${error.message}`, 'error');
       }
     }
+
+    // Função para atualizar o modal quando o filtro de período é alterado
+    function updateDistribuicaoModal() {
+      const selectElement = document.getElementById('selectDistribuicaoPeriodo');
+      const selectedQtd = selectElement.value;
+      
+      // Carregar dados no modal genérico
+      const conteudo = document.getElementById('conteudo-modal');
+      if (conteudo) {
+        carregarAnaliseDistribuicao(conteudo, selectedQtd);
+      }
+    }
   </script>
 
 
@@ -2933,27 +3285,27 @@
       <h3>📊 Interpretando os Gráficos</h3>
       <p>
         <strong>📈 Gráfico de Pares:</strong> Mostra os pares com maior afinidade em ordem decrescente. Barras mais altas indicam pares que saem juntos com mais frequência.<br>
-        <strong>⭐ Gráfico de Afinidade Geral:</strong> Mostra a pontuação total de cada número. Números com barras mais altas são mais "sociais" nos sorteios.<br>
-        <strong>🌐 Rede de Afinidade:</strong> Linhas mais grossas e coloridas (vermelho = alta afinidade, laranja = média, roxo = baixa) mostram a intensidade das conexões.
+        <strong⭐ Gráfico de Afinidade Geral:</strong> Mostra a pontuação total de cada número. Números com barras mais altas são mais "sociais" nos sorteios.<br>
+        <strong🌐 Rede de Afinidade:</strong> Linhas mais grossas e coloridas (vermelho = alta afinidade, laranja = média, roxo = baixa) mostram a intensidade das conexões.
       </p>
 
       <h3>🎯 Estratégias de Uso</h3>
       <p>
         <strong>✅ Estratégia de Inclusão:</strong> Incluir pares com alta afinidade em sua aposta, pois eles têm histórico de sair juntos.<br>
-        <strong>❌ Estratégia de Evitação:</strong> Evitar pares com alta afinidade para não "concentrar" demais sua aposta.<br>
-        <strong>🔄 Estratégia Mista:</strong> Usar números com alta afinidade geral como base e complementar com números menos frequentes.<br>
-        <strong>⚖️ Balanceamento:</strong> Combinar números com diferentes níveis de afinidade para criar apostas mais equilibradas.
+        <strong❌ Estratégia de Evitação:</strong> Evitar pares com alta afinidade para não "concentrar" demais sua aposta.<br>
+        <strong🔄 Estratégia Mista:</strong> Usar números com alta afinidade geral como base e complementar com números menos frequentes.<br>
+        <strong⚖️ Balanceamento:</strong> Combinar números com diferentes níveis de afinidade para criar apostas mais equilibradas.
       </p>
 
       <h3>⚠️ Considerações Importantes</h3>
       <p>
-        <strong>🔍 Correlação não é causalidade:</strong> Números com alta afinidade não "causam" o sorteio um do outro, apenas têm histórico de aparecer juntos.<br>
-        <strong>🔄 Padrões podem mudar:</strong> Afinidades baseadas em dados históricos podem não se repetir no futuro.<br>
-        <strong>🎯 Use com moderação:</strong> Não dependa exclusivamente da afinidade, combine com outras análises.
+        <strong🔍 Correlação não é causalidade:</strong> Números com alta afinidade não "causam" o sorteio um do outro, apenas têm histórico de aparecer juntos.<br>
+        <strong🔄 Padrões podem mudar:</strong> Afinidades baseadas em dados históricos podem não se repetir no futuro.<br>
+        <strong🎯 Use com moderação:</strong> Não dependa exclusivamente da afinidade, combine com outras análises.
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong>⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises de afinidade não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+        <strong⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises de afinidade não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
       </p>
     </div>
   </div>
@@ -2986,27 +3338,27 @@
       <h3>📊 Interpretando os Gráficos</h3>
       <p>
         <strong>📈 Gráfico de Frequência:</strong> Mostra a frequência de cada trevo em ordem decrescente. Barras mais altas indicam trevos mais sorteados.<br>
-        <strong>🤝 Gráfico de Combinações:</strong> Mostra as duplas de trevos mais frequentes. Barras mais altas indicam combinações que saem juntas mais vezes.<br>
-        <strong>🔗 Gráfico de Correlação:</strong> Mostra quais números principais mais saem com cada trevo, facilitando a criação de combinações.
+        <strong🤝 Gráfico de Combinações:</strong> Mostra as duplas de trevos mais frequentes. Barras mais altas indicam combinações que saem juntas mais vezes.<br>
+        <strong🔗 Gráfico de Correlação:</strong> Mostra quais números principais mais saem com cada trevo, facilitando a criação de combinações.
       </p>
 
       <h3>🎯 Estratégias de Uso</h3>
       <p>
         <strong>✅ Estratégia de Frequência:</strong> Escolher trevos com alta frequência histórica.<br>
-        <strong>🤝 Estratégia de Combinação:</strong> Usar duplas de trevos que têm histórico de sair juntas.<br>
-        <strong>🔗 Estratégia de Correlação:</strong> Combinar trevos com números principais que têm alta correlação.<br>
-        <strong>⚖️ Estratégia Balanceada:</strong> Misturar trevos quentes e frios para diversificar.
+        <strong🤝 Estratégia de Combinação:</strong> Usar duplas de trevos que têm histórico de sair juntas.<br>
+        <strong🔗 Estratégia de Correlação:</strong> Combinar trevos com números principais que têm alta correlação.<br>
+        <strong⚖️ Estratégia Balanceada:</strong> Misturar trevos quentes e frios para diversificar.
       </p>
 
       <h3>⚠️ Considerações Importantes</h3>
       <p>
-        <strong>🔍 Padrões podem variar:</strong> Frequências históricas não garantem repetição no futuro.<br>
-        <strong>🔄 Análise temporal:</strong> Use a janela de análise para ver padrões recentes vs. históricos.<br>
-        <strong>🎯 Use com moderação:</strong> Combine com outras análises para estratégias mais robustas.
+        <strong🔍 Padrões podem variar:</strong> Frequências históricas não garantem repetição no futuro.<br>
+        <strong🔄 Análise temporal:</strong> Use a janela de análise para ver padrões recentes vs. históricos.<br>
+        <strong🎯 Use com moderação:</strong> Combine com outras análises para estratégias mais robustas.
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong>⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises dos trevos não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+        <strong⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises dos trevos não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
       </p>
     </div>
   </div>
@@ -3023,52 +3375,140 @@
         A análise de seca calcula o período em que cada número ou trevo não foi sorteado.<br>
         <strong>Maior Seca:</strong> Números/trevos que estão há mais tempo sem aparecer.<br>
         <strong>Recentemente Sorteados:</strong> Números/trevos que saíram nos últimos concursos.<br>
-        <strong>💡 Dica:</strong> Números em seca prolongada podem estar "atrasados" para sair.
+        <strong💡 Dica:</strong> Números em seca prolongada podem estar "atrasados" para sair.
       </p>
 
       <h3>🎯 Janela de Análise Temporal</h3>
       <p>
         Use o seletor de período para analisar diferentes janelas de tempo:<br>
         <strong>Todos os concursos:</strong> Análise completa do histórico disponível.<br>
-        <strong>Últimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
-        <strong>💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
+        <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
+        <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
       </p>
 
       <h3>📈 Interpretando os Gráficos</h3>
       <p>
         <strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).<br>
         <strong>Eixo Y:</strong> Concursos em que estão sem sair.<br>
-        <strong>Barras vermelhas:</strong> Maior tempo de seca (mais "atrasados").<br>
-        <strong>Barras verdes:</strong> Sorteados recentemente.<br>
-        <strong>💡 Dica:</strong> As cores indicam a intensidade da seca, facilitando a identificação visual.
+        <strongBarras vermelhas:</strong> Maior tempo de seca (mais "atrasados").<br>
+        <strongBarras verdes:</strong> Sorteados recentemente.<br>
+        <strong💡 Dica:</strong> As cores indicam a intensidade da seca, facilitando a identificação visual.
       </p>
 
       <h3>💡 Estratégias de Aposta</h3>
       <p>
-        <strong>Atrasados:</strong> Apostar nos números em maior seca, baseado na teoria de que estão "devendo" sair.<br>
-        <strong>Recentes:</strong> Apostar nos que saíram há pouco, seguindo a tendência de "momentum".<br>
-        <strong>Misto:</strong> Combinar ambas as estratégias para diversificar sua aposta.<br>
-        <strong>Aleatoriedade:</strong> Lembre-se: não há garantias! A loteria é um jogo de azar.
+        <strongAtrasados:</strong> Apostar nos números em maior seca, baseado na teoria de que estão "devendo" sair.<br>
+        <strongRecentes:</strong> Apostar nos que saíram há pouco, seguindo a tendência de "momentum".<br>
+        <strongMisto:</strong> Combinar ambas as estratégias para diversificar sua aposta.<br>
+        <strongAleatoriedade:</strong> Lembre-se: não há garantias! A loteria é um jogo de azar.
       </p>
 
       <h3>🎯 Como Usar na Prática</h3>
       <p>
-        <strong>Observe as barras altas:</strong> Elas indicam números em maior seca.<br>
-        <strong>Analise as barras baixas:</strong> Mostram números sorteados recentemente.<br>
-        <strong>Compare períodos:</strong> Use diferentes janelas temporais para identificar tendências.<br>
-        <strong>Combine estratégias:</strong> Use a seca em conjunto com outras análises disponíveis.
+        <strongObserve as barras altas:</strong> Elas indicam números em maior seca.<br>
+        <strongAnalise as barras baixas:</strong> Mostram números sorteados recentemente.<br>
+        <strongCompare períodos:</strong> Use diferentes janelas temporais para identificar tendências.<br>
+        <strongCombine estratégias:</strong> Use a seca em conjunto com outras análises disponíveis.
       </p>
 
       <h3>⚠️ Considerações Importantes</h3>
       <p>
-        <strong>Não é garantia:</strong> A análise de seca é uma ferramenta estatística, não uma previsão.<br>
-        <strong>Aleatoriedade:</strong> Cada sorteio é independente, não há "dívida" real dos números.<br>
-        <strong>Responsabilidade:</strong> Aposte apenas o que pode perder, dentro dos seus limites financeiros.<br>
-        <strong>Diversificação:</strong> Não aposte apenas em números em seca, diversifique suas escolhas.
+        <strongNão é garantia:</strong> A análise de seca é uma ferramenta estatística, não uma previsão.<br>
+        <strongAleatoriedade:</strong> Cada sorteio é independente, não há "dívida" real dos números.<br>
+        <strongResponsabilidade:</strong> Aposte apenas o que pode perder, dentro dos seus limites financeiros.<br>
+        <strongDiversificação:</strong> Não aposte apenas em números em seca, diversifique suas escolhas.
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong>Importante:</strong> Esta é uma análise estatística histórica que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
+        <strongImportante:</strong> Esta é uma análise estatística histórica que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
+      </p>
+    </div>
+  </div>
+
+  <!-- Popup de Ajuda para Estatísticas Avançadas -->
+  <div id="popupAjudaEstatisticasAvancadas" class="modal-ajuda">
+    <div class="modal-content">
+      <span class="close" onclick="fecharPopupAjudaEstatisticasAvancadas()">×</span>
+      <h2>📈 Entendendo as Estatísticas Avançadas</h2>
+      <p>Esta análise utiliza métodos estatísticos avançados para identificar padrões complexos nos sorteios da +Milionária, oferecendo insights profundos sobre a aleatoriedade e distribuição dos números.</p>
+
+      <h3>🎲 Teste de Aleatoriedade</h3>
+      <p>
+        Verifica se os sorteios são realmente aleatórios usando testes estatísticos rigorosos.<br>
+        <strongResultado:</strong> Indica se os dados seguem uma distribuição aleatória.<br>
+        <strongP-valor:</strong> Probabilidade de obter resultados tão extremos por acaso.<br>
+        <strong💡 Dica:</strong> P-valores baixos (< 0.05) sugerem padrões não aleatórios.
+      </p>
+
+      <h3>📊 Desvio Padrão da Distribuição</h3>
+      <p>
+        Mede a dispersão dos números sorteados em relação à média esperada.<br>
+        <strongDesvio Padrão:</strong> Indica o quão espalhados estão os números.<br>
+        <strongCoeficiente de Variação:</strong> Desvio padrão relativo à média (em %).<br>
+        <strong💡 Dica:</strong> Valores altos indicam maior variabilidade nos sorteios.
+      </p>
+
+      <h3>🔗 Análise de Clusters</h3>
+      <p>
+        Identifica grupos de números que tendem a aparecer juntos nos sorteios.<br>
+        <strongClusters Identificados:</strong> Grupos de números relacionados.<br>
+        <strongFrequência:</strong> Quantas vezes cada cluster aparece.<br>
+        <strong💡 Dica:</strong> Use clusters para identificar combinações promissoras.
+      </p>
+
+      <h3>📈 Correlação entre Números</h3>
+      <p>
+        Analisa as relações estatísticas entre diferentes números.<br>
+        <strongCorrelações Significativas:</strong> Pares de números que se relacionam.<br>
+        <strongCoeficiente:</strong> Força da relação (-1 a +1).<br>
+        <strong💡 Dica:</strong> Correlações positivas indicam números que tendem a sair juntos.
+      </p>
+
+      <h3>🎯 Probabilidades Condicionais</h3>
+      <p>
+        Calcula a probabilidade de um número sair dado que outro já saiu.<br>
+        <strongProbabilidades:</strong> Chances condicionais entre pares de números.<br>
+        <strongInterpretação:</strong> Probabilidade em porcentagem.<br>
+        <strong💡 Dica:</strong> Use para identificar números que se "atraem" estatisticamente.
+      </p>
+
+      <h3>🎯 Janela de Análise Temporal</h3>
+      <p>
+        Use o seletor de período para analisar diferentes janelas de tempo:<br>
+        <strongTodos os concursos:</strong> Análise completa do histórico disponível.<br>
+        <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
+        <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
+      </p>
+
+      <h3>💡 Estratégias de Aposta</h3>
+      <p>
+        <strongAleatoriedade Confirmada:</strong> Use estratégias balanceadas e diversificadas.<br>
+        <strongClusters Identificados:</strong> Evite ou explore grupos de números relacionados.<br>
+        <strongCorrelações:</strong> Use pares de números que se relacionam estatisticamente.<br>
+        <strongProbabilidades:</strong> Aproveite as relações condicionais identificadas.<br>
+        <strongCombinação:</strong> Integre com análises de frequência e seca.
+      </p>
+
+      <h3>🎯 Como Usar na Prática</h3>
+      <p>
+        <strongObserve o teste de aleatoriedade:</strong> Confirma se há padrões nos dados.<br>
+        <strongAnalise os clusters:</strong> Identifique grupos de números relacionados.<br>
+        <strongEstude as correlações:</strong> Use pares de números que se relacionam.<br>
+        <strongConsidere as probabilidades:</strong> Aproveite as relações condicionais.<br>
+        <strongCompare períodos:</strong> Use diferentes janelas temporais para identificar tendências.
+      </p>
+
+      <h3>⚠️ Considerações Importantes</h3>
+      <p>
+        <strongComplexidade:</strong> Esta análise usa métodos estatísticos avançados.<br>
+        <strongInterpretação:</strong> Requer conhecimento básico de estatística.<br>
+        <strongLimitações:</strong> Padrões passados não garantem resultados futuros.<br>
+        <strongResponsabilidade:</strong> Aposte apenas o que pode perder, dentro dos seus limites financeiros.<br>
+        <strongDiversificação:</strong> Não aposte apenas baseado em uma análise, diversifique suas escolhas.
+      </p>
+
+      <p style="margin-top: 20px; font-style: italic;">
+        <strongImportante:</strong> Esta é uma análise estatística avançada que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
       </p>
     </div>
   </div>
