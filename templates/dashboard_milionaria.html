@@ -37,6 +37,102 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 
+  <style>
+    /* Responsividade para smartphones - remover títulos dos eixos */
+    @media (max-width: 640px) {
+      .js-plotly-plot .g-gtitle {
+        font-size: 14px !important;
+      }
+      
+      /* Remover títulos dos eixos Y em smartphones */
+      .js-plotly-plot .g-ytitle,
+      .js-plotly-plot .g-ytitle-2 {
+        display: none !important;
+      }
+      
+      /* Ajustar margens para smartphones */
+      .js-plotly-plot .plotly {
+        margin-left: 20px !important;
+        margin-right: 20px !important;
+      }
+    }
+    
+    /* Reduzir tamanho dos títulos dos gráficos - APENAS para smartphones */
+    @media (max-width: 640px) {
+      .chart-container h3 {
+        font-size: 14px !important;
+      }
+    }
+    
+    /* Reduzir tamanho das fontes dos eixos do Plotly - APENAS para smartphones */
+    @media (max-width: 640px) {
+      .js-plotly-plot .g-xtick text,
+      .js-plotly-plot .g-ytick text,
+      .js-plotly-plot .g-ytick2 text {
+        font-size: 7px !important;
+      }
+    }
+    
+    /* Cor vermelha para valores do eixo Y2 (frequência relativa) - GLOBAL */
+    .js-plotly-plot .g-ytick2 text {
+      fill: red !important;
+      color: red !important;
+    }
+    
+    /* Garantir que a cor vermelha seja aplicada em todos os dispositivos */
+    .js-plotly-plot .g-ytick2 text,
+    .js-plotly-plot .g-ytick2 .tick text,
+    .js-plotly-plot .g-ytick2 .tick-label text,
+    .js-plotly-plot .g-ytick2 .tick-label,
+    .js-plotly-plot .g-ytick2 .tick,
+    .js-plotly-plot .g-ytick2 .tick text,
+    .js-plotly-plot .g-ytick2 .tick-label text {
+      fill: red !important;
+      color: red !important;
+      stroke: red !important;
+    }
+    
+    /* Forçar cor vermelha para todos os elementos do eixo Y2 */
+    .js-plotly-plot .g-ytick2 * {
+      fill: red !important;
+      color: red !important;
+    }
+    
+    /* Reduzir altura dos gráficos para 70% - APENAS para smartphones */
+    @media (max-width: 640px) {
+      .chart-container div[id^="grafico"] {
+        height: 280px !important;
+      }
+      
+      /* Ajustar margens específicas do gráfico combinado para smartphones */
+      #grafico-frequencia .js-plotly-plot .plotly {
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
+      }
+      
+      /* Reduzir margens dos eixos no gráfico combinado para smartphones */
+      #grafico-frequencia .js-plotly-plot .g-ytick,
+      #grafico-frequencia .js-plotly-plot .g-ytick2 {
+        margin-left: 2px !important;
+        margin-right: 2px !important;
+      }
+      
+      /* Ajustar layout do gráfico combinado para smartphones */
+      #grafico-frequencia .js-plotly-plot .main-svg {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      
+      /* Reduzir espaçamento interno do gráfico combinado */
+      #grafico-frequencia .js-plotly-plot .bglayer {
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+    }
+  </style>
+
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 
 </head>
@@ -615,7 +711,7 @@
             </div>
             
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
+              <h3 class="text-lg font-semibold mb-4">📊 Frequência Absoluta  vs  Relativa <span style="color: red;">(%)</span>  </h3>
               <div id="grafico-frequencia" style="height: 400px;"></div>
             </div>
             
@@ -626,17 +722,44 @@
           </div>
         `;
         
-        // Criar gráfico absoluto com Plotly
+        // Criar gráfico combinado: Absoluta vs Relativa
         const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
-        const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
+        const yFreqAbs = data.frequencia_absoluta_numeros.map(e => e.frequencia);
+        const yFreqRelComb = data.frequencia_relativa_numeros.map(e => e.frequencia);
+        const linhaEsperadaComb = Array(50).fill(2); // Linha de referência 2%
 
-        Plotly.newPlot('grafico-frequencia', [{
-          x: xNumeros,
-          y: yFreq,
-          type: 'bar',
-          marker: { color: 'deepskyblue' }
-        }], {
-          title: 'Frequência Absoluta dos Números',
+        Plotly.newPlot('grafico-frequencia', [
+          {
+            x: xNumeros,
+            y: yFreqAbs,
+            type: 'bar',
+            name: '',
+            marker: { color: 'deepskyblue' },
+            yaxis: 'y',
+            showlegend: false
+          },
+          {
+            x: xNumeros,
+            y: yFreqRelComb,
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: '',
+            line: { color: 'red', width: 2 },
+            marker: { color: 'red', size: 4 },
+            yaxis: 'y2',
+            showlegend: false
+          },
+          {
+            x: xNumeros,
+            y: linhaEsperadaComb,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Freq. esperada',
+            line: { color: 'white', dash: 'dash', width: 2 },
+            yaxis: 'y2'
+          }
+        ], {
+          title: '',
           paper_bgcolor: '#1a1a1a',
           plot_bgcolor: '#1a1a1a',
           font: { color: 'white' },
@@ -644,7 +767,17 @@
           responsive: true,
           margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 },
           xaxis: { automargin: true },
-          yaxis: { automargin: true }
+          yaxis: { 
+            automargin: true,
+            side: 'left'
+          },
+          yaxis2: { 
+            side: 'right',
+            overlaying: 'y',
+            automargin: true,
+            tickfont: { color: 'red' }
+          },
+          showlegend: false
         }, { displayModeBar: false });
 
         // Criar gráfico relativo com Plotly
