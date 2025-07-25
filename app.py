@@ -75,19 +75,8 @@ def dashboard():
 
 # --- Rotas de API para as Análises ---
 
-@app.route('/api/analise_frequencia', methods=['GET'])
-def get_analise_frequencia():
-    """Retorna os dados da análise de frequência geral (bolas e trevos)."""
-    if df_milionaria.empty:
-        return jsonify({"error": "Dados da +Milionária não carregados."}), 500
-
-    qtd_concursos = request.args.get('qtd_concursos', type=int)
-
-    # Note: A função 'analise_frequencia_milionaria_completa' esperava uma lista de listas
-    # de df_milionaria.values.tolist(), vamos manter o padrão.
-    dados_para_analise = df_milionaria.values.tolist()
-    resultado = analise_frequencia_milionaria_completa(dados_para_analise, qtd_concursos)
-    return jsonify(resultado)
+# ROTA REMOVIDA: /api/analise_frequencia (antiga) - Substituída por /api/analise-frequencia
+# Para evitar confusão e manter consistência, use apenas a nova rota
 
 @app.route('/api/analise-frequencia')
 def get_analise_frequencia_nova():
@@ -121,8 +110,12 @@ def get_analise_padroes_sequencias():
     if df_milionaria.empty:
         return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
+    # Verificar se há parâmetro de quantidade de concursos
+    qtd_concursos = request.args.get('qtd_concursos', type=int)
+    print(f"🎯 Padrões/Sequências - Parâmetro qtd_concursos: {qtd_concursos}")
+
     dados_para_analise = df_milionaria.values.tolist()
-    resultado = analise_padroes_sequencias_milionaria(dados_para_analise)
+    resultado = analise_padroes_sequencias_milionaria(dados_para_analise, qtd_concursos)
     return jsonify(resultado)
 
 @app.route('/api/analise_de_distribuicao', methods=['GET'])
@@ -131,7 +124,11 @@ def get_analise_de_distribuicao():
     if df_milionaria.empty:
         return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
-    resultado = analise_distribuicao_milionaria(df_milionaria)
+    # Verificar se há parâmetro de quantidade de concursos
+    qtd_concursos = request.args.get('qtd_concursos', type=int)
+    print(f"🎯 Distribuição - Parâmetro qtd_concursos: {qtd_concursos}")
+
+    resultado = analise_distribuicao_milionaria(df_milionaria, qtd_concursos)
     return jsonify(resultado)
 
 @app.route('/api/analise_de_combinacoes', methods=['GET'])

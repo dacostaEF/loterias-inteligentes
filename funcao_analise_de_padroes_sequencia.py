@@ -397,12 +397,14 @@ def exibir_analise_padroes_sequencias(resultado):
         print(f"  Número {num}: probabilidade relativa {prob}")
 
 # Função para integrar com dados da Mais Milionária
-def analise_padroes_sequencias_milionaria(df_milionaria):
+def analise_padroes_sequencias_milionaria(df_milionaria, qtd_concursos=None):
     """
     Versão adaptada para trabalhar com DataFrame da Mais Milionária
     
     Args:
         df_milionaria (pd.DataFrame): DataFrame com dados da Mais Milionária
+        qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
+                                      Se None, analisa todos os concursos.
         Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6, Trevo1, Trevo2
     
     Returns:
@@ -442,6 +444,22 @@ def analise_padroes_sequencias_milionaria(df_milionaria):
     if not dados_sorteios:
         print("⚠️  Aviso: Nenhum sorteio válido encontrado no DataFrame!")
         return {}
+    
+    # Aplicar filtro por quantidade de concursos se especificado
+    if qtd_concursos is not None:
+        print(f"🎯 Padrões/Sequências - Filtro solicitado: {qtd_concursos} concursos")
+        print(f"📊 Total de concursos disponíveis: {len(dados_sorteios)}")
+        
+        # Ordenar por concurso (assumindo que o primeiro elemento é o número do concurso)
+        dados_sorteios = sorted(dados_sorteios, key=lambda x: x[0])
+        
+        if qtd_concursos > len(dados_sorteios):
+            print(f"⚠️  Aviso: Solicitados {qtd_concursos} concursos, mas só há {len(dados_sorteios)} disponíveis.")
+            qtd_concursos = len(dados_sorteios)
+        
+        # Pegar os últimos N concursos (mais recentes primeiro)
+        dados_sorteios = dados_sorteios[-qtd_concursos:]
+        print(f"📊 Analisando os últimos {qtd_concursos} concursos...")
     
     # Executar análise original
     return analise_padroes_sequencias(dados_sorteios)
