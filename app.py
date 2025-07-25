@@ -137,12 +137,68 @@ def get_analise_de_distribuicao():
 @app.route('/api/analise_de_combinacoes', methods=['GET'])
 def get_analise_de_combinacoes():
     """Retorna os dados da análise de combinações."""
-    if df_milionaria.empty:
-        return jsonify({"error": "Dados da +Milionária não carregados."}), 500
+    try:
+        # Verificar se df_milionaria é DataFrame ou lista
+        if df_milionaria is None:
+            return jsonify({"error": "Dados da +Milionária não carregados."}), 500
+        
+        # Se for DataFrame, verificar se está vazio
+        if hasattr(df_milionaria, 'empty') and df_milionaria.empty:
+            return jsonify({"error": "DataFrame da +Milionária está vazio."}), 500
+        
+        # Se for lista, verificar se está vazia
+        if isinstance(df_milionaria, list) and len(df_milionaria) == 0:
+            return jsonify({"error": "Lista de dados da +Milionária está vazia."}), 500
 
-    dados_para_analise = df_milionaria.values.tolist()
-    resultado = analise_combinacoes_milionaria(dados_para_analise)
-    return jsonify(resultado)
+        print(f"Tipo de df_milionaria: {type(df_milionaria)}")
+        
+        # Converter para lista se necessário
+        if hasattr(df_milionaria, 'values'):
+            dados_para_analise = df_milionaria.values.tolist()
+        else:
+            dados_para_analise = df_milionaria
+            
+        print(f"Dados para análise: {len(dados_para_analise)} linhas")
+        
+        # Verificar se há parâmetro de quantidade de concursos
+        qtd_concursos = request.args.get('qtd_concursos')
+        if qtd_concursos:
+            qtd_concursos = int(qtd_concursos)
+            print(f"🎯 Parâmetro qtd_concursos recebido: {qtd_concursos}")
+        else:
+            print(f"🎯 Nenhum parâmetro qtd_concursos recebido")
+        
+        resultado = analise_combinacoes_milionaria(dados_para_analise, qtd_concursos)
+        print(f"Resultado obtido: {type(resultado)}")
+        
+        # Debug detalhado do resultado
+        if resultado and 'afinidade_entre_numeros' in resultado:
+            afinidades = resultado['afinidade_entre_numeros']
+            print(f"=== DEBUG AFINIDADES BACKEND ===")
+            print(f"Tipo de afinidades: {type(afinidades)}")
+            print(f"Chaves em afinidades: {list(afinidades.keys())}")
+            
+            if 'pares_com_maior_afinidade' in afinidades:
+                pares = afinidades['pares_com_maior_afinidade']
+                print(f"Tipo de pares_com_maior_afinidade: {type(pares)}")
+                print(f"É lista? {isinstance(pares, list)}")
+                print(f"Tamanho: {len(pares) if isinstance(pares, list) else 'N/A'}")
+                
+                if isinstance(pares, list) and len(pares) > 0:
+                    print(f"Primeiro par: {pares[0]}")
+                    print(f"Tipo do primeiro par: {type(pares[0])}")
+                    print(f"Estrutura do primeiro par: {pares[0]}")
+        
+        if not resultado:
+            return jsonify({"error": "Erro ao processar análise de combinações."}), 500
+            
+        return jsonify(resultado)
+        
+    except Exception as e:
+        print(f"Erro na API de combinações: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
 
 @app.route('/api/analise_trevos_da_sorte', methods=['GET'])
 def get_analise_trevos_da_sorte():

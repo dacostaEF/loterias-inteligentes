@@ -47,6 +47,25 @@ def analise_de_combinacoes(dados_sorteios, qtd_concursos=None):
     
     # Aplicar filtro por quantidade de concursos se especificado
     if qtd_concursos is not None:
+        print(f"🎯 Filtro solicitado: {qtd_concursos} concursos")
+        print(f"📊 Total de concursos disponíveis: {len(dados_validos)}")
+        
+        # Ordenar por concurso (assumindo que o primeiro elemento é o número do concurso)
+        dados_validos = sorted(dados_validos, key=lambda x: x[0])
+        print(f"📋 Concursos ordenados: {[d[0] for d in dados_validos[:5]]} ... {[d[0] for d in dados_validos[-5:]]}")
+        
+        # Verificar se os concursos estão em ordem crescente ou decrescente
+        if len(dados_validos) > 1:
+            primeiro_concurso = dados_validos[0][0]
+            ultimo_concurso = dados_validos[-1][0]
+            print(f"📊 Primeiro concurso: {primeiro_concurso}, Último concurso: {ultimo_concurso}")
+            
+            # Se o primeiro concurso for maior que o último, inverter a ordem
+            if primeiro_concurso > ultimo_concurso:
+                print("🔄 Invertendo ordem dos concursos (mais recentes primeiro)")
+                dados_validos = dados_validos[::-1]
+                print(f"📋 Ordem corrigida: {[d[0] for d in dados_validos[:5]]} ... {[d[0] for d in dados_validos[-5:]]}")
+        
         if qtd_concursos > len(dados_validos):
             print(f"⚠️  Aviso: Solicitados {qtd_concursos} concursos, mas só há {len(dados_validos)} disponíveis.")
             qtd_concursos = len(dados_validos)
@@ -54,6 +73,7 @@ def analise_de_combinacoes(dados_sorteios, qtd_concursos=None):
         # Pegar os últimos N concursos (mais recentes primeiro)
         dados_validos = dados_validos[-qtd_concursos:]
         print(f"📊 Analisando os últimos {qtd_concursos} concursos...")
+        print(f"📋 Concursos selecionados: {[d[0] for d in dados_validos[:5]]} ... {[d[0] for d in dados_validos[-5:]]}")
     
     df_sorteios_pd = pd.DataFrame(dados_validos, columns=colunas)
 
@@ -143,16 +163,30 @@ def analise_de_combinacoes(dados_sorteios, qtd_concursos=None):
                 if n1 < n2: # Para evitar duplicação (ex: (1,2) e (2,1))
                     pares_afinidade[tuple(sorted((n1, n2)))] = freq
         
-        # Encontrar os 10 pares com maior afinidade
-        top_afinidade = pares_afinidade.most_common(10)
-
-        # Encontrar os números com maior "centro de afinidade" (soma das afinidades com outros)
+        # Encontrar os pares com maior afinidade (aumentado para 50)
+        top_afinidade = pares_afinidade.most_common(50)
+        
+        # Debug dos pares de afinidade
+        print(f"=== DEBUG ANALISE AFINIDADE ===")
+        print(f"Total de pares únicos: {len(pares_afinidade)}")
+        print(f"Top 50 pares: {len(top_afinidade)}")
+        print(f"Primeiros 5 pares: {top_afinidade[:5]}")
+        
+        # Encontrar os números com maior "centro de afinidade" (aumentado para 30)
         numero_afinidade_total = {n: sum(c.values()) for n, c in afinidade_stats.items()}
-        numeros_com_maior_afinidade_geral = sorted(numero_afinidade_total.items(), key=lambda item: item[1], reverse=True)[:10]
+        numeros_com_maior_afinidade_geral = sorted(numero_afinidade_total.items(), key=lambda item: item[1], reverse=True)[:30]
+        
+        # Retornar TODOS os pares para o gráfico de rede (limitado a 100 para performance)
+        todos_pares_afinidade = pares_afinidade.most_common(100)
+        
+        print(f"Total de números únicos: {len(numero_afinidade_total)}")
+        print(f"Top 30 números: {len(numeros_com_maior_afinidade_geral)}")
+        print(f"Todos os pares para rede: {len(todos_pares_afinidade)}")
 
         return {
             'pares_com_maior_afinidade': top_afinidade,
-            'numeros_com_maior_afinidade_geral': numeros_com_maior_afinidade_geral
+            'numeros_com_maior_afinidade_geral': numeros_com_maior_afinidade_geral,
+            'todos_pares_afinidade': todos_pares_afinidade  # Para o gráfico de rede
         }
 
     # 3. Padrões geométricos: Distribuição no volante (cantos, bordas, centro)
@@ -286,7 +320,7 @@ def analise_combinacoes_milionaria(df_milionaria, qtd_concursos=None):
     Versão adaptada para trabalhar com DataFrame da Mais Milionária
     
     Args:
-        df_milionaria (pd.DataFrame): DataFrame com dados da Mais Milionária
+        df_milionaria (pd.DataFrame ou list): DataFrame ou lista com dados da Mais Milionária
         qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
                                       Se None, analisa todos os concursos.
         Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6, Trevo1, Trevo2
@@ -295,38 +329,57 @@ def analise_combinacoes_milionaria(df_milionaria, qtd_concursos=None):
         dict: Resultado da análise de combinações
     """
     
-    # Verificação de segurança para DataFrame vazio
-    if df_milionaria is None or df_milionaria.empty:
-        print("⚠️  Aviso: DataFrame da Mais Milionária está vazio ou é None!")
+    # Verificação de segurança para dados vazios
+    if df_milionaria is None:
+        print("⚠️  Aviso: Dados da Mais Milionária são None!")
         return {}
     
-    # Verificar se as colunas necessárias existem
-    colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
-    colunas_faltantes = [col for col in colunas_necessarias if col not in df_milionaria.columns]
-    
-    if colunas_faltantes:
-        print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
-        return {}
-    
-    # Converter DataFrame para formato esperado pela função original
-    dados_sorteios = []
-    
-    for _, row in df_milionaria.iterrows():
-        # Verificar se os dados são válidos
-        if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']):
-            continue  # Pular linhas com dados inválidos
+    # Se for lista, verificar se está vazia
+    if isinstance(df_milionaria, list):
+        if len(df_milionaria) == 0:
+            print("⚠️  Aviso: Lista de dados da Mais Milionária está vazia!")
+            return {}
+        # Se for lista, usar diretamente
+        dados_sorteios = df_milionaria
+    else:
+        # Se for DataFrame, verificar se está vazio
+        if hasattr(df_milionaria, 'empty') and df_milionaria.empty:
+            print("⚠️  Aviso: DataFrame da Mais Milionária está vazio!")
+            return {}
         
-        sorteio = [
-            row['Concurso'],
-            row['Bola1'], row['Bola2'], row['Bola3'], 
-            row['Bola4'], row['Bola5'], row['Bola6'],
-            row['Trevo1'], row['Trevo2']
-        ]
-        dados_sorteios.append(sorteio)
+        # Verificar se as colunas necessárias existem
+        colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
+        colunas_faltantes = [col for col in colunas_necessarias if col not in df_milionaria.columns]
+        
+        if colunas_faltantes:
+            print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
+            return {}
+        
+        # Converter DataFrame para formato esperado pela função original
+        dados_sorteios = []
+        
+        print(f"📊 Convertendo DataFrame com {len(df_milionaria)} linhas")
+        
+        for _, row in df_milionaria.iterrows():
+            # Verificar se os dados são válidos
+            if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']):
+                continue  # Pular linhas com dados inválidos
+            
+            sorteio = [
+                row['Concurso'],
+                row['Bola1'], row['Bola2'], row['Bola3'], 
+                row['Bola4'], row['Bola5'], row['Bola6'],
+                row['Trevo1'], row['Trevo2']
+            ]
+            dados_sorteios.append(sorteio)
+        
+        print(f"📊 Dados convertidos: {len(dados_sorteios)} sorteios válidos")
+        print(f"📋 Primeiros concursos: {[d[0] for d in dados_sorteios[:5]]}")
+        print(f"📋 Últimos concursos: {[d[0] for d in dados_sorteios[-5:]]}")
     
     # Verificação final antes de executar análise
     if not dados_sorteios:
-        print("⚠️  Aviso: Nenhum sorteio válido encontrado no DataFrame!")
+        print("⚠️  Aviso: Nenhum sorteio válido encontrado nos dados!")
         return {}
     
     # Executar análise original com parâmetro de quantidade de concursos
