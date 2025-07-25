@@ -27,7 +27,7 @@ from funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
 
 # As funções de 'calculos.py' e a classe 'AnaliseEstatisticaAvancada' de 'analise_estatistica_avancada.py'
 # ainda não foram integradas aos endpoints da API ou ao dashboard, mas estão anotadas para futuras implementações.
-# from calculos import calcular_seca_numeros, calcular_seca_trevos
+from calculos import calcular_seca_numeros, calcular_seca_trevos
 # from analise_estatistica_avancada import AnaliseEstatisticaAvancada
 
 
@@ -218,6 +218,38 @@ def get_analise_trevos_da_sorte():
         
     except Exception as e:
         print(f"Erro na API de trevos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+
+
+@app.route('/api/analise_seca', methods=['GET'])
+def get_analise_seca():
+    """Retorna os dados da análise de seca dos números principais e trevos."""
+    try:
+        if df_milionaria.empty:
+            return jsonify({"error": "Dados da +Milionária não carregados."}), 500
+
+        # Verificar se há parâmetro de quantidade de concursos
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+
+        # Calcular seca dos números principais
+        numeros_seca = calcular_seca_numeros(df_milionaria, qtd_concursos=qtd_concursos)
+        
+        # Calcular seca dos trevos
+        trevos_seca = calcular_seca_trevos(df_milionaria, qtd_concursos=qtd_concursos)
+
+        # Verificar se os dados estão válidos
+        if not numeros_seca or not trevos_seca:
+            return jsonify({"error": "Falha ao calcular análise de seca."}), 400
+
+        return jsonify({
+            "numeros_seca": numeros_seca,
+            "trevos_seca": trevos_seca
+        })
+
+    except Exception as e:
+        print(f"Erro na API de seca: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Erro interno: {str(e)}"}), 500

@@ -204,6 +204,102 @@
     </div>
   </div>
 
+  <!-- Modal: Análise de Seca -->
+  <div id="modalSeca" class="modal-ajuda hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <div class="modal-content bg-card rounded-lg shadow-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto relative">
+      <span class="close absolute top-3 right-3 text-3xl font-bold cursor-pointer text-gray-400 hover:text-red-500" onclick="fecharModal('modalSeca')">&times;</span>
+      <h2 class="text-3xl font-bold text-primary mb-4 text-center">🌵 Análise de Seca</h2>
+
+      <!-- Explicação -->
+      <div class="info-section bg-gray-800 p-4 rounded-lg mb-6 border-l-4 border-primary">
+        <h3 class="text-xl font-semibold text-primary mb-2">Entendendo a Análise de Seca 🌵</h3>
+        <p class="text-gray-300 mb-2">
+          A análise de seca identifica há quantos concursos um determinado número ou trevo não é sorteado.
+        </p>
+        <p class="text-gray-300">
+          <span class="font-bold text-red-400">"Maior Seca"</span> indica os que estão há mais tempo sem aparecer.
+          <span class="font-bold text-green-400">"Recentemente Sorteados"</span> são os que saíram nos últimos concursos.
+        </p>
+      </div>
+
+      <!-- Dropdown -->
+      <div class="flex flex-col md:flex-row gap-6 mb-6">
+        <div class="flex-1">
+          <label for="selectSecaPeriodo" class="block text-gray-300 text-sm font-bold mb-2">Analisar últimos concursos:</label>
+          <select id="selectSecaPeriodo" class="w-full p-2 rounded-md bg-surface text-white border border-gray-600 focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50" onchange="updateSecaModal()">
+            <option value="">Todos</option>
+            <option value="50">Últimos 50</option>
+            <option value="100">Últimos 100</option>
+            <option value="200">Últimos 200</option>
+          </select>
+          <p class="text-gray-400 text-xs mt-2" id="secaPeriodoDisplay">Análise de todos os concursos disponíveis.</p>
+        </div>
+      </div>
+
+      <!-- Números e Trevos -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <!-- Números -->
+        <div class="bg-surface p-4 rounded-lg shadow">
+          <h3 class="text-xl font-semibold text-primary mb-4 text-center">Números Principais (1-50)</h3>
+          <div id="secaNumerosContainer" class="text-gray-300 mb-4">
+            <p class="mb-2"><strong>Em Maior Seca:</strong> <span id="secaNumerosMaior" class="font-bold text-lg text-red-400">Carregando...</span></p>
+            <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span id="secaNumerosRecentes" class="font-bold text-lg text-green-400">Carregando...</span></p>
+            <div class="mb-2">
+              <strong>Estatísticas:</strong>
+              <ul id="secaNumerosStats" class="list-disc list-inside ml-4 text-sm">
+                <li>Carregando...</li>
+              </ul>
+            </div>
+          </div>
+          <div id="graficoSecaNumeros" class="w-full h-80 bg-gray-700 rounded flex items-center justify-center text-gray-400">Carregando gráfico...</div>
+        </div>
+
+        <!-- Trevos -->
+        <div class="bg-surface p-4 rounded-lg shadow">
+          <h3 class="text-xl font-semibold text-primary mb-4 text-center">Trevos da Sorte (1-6)</h3>
+          <div id="secaTrevosContainer" class="text-gray-300 mb-4">
+            <p class="mb-2"><strong>Em Maior Seca:</strong> <span id="secaTrevosMaior" class="font-bold text-lg text-red-400">Carregando...</span></p>
+            <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span id="secaTrevosRecentes" class="font-bold text-lg text-green-400">Carregando...</span></p>
+            <div class="mb-2">
+              <strong>Estatísticas:</strong>
+              <ul id="secaTrevosStats" class="list-disc list-inside ml-4 text-sm">
+                <li>Carregando...</li>
+              </ul>
+            </div>
+          </div>
+          <div id="graficoSecaTrevos" class="w-full h-80 bg-gray-700 rounded flex items-center justify-center text-gray-400">Carregando gráfico...</div>
+        </div>
+      </div>
+
+      <!-- Interpretação -->
+      <div class="info-section bg-gray-800 p-4 rounded-lg mb-6 border-l-4 border-secondary">
+        <h3 class="text-xl font-semibold text-secondary mb-2">Interpretação dos Gráficos de Seca 📊</h3>
+        <ul class="list-disc list-inside text-gray-300 ml-4">
+          <li><strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).</li>
+          <li><strong>Eixo Y:</strong> Concursos em que estão sem sair.</li>
+          <li><strong>Barras altas:</strong> Maior tempo de seca.</li>
+          <li><strong>Barras baixas:</strong> Sorteados recentemente.</li>
+        </ul>
+      </div>
+
+      <!-- Estratégias -->
+      <div class="info-section bg-gray-800 p-4 rounded-lg mb-6 border-l-4 border-green-400">
+        <h3 class="text-xl font-semibold text-green-400 mb-2">Estratégias com a Seca ✅</h3>
+        <ul class="list-disc list-inside text-gray-300 ml-4">
+          <li><strong>Atrasados:</strong> Apostar nos que estão em seca.</li>
+          <li><strong>Recentes:</strong> Apostar nos que saíram há pouco.</li>
+          <li><strong>Misto:</strong> Combinar os dois.</li>
+          <li><strong>Aleatoriedade:</strong> Não é garantia. Combine com frequência.</li>
+        </ul>
+      </div>
+
+      <!-- Alerta Final -->
+      <div class="mt-8 text-center text-gray-400">
+        <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística histórica. Não garante resultados futuros. Aposte com responsabilidade.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script>
     // Dados simulados (serão substituídos pelos dados reais)
@@ -254,6 +350,8 @@
       gerarNumeros();
       gerarTrevos();
       carregarEstatisticasRapidas();
+      
+
     }
 
     // Aguarda tanto DOM quanto estilos carregados
@@ -520,6 +618,7 @@
           titulo.textContent = '🌵 Análise de Seca';
           carregarAnaliseSeca(conteudo);
           break;
+
         case 'estatisticas':
           titulo.textContent = '📈 Estatísticas Avançadas';
           carregarEstatisticasAvancadas(conteudo);
@@ -2092,44 +2191,389 @@
       });
     }
 
-    // Carregar análise de seca
-    function carregarAnaliseSeca(container) {
-      container.innerHTML = `
-        <div class="space-y-6">
-          <div class="grid grid-cols-2 gap-6">
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🌵 Números em Maior Seca</h3>
-              <div class="space-y-2">
-                ${dadosMilionaria.seca.maior.map((numero, index) => 
-                  `<div class="flex justify-between items-center p-2 bg-[#2E303A] rounded">
-                    <span class="font-semibold">${numero}</span>
-                    <span class="text-red-400">${15 + index} concursos</span>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-            
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🎯 Números Recentes</h3>
-              <div class="space-y-2">
-                ${dadosMilionaria.seca.recentes.map((numero, index) => 
-                  `<div class="flex justify-between items-center p-2 bg-[#2E303A] rounded">
-                    <span class="font-semibold">${numero}</span>
-                    <span class="text-[#00E38C]">${index + 1} concurso(s)</span>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-          </div>
-          
-          <div class="chart-container">
-            <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Seca</h3>
-            <div id="grafico-seca" style="height: 400px;"></div>
-          </div>
-        </div>
-      `;
+        // Carregar análise de seca
+    async function carregarAnaliseSeca(container, qtdConcursos = null) {
+      if (!container) {
+        console.error('Container não fornecido para carregarAnaliseSeca');
+        return;
+      }
       
-      criarGraficoSeca();
+      container.innerHTML = `<p class="text-center text-gray-400">🔄 Carregando análise de seca...</p>`;
+      
+        try {
+          let url = '/api/analise_seca';
+          if (qtdConcursos !== null && qtdConcursos !== '') {
+            url += `?qtd_concursos=${qtdConcursos}`;
+          }
+          
+          const response = await fetch(url);
+          const data = await response.json();
+        
+        if (data.error) {
+          if (container) {
+            container.innerHTML = `<p class="text-red-500 text-center">Erro: ${data.error}</p>`;
+          }
+          return;
+        }
+        
+        const numerosSeca = data.numeros_seca;
+        const trevosSeca = data.trevos_seca;
+        
+        if (!numerosSeca || !trevosSeca) {
+          if (container) {
+            container.innerHTML = `<p class="text-red-500 text-center">Dados de seca incompletos ou não encontrados.</p>`;
+          }
+          return;
+        }
+        
+        // Preparar dados para exibição
+        const maiorSecaNumeros = numerosSeca.numeros_maior_seca && numerosSeca.numeros_maior_seca.length > 0 
+          ? `${numerosSeca.numeros_maior_seca[0][0]} (${numerosSeca.numeros_maior_seca[0][1].seca_atual} concursos)`
+          : 'N/A';
+        
+        const recentesNumeros = numerosSeca.numeros_recentes && numerosSeca.numeros_recentes.length > 0
+          ? numerosSeca.numeros_recentes.slice(0, 3).join(', ')
+          : 'N/A';
+        
+        const maiorSecaTrevos = trevosSeca.trevos_maior_seca && trevosSeca.trevos_maior_seca.length > 0
+          ? `${trevosSeca.trevos_maior_seca[0][0]} (${trevosSeca.trevos_maior_seca[0][1].seca_atual} concursos)`
+          : 'N/A';
+        
+        const recentesTrevos = trevosSeca.trevos_recentes && trevosSeca.trevos_recentes.length > 0
+          ? trevosSeca.trevos_recentes.slice(0, 3).join(', ')
+          : 'N/A';
+        
+        // Criar HTML completo do modal
+        container.innerHTML = `
+          <div class="space-y-6">
+            <!-- Explicação -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#00E38C]">
+              <h3 class="text-xl font-semibold text-[#00E38C] mb-2">Entendendo a Análise de Seca 🌵</h3>
+              <p class="text-gray-300 mb-2">
+                A análise de seca identifica há quantos concursos um determinado número ou trevo não é sorteado.
+              </p>
+              <p class="text-gray-300">
+                <span class="font-bold text-red-400">"Maior Seca"</span> indica os que estão há mais tempo sem aparecer.
+                <span class="font-bold text-green-400">"Recentemente Sorteados"</span> são os que saíram nos últimos concursos.
+              </p>
+            </div>
+
+            <!-- Cabeçalho com título e ajuda -->
+            <div class="flex justify-between items-start">
+              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
+                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
+                <div class="flex flex-wrap gap-3 items-center">
+                  <label class="text-sm text-gray-300">Período:</label>
+                  <select id="selectSecaPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSecaModal()">
+                    <option value="">Todos os concursos</option>
+                    <option value="25">Últimos 25 concursos</option>
+                    <option value="50">Últimos 50 concursos</option>
+                    <option value="100">Últimos 100 concursos</option>
+                    <option value="200">Últimos 200 concursos</option>
+                  </select>
+                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+                </div>
+                <div class="mt-2 text-xs text-gray-400" id="secaPeriodoDisplay">
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
+                </div>
+              </div>
+              <button onclick="abrirPopupAjudaSeca()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
+                ❓
+              </button>
+            </div>
+
+            <!-- Números e Trevos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Números -->
+              <div class="bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Números Principais (1-50)</h3>
+                <div class="text-gray-300 mb-4">
+                  <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaNumeros}</span></p>
+                  <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesNumeros}</span></p>
+                  <div class="mb-2">
+                    <strong>Estatísticas:</strong>
+                    <ul class="list-disc list-inside ml-4 text-sm">
+                      <li>Média de seca: ${numerosSeca.estatisticas?.seca_media || 'N/A'} concursos</li>
+                      <li>Maior seca: ${numerosSeca.estatisticas?.seca_maxima || 'N/A'} concursos</li>
+                      <li>Menor seca: ${numerosSeca.estatisticas?.seca_mediana || 'N/A'} concursos</li>
+                    </ul>
+                  </div>
+                </div>
+                <div id="graficoSecaNumeros" class="w-full h-80 bg-gray-700 rounded"></div>
+              </div>
+
+              <!-- Trevos -->
+              <div class="bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Trevos da Sorte (1-6)</h3>
+                <div class="text-gray-300 mb-4">
+                  <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaTrevos}</span></p>
+                  <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesTrevos}</span></p>
+                  <div class="mb-2">
+                    <strong>Estatísticas:</strong>
+                    <ul class="list-disc list-inside ml-4 text-sm">
+                      <li>Média de seca: ${trevosSeca.estatisticas?.seca_media || 'N/A'} concursos</li>
+                      <li>Maior seca: ${trevosSeca.estatisticas?.seca_maxima || 'N/A'} concursos</li>
+                      <li>Menor seca: ${trevosSeca.estatisticas?.seca_mediana || 'N/A'} concursos</li>
+                    </ul>
+                  </div>
+                </div>
+                <div id="graficoSecaTrevos" class="w-full h-80 bg-gray-700 rounded"></div>
+              </div>
+            </div>
+
+            <!-- Interpretação -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#8B5CF6]">
+              <h3 class="text-xl font-semibold text-[#8B5CF6] mb-2">Interpretação dos Gráficos de Seca 📊</h3>
+              <ul class="list-disc list-inside text-gray-300 ml-4">
+                <li><strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).</li>
+                <li><strong>Eixo Y:</strong> Concursos em que estão sem sair.</li>
+                <li><strong>Barras altas:</strong> Maior tempo de seca.</li>
+                <li><strong>Barras baixas:</strong> Sorteados recentemente.</li>
+              </ul>
+            </div>
+
+            <!-- Estratégias -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-green-400">
+              <h3 class="text-xl font-semibold text-green-400 mb-2">Estratégias com a Seca ✅</h3>
+              <ul class="list-disc list-inside text-gray-300 ml-4">
+                <li><strong>Atrasados:</strong> Apostar nos que estão em seca.</li>
+                <li><strong>Recentes:</strong> Apostar nos que saíram há pouco.</li>
+                <li><strong>Misto:</strong> Combinar os dois.</li>
+                <li><strong>Aleatoriedade:</strong> Não é garantia. Combine com frequência.</li>
+              </ul>
+            </div>
+
+            <!-- Alerta Final -->
+            <div class="mt-8 text-center text-gray-400">
+              <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística histórica. Não garante resultados futuros. Aposte com responsabilidade.</p>
+            </div>
+          </div>
+        `;
+        
+        // Criar gráficos após o HTML ser inserido
+        setTimeout(() => {
+          plotGraficoSecaNumeros(numerosSeca);
+          plotGraficoSecaTrevos(trevosSeca);
+        }, 100);
+        
+      } catch (error) {
+        console.error('❌ Erro ao carregar dados de seca:', error);
+        console.error('❌ Stack trace:', error.stack);
+        if (container) {
+          container.innerHTML = `<p class="text-red-500 text-center">Erro ao carregar dados: ${error.message}. Verifique a conexão com o servidor.</p>`;
+        } else {
+          // Atualizar elementos do modal diretamente
+          const secaNumerosMaior = document.getElementById('secaNumerosMaior');
+          const secaNumerosRecentes = document.getElementById('secaNumerosRecentes');
+          const secaTrevosMaior = document.getElementById('secaTrevosMaior');
+          const secaTrevosRecentes = document.getElementById('secaTrevosRecentes');
+          
+          if (secaNumerosMaior) secaNumerosMaior.textContent = `Erro: ${error.message}`;
+          if (secaNumerosRecentes) secaNumerosRecentes.textContent = `Erro: ${error.message}`;
+          if (secaTrevosMaior) secaTrevosMaior.textContent = `Erro: ${error.message}`;
+          if (secaTrevosRecentes) secaTrevosRecentes.textContent = `Erro: ${error.message}`;
+        }
+      }
+    }
+    
+
+    
+    // Função para atualizar o modal quando o filtro de período é alterado
+    function updateSecaModal() {
+      const selectElement = document.getElementById('selectSecaPeriodo');
+      const selectedQtd = selectElement.value;
+      const conteudo = document.getElementById('conteudo-modal');
+      if (conteudo) {
+        carregarAnaliseSeca(conteudo, selectedQtd);
+      }
+      
+      // Atualizar display do período
+      const periodoDisplay = document.getElementById('secaPeriodoDisplay');
+      if (periodoDisplay) {
+        if (selectedQtd) {
+          periodoDisplay.textContent = `Análise dos últimos ${selectedQtd} concursos.`;
+        } else {
+          periodoDisplay.textContent = 'Análise de todos os concursos disponíveis.';
+        }
+      }
+    }
+    
+    // Função para abrir popup de ajuda da análise de seca
+    function abrirPopupAjudaSeca() {
+      document.getElementById("popupAjudaSeca").style.display = "block";
+    }
+
+    function fecharPopupAjudaSeca() {
+      document.getElementById("popupAjudaSeca").style.display = "none";
+    }
+    
+    // Função para criar gráfico de seca dos números principais
+    function plotGraficoSecaNumeros(numerosSeca) {
+      if (!numerosSeca || !numerosSeca.seca_por_numero) {
+        console.error('Dados de seca dos números não disponíveis');
+        return;
+      }
+      
+      // Converter seca_por_numero em arrays para o gráfico
+      const secaPorNumero = numerosSeca.seca_por_numero;
+      const labels = Object.keys(secaPorNumero).map(num => parseInt(num)).sort((a, b) => a - b);
+      const valores = labels.map(num => secaPorNumero[num].seca_atual);
+      
+      // Cores baseadas na seca (vermelho para maior seca, verde para menor)
+      const cores = valores.map(valor => {
+        const maxSeca = Math.max(...valores);
+        const minSeca = Math.min(...valores);
+        const normalized = (valor - minSeca) / (maxSeca - minSeca);
+        
+        if (normalized > 0.8) return '#EF4444'; // Vermelho (maior seca)
+        if (normalized > 0.6) return '#F97316'; // Laranja
+        if (normalized > 0.4) return '#EAB308'; // Amarelo
+        if (normalized > 0.2) return '#22C55E'; // Verde claro
+        return '#00E38C'; // Verde (menor seca)
+      });
+      
+      const data = [{
+        x: labels,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: cores,
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 1
+          }
+        },
+        text: valores.map(val => `${val} concursos`),
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 10,
+          weight: 'bold'
+        },
+        hovertemplate: '<b>Número %{x}</b><br>Em seca há: %{y} concursos<extra></extra>'
+      }];
+      
+      const layout = {
+        title: {
+          text: '🌵 Seca dos Números Principais (1-50)',
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Número',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 12 },
+          tickmode: 'linear',
+          tick0: 1,
+          dtick: 5
+        },
+        yaxis: { 
+          title: 'Concursos em Seca',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
+        annotations: [{
+          text: 'Barras vermelhas = maior seca | Barras verdes = menor seca',
+          showarrow: false,
+          xref: 'paper',
+          yref: 'paper',
+          x: 0.5,
+          y: -0.15,
+          font: { color: 'gray', size: 12 }
+        }]
+      };
+      
+      Plotly.newPlot('graficoSecaNumeros', data, layout, { 
+        displayModeBar: false,
+        responsive: true
+      });
+    }
+    
+    // Função para criar gráfico de seca dos trevos
+    function plotGraficoSecaTrevos(trevosSeca) {
+      if (!trevosSeca || !trevosSeca.seca_por_trevo) {
+        console.error('Dados de seca dos trevos não disponíveis');
+        return;
+      }
+      
+      // Converter seca_por_trevo em arrays para o gráfico
+      const secaPorTrevo = trevosSeca.seca_por_trevo;
+      const labels = Object.keys(secaPorTrevo).map(trevo => `🍀 ${trevo}`);
+      const valores = Object.keys(secaPorTrevo).map(trevo => secaPorTrevo[trevo].seca_atual);
+      
+      // Cores baseadas na seca (vermelho para maior seca, verde para menor)
+      const cores = valores.map(valor => {
+        const maxSeca = Math.max(...valores);
+        const minSeca = Math.min(...valores);
+        const normalized = (valor - minSeca) / (maxSeca - minSeca);
+        
+        if (normalized > 0.8) return '#EF4444'; // Vermelho (maior seca)
+        if (normalized > 0.6) return '#F97316'; // Laranja
+        if (normalized > 0.4) return '#EAB308'; // Amarelo
+        if (normalized > 0.2) return '#22C55E'; // Verde claro
+        return '#00E38C'; // Verde (menor seca)
+      });
+      
+      const data = [{
+        x: labels,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: cores,
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 2
+          }
+        },
+        text: valores.map(val => `${val} concursos`),
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 12,
+          weight: 'bold'
+        },
+        hovertemplate: '<b>%{x}</b><br>Em seca há: %{y} concursos<extra></extra>'
+      }];
+      
+      const layout = {
+        title: {
+          text: '🍀 Seca dos Trevos da Sorte (1-6)',
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Trevo',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 14 }
+        },
+        yaxis: { 
+          title: 'Concursos em Seca',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
+        annotations: [{
+          text: 'Barras vermelhas = maior seca | Barras verdes = menor seca',
+          showarrow: false,
+          xref: 'paper',
+          yref: 'paper',
+          x: 0.5,
+          y: -0.15,
+          font: { color: 'gray', size: 12 }
+        }]
+      };
+      
+      Plotly.newPlot('graficoSecaTrevos', data, layout, { 
+        displayModeBar: false,
+        responsive: true
+      });
     }
 
     // Carregar estatísticas avançadas
@@ -2651,6 +3095,68 @@
 
       <p style="margin-top: 20px; font-style: italic;">
         <strong>⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises dos trevos não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+      </p>
+    </div>
+  </div>
+
+  <!-- Popup de Ajuda para Seca -->
+  <div id="popupAjudaSeca" class="modal-ajuda">
+    <div class="modal-content">
+      <span class="close" onclick="fecharPopupAjudaSeca()">×</span>
+      <h2>🌵 Entendendo a Análise de Seca</h2>
+      <p>Esta análise identifica há quantos concursos um determinado número ou trevo não foi sorteado, revelando padrões de "seca" que podem orientar suas estratégias de aposta.</p>
+
+      <h3>📊 O que é a Análise de Seca?</h3>
+      <p>
+        A análise de seca calcula o período em que cada número ou trevo não foi sorteado.<br>
+        <strong>Maior Seca:</strong> Números/trevos que estão há mais tempo sem aparecer.<br>
+        <strong>Recentemente Sorteados:</strong> Números/trevos que saíram nos últimos concursos.<br>
+        <strong>💡 Dica:</strong> Números em seca prolongada podem estar "atrasados" para sair.
+      </p>
+
+      <h3>🎯 Janela de Análise Temporal</h3>
+      <p>
+        Use o seletor de período para analisar diferentes janelas de tempo:<br>
+        <strong>Todos os concursos:</strong> Análise completa do histórico disponível.<br>
+        <strong>Últimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
+        <strong>💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
+      </p>
+
+      <h3>📈 Interpretando os Gráficos</h3>
+      <p>
+        <strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).<br>
+        <strong>Eixo Y:</strong> Concursos em que estão sem sair.<br>
+        <strong>Barras vermelhas:</strong> Maior tempo de seca (mais "atrasados").<br>
+        <strong>Barras verdes:</strong> Sorteados recentemente.<br>
+        <strong>💡 Dica:</strong> As cores indicam a intensidade da seca, facilitando a identificação visual.
+      </p>
+
+      <h3>💡 Estratégias de Aposta</h3>
+      <p>
+        <strong>Atrasados:</strong> Apostar nos números em maior seca, baseado na teoria de que estão "devendo" sair.<br>
+        <strong>Recentes:</strong> Apostar nos que saíram há pouco, seguindo a tendência de "momentum".<br>
+        <strong>Misto:</strong> Combinar ambas as estratégias para diversificar sua aposta.<br>
+        <strong>Aleatoriedade:</strong> Lembre-se: não há garantias! A loteria é um jogo de azar.
+      </p>
+
+      <h3>🎯 Como Usar na Prática</h3>
+      <p>
+        <strong>Observe as barras altas:</strong> Elas indicam números em maior seca.<br>
+        <strong>Analise as barras baixas:</strong> Mostram números sorteados recentemente.<br>
+        <strong>Compare períodos:</strong> Use diferentes janelas temporais para identificar tendências.<br>
+        <strong>Combine estratégias:</strong> Use a seca em conjunto com outras análises disponíveis.
+      </p>
+
+      <h3>⚠️ Considerações Importantes</h3>
+      <p>
+        <strong>Não é garantia:</strong> A análise de seca é uma ferramenta estatística, não uma previsão.<br>
+        <strong>Aleatoriedade:</strong> Cada sorteio é independente, não há "dívida" real dos números.<br>
+        <strong>Responsabilidade:</strong> Aposte apenas o que pode perder, dentro dos seus limites financeiros.<br>
+        <strong>Diversificação:</strong> Não aposte apenas em números em seca, diversifique suas escolhas.
+      </p>
+
+      <p style="margin-top: 20px; font-style: italic;">
+        <strong>Importante:</strong> Esta é uma análise estatística histórica que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
       </p>
     </div>
   </div>
