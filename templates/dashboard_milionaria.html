@@ -68,8 +68,22 @@
     @media (max-width: 640px) {
       .js-plotly-plot .g-xtick text,
       .js-plotly-plot .g-ytick text,
-      .js-plotly-plot .g-ytick2 text {
-        font-size: 7px !important;
+      .js-plotly-plot .g-ytick2 text,
+      .js-plotly-plot .g-xtick .tick-label,
+      .js-plotly-plot .g-ytick .tick-label,
+      .js-plotly-plot .g-ytick2 .tick-label,
+      .js-plotly-plot .g-xtick .tick-label text,
+      .js-plotly-plot .g-ytick .tick-label text,
+      .js-plotly-plot .g-ytick2 .tick-label text {
+        font-size: 6px !important;
+        font-size: 6px !important;
+      }
+      
+      /* Forçar tamanho da fonte para todos os elementos de texto dos eixos */
+      .js-plotly-plot .g-xtick *,
+      .js-plotly-plot .g-ytick *,
+      .js-plotly-plot .g-ytick2 * {
+        font-size: 6px !important;
       }
     }
     
@@ -104,32 +118,7 @@
         height: 280px !important;
       }
       
-      /* Ajustar margens específicas do gráfico combinado para smartphones */
-      #grafico-frequencia .js-plotly-plot .plotly {
-        margin-left: 5px !important;
-        margin-right: 5px !important;
-        margin-top: 10px !important;
-        margin-bottom: 10px !important;
-      }
-      
-      /* Reduzir margens dos eixos no gráfico combinado para smartphones */
-      #grafico-frequencia .js-plotly-plot .g-ytick,
-      #grafico-frequencia .js-plotly-plot .g-ytick2 {
-        margin-left: 2px !important;
-        margin-right: 2px !important;
-      }
-      
-      /* Ajustar layout do gráfico combinado para smartphones */
-      #grafico-frequencia .js-plotly-plot .main-svg {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      
-      /* Reduzir espaçamento interno do gráfico combinado */
-      #grafico-frequencia .js-plotly-plot .bglayer {
-        margin: 0 !important;
-        padding: 0 !important;
-      }
+
     }
   </style>
 
@@ -727,6 +716,10 @@
         const yFreqAbs = data.frequencia_absoluta_numeros.map(e => e.frequencia);
         const yFreqRelComb = data.frequencia_relativa_numeros.map(e => e.frequencia);
         const linhaEsperadaComb = Array(50).fill(2); // Linha de referência 2%
+        
+        // Detectar se é smartphone para ajustar tamanho da fonte
+        const isMobile = window.innerWidth <= 640;
+        const fontSize = isMobile ? 6 : 12; // 6px para mobile, 12px para desktop
 
         Plotly.newPlot('grafico-frequencia', [
           {
@@ -766,16 +759,19 @@
           autosize: true,
           responsive: true,
           margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 },
-          xaxis: { automargin: true },
+          xaxis: { 
+            automargin: true,
+            tickfont: { size: fontSize }
+          },
           yaxis: { 
             automargin: true,
-            side: 'left'
+            tickfont: { size: fontSize }
           },
           yaxis2: { 
             side: 'right',
             overlaying: 'y',
             automargin: true,
-            tickfont: { color: 'red' }
+            tickfont: { color: 'red', size: fontSize }
           },
           showlegend: false
         }, { displayModeBar: false });
