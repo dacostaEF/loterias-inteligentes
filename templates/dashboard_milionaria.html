@@ -105,32 +105,66 @@
       flex-direction: column;
       gap: 8px;
       margin-top: 20px;
-      /* Altura flexível baseada no número de concursos */
-      min-height: 200px; /* Altura mínima para poucos concursos */
-      max-height: 80vh; /* Altura máxima de 80% da viewport */
-      overflow-y: auto; /* Rolagem vertical quando necessário */
-      border-top: 1px solid #ccc;
-      padding-top: 10px;
-      overflow-x: auto; /* Permite rolagem horizontal se o conteúdo for maior que o container */
+      /* Container com tamanho fixo para manter scrollbars sempre visíveis */
+      width: 100%;
+      height: 400px; /* Altura fixa - ajuste conforme necessário */
+      overflow: auto; /* Permite scroll vertical e horizontal */
       white-space: nowrap; /* Impede que o texto ou elementos dentro do flexbox quebrem */
-      padding-bottom: 15px; /* Para não cortar o scrollbar */
       /* Melhorias visuais */
+      border: 2px solid #2E303A;
       border-radius: 8px;
       background-color: rgba(255, 255, 255, 0.02);
       box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+      /* Garantir que as scrollbars sejam sempre visíveis */
+      scrollbar-width: thin; /* Firefox */
+      scrollbar-color: #00E38C #2E303A; /* Firefox - thumb e track */
+    }
+
+    /* Estilização das scrollbars para Webkit (Chrome, Safari, Edge) */
+    .matriz-container::-webkit-scrollbar {
+      width: 12px; /* Largura da scrollbar vertical */
+      height: 12px; /* Altura da scrollbar horizontal */
+    }
+
+    .matriz-container::-webkit-scrollbar-track {
+      background: #2E303A; /* Cor do fundo da scrollbar */
+      border-radius: 6px;
+    }
+
+    .matriz-container::-webkit-scrollbar-thumb {
+      background: #00E38C; /* Cor da scrollbar (verde) */
+      border-radius: 6px;
+      border: 2px solid #2E303A;
+    }
+
+    .matriz-container::-webkit-scrollbar-thumb:hover {
+      background: #00C973; /* Cor mais escura no hover */
+    }
+
+    /* Scrollbar horizontal específica */
+    .matriz-container::-webkit-scrollbar:horizontal {
+      height: 12px;
     }
 
     /* Solução específica para mobile - scroll horizontal */
     @media (max-width: 768px) {
       .matriz-container {
+        height: 300px; /* Altura menor no mobile */
         -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
         scroll-behavior: smooth; /* Scroll suave */
-        /* Força o scroll horizontal no mobile */
-        overflow-x: scroll;
-        overflow-y: auto;
+        /* Scroll em todas as direções */
+        overflow: auto;
         /* Remove padding que pode interferir no scroll */
         padding-left: 0;
         padding-right: 0;
+        /* Scrollbars mais finas no mobile */
+        scrollbar-width: thin;
+      }
+      
+      /* Scrollbars menores no mobile */
+      .matriz-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
       }
       
       /* Garante que as linhas não quebrem no mobile */
@@ -181,6 +215,21 @@
       background-color: rgba(46, 48, 58, 0.5);
       border-radius: 6px;
       border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .matriz-navigation-hint {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    /* Mobile: dicas em linha única */
+    @media (max-width: 768px) {
+      .matriz-navigation-hint {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
     }
 
     .celula-numero {
@@ -834,7 +883,10 @@
               <h3 class="titulo-matriz">🔢 Matriz Visual dos Últimos Concursos</h3>
               <div class="matriz-info">
                 <span id="matriz-concursos-count" class="text-sm text-gray-400">Carregando...</span>
-                <span class="text-xs text-gray-500 ml-2">(Role horizontalmente para ver todos os números)</span>
+                <div class="matriz-navigation-hint">
+                  <span class="text-xs text-gray-500">🖱️ Desktop: Use as barras de rolagem</span>
+                  <span class="text-xs text-gray-500 ml-2">📱 Mobile: Deslize o dedo em qualquer direção</span>
+                </div>
               </div>
               <div id="matriz-frequencia" class="matriz-container"></div>
             </div>
@@ -986,37 +1038,12 @@
         contadorElement.textContent = `${concursos.length} concursos exibidos`;
       }
       
-      // Solução para scroll horizontal no mobile
-      if (window.innerWidth <= 768) {
-        const matrizContainer = document.getElementById('matriz-frequencia');
-        if (matrizContainer) {
-          // Força o scroll horizontal no mobile
-          matrizContainer.style.webkitOverflowScrolling = 'touch';
-          matrizContainer.style.overflowX = 'scroll';
-          
-          // Adiciona evento de touch para melhorar o scroll
-          let isScrolling = false;
-          let startX = 0;
-          let scrollLeft = 0;
-          
-          matrizContainer.addEventListener('touchstart', (e) => {
-            isScrolling = true;
-            startX = e.touches[0].pageX - matrizContainer.offsetLeft;
-            scrollLeft = matrizContainer.scrollLeft;
-          });
-          
-          matrizContainer.addEventListener('touchmove', (e) => {
-            if (!isScrolling) return;
-            e.preventDefault();
-            const x = e.touches[0].pageX - matrizContainer.offsetLeft;
-            const walk = (x - startX) * 2;
-            matrizContainer.scrollLeft = scrollLeft - walk;
-          });
-          
-          matrizContainer.addEventListener('touchend', () => {
-            isScrolling = false;
-          });
-        }
+      // Configuração adicional para melhor experiência de scroll
+      const matrizContainer = document.getElementById('matriz-frequencia');
+      if (matrizContainer) {
+        // Garantir que o scroll funcione bem em todos os dispositivos
+        matrizContainer.style.webkitOverflowScrolling = 'touch';
+        matrizContainer.style.scrollBehavior = 'smooth';
       }
     }
 
@@ -1089,7 +1116,10 @@
             <h3 class="titulo-matriz">🔢 Matriz Visual dos Últimos Concursos</h3>
             <div class="matriz-info">
               <span id="matriz-concursos-count" class="text-sm text-gray-400">Carregando...</span>
-              <span class="text-xs text-gray-500 ml-2">(Role horizontalmente para ver todos os números)</span>
+              <div class="matriz-navigation-hint">
+                <span class="text-xs text-gray-500">🖱️ Desktop: Use as barras de rolagem</span>
+                <span class="text-xs text-gray-500 ml-2">📱 Mobile: Deslize o dedo em qualquer direção</span>
+              </div>
             </div>
             <div id="matriz-frequencia" class="matriz-container"></div>
           </div>
