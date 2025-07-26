@@ -98,6 +98,69 @@
     .js-plotly-plot .g-ytick2 .tick text,
     .js-plotly-plot .g-ytick2 .tick-label text,
     .js-plotly-plot .g-ytick2 .tick-label,
+    
+    /* Estilos para a matriz visual */
+    .matriz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 20px;
+      max-height: 500px;
+      overflow-y: auto;
+      border-top: 1px solid #ccc;
+      padding-top: 10px;
+    }
+
+    /* Para o container que agrupa os números e trevos de UM concurso */
+    .matriz-numeros-concurso, .matriz-trevos-concurso {
+      margin-bottom: 5px; /* Espaçamento entre as seções de números e trevos dentro de um concurso */
+    }
+
+    .linha-concurso {
+      display: flex;
+      gap: 3px;
+      padding: 2px 0;
+      flex-wrap: wrap; /* Permite que as células quebrem para a próxima linha se não couberem */
+    }
+
+    .celula-numero {
+      font-size: 9px !important;
+      font-family: 'Inter', sans-serif;
+      line-height: 22px;
+      text-align: center;
+      min-width: 22px;
+      max-width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background-color: #222;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .celula-numero.sorteado {
+      background-color: #00E38C;
+      color: #1A1D25;
+      font-weight: bold;
+    }
+
+    .celula-numero.trevo {
+      background-color: #8B5CF6;
+    }
+
+    /* Força total para sobrescrever estilos globais */
+    /* Desktop */
+    .celula-numero {
+      font-size: 9px !important;
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .celula-numero {
+        font-size: 8px !important;
+      }
+    }
     .js-plotly-plot .g-ytick2 .tick,
     .js-plotly-plot .g-ytick2 .tick text,
     .js-plotly-plot .g-ytick2 .tick-label text {
@@ -705,8 +768,8 @@
             </div>
             
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Frequência Relativa (%)</h3>
-              <div id="grafico-frequencia-relativa" style="height: 400px;"></div>
+              <h3 class="titulo-matriz">🔢 Matriz Visual dos Últimos Concursos</h3>
+              <div id="matriz-frequencia" class="matriz-container"></div>
             </div>
           </div>
         `;
@@ -776,47 +839,93 @@
           showlegend: false
         }, { displayModeBar: false });
 
-        // Criar gráfico relativo com Plotly
-        const xNumerosRel = data.frequencia_relativa_numeros.map(e => e.numero);
-        const yFreqRel = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperada = Array(50).fill(2); // Linha de referência 2%
-
-        Plotly.newPlot('grafico-frequencia-relativa', [
-          {
-            x: xNumerosRel,
-            y: yFreqRel,
-            type: 'bar',
-            name: 'Frequência Relativa',
-            marker: { color: '#00E38C' }
-          },
-          {
-            x: xNumerosRel,
-            y: linhaEsperada,
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Esperado (2%)',
-            line: { color: 'red', dash: 'dash' }
+        // Aguardar um pouco para garantir que o DOM foi renderizado
+        setTimeout(() => {
+          if (data.analise_temporal && Array.isArray(data.analise_temporal)) {
+            montarMatriz(data.analise_temporal);
+          } else {
+            montarMatriz(concursosMock); // fallback para teste
           }
-        ], {
-          title: 'Frequência Relativa dos Números (%)',
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          yaxis: { automargin: true }, // Remove título do eixo Y
-          xaxis: { automargin: true }, // Remove título do eixo X
-          showlegend: false, // Remove legenda
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
-        }, { 
-          displayModeBar: false,
-          scrollZoom: false
-        });
+        }, 100);
 
       } catch (error) {
         container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
       }
     }
+
+    // Mock JS com dados fictícios (até conectar com a API real)
+    const concursosMock = [
+      { numeros: [12, 23, 35, 44, 46, 50], trevos: [1, 6] },
+      { numeros: [3, 15, 21, 33, 42, 49], trevos: [2, 4] },
+      { numeros: [7, 9, 11, 20, 37, 40], trevos: [3, 5] },
+      { numeros: [5, 8, 18, 26, 39, 43], trevos: [1, 2] }
+    ];
+
+    function aplicarEstiloCelula(div) {
+      // Removido: div.style.fontSize = '9px';
+      // Removido: div.style.fontFamily = 'Arial, sans-serif';
+      // Removido: div.style.lineHeight = '22px';
+      // Removido: div.style.textAlign = 'center';
+      // Removido: div.style.width = '22px';
+      // Removido: div.style.height = '22px';
+    }
+
+    function montarMatriz(concursos) {
+      console.log('montarMatriz chamada com:', concursos);
+      const container = document.getElementById('matriz-frequencia');
+      if (!container) {
+        console.error('Elemento matriz-frequencia não encontrado');
+        return;
+      }
+      console.log('Container encontrado, limpando...');
+      container.innerHTML = '';
+
+      concursos.forEach((concurso, index) => { // Itera por cada concurso
+        console.log(`Processando concurso ${index + 1}:`, concurso);
+        // --- SEÇÃO PARA NÚMEROS (1-50) ---
+        const numerosContainer = document.createElement('div');
+        numerosContainer.className = 'matriz-numeros-concurso';
+        container.appendChild(numerosContainer);
+
+        // Crie linhas de 10 números
+        for (let l = 0; l < 5; l++) { // 5 linhas
+          const linhaNumeros = document.createElement('div');
+          linhaNumeros.className = 'linha-concurso';
+          
+          for (let i = (l * 10) + 1; i <= (l * 10) + 10; i++) { // 10 números por linha
+            const celula = document.createElement('div');
+            celula.className = 'celula-numero';
+            celula.textContent = i;
+            if (concurso.numeros.includes(i)) {
+              celula.classList.add('sorteado');
+            }
+            linhaNumeros.appendChild(celula);
+          }
+          numerosContainer.appendChild(linhaNumeros);
+        }
+
+        // --- SEÇÃO PARA TREVOS (T1-T6) ---
+        const trevosContainer = document.createElement('div');
+        trevosContainer.className = 'matriz-trevos-concurso';
+        container.appendChild(trevosContainer);
+
+        const linhaTrevos = document.createElement('div');
+        linhaTrevos.className = 'linha-concurso';
+        for (let t = 1; t <= 6; t++) {
+          const celula = document.createElement('div');
+          celula.className = 'celula-numero trevo';
+          celula.textContent = `T${t}`;
+          if (concurso.trevos.includes(t)) {
+            celula.classList.add('sorteado');
+          }
+          linhaTrevos.appendChild(celula);
+        }
+        trevosContainer.appendChild(linhaTrevos);
+      });
+      console.log('Matriz montada com sucesso!');
+    }
+
+
 
     // Função para atualizar análise quando mudar a janela
     async function atualizarAnaliseFrequencia() {
@@ -878,74 +987,94 @@
             </div>
             
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência Absoluta</h3>
+              <h3 class="text-lg font-semibold mb-4">📊 Frequência Absoluta  vs  Relativa <span style="color: red;">(%)</span>  </h3>
               <div id="grafico-frequencia" style="height: 400px;"></div>
             </div>
             
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Frequência Relativa (%)</h3>
-              <div id="grafico-frequencia-relativa" style="height: 400px;"></div>
-            </div>
+            <h3 class="titulo-matriz">🔢 Matriz Visual dos Últimos Concursos</h3>
+            <div id="matriz-frequencia" class="matriz-container"></div>
           </div>
         `;
         
-        // Recriar gráfico absoluto com novos dados
+        // Criar gráfico combinado: Absoluta vs Relativa
         const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
-        const yFreq = data.frequencia_absoluta_numeros.map(e => e.frequencia);
+        const yFreqAbs = data.frequencia_absoluta_numeros.map(e => e.frequencia);
+        const yFreqRelComb = data.frequencia_relativa_numeros.map(e => e.frequencia);
+        const linhaEsperadaComb = Array(50).fill(2); // Linha de referência 2%
+        
+        // Detectar se é smartphone para ajustar tamanho da fonte
+        const isMobile = window.innerWidth <= 640;
+        const fontSize = isMobile ? 6 : 12; // 6px para mobile, 12px para desktop
 
-        Plotly.newPlot('grafico-frequencia', [{
-          x: xNumeros,
-          y: yFreq,
-          type: 'bar',
-          marker: { color: 'deepskyblue' }
-        }], {
-          title: `Frequência Absoluta dos Números ${janela ? `(Últimos ${janela} concursos)` : '(Todos os concursos)'}`,
+        Plotly.newPlot('grafico-frequencia', [
+          {
+            x: xNumeros,
+            y: yFreqAbs,
+            type: 'bar',
+            name: '',
+            marker: { color: 'deepskyblue' },
+            yaxis: 'y',
+            showlegend: false
+          },
+          {
+            x: xNumeros,
+            y: yFreqRelComb,
+            type: 'scatter',
+            mode: 'lines+markers',
+            name: '',
+            line: { color: 'red', width: 2 },
+            marker: { color: 'red', size: 4 },
+            yaxis: 'y2',
+            showlegend: false
+          },
+          {
+            x: xNumeros,
+            y: linhaEsperadaComb,
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Freq. esperada',
+            line: { color: 'white', dash: 'dash', width: 2 },
+            yaxis: 'y2'
+          }
+        ], {
+          title: '',
           paper_bgcolor: '#1a1a1a',
           plot_bgcolor: '#1a1a1a',
           font: { color: 'white' },
           autosize: true,
           responsive: true,
           margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 },
-          xaxis: { automargin: true },
-          yaxis: { automargin: true }
+          xaxis: { 
+            automargin: true,
+            tickfont: { size: fontSize }
+          },
+          yaxis: { 
+            automargin: true,
+            tickfont: { size: fontSize }
+          },
+          yaxis2: { 
+            side: 'right',
+            overlaying: 'y',
+            automargin: true,
+            tickfont: { color: 'red', size: fontSize }
+          },
+          showlegend: false
         }, { displayModeBar: false });
 
-        // Recriar gráfico relativo com novos dados
-        const xNumerosRel = data.frequencia_relativa_numeros.map(e => e.numero);
-        const yFreqRel = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperada = Array(50).fill(2); // Linha de referência 2%
-
-        Plotly.newPlot('grafico-frequencia-relativa', [
-          {
-            x: xNumerosRel,
-            y: yFreqRel,
-            type: 'bar',
-            name: 'Frequência Relativa',
-            marker: { color: '#00E38C' }
-          },
-          {
-            x: xNumerosRel,
-            y: linhaEsperada,
-            type: 'scatter',
-            mode: 'lines',
-            name: 'Esperado (2%)',
-            line: { color: 'red', dash: 'dash' }
+        // Carregar matriz visual com dados reais
+        setTimeout(() => {
+          console.log('Tentando carregar matriz...');
+          console.log('data.analise_temporal:', data.analise_temporal);
+          console.log('concursosMock:', concursosMock);
+          
+          if (data.analise_temporal && Array.isArray(data.analise_temporal)) {
+            console.log('Usando dados reais da API');
+            montarMatriz(data.analise_temporal);
+          } else {
+            console.log('Usando dados mock');
+            montarMatriz(concursosMock); // fallback para teste
           }
-        ], {
-          title: `Frequência Relativa dos Números (%) ${janela ? `(Últimos ${janela} concursos)` : '(Todos os concursos)'}`,
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          yaxis: { automargin: true }, // Remove título do eixo Y
-          xaxis: { automargin: true }, // Remove título do eixo X
-          showlegend: false, // Remove legenda
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
-        }, { 
-          displayModeBar: false,
-          scrollZoom: false
-        });
+        }, 100);
 
               } catch (error) {
           container.innerHTML = `<p style="color: red;">Erro ao atualizar dados: ${error.message}</p>`;
