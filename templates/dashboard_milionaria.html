@@ -109,18 +109,18 @@
       overflow-y: auto;
       border-top: 1px solid #ccc;
       padding-top: 10px;
+      overflow-x: auto; /* Permite rolagem horizontal se o conteúdo for maior que o container */
+      white-space: nowrap; /* Impede que o texto ou elementos dentro do flexbox quebrem */
+      padding-bottom: 15px; /* Para não cortar o scrollbar */
     }
 
-    /* Para o container que agrupa os números e trevos de UM concurso */
-    .matriz-numeros-concurso, .matriz-trevos-concurso {
-      margin-bottom: 5px; /* Espaçamento entre as seções de números e trevos dentro de um concurso */
-    }
+
 
     .linha-concurso {
-      display: flex;
+      display: flex; /* Mantém as células lado a lado */
       gap: 3px;
       padding: 2px 0;
-      flex-wrap: wrap; /* Permite que as células quebrem para a próxima linha se não couberem */
+      flex-shrink: 0; /* Para garantir que não haja encolhimento das células */
     }
 
     .celula-numero {
@@ -137,6 +137,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-shrink: 0; /* IMPEDE QUE A CÉLULA ENCOLHA */
     }
 
     .celula-numero.sorteado {
@@ -882,35 +883,23 @@
 
       concursos.forEach((concurso, index) => { // Itera por cada concurso
         console.log(`Processando concurso ${index + 1}:`, concurso);
-        // --- SEÇÃO PARA NÚMEROS (1-50) ---
-        const numerosContainer = document.createElement('div');
-        numerosContainer.className = 'matriz-numeros-concurso';
-        container.appendChild(numerosContainer);
-
-        // Crie linhas de 10 números
-        for (let l = 0; l < 5; l++) { // 5 linhas
-          const linhaNumeros = document.createElement('div');
-          linhaNumeros.className = 'linha-concurso';
-          
-          for (let i = (l * 10) + 1; i <= (l * 10) + 10; i++) { // 10 números por linha
-            const celula = document.createElement('div');
-            celula.className = 'celula-numero';
-            celula.textContent = i;
-            if (concurso.numeros.includes(i)) {
-              celula.classList.add('sorteado');
-            }
-            linhaNumeros.appendChild(celula);
+        
+        // --- UMA ÚNICA LINHA POR CONCURSO ---
+        const linhaConcurso = document.createElement('div');
+        linhaConcurso.className = 'linha-concurso';
+        
+        // Adicionar todos os 50 números na mesma linha
+        for (let i = 1; i <= 50; i++) {
+          const celula = document.createElement('div');
+          celula.className = 'celula-numero';
+          celula.textContent = i;
+          if (concurso.numeros.includes(i)) {
+            celula.classList.add('sorteado');
           }
-          numerosContainer.appendChild(linhaNumeros);
+          linhaConcurso.appendChild(celula);
         }
-
-        // --- SEÇÃO PARA TREVOS (T1-T6) ---
-        const trevosContainer = document.createElement('div');
-        trevosContainer.className = 'matriz-trevos-concurso';
-        container.appendChild(trevosContainer);
-
-        const linhaTrevos = document.createElement('div');
-        linhaTrevos.className = 'linha-concurso';
+        
+        // Adicionar os 6 trevos na mesma linha
         for (let t = 1; t <= 6; t++) {
           const celula = document.createElement('div');
           celula.className = 'celula-numero trevo';
@@ -918,9 +907,10 @@
           if (concurso.trevos.includes(t)) {
             celula.classList.add('sorteado');
           }
-          linhaTrevos.appendChild(celula);
+          linhaConcurso.appendChild(celula);
         }
-        trevosContainer.appendChild(linhaTrevos);
+        
+        container.appendChild(linhaConcurso);
       });
       console.log('Matriz montada com sucesso!');
     }
