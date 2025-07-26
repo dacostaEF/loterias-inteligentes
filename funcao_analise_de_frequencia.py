@@ -177,7 +177,8 @@ def analise_frequencia(dados_sorteios, qtd_concursos=None):
             'diferenca_max_min_trevos': trevos_quentes[0][1] - trevos_frios[0][1] if trevos_quentes and trevos_frios else 0
         },
         
-        'analise_temporal': {
+        'analise_temporal': historico_por_concurso,  # Lista de concursos individuais para a matriz
+        'analise_temporal_estatistica': {
             'ultimos_30_pct': {
                 'numeros': dict(freq_30p[0]),
                 'trevos': dict(freq_30p[1]),
