@@ -103,11 +103,11 @@
     .matriz-container {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 1px; /* Reduzido de 2px para 1px - linhas ainda mais próximas */
       margin-top: 20px;
       /* Container com tamanho fixo para manter scrollbars sempre visíveis */
       width: 100%;
-      height: 400px; /* Altura fixa - ajuste conforme necessário */
+      height: 650px; /* Altura para mostrar 25+ concursos simultaneamente */
       overflow: auto; /* Permite scroll vertical e horizontal */
       white-space: nowrap; /* Impede que o texto ou elementos dentro do flexbox quebrem */
       /* Melhorias visuais */
@@ -149,7 +149,7 @@
     /* Solução específica para mobile - scroll horizontal */
     @media (max-width: 768px) {
       .matriz-container {
-        height: 300px; /* Altura menor no mobile */
+        height: 600px; /* Altura para mostrar 25+ concursos no mobile */
         -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
         scroll-behavior: smooth; /* Scroll suave */
         /* Scroll em todas as direções */
@@ -188,10 +188,10 @@
     .linha-concurso {
       display: flex; /* Mantém as células lado a lado */
       gap: 3px;
-      padding: 2px 0;
+      padding: 1px 0; /* Reduzido de 2px para 1px - menos espaço interno */
       flex-shrink: 0; /* Para garantir que não haja encolhimento das células */
       /* Melhorias para muitos concursos */
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Linha sutil entre concursos */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03); /* Linha mais sutil */
       transition: background-color 0.2s ease; /* Transição suave */
     }
 
