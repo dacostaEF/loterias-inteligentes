@@ -232,6 +232,45 @@
       }
     }
 
+    /* CSS para o container do gráfico de frequência */
+    .grafico-frequencia-container {
+      width: 100% !important; /* Ocupa 100% da largura do container pai */
+      height: 400px; /* Altura fixa para o gráfico */
+      min-width: 100%; /* Garante largura mínima */
+      /* Remover qualquer padding horizontal que possa ter sido adicionado */
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+
+    /* Otimização para Mobile - Máxima Expansão Horizontal */
+    @media (max-width: 768px) {
+      .grafico-frequencia-container {
+        height: 300px; /* Altura menor em mobile */
+        width: 100% !important; /* Garante que ocupe toda a largura */
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+      
+      /* Ajuste agressivo do modal para mobile - Quase 100% da largura */
+      .modal-content {
+        width: 98% !important; /* Quase 100% da largura do viewport */
+        max-width: 98% !important; /* Garante que não haja limite de largura */
+        margin: 2% auto !important; /* Reduz margem superior/inferior para ocupar mais tela */
+        /* Reduzir drasticamente os paddings laterais */
+        padding-left: 10px !important; 
+        padding-right: 10px !important;
+        /* Manter padding vertical se necessário */
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
+      }
+
+      /* Se tiver um .modal-body dentro do modal-content, também remover paddings */
+      .modal-body {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+    }
+
     .celula-numero {
       font-size: 9px !important;
       font-family: 'Inter', sans-serif;
@@ -292,8 +331,31 @@
       .chart-container div[id^="grafico"] {
         height: 280px !important;
       }
-      
+    }
 
+    /* Otimizações específicas para Samsung S20 e smartphones similares */
+    @media (max-width: 768px) {
+      /* Garantir que o gráfico ocupe toda a largura disponível */
+      #grafico-frequencia {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+      }
+      
+      /* Remover qualquer padding que possa estar limitando a largura */
+      .chart-container {
+        padding-left: 0px !important;
+        padding-right: 0px !important;
+      }
+      
+      /* Otimizar o container do gráfico para máxima expansão */
+      .grafico-frequencia-container {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        padding: 0px !important;
+        margin: 0px !important;
+      }
     }
   </style>
 
@@ -876,7 +938,7 @@
             
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Frequência Absoluta  vs  Relativa <span style="color: red;">(%)</span>  </h3>
-              <div id="grafico-frequencia" style="height: 400px;"></div>
+              <div id="grafico-frequencia" class="grafico-frequencia-container"></div>
             </div>
             
             <div class="chart-container">
@@ -934,29 +996,55 @@
             yaxis: 'y2'
           }
         ], {
-          title: '',
+          title: {
+            text: 'Freq. Números', // Título principal mais conciso para mobile
+            font: { size: 14 } // Tamanho da fonte menor para o título do gráfico
+          },
           paper_bgcolor: '#1a1a1a',
           plot_bgcolor: '#1a1a1a',
           font: { color: 'white' },
           autosize: true,
           responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 },
+          // Reduzir as margens ao mínimo necessário para os rótulos dos eixos
+          margin: { 
+            l: 25, // Margem esquerda mínima
+            r: 25, // Margem direita mínima
+            b: 70, // Ajuste para acomodar rótulos inclinados do eixo X
+            t: 40, // Margem superior
+            pad: 0 // Sem padding extra interno ao gráfico
+          },
           xaxis: { 
             automargin: true,
-            tickfont: { size: fontSize }
+            // CHAVE PARA OS RÓTULOS SOBREPOSTOS:
+            tickangle: 45, // Incline os rótulos em 45 graus
+            tickfont: { size: 8 }, // Diminua o tamanho da fonte dos rótulos para que caibam melhor
+            // showgrid: false // Remover grade vertical para menos poluição visual se não for essencial
           },
           yaxis: { 
             automargin: true,
-            tickfont: { size: fontSize }
+            title: {
+              text: 'Abs.', // Título do eixo Y mais curto para economizar espaço
+              font: { size: 9 } // Fonte menor para o título do eixo Y
+            },
+            tickfont: { size: 9 } // Fonte menor para os rótulos do eixo Y
           },
           yaxis2: { 
             side: 'right',
             overlaying: 'y',
             automargin: true,
-            tickfont: { color: 'red', size: fontSize }
+            title: {
+              text: 'Rel. (%)', // Título do eixo Y2 mais curto
+              font: { size: 9, color: 'red' }
+            },
+            tickfont: { color: 'red', size: 9 }
           },
           showlegend: false
         }, { displayModeBar: false });
+
+        // Garantir que o gráfico se redimensione quando a janela mudar
+        window.addEventListener('resize', () => {
+          Plotly.relayout('grafico-frequencia', { 'autosize': true });
+        });
 
         // Aguardar um pouco para garantir que o DOM foi renderizado
         setTimeout(() => {
@@ -1110,7 +1198,7 @@
             
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Frequência Absoluta  vs  Relativa <span style="color: red;">(%)</span>  </h3>
-              <div id="grafico-frequencia" style="height: 400px;"></div>
+              <div id="grafico-frequencia" class="grafico-frequencia-container"></div>
             </div>
             
             <h3 class="titulo-matriz">🔢 Matriz Visual dos Últimos Concursos</h3>
@@ -1166,29 +1254,55 @@
             yaxis: 'y2'
           }
         ], {
-          title: '',
+          title: {
+            text: 'Freq. Números', // Título principal mais conciso para mobile
+            font: { size: 14 } // Tamanho da fonte menor para o título do gráfico
+          },
           paper_bgcolor: '#1a1a1a',
           plot_bgcolor: '#1a1a1a',
           font: { color: 'white' },
           autosize: true,
           responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 },
+          // Reduzir as margens ao mínimo necessário para os rótulos dos eixos
+          margin: { 
+            l: 25, // Margem esquerda mínima
+            r: 25, // Margem direita mínima
+            b: 70, // Ajuste para acomodar rótulos inclinados do eixo X
+            t: 40, // Margem superior
+            pad: 0 // Sem padding extra interno ao gráfico
+          },
           xaxis: { 
             automargin: true,
-            tickfont: { size: fontSize }
+            // CHAVE PARA OS RÓTULOS SOBREPOSTOS:
+            tickangle: 45, // Incline os rótulos em 45 graus
+            tickfont: { size: 8 }, // Diminua o tamanho da fonte dos rótulos para que caibam melhor
+            // showgrid: false // Remover grade vertical para menos poluição visual se não for essencial
           },
           yaxis: { 
             automargin: true,
-            tickfont: { size: fontSize }
+            title: {
+              text: 'Abs.', // Título do eixo Y mais curto para economizar espaço
+              font: { size: 9 } // Fonte menor para o título do eixo Y
+            },
+            tickfont: { size: 9 } // Fonte menor para os rótulos do eixo Y
           },
           yaxis2: { 
             side: 'right',
             overlaying: 'y',
             automargin: true,
-            tickfont: { color: 'red', size: fontSize }
+            title: {
+              text: 'Rel. (%)', // Título do eixo Y2 mais curto
+              font: { size: 9, color: 'red' }
+            },
+            tickfont: { color: 'red', size: 9 }
           },
           showlegend: false
         }, { displayModeBar: false });
+
+        // Garantir que o gráfico se redimensione quando a janela mudar
+        window.addEventListener('resize', () => {
+          Plotly.relayout('grafico-frequencia', { 'autosize': true });
+        });
 
         // Carregar matriz visual com dados reais
         setTimeout(() => {
@@ -3551,8 +3665,8 @@
   <div id="popupAjuda" class="modal-ajuda">
     <div class="modal-content">
       <span class="close" onclick="fecharPopupAjuda()">×</span>
-      <h2>🧠 Entendendo os Gráficos</h2>
-      <p>Esses gráficos mostram padrões que podem te ajudar a escolher seus números com mais estratégia.</p>
+      <h2>🧠 Entendendo os Gráficos e a Matriz</h2>
+      <p>Esses gráficos e a matriz visual mostram padrões que podem te ajudar a escolher seus números com mais estratégia.</p>
 
       <h3>📊 Frequência Absoluta</h3>
       <p>
@@ -3582,8 +3696,17 @@
         <strong>✔ Útil para:</strong> detectar tendências mais recentes.
       </p>
 
+      <h3>🔢 Matriz Visual dos Concursos</h3>
+      <p>
+        Esta grade mostra os resultados dos últimos concursos de forma visual e compacta. Cada linha representa um sorteio, com os números e trevos sorteados destacados.<br>
+        <strong>✔ Útil para:</strong><br>
+        • <strong>Identificar padrões visuais:</strong> ver se há aglomerados de números, sequências (ex: 1, 2, 3), ou se a distribuição está mais dispersa.<br>
+        • <strong>Observar "buracos":</strong> identificar áreas da matriz que parecem "vazias" (números que não foram sorteados em uma sequência de concursos).<br>
+        • <strong>Revisão rápida:</strong> ter uma visão geral dos números e trevos que saíram nos sorteios recentes.
+      </p>
+
       <p style="margin-top: 20px; font-style: italic;">
-        Estes gráficos <strong>não garantem acertos</strong>, mas ajudam a apostar com mais consciência estatística.
+        <strong>⚠️ Lembre-se:</strong> Estes gráficos e a matriz não garantem acertos, mas ajudam a apostar com mais consciência estatística e a explorar os dados históricos do jogo.
       </p>
     </div>
   </div>
