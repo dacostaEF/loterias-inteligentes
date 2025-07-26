@@ -114,6 +114,35 @@
       padding-bottom: 15px; /* Para não cortar o scrollbar */
     }
 
+    /* Solução específica para mobile - scroll horizontal */
+    @media (max-width: 768px) {
+      .matriz-container {
+        -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+        scroll-behavior: smooth; /* Scroll suave */
+        /* Força o scroll horizontal no mobile */
+        overflow-x: scroll;
+        overflow-y: auto;
+        /* Remove padding que pode interferir no scroll */
+        padding-left: 0;
+        padding-right: 0;
+      }
+      
+      /* Garante que as linhas não quebrem no mobile */
+      .linha-concurso {
+        min-width: max-content; /* Força largura mínima baseada no conteúdo */
+        width: max-content; /* Garante que a linha ocupe todo o espaço necessário */
+      }
+      
+      /* Células com tamanho fixo no mobile */
+      .celula-numero {
+        flex-shrink: 0 !important;
+        min-width: 20px !important; /* Ligeiramente menor no mobile */
+        max-width: 20px !important;
+        height: 20px !important;
+        font-size: 8px !important;
+      }
+    }
+
 
 
     .linha-concurso {
@@ -915,6 +944,39 @@
         container.appendChild(linhaConcurso);
       });
       console.log('Matriz montada com sucesso!');
+      
+      // Solução para scroll horizontal no mobile
+      if (window.innerWidth <= 768) {
+        const matrizContainer = document.getElementById('matriz-frequencia');
+        if (matrizContainer) {
+          // Força o scroll horizontal no mobile
+          matrizContainer.style.webkitOverflowScrolling = 'touch';
+          matrizContainer.style.overflowX = 'scroll';
+          
+          // Adiciona evento de touch para melhorar o scroll
+          let isScrolling = false;
+          let startX = 0;
+          let scrollLeft = 0;
+          
+          matrizContainer.addEventListener('touchstart', (e) => {
+            isScrolling = true;
+            startX = e.touches[0].pageX - matrizContainer.offsetLeft;
+            scrollLeft = matrizContainer.scrollLeft;
+          });
+          
+          matrizContainer.addEventListener('touchmove', (e) => {
+            if (!isScrolling) return;
+            e.preventDefault();
+            const x = e.touches[0].pageX - matrizContainer.offsetLeft;
+            const walk = (x - startX) * 2;
+            matrizContainer.scrollLeft = scrollLeft - walk;
+          });
+          
+          matrizContainer.addEventListener('touchend', () => {
+            isScrolling = false;
+          });
+        }
+      }
     }
 
 
