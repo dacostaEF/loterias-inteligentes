@@ -3076,6 +3076,27 @@
             <!-- Gráfico de Distribuição -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Distribuição de Frequência dos Números${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
+              
+              <!-- Controles de Ordenação -->
+              <div class="flex justify-center items-center mb-4 gap-4">
+                <span class="text-gray-300 text-sm">Ordenar por:</span>
+                <button id="btn-ordenar-numerica" class="px-4 py-2 rounded-lg bg-[#00E38C] text-black font-semibold hover:opacity-80 transition-all">
+                  🔢 Ordem Numérica
+                </button>
+                <button id="btn-ordenar-frequencia" class="px-4 py-2 rounded-lg bg-[#2E303A] text-white hover:bg-[#3E404A] transition-all">
+                  📊 Por Frequência
+                </button>
+              </div>
+              
+              <!-- Estatísticas Rápidas -->
+              <div class="text-center text-xs text-gray-400 mb-2">
+                <span id="stats-distribuicao">
+                  Total: <span id="total-numeros">0</span> | 
+                  Média: <span id="media-frequencia">0</span> | 
+                  Máximo: <span id="max-frequencia">0</span>
+                </span>
+              </div>
+              
               <div id="grafico-estatisticas-distribuicao" style="height: 400px;"></div>
             </div>
 
@@ -3128,12 +3149,19 @@
           </div>
         `;
         
+        // Armazenar dados da distribuição globalmente para os controles de ordenação
+        window.ultimaDistribuicaoNumeros = data.distribuicao_numeros;
+        window.ultimoPeriodoEstatisticas = qtdConcursos;
+        
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
-          plotGraficoEstatisticasDistribuicao(data.distribuicao_numeros, qtdConcursos);
+          plotGraficoEstatisticasDistribuicao(data.distribuicao_numeros, 'numerica', qtdConcursos);
           plotGraficoEstatisticasClusters(clusters, qtdConcursos);
           plotGraficoEstatisticasCorrelacao(correlacao, qtdConcursos);
           plotGraficoEstatisticasProbabilidades(probabilidades, qtdConcursos);
+          
+          // Configurar event listeners para os botões de ordenação
+          configurarControlesOrdenacao();
         }, 100);
         
       } catch (error) {
@@ -3385,23 +3413,48 @@
       Plotly.newPlot('grafico-estatisticas-probabilidades', data, layout, { displayModeBar: false });
     }
 
-    // Função para criar gráfico de distribuição
-    function plotGraficoEstatisticasDistribuicao(distribuicaoNumeros, periodo = null) {
-      if (!distribuicaoNumeros || distribuicaoNumeros.length === 0) {
+    // Função para criar gráfico de distribuição com ordenação
+    function plotGraficoEstatisticasDistribuicao(distribuicaoNumerosOriginal, ordenacao = 'numerica', periodo = null) {
+      if (!distribuicaoNumerosOriginal || distribuicaoNumerosOriginal.length === 0) {
         console.warn('Dados de distribuição de números vazios ou inválidos.');
         Plotly.purge('grafico-estatisticas-distribuicao');
         document.getElementById('grafico-estatisticas-distribuicao').innerHTML = '<p class="text-center text-gray-400">Dados de distribuição não disponíveis para este período.</p>';
         return;
       }
 
-      const numeros = distribuicaoNumeros.map(item => item.numero);
-      const frequencias = distribuicaoNumeros.map(item => item.frequencia);
+      // 1. Criar uma cópia dos dados para não alterar o original
+      let distribuicaoParaPlotar = [...distribuicaoNumerosOriginal];
 
-      // Criar título com período
+      // 2. Aplicar a ordenação
+      if (ordenacao === 'frequencia') {
+        distribuicaoParaPlotar.sort((a, b) => b.frequencia - a.frequencia); // Do maior para o menor
+      } else { // 'numerica' ou qualquer outro valor, mantém a ordem original (1 a 50)
+        distribuicaoParaPlotar.sort((a, b) => a.numero - b.numero);
+      }
+
+      const numeros = distribuicaoParaPlotar.map(item => item.numero);
+      const frequencias = distribuicaoParaPlotar.map(item => item.frequencia);
+
+      // Calcular estatísticas para exibir
+      const total = frequencias.reduce((a, b) => a + b, 0);
+      const media = total / frequencias.length;
+      const maximo = Math.max(...frequencias);
+
+      // Atualizar estatísticas rápidas
+      const totalElement = document.getElementById('total-numeros');
+      const mediaElement = document.getElementById('media-frequencia');
+      const maximoElement = document.getElementById('max-frequencia');
+      
+      if (totalElement) totalElement.textContent = total;
+      if (mediaElement) mediaElement.textContent = media.toFixed(1);
+      if (maximoElement) maximoElement.textContent = maximo;
+
+      // Criar título com período e ordenação
       let titulo = '📊 Distribuição de Frequência dos Números';
       if (periodo) {
         titulo += ` (Últimos ${periodo} concursos)`;
       }
+      titulo += ordenacao === 'frequencia' ? ' - Ordenado por Frequência' : ' - Ordem Numérica';
 
       const data = [{
         x: numeros,
@@ -3422,21 +3475,38 @@
           size: 8,
           weight: 'bold'
         },
-        hovertemplate: '<b>Número %{x}</b><br>Frequência: %{y}<extra></extra>'
+        hovertemplate: ordenacao === 'frequencia' 
+          ? '<b>Número %{x}</b><br>Frequência: %{y}<br><i>Ordenado por frequência</i><extra></extra>'
+          : '<b>Número %{x}</b><br>Frequência: %{y}<extra></extra>'
       }];
+
+      // Adicionar linha de média quando ordenado por frequência
+      if (ordenacao === 'frequencia') {
+        data.push({
+          x: [numeros[0].toString(), numeros[numeros.length - 1].toString()], // Converter para string para eixo categórico
+          y: [media, media],
+          type: 'scatter',
+          mode: 'lines',
+          line: { color: 'red', dash: 'dash', width: 2 },
+          name: 'Média',
+          showlegend: true,
+          hoverinfo: 'skip'
+        });
+      }
 
       const layout = {
         title: {
           text: titulo,
           font: { size: 18, color: 'white' }
         },
-        xaxis: { 
-          title: 'Número',
-          titlefont: { color: 'white' },
+        xaxis: {
+          title: { text: 'Número', font: { color: 'white' } },
+          // *** MUDANÇA ESSENCIAL AQUI: DEFINIR O TIPO DO EIXO COMO 'category' ***
+          type: 'category', // Força o Plotly a tratar 'x' como categorias ordenadas
+          gridcolor: '#2E303A',
           tickfont: { color: 'white', size: 10 },
-          tickmode: 'linear',
-          dtick: 5,
-          range: [0.5, 50.5]
+          linecolor: '#2E303A',
+          automargin: true // Ajuda a evitar cortes de labels quando há muitos ticks
         },
         yaxis: { 
           title: 'Frequência',
@@ -3446,10 +3516,59 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
+        showlegend: ordenacao === 'frequencia'
       };
 
       Plotly.newPlot('grafico-estatisticas-distribuicao', data, layout, { displayModeBar: false });
+      console.log(`✅ Gráfico de distribuição criado com ordenação: ${ordenacao}!`);
+    }
+
+    // Função para atualizar estados dos botões de ordenação
+    function atualizarBotoesOrdenacao(ordenacaoAtiva) {
+      const btnNumerica = document.getElementById('btn-ordenar-numerica');
+      const btnFrequencia = document.getElementById('btn-ordenar-frequencia');
+      
+      if (btnNumerica && btnFrequencia) {
+        if (ordenacaoAtiva === 'numerica') {
+          btnNumerica.className = 'px-4 py-2 rounded-lg bg-[#00E38C] text-black font-semibold hover:opacity-80 transition-all';
+          btnFrequencia.className = 'px-4 py-2 rounded-lg bg-[#2E303A] text-white hover:bg-[#3E404A] transition-all';
+        } else {
+          btnFrequencia.className = 'px-4 py-2 rounded-lg bg-[#00E38C] text-black font-semibold hover:opacity-80 transition-all';
+          btnNumerica.className = 'px-4 py-2 rounded-lg bg-[#2E303A] text-white hover:bg-[#3E404A] transition-all';
+        }
+      }
+    }
+
+    // Função para configurar event listeners dos controles de ordenação
+    function configurarControlesOrdenacao() {
+      const btnOrdenarNumerica = document.getElementById('btn-ordenar-numerica');
+      const btnOrdenarFrequencia = document.getElementById('btn-ordenar-frequencia');
+
+      if (btnOrdenarNumerica && btnOrdenarFrequencia && window.ultimaDistribuicaoNumeros) {
+        // Remover event listeners anteriores para evitar duplicação
+        btnOrdenarNumerica.replaceWith(btnOrdenarNumerica.cloneNode(true));
+        btnOrdenarFrequencia.replaceWith(btnOrdenarFrequencia.cloneNode(true));
+        
+        // Recuperar referências após clonagem
+        const btnNumerica = document.getElementById('btn-ordenar-numerica');
+        const btnFrequencia = document.getElementById('btn-ordenar-frequencia');
+
+        btnNumerica.addEventListener('click', () => {
+          plotGraficoEstatisticasDistribuicao(window.ultimaDistribuicaoNumeros, 'numerica', window.ultimoPeriodoEstatisticas);
+          atualizarBotoesOrdenacao('numerica');
+        });
+
+        btnFrequencia.addEventListener('click', () => {
+          plotGraficoEstatisticasDistribuicao(window.ultimaDistribuicaoNumeros, 'frequencia', window.ultimoPeriodoEstatisticas);
+          atualizarBotoesOrdenacao('frequencia');
+        });
+
+        // Definir estado inicial (ordem numérica ativa)
+        atualizarBotoesOrdenacao('numerica');
+        
+        console.log('✅ Controles de ordenação configurados!');
+      }
     }
 
     function criarGraficoClusters() {
