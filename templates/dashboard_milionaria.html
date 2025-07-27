@@ -3111,6 +3111,14 @@
               </div>
             </div>
 
+            <!-- Interpretação dos Clusters -->
+            <div class="mt-8">
+              <h4 class="text-primary text-xl font-semibold mb-4 text-center">📊 Interpretação dos Grupos de Números</h4>
+              <div id="interpretacao-clusters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <p class="text-textSecondary text-center col-span-full">Carregando detalhes dos clusters...</p>
+              </div>
+            </div>
+
             <!-- Probabilidades Condicionais -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🎯 Probabilidades Condicionais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
@@ -3243,14 +3251,17 @@
       document.getElementById("popupAjudaEstatisticasAvancadas").style.display = "none";
     }
     
-    // Função para criar gráfico de clusters
+    // Função para criar gráfico de clusters com interface melhorada
     function plotGraficoEstatisticasClusters(clusters, periodo = null) {
+      console.log('Dados de clusters recebidos:', clusters);
       if (!clusters || !clusters.estatisticas_clusters) {
         console.error('Dados de clusters não disponíveis');
         return;
       }
       
       const clusterData = clusters.estatisticas_clusters;
+      const resumoClusters = clusters.resumo_clusters || {};
+      console.log('Resumo clusters:', resumoClusters);
       const labels = Object.keys(clusterData);
       const valores = Object.values(clusterData).map(cluster => cluster.quantidade);
       
@@ -3260,12 +3271,18 @@
         titulo += `<br>(Últimos ${periodo} concursos)`;
       }
       
+      // Usar cores dos clusters se disponíveis
+      const cores = labels.map(label => {
+        const resumo = resumoClusters[label];
+        return resumo && resumo.cor ? resumo.cor : '#00E38C';
+      });
+      
       const data = [{
         x: labels,
         y: valores,
         type: 'bar',
         marker: {
-          color: '#00E38C',
+          color: cores,
           opacity: 0.9,
           line: {
             color: 'white',
@@ -3304,6 +3321,56 @@
       };
       
       Plotly.newPlot('grafico-estatisticas-clusters', data, layout, { displayModeBar: false });
+      
+      // Criar cards de interpretação dos clusters
+      criarCardsInterpretacaoClusters(resumoClusters);
+    }
+    
+    // Função para criar cards de interpretação dos clusters
+    function criarCardsInterpretacaoClusters(resumoClusters) {
+      console.log('Criando cards de interpretação:', resumoClusters);
+      const container = document.getElementById('interpretacao-clusters');
+      if (!container || !resumoClusters) {
+        console.log('Container ou resumoClusters não encontrado:', { container: !!container, resumoClusters: !!resumoClusters });
+        return;
+      }
+      
+      container.innerHTML = '';
+      
+      Object.values(resumoClusters).forEach(cluster => {
+        const card = document.createElement('div');
+        card.className = 'bg-card p-4 rounded-lg border-l-4 shadow-lg hover:shadow-xl transition-shadow duration-300';
+        card.style.borderLeftColor = cluster.cor;
+        
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-3">
+            <h4 class="text-lg font-semibold text-text">${cluster.id}</h4>
+            <span class="px-2 py-1 rounded text-xs font-bold" style="background-color: ${cluster.cor}; color: white;">
+              ${cluster.tipo}
+            </span>
+          </div>
+          
+          <div class="text-sm text-textSecondary mb-3">
+            <p class="mb-2 leading-relaxed">${cluster.descricao_curta}</p>
+            <p class="text-yellow-400 font-semibold text-sm">${cluster.recomendacao}</p>
+          </div>
+          
+          <div class="text-xs text-textSecondary mb-3 bg-surface p-2 rounded">
+            <div class="grid grid-cols-2 gap-2">
+              <div><strong>Freq:</strong> ${cluster.caracteristicas_principais.frequencia_media}</div>
+              <div><strong>Intervalo:</strong> ${cluster.caracteristicas_principais.intervalo_medio}</div>
+              <div><strong>Atraso:</strong> ${cluster.caracteristicas_principais.score_atraso}</div>
+              <div><strong>Volatilidade:</strong> ${cluster.caracteristicas_principais.volatilidade}</div>
+            </div>
+          </div>
+          
+          <div class="text-xs text-textSecondary">
+            <strong>Exemplos:</strong> ${cluster.numeros_exemplos.join(', ')}
+          </div>
+        `;
+        
+        container.appendChild(card);
+      });
     }
     
     // Função para criar gráfico de correlação
@@ -4441,5 +4508,19 @@
   </style>
 
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+
+  <!-- Modal para Números do Cluster -->
+  <div id="modal-numeros-cluster" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-card rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto text-text relative">
+      <h3 id="modal-numeros-cluster-titulo" class="text-primary text-2xl font-semibold mb-4 text-center">Números do Cluster</h3>
+      <div id="modal-numeros-cluster-conteudo" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2 text-center text-lg font-bold">
+      </div>
+      <button id="fechar-modal-numeros-cluster" class="absolute top-4 right-4 text-textSecondary hover:text-primary transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+  </div>
 </body>
 </html> 

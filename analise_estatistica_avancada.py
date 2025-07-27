@@ -319,13 +319,13 @@ class AnaliseEstatisticaAvancada:
     
     def analise_clusters(self, n_clusters=5):
         """
-        Realiza análise de clusters dos números
+        Realiza análise de clusters dos números com métricas avançadas
         
         Args:
             n_clusters (int): Número de clusters a formar
             
         Returns:
-            dict: Resultados da análise de clusters
+            dict: Resultados da análise de clusters com interpretação detalhada
         """
         if self.df_validos is None or self.df_validos.empty:
             return {}
@@ -335,11 +335,15 @@ class AnaliseEstatisticaAvancada:
         numeros_analisados = []
         
         for numero in range(1, 51):
-            # Características do número
+            # Características básicas do número
             freq_total = 0
             freq_recente = 0
             ultima_aparicao = 0
             media_aparicoes_concurso = 0
+            
+            # Novas métricas avançadas
+            intervalos_aparicoes = []
+            ultima_posicao = -1
             
             # Usar enumerate para ter controle sobre o índice
             for pos, (idx, row) in enumerate(self.df_validos.iterrows()):
@@ -349,16 +353,34 @@ class AnaliseEstatisticaAvancada:
                     if pos < len(self.df_validos) * 0.3:  # Últimos 30%
                         freq_recente += 1
                     ultima_aparicao = len(self.df_validos) - pos
+                    
+                    # Calcular intervalos entre aparições
+                    if ultima_posicao != -1:
+                        intervalo = pos - ultima_posicao
+                        intervalos_aparicoes.append(intervalo)
+                    ultima_posicao = pos
             
-            # Calcular média de aparições por concurso
+            # Calcular métricas avançadas
             media_aparicoes_concurso = freq_total / len(self.df_validos) if len(self.df_validos) > 0 else 0
+            intervalo_medio = np.mean(intervalos_aparicoes) if intervalos_aparicoes else len(self.df_validos)
+            desvio_intervalo = np.std(intervalos_aparicoes) if len(intervalos_aparicoes) > 1 else 0
+            score_atraso = ultima_aparicao / intervalo_medio if intervalo_medio > 0 else 0
+            volatilidade = desvio_intervalo / intervalo_medio if intervalo_medio > 0 else 0
+            
+            # Tendência (comparar frequência recente vs total)
+            tendencia = (freq_recente / max(len(self.df_validos) * 0.3, 1)) - media_aparicoes_concurso
             
             caracteristicas.append([
-                freq_total,
-                freq_recente,
-                ultima_aparicao,
-                media_aparicoes_concurso,
-                numero  # Incluir o próprio número como característica
+                freq_total,           # 0: Frequência total
+                freq_recente,         # 1: Frequência recente
+                ultima_aparicao,      # 2: Última aparição
+                media_aparicoes_concurso,  # 3: Média de aparições
+                intervalo_medio,      # 4: Intervalo médio (NOVA)
+                desvio_intervalo,     # 5: Desvio do intervalo (NOVA)
+                score_atraso,         # 6: Score de atraso (NOVA)
+                volatilidade,         # 7: Volatilidade (NOVA)
+                tendencia,            # 8: Tendência (NOVA)
+                numero                # 9: Número
             ])
             numeros_analisados.append(numero)
         
@@ -394,45 +416,120 @@ class AnaliseEstatisticaAvancada:
         for i, cluster_id in enumerate(clusters):
             resultados_clusters[f'cluster_{cluster_id}'].append(numeros_analisados[i])
         
-        # Calcular estatísticas de cada cluster
+        # Calcular estatísticas detalhadas de cada cluster
         estatisticas_clusters = {}
+        resumo_clusters = {}
+        
         for cluster_id in range(n_clusters):
             numeros_cluster = resultados_clusters[f'cluster_{cluster_id}']
             if numeros_cluster:
                 # Calcular características médias do cluster
                 caracteristicas_cluster = [caracteristicas[i] for i, c in enumerate(clusters) if c == cluster_id]
                 if caracteristicas_cluster:
+                    # Métricas básicas
                     media_freq = np.mean([c[0] for c in caracteristicas_cluster])
                     media_recente = np.mean([c[1] for c in caracteristicas_cluster])
                     media_ultima = np.mean([c[2] for c in caracteristicas_cluster])
+                    media_intervalo = np.mean([c[4] for c in caracteristicas_cluster])
+                    media_desvio = np.mean([c[5] for c in caracteristicas_cluster])
+                    media_score_atraso = np.mean([c[6] for c in caracteristicas_cluster])
+                    media_volatilidade = np.mean([c[7] for c in caracteristicas_cluster])
+                    media_tendencia = np.mean([c[8] for c in caracteristicas_cluster])
                     
                     # Converter NaN para valores válidos
                     media_freq = 0.0 if np.isnan(media_freq) else float(media_freq)
                     media_recente = 0.0 if np.isnan(media_recente) else float(media_recente)
                     media_ultima = 0.0 if np.isnan(media_ultima) else float(media_ultima)
+                    media_intervalo = 0.0 if np.isnan(media_intervalo) else float(media_intervalo)
+                    media_desvio = 0.0 if np.isnan(media_desvio) else float(media_desvio)
+                    media_score_atraso = 0.0 if np.isnan(media_score_atraso) else float(media_score_atraso)
+                    media_volatilidade = 0.0 if np.isnan(media_volatilidade) else float(media_volatilidade)
+                    media_tendencia = 0.0 if np.isnan(media_tendencia) else float(media_tendencia)
                 else:
-                    media_freq = 0.0
-                    media_recente = 0.0
-                    media_ultima = 0.0
+                    media_freq = media_recente = media_ultima = media_intervalo = 0.0
+                    media_desvio = media_score_atraso = media_volatilidade = media_tendencia = 0.0
                 
+                # Classificar cluster com métricas avançadas
+                tipo_cluster = self._classificar_cluster_avancado(
+                    media_freq, media_recente, media_ultima, 
+                    media_intervalo, media_score_atraso, media_volatilidade, media_tendencia
+                )
+                
+                # Gerar descrição detalhada
+                descricao_curta = self._gerar_descricao_cluster(
+                    media_freq, media_recente, media_ultima, 
+                    media_intervalo, media_score_atraso, media_volatilidade, media_tendencia,
+                    len(numeros_cluster)
+                )
+                
+                # Gerar recomendação de aposta
+                recomendacao = self._gerar_recomendacao_cluster(tipo_cluster, media_score_atraso, media_volatilidade)
+                
+                # Estatísticas básicas (mantidas para compatibilidade)
                 estatisticas_clusters[f'cluster_{cluster_id}'] = {
                     'numeros': numeros_cluster,
                     'quantidade': int(len(numeros_cluster)),
                     'frequencia_media': float(media_freq),
                     'frequencia_recente_media': float(media_recente),
                     'ultima_aparicao_media': float(media_ultima),
-                    'tipo': self._classificar_cluster(media_freq, media_recente, media_ultima)
+                    'tipo': tipo_cluster
+                }
+                
+                # Resumo detalhado (nova estrutura)
+                resumo_clusters[f'cluster_{cluster_id}'] = {
+                    'id': f'Cluster {cluster_id}',
+                    'descricao_curta': descricao_curta,
+                    'caracteristicas_principais': {
+                        'frequencia_media': round(media_freq, 2),
+                        'intervalo_medio': round(media_intervalo, 2),
+                        'score_atraso': round(media_score_atraso, 2),
+                        'volatilidade': round(media_volatilidade, 2),
+                        'tendencia': round(media_tendencia, 2)
+                    },
+                    'numeros_exemplos': sorted(numeros_cluster)[:min(len(numeros_cluster), 8)],
+                    'todos_numeros_do_cluster': sorted(numeros_cluster),  # Lista COMPLETA ordenada
+                    'tamanho': len(numeros_cluster),
+                    'tipo': tipo_cluster,
+                    'recomendacao': recomendacao,
+                    'cor': self._obter_cor_cluster(tipo_cluster)
                 }
         
         return {
             'clusters': dict(resultados_clusters),
             'estatisticas_clusters': estatisticas_clusters,
+            'resumo_clusters': resumo_clusters,  # Nova estrutura detalhada
             'centroids': kmeans.cluster_centers_.tolist(),
             'inertia': float(kmeans.inertia_)
         }
     
+    def _classificar_cluster_avancado(self, freq_media, freq_recente, ultima_aparicao, 
+                                    intervalo_medio, score_atraso, volatilidade, tendencia):
+        """Classifica o tipo de cluster baseado em métricas avançadas"""
+        
+        # Determinar perfil principal
+        if freq_media > 8 and score_atraso < 0.5:
+            if volatilidade > 0.5:
+                return "Quente Volátil"
+            else:
+                return "Quente Estável"
+        elif freq_media <= 5 and score_atraso > 1.5:
+            if volatilidade > 0.7:
+                return "Frio Volátil"
+            else:
+                return "Frio Atrasado"
+        elif score_atraso > 2.0:
+            return "Muito Atrasado"
+        elif volatilidade > 0.8:
+            return "Altamente Volátil"
+        elif tendencia > 0.1:
+            return "Em Ascensão"
+        elif tendencia < -0.1:
+            return "Em Declínio"
+        else:
+            return "Equilibrado"
+    
     def _classificar_cluster(self, freq_media, freq_recente, ultima_aparicao):
-        """Classifica o tipo de cluster baseado nas características"""
+        """Classifica o tipo de cluster baseado nas características (mantido para compatibilidade)"""
         if freq_media > 8 and freq_recente > 2:
             return "Quente e Recente"
         elif freq_media > 8 and freq_recente <= 2:
@@ -443,6 +540,79 @@ class AnaliseEstatisticaAvancada:
             return "Frio mas Recente"
         else:
             return "Neutro"
+    
+    def _gerar_descricao_cluster(self, freq_media, freq_recente, ultima_aparicao, 
+                                intervalo_medio, score_atraso, volatilidade, tendencia, tamanho):
+        """Gera descrição detalhada do cluster"""
+        
+        descricao = f"Este cluster (com {tamanho} números) é caracterizado por:"
+        
+        # Frequência
+        if freq_media > 8:
+            descricao += f" alta frequência média de {freq_media:.1f};"
+        elif freq_media <= 5:
+            descricao += f" baixa frequência média de {freq_media:.1f};"
+        else:
+            descricao += f" frequência média equilibrada de {freq_media:.1f};"
+        
+        # Intervalo
+        descricao += f" intervalo médio de {intervalo_medio:.1f} concursos;"
+        
+        # Score de atraso
+        if score_atraso > 1.5:
+            descricao += f" números atrasados (score {score_atraso:.1f});"
+        elif score_atraso < 0.5:
+            descricao += f" números recentes (score {score_atraso:.1f});"
+        
+        # Volatilidade
+        if volatilidade > 0.7:
+            descricao += f" alta volatilidade ({volatilidade:.1f});"
+        elif volatilidade < 0.3:
+            descricao += f" baixa volatilidade ({volatilidade:.1f});"
+        
+        # Tendência
+        if tendencia > 0.1:
+            descricao += f" tendência de ascensão;"
+        elif tendencia < -0.1:
+            descricao += f" tendência de declínio;"
+        else:
+            descricao += f" tendência estável;"
+        
+        return descricao.rstrip(';') + "."
+    
+    def _gerar_recomendacao_cluster(self, tipo_cluster, score_atraso, volatilidade):
+        """Gera recomendação de aposta baseada no tipo do cluster"""
+        
+        recomendacoes = {
+            "Quente Volátil": "⚠️ Use com moderação - pode esfriar rapidamente",
+            "Quente Estável": "✅ Bom para apostas - padrão confiável",
+            "Frio Volátil": "🎯 Considere - pode surpreender, mas é arriscado",
+            "Frio Atrasado": "🔥 Quente - alta probabilidade de sair em breve",
+            "Muito Atrasado": "🔥 Muito quente - muito provável de sair",
+            "Altamente Volátil": "⚠️ Muito arriscado - comportamento imprevisível",
+            "Em Ascensão": "📈 Promissor - tendência positiva",
+            "Em Declínio": "📉 Evite - tendência negativa",
+            "Equilibrado": "⚖️ Seguro - padrão estável e previsível"
+        }
+        
+        return recomendacoes.get(tipo_cluster, "🤔 Padrão não identificado")
+    
+    def _obter_cor_cluster(self, tipo_cluster):
+        """Retorna cor associada ao tipo do cluster"""
+        
+        cores = {
+            "Quente Volátil": "#FF6B6B",      # Vermelho
+            "Quente Estável": "#4ECDC4",      # Verde
+            "Frio Volátil": "#FFA07A",        # Laranja
+            "Frio Atrasado": "#FFD93D",       # Amarelo
+            "Muito Atrasado": "#FF8C00",      # Laranja escuro
+            "Altamente Volátil": "#DDA0DD",   # Roxo
+            "Em Ascensão": "#98FB98",         # Verde claro
+            "Em Declínio": "#F08080",         # Rosa
+            "Equilibrado": "#87CEEB"          # Azul claro
+        }
+        
+        return cores.get(tipo_cluster, "#808080")  # Cinza como padrão
     
     def analise_correlacao_numeros(self):
         """

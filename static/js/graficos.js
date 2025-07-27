@@ -690,6 +690,9 @@ async function carregarEstatisticasAvancadas() {
         // e que recebem os dados no formato correto.
         renderizarDesvioPadrao(dados.desvio_padrao_distribuicao);
         renderizarTestesAleatoriedade(dados.teste_aleatoriedade);
+        
+        // Debug: Verificar estrutura dos dados de clusters
+        console.log("🔍 Dados de clusters recebidos:", dados.analise_clusters);
         renderizarClusters(dados.analise_clusters);
         renderizarCorrelacoes(dados.analise_correlacao_numeros); // Descomentada conforme discutimos!
         renderizarProbabilidadesCondicionais(dados.probabilidades_condicionais); // Descomente quando implementar
@@ -948,93 +951,130 @@ function renderizarTestesAleatoriedade(dadosTesteAleatoriedade) {
 // 🔗 FUNÇÃO PARA ANÁLISE DE CLUSTERS
 // ========================================
 
-function renderizarClusters(dadosClusters) {
-    console.log("🔗 Renderizando Análise de Clusters:", dadosClusters);
+function renderizarClusters(analiseClusters) {
+    console.log("🔗 Renderizando Análise de Clusters:", analiseClusters);
 
-    // Verificar se os dados existem
-    if (!dadosClusters || !dadosClusters.clusters) {
-        console.error('❌ Dados de clusters não disponíveis');
+    // Verificar se os dados existem e têm a estrutura esperada
+    if (!analiseClusters) {
+        console.error('❌ Dados de clusters não disponíveis.');
+        const container = document.getElementById('grafico-clusters');
+        if (container) {
+            Plotly.purge('grafico-clusters');
+            container.innerHTML = '<p class="text-red-500 text-center p-4">Não foi possível carregar o gráfico de clusters. Dados ausentes.</p>';
+        }
+        // Também limpar a seção de interpretação
+        const interpretacaoDiv = document.getElementById('interpretacao-clusters');
+        if (interpretacaoDiv) {
+             interpretacaoDiv.innerHTML = '<p class="text-red-500 text-center p-4">Não foi possível carregar a interpretação dos clusters.</p>';
+        }
         return;
     }
 
-    const clusters = dadosClusters.clusters;
-    const tabelaBody = document.getElementById('corpo-tabela-clusters');
-
-    if (!tabelaBody) {
-        console.error('❌ Elemento corpo-tabela-clusters não encontrado');
+    // Verificar se temos dados para o gráfico (dados_para_grafico ou estatisticas_clusters)
+    const temDadosGrafico = analiseClusters.dados_para_grafico || analiseClusters.estatisticas_clusters;
+    if (!temDadosGrafico) {
+        console.error('❌ Dados para o gráfico de clusters não disponíveis.');
+        const container = document.getElementById('grafico-clusters');
+        if (container) {
+            Plotly.purge('grafico-clusters');
+            container.innerHTML = '<p class="text-red-500 text-center p-4">Não foi possível carregar o gráfico de clusters. Dados ausentes.</p>';
+        }
+        // Também limpar a seção de interpretação
+        const interpretacaoDiv = document.getElementById('interpretacao-clusters');
+        if (interpretacaoDiv) {
+             interpretacaoDiv.innerHTML = '<p class="text-red-500 text-center p-4">Não foi possível carregar a interpretação dos clusters.</p>';
+        }
         return;
     }
 
-    // Limpar tabela atual
-    tabelaBody.innerHTML = '';
+    // --- Lógica de Plotly para criar o gráfico de clusters ---
+    let traces = [];
+    
+    if (analiseClusters.dados_para_grafico) {
+        // Se temos dados para gráfico de dispersão (PCA)
+        const numerosComClusters = analiseClusters.dados_para_grafico;
+        const uniqueClusters = [...new Set(numerosComClusters.map(item => item.cluster))].sort((a, b) => a - b);
 
-    // Preencher tabela com os clusters
-    clusters.forEach((cluster, index) => {
-        const row = document.createElement('tr');
-        row.className = 'border-b border-gray-600 hover:bg-gray-700';
+        traces = uniqueClusters.map(clusterId => {
+            const clusterData = numerosComClusters.filter(item => item.cluster === clusterId);
+            return {
+                x: clusterData.map(item => item.x_coordenada || item.numero), // Fallback para número se não tiver coordenadas
+                y: clusterData.map(item => item.y_coordenada || item.frequencia || 0), // Fallback para frequência
+                mode: 'markers',
+                type: 'scatter',
+                name: `Cluster ${clusterId}`,
+                text: clusterData.map(item => `Número: ${item.numero}<br>Frequência: ${item.frequencia || 'N/A'}<br>Intervalo Médio: ${item.intervalo_medio ? item.intervalo_medio.toFixed(2) : 'N/A'}`),
+                hoverinfo: 'text',
+                marker: {
+                    size: 10,
+                    opacity: 0.8,
+                    color: MILIONARIA_COLORS.primary,
+                    line: {
+                        color: 'rgba(217, 217, 217, 0.5)',
+                        width: 1
+                    }
+                }
+            };
+        });
+    } else if (analiseClusters.estatisticas_clusters) {
+        // Se temos dados de estatísticas de clusters (gráfico de barras)
+        const clusterData = analiseClusters.estatisticas_clusters;
+        const labels = Object.keys(clusterData);
+        const valores = Object.values(clusterData).map(cluster => cluster.quantidade);
         
-        const numerosFormatados = cluster.numeros.join(', ');
-        const frequenciaFormatada = (cluster.frequencia_relativa * 100).toFixed(1) + '%';
-        
-        row.innerHTML = `
-            <td class="p-3 font-semibold text-[#00E38C]">C${index + 1}</td>
-            <td class="p-3">${numerosFormatados}</td>
-            <td class="p-3 text-center">${frequenciaFormatada}</td>
-        `;
-        
-        tabelaBody.appendChild(row);
-    });
-
-    console.log('✅ Tabela de clusters atualizada!');
-
-    // Criar gráfico de clusters (gráfico de bolhas)
-    const containerGrafico = document.getElementById('grafico-clusters');
-    if (!containerGrafico) {
-        console.error('❌ Container grafico-clusters não encontrado');
-        return;
-    }
-
-    // Preparar dados para o gráfico
-    const traces = clusters.map((cluster, index) => {
-        return {
-            x: cluster.numeros.map((_, i) => i + 1), // Posições dos números no cluster
-            y: cluster.numeros, // Números do cluster
-            mode: 'markers',
-            type: 'scatter',
-            name: `Cluster ${index + 1}`,
+        traces = [{
+            x: labels,
+            y: valores,
+            type: 'bar',
             marker: {
-                size: 15,
                 color: MILIONARIA_COLORS.primary,
-                opacity: 0.7,
+                opacity: 0.9,
                 line: {
-                    color: MILIONARIA_COLORS.secondary,
-                    width: 2
+                    color: 'white',
+                    width: 1
                 }
             },
-            text: cluster.numeros.map(num => `Número ${num}`),
-            hoverinfo: 'text+name'
-        };
-    });
+            text: valores.map(val => `${val} números`),
+            textposition: 'auto',
+            textfont: {
+                color: 'white',
+                size: 10,
+                weight: 'bold'
+            },
+            hovertemplate: '<b>Cluster %{x}</b><br>Números: %{y}<extra></extra>'
+        }];
+    }
 
-    const layout = {
-        title: {
-            text: 'Análise de Clusters - Grupos de Números',
-            font: { color: MILIONARIA_COLORS.text, size: 16 }
-        },
-        xaxis: {
-            title: { text: 'Posição no Cluster', font: { color: MILIONARIA_COLORS.textSecondary, size: 12 } },
-            gridcolor: MILIONARIA_COLORS.surface,
-            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
-            linecolor: MILIONARIA_COLORS.surfaceDark,
-            fixedrange: true
-        },
-        yaxis: {
-            title: { text: 'Números', font: { color: MILIONARIA_COLORS.textSecondary, size: 12 } },
-            gridcolor: MILIONARIA_COLORS.surface,
-            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
-            zerolinecolor: MILIONARIA_COLORS.textSecondary,
-            fixedrange: true
-        },
+    // Adapte as cores dos clusters se você tiver um mapeamento no JS
+    const clusterColors = [
+        MILIONARIA_COLORS.primary,
+        MILIONARIA_COLORS.secondary,
+        '#FF6347', // Tomate
+        '#DA70D6', // Orquídea
+        '#FFA500'  // Laranja
+        // Adicione mais cores se tiver mais clusters
+    ];
+    
+    if (analiseClusters.dados_para_grafico) {
+        // Para gráfico de dispersão, aplicar cores por cluster
+        traces.forEach((trace, index) => {
+            if (clusterColors[index]) {
+                trace.marker.color = clusterColors[index];
+            }
+        });
+    } else if (analiseClusters.estatisticas_clusters) {
+        // Para gráfico de barras, usar cores baseadas no resumo dos clusters
+        const resumoClusters = analiseClusters.resumo_clusters || {};
+        if (traces[0] && traces[0].x) {
+            traces[0].marker.color = traces[0].x.map(label => {
+                const resumo = resumoClusters[label];
+                return resumo && resumo.cor ? resumo.cor : MILIONARIA_COLORS.primary;
+            });
+        }
+    }
+
+    // Layout flexível baseado no tipo de gráfico
+    let layout = {
         plot_bgcolor: MILIONARIA_COLORS.card,
         paper_bgcolor: MILIONARIA_COLORS.surface,
         showlegend: true,
@@ -1047,8 +1087,136 @@ function renderizarClusters(dadosClusters) {
         margin: { l: 50, r: 50, b: 50, t: 80, pad: 0 }
     };
 
+    if (analiseClusters.dados_para_grafico) {
+        // Layout para gráfico de dispersão (PCA)
+        layout.title = {
+            text: 'Clusters de Números (Análise de Componentes Principais)',
+            font: { color: MILIONARIA_COLORS.text }
+        };
+        layout.xaxis = {
+            title: { text: 'Componente Principal 1', font: { color: MILIONARIA_COLORS.textSecondary } },
+            gridcolor: MILIONARIA_COLORS.surface,
+            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+            linecolor: MILIONARIA_COLORS.surfaceDark,
+            fixedrange: true
+        };
+        layout.yaxis = {
+            title: { text: 'Componente Principal 2', font: { color: MILIONARIA_COLORS.textSecondary } },
+            gridcolor: MILIONARIA_COLORS.surface,
+            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+            zerolinecolor: MILIONARIA_COLORS.textSecondary,
+            fixedrange: true
+        };
+    } else if (analiseClusters.estatisticas_clusters) {
+        // Layout para gráfico de barras
+        layout.title = {
+            text: 'Análise de Clusters - Grupos de Números',
+            font: { color: MILIONARIA_COLORS.text, size: 16 }
+        };
+        layout.xaxis = {
+            title: { text: 'Cluster', font: { color: MILIONARIA_COLORS.textSecondary, size: 12 } },
+            gridcolor: MILIONARIA_COLORS.surface,
+            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 12 },
+            linecolor: MILIONARIA_COLORS.surfaceDark,
+            fixedrange: true
+        };
+        layout.yaxis = {
+            title: { text: 'Quantidade de Números', font: { color: MILIONARIA_COLORS.textSecondary, size: 12 } },
+            gridcolor: MILIONARIA_COLORS.surface,
+            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+            zerolinecolor: MILIONARIA_COLORS.textSecondary,
+            fixedrange: true
+        };
+    }
+
     Plotly.newPlot('grafico-clusters', traces, layout, PLOTLY_CONFIG);
     console.log('✅ Gráfico de clusters criado!');
+
+    // --- NOVA LÓGICA PARA INTERPRETAÇÃO DOS CLUSTERS ---
+    const interpretacaoClustersDiv = document.getElementById('interpretacao-clusters');
+    if (interpretacaoClustersDiv && analiseClusters.resumo_clusters) {
+        let htmlClusters = '';
+        // Itera sobre o objeto resumo_clusters para cada cluster_ID
+        for (const clusterKey in analiseClusters.resumo_clusters) {
+            const clusterData = analiseClusters.resumo_clusters[clusterKey];
+            const clusterIdNumber = parseInt(clusterKey.split('_')[1]); // Pega o número do cluster (0, 1, 2...)
+            const corCluster = clusterColors[clusterIdNumber] || MILIONARIA_COLORS.text; // Garante uma cor
+
+            // Monta as características principais em uma lista
+            let caracteristicasHtml = '';
+            for (const feature in clusterData.caracteristicas_principais) {
+                let displayName = feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Formatar nome da feature
+                caracteristicasHtml += `<li class="text-sm text-textSecondary">${displayName}: <span class="font-semibold">${clusterData.caracteristicas_principais[feature].toFixed(2)}</span></li>`;
+            }
+
+            htmlClusters += `
+                <div class="bg-card p-4 rounded-lg shadow-lg border border-surface cursor-pointer hover:bg-surface transition-colors click-cluster-card" data-cluster-key="${clusterKey}">
+                    <h4 class="font-bold text-xl mb-2" style="color: ${corCluster}">${clusterData.id || clusterKey.toUpperCase()}</h4>
+                    <p class="text-text mt-2 mb-3">${clusterData.descricao_curta}</p>
+                    <p class="font-semibold text-textSecondary">Características Médias:</p>
+                    <ul class="list-disc list-inside ml-4 mb-3">
+                        ${caracteristicasHtml}
+                    </ul>
+                    <p class="text-textSecondary text-sm">Números no cluster: <span class="font-semibold">${clusterData.tamanho}</span></p>
+                    <p class="text-textSecondary text-sm">Exemplos: <span class="font-semibold">${clusterData.numeros_exemplos.join(', ')}</span></p>
+                    <p class="text-xs text-primary mt-2">Clique para ver todos os números</p>
+                </div>
+            `;
+        }
+        interpretacaoClustersDiv.innerHTML = htmlClusters;
+
+        // --- Adicionar Event Listeners aos novos cards ---
+        const clusterCards = document.querySelectorAll('.click-cluster-card');
+        clusterCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const clickedClusterKey = card.dataset.clusterKey;
+                const clusterData = analiseClusters.resumo_clusters[clickedClusterKey];
+                if (clusterData && clusterData.todos_numeros_do_cluster) {
+                    exibirNumerosDoCluster(clusterData.id, clusterData.todos_numeros_do_cluster);
+                } else {
+                    console.error('Dados completos do cluster não encontrados para:', clickedClusterKey);
+                }
+            });
+        });
+
+    } else if (interpretacaoClustersDiv) {
+        interpretacaoClustersDiv.innerHTML = '<p class="text-textSecondary text-center col-span-full">Dados de interpretação de clusters não disponíveis.</p>';
+    }
+}
+
+// --- Nova Função para Exibir o Popup de Números ---
+function exibirNumerosDoCluster(titulo, numeros) {
+    const modal = document.getElementById('modal-numeros-cluster');
+    const modalTitulo = document.getElementById('modal-numeros-cluster-titulo');
+    const modalConteudo = document.getElementById('modal-numeros-cluster-conteudo');
+    const fecharBtn = document.getElementById('fechar-modal-numeros-cluster');
+
+    modalTitulo.innerText = `${titulo}: Números`;
+
+    // Limpar conteúdo anterior
+    modalConteudo.innerHTML = ''; 
+
+    // Adicionar os números formatados
+    numeros.forEach(num => {
+        const numDiv = document.createElement('div');
+        numDiv.className = 'bg-surface text-text px-2 py-1 rounded-md';
+        numDiv.innerText = num;
+        modalConteudo.appendChild(numDiv);
+    });
+
+    modal.classList.remove('hidden'); // Mostra o modal
+
+    // Adicionar listener para fechar o modal
+    fecharBtn.onclick = () => {
+        modal.classList.add('hidden');
+    };
+
+    // Fechar ao clicar fora do conteúdo do modal
+    modal.onclick = (event) => {
+        if (event.target === modal) {
+            modal.classList.add('hidden');
+        }
+    };
 }
 
 // Exportar funções para uso global
@@ -1068,5 +1236,6 @@ window.MilionariaGraficos = {
     carregarEstatisticasAvancadas,
     renderizarDesvioPadrao,
     renderizarTestesAleatoriedade,
-    renderizarClusters
+    renderizarClusters,
+    exibirNumerosDoCluster
 }; 
