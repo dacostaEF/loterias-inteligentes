@@ -471,6 +471,9 @@
       <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('estatisticas')">
         📈 Estatísticas Avançadas
       </button>
+      <button class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" id="abrir-modal-premium">
+        🎯 Aposta Inteligente (Premium)
+      </button>
     </div>
   </section>
 
@@ -530,6 +533,48 @@
         <button id="btnCancelarModal" class="bg-gray-600 text-white px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">Cancelar</button>
         <button id="btnGerarNoModal" class="bg-[#00E38C] text-black px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">Gerar Aposta</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Modal Premium - Análise Estatística Premium -->
+  <div id="modal-premium" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+    <div class="bg-[#1A1D25] rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-white relative">
+        <h3 class="text-[#00E38C] text-2xl font-semibold mb-4 text-center">🎯 Gerar Aposta Inteligente (Premium)</h3>
+
+        <p class="text-gray-300 text-sm mb-4">Revise e ajuste os parâmetros selecionados nas análises. Estes serão usados para gerar sua aposta inteligente:</p>
+
+        <div id="resumo-parametros-premium" class="bg-[#2E303A] p-4 rounded-md mb-6">
+            <h4 class="text-white text-lg font-semibold mb-3">📊 Parâmetros Ativos:</h4>
+            <div id="lista-parametros" class="space-y-2 text-sm text-gray-300">
+                <p class="text-gray-400">Nenhum parâmetro selecionado ainda.</p>
+            </div>
+        </div>
+
+        <div class="bg-[#2E303A] p-4 rounded-md mb-6">
+            <h4 class="text-white text-lg font-semibold mb-3">⚙️ Configuração da Aposta Gerada:</h4>
+            <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
+                <label for="qtde-numeros-aposta" class="text-gray-300">Quantos números na aposta?</label>
+                <input type="number" id="qtde-numeros-aposta" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="6" min="6" max="12">
+                <label for="qtde-trevos-aposta" class="text-gray-300">Quantos trevos na aposta?</label>
+                <input type="number" id="qtde-trevos-aposta" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="2" min="2" max="6">
+            </div>
+            <div class="flex items-center">
+                <label for="num-apostas-gerar" class="text-gray-300">Quantas apostas gerar?</label>
+                <input type="number" id="num-apostas-gerar" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm ml-2" value="1" min="1" max="10">
+            </div>
+        </div>
+
+        <button id="gerar-sugestao-btn" class="bg-[#00E38C] text-black font-bold py-3 px-6 rounded-lg w-full hover:bg-green-600 transition-colors text-lg">
+            🎲 Gerar Sugestão de Números
+        </button>
+
+        <div id="resultado-sugestao" class="bg-[#2E303A] p-4 rounded-md mt-6 hidden">
+            <h4 class="text-[#00E38C] text-xl font-semibold mb-3 text-center">🎯 Sua Aposta Sugerida:</h4>
+            <div id="lista-apostas-geradas" class="space-y-4">
+            </div>
+        </div>
+
+        <button id="fechar-modal-premium" class="absolute top-4 right-4 text-gray-400 hover:text-white text-3xl">&times;</button>
     </div>
   </div>
 
@@ -843,26 +888,62 @@
         case 'frequencia':
           titulo.textContent = '📊 Análise de Frequência';
           carregarAnaliseFrequencia(conteudo);
+          // Carregar preferências salvas após o modal ser carregado
+          setTimeout(() => {
+            if (typeof carregarPreferenciasFrequencia === 'function') {
+              carregarPreferenciasFrequencia();
+            }
+          }, 500);
           break;
         case 'distribuicao':
           titulo.textContent = '🔢 Análise de Distribuição';
           carregarAnaliseDistribuicao(conteudo, null);
+          // Carregar preferências salvas após o modal ser carregado
+          setTimeout(() => {
+            if (typeof carregarPreferenciasDistribuicao === 'function') {
+              carregarPreferenciasDistribuicao();
+            }
+          }, 500);
           break;
         case 'afinidades':
           titulo.textContent = '🤝 Análise de Afinidades';
           carregarAnaliseAfinidades(conteudo);
+          // Carregar preferências salvas após o modal ser carregado
+          setTimeout(() => {
+            if (typeof carregarPreferenciasAfinidades === 'function') {
+              carregarPreferenciasAfinidades();
+            }
+          }, 500);
           break;
         case 'trevos':
           titulo.textContent = '🍀 Análise dos Trevos';
           carregarAnaliseTrevos(conteudo);
+          // Carregar preferências salvas após o modal ser carregado
+          setTimeout(() => {
+            if (typeof carregarPreferenciasTrevos === 'function') {
+              carregarPreferenciasTrevos();
+            }
+          }, 500);
           break;
         case 'seca':
           titulo.textContent = '🌵 Análise de Seca';
           carregarAnaliseSeca(conteudo);
+          // Carregar preferências salvas após o modal ser carregado
+          setTimeout(() => {
+            if (typeof carregarPreferenciasPadroes === 'function') {
+              carregarPreferenciasPadroes();
+            }
+          }, 500);
           break;
         case 'estatisticas':
           titulo.textContent = '📈 Estatísticas Avançadas';
           carregarAnaliseEstatisticasAvancadas(conteudo);
+          // Carregar preferências salvas após o modal ser carregado
+          setTimeout(() => {
+            if (typeof carregarPreferenciasAvancadas === 'function') {
+              carregarPreferenciasAvancadas();
+            }
+          }, 500);
           break;
       }
     }
@@ -950,6 +1031,35 @@
                 </div>
               </div>
               <div id="matriz-frequencia" class="matriz-container"></div>
+            </div>
+            
+            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <input type="checkbox" id="freq-priorizar-quentes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarQuentes" data-pref-period="completa">
+                  <label for="freq-priorizar-quentes" class="text-white">Priorizar Números MAIS Frequentes</label>
+                  <input type="number" id="freq-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="freq-priorizar-frios" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarFrios" data-pref-period="completa">
+                  <label for="freq-priorizar-frios" class="text-white">Priorizar Números MENOS Frequentes</label>
+                  <input type="number" id="freq-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
+                </div>
+                <div class="flex items-center">
+                  <label for="freq-periodo" class="text-white">Considerar período:</label>
+                  <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
+                    <option value="completa">Todos os Concursos</option>
+                    <option value="25">Últimos 25 Concursos</option>
+                    <option value="50">Últimos 50 Concursos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
+                <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
+                <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
+              </div>
             </div>
           </div>
         `;
@@ -1209,6 +1319,35 @@
               </div>
             </div>
             <div id="matriz-frequencia" class="matriz-container"></div>
+            
+            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <input type="checkbox" id="freq-priorizar-quentes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarQuentes" data-pref-period="completa">
+                  <label for="freq-priorizar-quentes" class="text-white">Priorizar Números MAIS Frequentes</label>
+                  <input type="number" id="freq-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="freq-priorizar-frios" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarFrios" data-pref-period="completa">
+                  <label for="freq-priorizar-frios" class="text-white">Priorizar Números MENOS Frequentes</label>
+                  <input type="number" id="freq-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
+                </div>
+                <div class="flex items-center">
+                  <label for="freq-periodo" class="text-white">Considerar período:</label>
+                  <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
+                    <option value="completa">Todos os Concursos</option>
+                    <option value="25">Últimos 25 Concursos</option>
+                    <option value="50">Últimos 50 Concursos</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
+                <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
+                <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
+              </div>
+            </div>
           </div>
         `;
         
@@ -1479,6 +1618,36 @@
                 <p class="text-sm text-gray-400">Máx: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.max}</span></p>
                 <p class="text-sm text-gray-400">Média: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.media}</span></p>
                 <p class="text-sm text-gray-400">Moda: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.moda}</span></p>
+              </div>
+            </div>
+            
+            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <input type="checkbox" id="dist-priorizar-pares-impares" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="distribuicao" data-pref-name="priorizarParesImpares">
+                  <label for="dist-priorizar-pares-impares" class="text-white">Priorizar Paridade (Pares/Ímpares)</label>
+                  <select id="dist-paridade-desejada" class="select-premium-pref ml-auto bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="distribuicao" data-pref-name="paridadeDesejada">
+                    <option value="equilibrado">Equilibrada (3 pares/3 ímpares)</option>
+                    <option value="mais_pares">Mais Pares</option>
+                    <option value="mais_impares">Mais Ímpares</option>
+                  </select>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="dist-priorizar-soma" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="distribuicao" data-pref-name="priorizarSoma">
+                  <label for="dist-priorizar-soma" class="text-white">Priorizar Soma dos Números</label>
+                </div>
+                <div class="flex items-center ml-auto">
+                  <label for="dist-soma-min" class="text-gray-300 text-sm mr-2">Soma Min:</label>
+                  <input type="number" id="dist-soma-min" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="100" min="21" max="285">
+                  <label for="dist-soma-max" class="text-gray-300 text-sm ml-4 mr-2">Soma Max:</label>
+                  <input type="number" id="dist-soma-max" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="200" min="21" max="285">
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
+                <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
+                <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
               </div>
             </div>
           </div>
@@ -1895,6 +2064,27 @@
             <!-- Dica Estratégica -->
             <div class="mt-8 p-4 bg-blue-900 bg-opacity-30 rounded-lg text-center text-blue-300 border border-blue-800 shadow">
               <span class="font-semibold">💡 Dica Estratégica:</span> Combine números com forte afinidade e alta conexão geral para aumentar suas chances de formar grupos vencedores!
+            </div>
+            
+            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestão para Aposta Inteligente (Afinidades)</h4>
+              <div class="space-y-3">
+                  <div class="flex items-center">
+                      <input type="checkbox" id="afinidade-priorizar-pares-fortes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="afinidades" data-pref-name="priorizarParesFortes">
+                      <label for="afinidade-priorizar-pares-fortes" class="text-white">Priorizar Pares com Forte Afinidade</label>
+                      <input type="number" id="afinidade-qtde-pares" class="ml-auto w-16 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="3" min="1" max="10">
+                  </div>
+                  <div class="flex items-center">
+                      <input type="checkbox" id="afinidade-priorizar-numeros-conectados" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="afinidades" data-pref-name="priorizarNumerosConectados">
+                      <label for="afinidade-priorizar-numeros-conectados" class="text-white">Priorizar Números com Alta Conexão Geral</label>
+                      <input type="number" id="afinidade-qtde-numeros" class="ml-auto w-16 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="4" min="1" max="10">
+                  </div>
+                  <div class="flex items-center">
+                      <input type="checkbox" id="afinidade-evitar-pares-fracos" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="afinidades" data-pref-name="evitarParesFracos">
+                      <label for="afinidade-evitar-pares-fracos" class="text-white">Evitar Pares com Afinidade Fraca</label>
+                  </div>
+              </div>
             </div>
           </div>
         `;
@@ -2385,6 +2575,23 @@
                   </div>
                 </div>
               </div>
+              
+              <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+              <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+                <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestão para Aposta Inteligente (Trevos)</h4>
+                <div class="space-y-3">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="trevo-priorizar-quentes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="trevos" data-pref-name="priorizarQuentesTrevos">
+                        <label for="trevo-priorizar-quentes" class="text-white">Priorizar Trevos MAIS Frequentes</label>
+                        <input type="number" id="trevo-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="2" min="1" max="6">
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="trevo-priorizar-frios" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="trevos" data-pref-name="priorizarFriosTrevos">
+                        <label for="trevo-priorizar-frios" class="text-white">Priorizar Trevos MENOS Frequentes</label>
+                        <input type="number" id="trevo-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="2" min="1" max="6">
+                    </div>
+                </div>
+              </div>
             </div>
           </div>
         `;
@@ -2782,6 +2989,31 @@
             <div class="mt-8 text-center text-gray-400">
               <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística histórica. Não garante resultados futuros. Aposte com responsabilidade.</p>
             </div>
+            
+            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <input type="checkbox" id="padrao-evitar-consecutivos" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="evitarConsecutivos">
+                  <label for="padrao-evitar-consecutivos" class="text-white">Evitar Números Consecutivos (ex: 23-24)</label>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="padrao-priorizar-atrasados" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="priorizarAtrasados">
+                  <label for="padrao-priorizar-atrasados" class="text-white">Priorizar Números MUITO Atrasados</label>
+                  <label for="padrao-min-atraso" class="text-gray-300 text-sm ml-auto mr-2">Mínimo de concursos sem sair:</label>
+                  <input type="number" id="padrao-min-atraso" class="w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="20" min="1" max="100">
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="padrao-evitar-repeticoes-seguidas" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="evitarRepeticoesSeguidas">
+                  <label for="padrao-evitar-repeticoes-seguidas" class="text-white">Evitar Números Repetidos do Último Concurso</label>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
+                <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
+                <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
+              </div>
+            </div>
           </div>
         `;
         
@@ -3174,12 +3406,28 @@
             <div class="mt-8 text-center text-gray-400">
               <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística avançada. Não garante resultados futuros. Aposte com responsabilidade.</p>
             </div>
+            
+            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente (Clusters)</h4>
+              <p class="text-gray-300 text-sm mb-3">Selecione os clusters cujos números você deseja priorizar:</p>
+              <div id="avancada-opcoes-clusters" class="grid grid-cols-2 gap-2 text-white">
+                <p class="col-span-2 text-gray-300">Carregando opções de clusters...</p>
+              </div>
+            </div>
           </div>
         `;
         
         // Armazenar dados da distribuição globalmente para os controles de ordenação
         window.ultimaDistribuicaoNumeros = data.distribuicao_numeros;
         window.ultimoPeriodoEstatisticas = qtdConcursos;
+        
+        // Armazenar dados dos clusters globalmente para as preferências premium
+        window.analiseResultados = {
+            avancada: {
+                clusters: clusters
+            }
+        };
         
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
