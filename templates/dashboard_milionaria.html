@@ -3114,7 +3114,7 @@
             <!-- Interpretação dos Clusters -->
             <div class="mt-8">
               <h4 class="text-primary text-xl font-semibold mb-4 text-center">📊 Interpretação dos Grupos de Números</h4>
-              <div id="interpretacao-clusters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div id="interpretacao-clusters" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                 <p class="text-textSecondary text-center col-span-full">Carregando detalhes dos clusters...</p>
               </div>
             </div>
@@ -3493,7 +3493,7 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 }
+        margin: { l: 40, r: 40, t: 70, b: 80, pad: 5 }
       };
       
       Plotly.newPlot('grafico-estatisticas-correlacao', data, layout, { displayModeBar: false });
@@ -3582,7 +3582,7 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 }
+        margin: { l: 40, r: 40, t: 70, b: 80, pad: 5 }
       };
       
       Plotly.newPlot('grafico-estatisticas-probabilidades', data, layout, { displayModeBar: false });
@@ -3692,7 +3692,7 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 },
+        margin: { l: 40, r: 40, t: 70, b: 80, pad: 5 },
         showlegend: ordenacao === 'frequencia'
       };
 
@@ -4349,10 +4349,11 @@
 
       <h3>🎯 Probabilidades Condicionais</h3>
       <p>
-        Calcula a probabilidade de um número sair dado que outro já saiu.<br>
-        <strongProbabilidades:</strong> Chances condicionais entre pares de números.<br>
-        <strongInterpretação:</strong> Probabilidade em porcentagem.<br>
-        <strong💡 Dica:</strong> Use para identificar números que se "atraem" estatisticamente.
+        Esse gráfico mostra a chance de um número ser sorteado quando outro já foi. É como observar se certos números têm uma tendência a aparecer juntos com frequência.<br><br>
+        <strong>🔗 Essas são chamadas de probabilidades condicionais</strong> — ou seja, "Dado que o número X saiu, qual a chance de Y também sair?".<br><br>
+        <strong>📊 Os valores são apresentados em porcentagem</strong>, mostrando a força dessa relação entre os pares.<br><br>
+        <strong>💡 Use essa análise para identificar números que "se atraem" estatisticamente</strong>, e que podem surgir juntos com mais frequência do que o acaso sugeriria.<br><br>
+        <strong>🧠 É uma ferramenta poderosa para quem busca padrões sutis e conexões escondidas entre os números.</strong>
       </p>
 
       <h3>🎯 Janela de Análise Temporal</h3>

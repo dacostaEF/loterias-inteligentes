@@ -53,8 +53,8 @@ const DEFAULT_LAYOUT = {
     autosize: true, // Garante que o gráfico se ajuste ao container
     responsive: true, // Habilita a responsividade do Plotly
     margin: {
-        l: 40, // Reduzido para mobile
-        r: 20, // Reduzido para mobile
+        l: 30, // Reduzido ainda mais para mobile
+        r: 30, // Reduzido ainda mais para mobile
         t: 40,
         b: 40, // Reduzido para mobile
         pad: 5 // Reduzido para mobile
@@ -1084,7 +1084,7 @@ function renderizarClusters(analiseClusters) {
             font: { color: MILIONARIA_COLORS.text }
         },
         autosize: true,
-        margin: { l: 50, r: 50, b: 50, t: 80, pad: 0 }
+        margin: { l: 40, r: 40, b: 50, t: 70, pad: 0 }
     };
 
     if (analiseClusters.dados_para_grafico) {
@@ -1146,24 +1146,24 @@ function renderizarClusters(analiseClusters) {
             let caracteristicasHtml = '';
             for (const feature in clusterData.caracteristicas_principais) {
                 let displayName = feature.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()); // Formatar nome da feature
-                caracteristicasHtml += `<li class="text-sm text-textSecondary">${displayName}: <span class="font-semibold">${clusterData.caracteristicas_principais[feature].toFixed(2)}</span></li>`;
+                caracteristicasHtml += `<li class="text-xs text-textSecondary cluster-list-item">${displayName}: <span class="font-semibold">${clusterData.caracteristicas_principais[feature].toFixed(2)}</span></li>`;
             }
 
             htmlClusters += `
-                <div class="bg-card p-4 rounded-lg shadow-lg border border-surface">
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="font-bold text-xl text-text">${clusterData.id || clusterKey.toUpperCase()}</h4>
+                <div class="bg-card px-3 py-2 rounded-lg shadow-lg border border-surface cluster-card-optimized">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-bold text-lg text-text cluster-title">${clusterData.id || clusterKey.toUpperCase()}</h4>
                         <span class="px-2 py-1 rounded text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity click-cluster-badge" data-cluster-key="${clusterKey}" style="background-color: ${clusterData.cor}; color: white;">
                             ${clusterData.tipo}
                         </span>
                     </div>
-                    <p class="text-text mt-2 mb-3">${clusterData.descricao_curta}</p>
-                    <p class="font-semibold text-textSecondary">Características Médias:</p>
-                    <ul class="list-disc list-inside ml-4 mb-3">
+                    <p class="text-text mt-1 mb-2 text-sm leading-tight cluster-description">${clusterData.descricao_curta}</p>
+                    <p class="font-semibold text-textSecondary mt-1 mb-1 cluster-subtitle">Características Médias:</p>
+                    <ul class="list-disc list-inside ml-4 mb-2 cluster-list">
                         ${caracteristicasHtml}
                     </ul>
-                    <p class="text-textSecondary text-sm">Números no cluster: <span class="font-semibold">${clusterData.tamanho}</span></p>
-                    <p class="text-textSecondary text-sm">Exemplos: <span class="font-semibold">${clusterData.numeros_exemplos.join(', ')}</span></p>
+                    <p class="text-textSecondary text-xs mt-1 cluster-info">Números no cluster: <span class="font-semibold">${clusterData.tamanho}</span></p>
+                    <p class="text-textSecondary text-xs mt-1 cluster-info">Exemplos: <span class="font-semibold">${clusterData.numeros_exemplos.join(', ')}</span></p>
                 </div>
             `;
         }

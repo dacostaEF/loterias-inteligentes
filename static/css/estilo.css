@@ -776,8 +776,9 @@ p {
 /* 📱 Estilo somente para MOBILE */
 @media (max-width: 768px) {
     .modal-content {
-        margin: 5% auto;
-        padding: var(--spacing-4);
+        margin: 5% auto; /* Ajuste para centralizar verticalmente um pouco melhor */
+        width: 95%; /* Ocupa 95% da largura */
+        padding: 15px; /* Padding interno */
         max-width: 95vw;
         max-height: 90vh;
         overflow-y: auto;
@@ -835,12 +836,118 @@ p {
 
 /* 📱 Otimizações para telas médias e pequenas */
 @media (max-width: 640px) {
+    /* Regras para telas pequenas (celulares, como S20) */
+    .modal-principal .modal-content {
+        margin: 2% auto; /* Reduz margem superior/inferior para mais espaço */
+        width: 98%; /* Ocupa quase toda a largura */
+        padding: 10px; /* Reduz padding para dar mais espaço ao conteúdo */
+    }
 
     
     /* Otimizações para container dos trevos */
     #trevos-container {
         gap: 6px;
         justify-content: center;
+    }
+
+    /* Containers dos gráficos dentro do modal - Otimização para remover "esprimido" */
+    .modal-principal #grafico-clusters,
+    .modal-principal #grafico-correlacao,
+    .modal-principal #grafico-desvio-padrao,
+    .modal-principal #grafico-teste-aleatoriedade,
+    .modal-principal #grafico-probabilidades-condicionais,
+    .modal-principal #grafico-estatisticas-distribuicao {
+        /* Garanta que o container use a largura total disponível e tenha um padding razoável */
+        width: 100% !important;
+        box-sizing: border-box !important; /* Inclui padding e borda na largura total */
+        padding: 0 8px !important; /* Padding um pouco maior para tablets */
+        /* height já deve ser definido no HTML, como h-[400px] */
+    }
+
+    /* Opcional: Ajuste de espaçamento para a seção de interpretação de clusters */
+    .modal-principal #interpretacao-clusters {
+        padding: 0 8px !important; /* Alinhe com o padding dos gráficos, se necessário */
+    }
+
+    /* Reduz espaçamento entre seções do modal em tablets */
+    .modal-principal .mt-8 {
+        margin-top: 20px !important; /* Reduz de 32px para 20px */
+    }
+
+    .modal-principal .mb-6 {
+        margin-bottom: 16px !important; /* Reduz de 24px para 16px */
+    }
+
+    .modal-principal .mb-4 {
+        margin-bottom: 10px !important; /* Reduz de 16px para 10px */
+    }
+
+    .modal-principal .chart-container {
+        margin-bottom: 16px !important; /* Reduz margem entre containers de gráficos */
+        padding: 16px !important; /* Reduz padding interno */
+    }
+
+    /* Classes específicas para otimização de cards de cluster em tablets */
+    .cluster-card-optimized {
+        padding: 12px 16px !important; /* Reduz padding para tablets */
+    }
+
+    .cluster-title {
+        font-size: 1.1rem !important; /* Reduz tamanho do título */
+        margin-bottom: 6px !important;
+        line-height: 1.2 !important;
+    }
+
+    .cluster-description {
+        margin-top: 4px !important;
+        margin-bottom: 6px !important;
+        line-height: 1.3 !important;
+    }
+
+    .cluster-subtitle {
+        margin-top: 4px !important;
+        margin-bottom: 4px !important;
+        line-height: 1.2 !important;
+    }
+
+    .cluster-list {
+        margin-bottom: 6px !important;
+    }
+
+    .cluster-list-item {
+        margin-bottom: 2px !important;
+        line-height: 1.2 !important;
+    }
+
+    .cluster-info {
+        margin-top: 3px !important;
+        line-height: 1.1 !important;
+    }
+
+    /* Otimização de espaçamento para cards de cluster em mobile */
+    .modal-principal #interpretacao-clusters .bg-card {
+        padding: 12px !important; /* Reduz padding interno dos cards */
+        margin-bottom: 8px !important; /* Reduz margem entre cards */
+    }
+
+    /* Reduz espaçamento entre elementos de texto dentro dos cards */
+    .modal-principal #interpretacao-clusters p {
+        margin-bottom: 6px !important; /* Reduz margem entre parágrafos */
+        line-height: 1.3 !important; /* Reduz altura da linha */
+    }
+
+    .modal-principal #interpretacao-clusters ul {
+        margin-bottom: 6px !important; /* Reduz margem das listas */
+    }
+
+    .modal-principal #interpretacao-clusters li {
+        margin-bottom: 2px !important; /* Reduz margem entre itens da lista */
+        line-height: 1.2 !important; /* Reduz altura da linha dos itens */
+    }
+
+    .modal-principal #interpretacao-clusters h4 {
+        margin-bottom: 8px !important; /* Reduz margem dos títulos */
+        line-height: 1.2 !important; /* Reduz altura da linha dos títulos */
     }
     
     /* Reduzir tamanho dos trevos para caber em uma linha */
@@ -1010,6 +1117,106 @@ p {
 
 /* 📱 Otimizações para telas muito pequenas (Galaxy S20, iPhone SE) */
 @media (max-width: 480px) {
+    /* Containers dos gráficos dentro do modal - Otimização para remover "esprimido" */
+    .modal-principal #grafico-clusters,
+    .modal-principal #grafico-correlacao,
+    .modal-principal #grafico-desvio-padrao,
+    .modal-principal #grafico-teste-aleatoriedade,
+    .modal-principal #grafico-probabilidades-condicionais,
+    .modal-principal #grafico-estatisticas-distribuicao {
+        /* Garanta que o container use a largura total disponível e tenha um padding razoável */
+        width: 100% !important;
+        box-sizing: border-box !important; /* Inclui padding e borda na largura total */
+        padding: 0 5px !important; /* Reduza o padding horizontal se ele estiver causando o 'espremido' */
+        /* height já deve ser definido no HTML, como h-[400px] */
+    }
+
+    /* Opcional: Ajuste de espaçamento para a seção de interpretação de clusters */
+    .modal-principal #interpretacao-clusters {
+        padding: 0 5px !important; /* Alinhe com o padding dos gráficos, se necessário */
+    }
+
+    /* Otimização de espaçamento para cards de cluster em mobile pequeno */
+    .modal-principal #interpretacao-clusters .bg-card {
+        padding: 8px !important; /* Reduz ainda mais o padding interno dos cards */
+        margin-bottom: 6px !important; /* Reduz ainda mais a margem entre cards */
+    }
+
+    /* Reduz espaçamento entre seções do modal em mobile pequeno */
+    .modal-principal .mt-8 {
+        margin-top: 16px !important; /* Reduz de 32px para 16px */
+    }
+
+    .modal-principal .mb-6 {
+        margin-bottom: 12px !important; /* Reduz de 24px para 12px */
+    }
+
+    .modal-principal .mb-4 {
+        margin-bottom: 8px !important; /* Reduz de 16px para 8px */
+    }
+
+    .modal-principal .chart-container {
+        margin-bottom: 12px !important; /* Reduz margem entre containers de gráficos */
+        padding: 12px !important; /* Reduz padding interno */
+    }
+
+    /* Classes específicas para otimização de cards de cluster em mobile pequeno */
+    .cluster-card-optimized {
+        padding: 8px 12px !important; /* Reduz ainda mais o padding para mobile pequeno */
+    }
+
+    .cluster-title {
+        font-size: 1rem !important; /* Reduz ainda mais o tamanho do título */
+        margin-bottom: 4px !important;
+        line-height: 1.1 !important;
+    }
+
+    .cluster-description {
+        margin-top: 3px !important;
+        margin-bottom: 4px !important;
+        line-height: 1.2 !important;
+    }
+
+    .cluster-subtitle {
+        margin-top: 3px !important;
+        margin-bottom: 3px !important;
+        line-height: 1.1 !important;
+    }
+
+    .cluster-list {
+        margin-bottom: 4px !important;
+    }
+
+    .cluster-list-item {
+        margin-bottom: 1px !important;
+        line-height: 1.1 !important;
+    }
+
+    .cluster-info {
+        margin-top: 2px !important;
+        line-height: 1.0 !important;
+    }
+
+    /* Reduz espaçamento entre elementos de texto dentro dos cards */
+    .modal-principal #interpretacao-clusters p {
+        margin-bottom: 4px !important; /* Reduz ainda mais a margem entre parágrafos */
+        line-height: 1.2 !important; /* Reduz ainda mais a altura da linha */
+    }
+
+    .modal-principal #interpretacao-clusters ul {
+        margin-bottom: 4px !important; /* Reduz ainda mais a margem das listas */
+    }
+
+    .modal-principal #interpretacao-clusters li {
+        margin-bottom: 1px !important; /* Reduz ainda mais a margem entre itens da lista */
+        line-height: 1.1 !important; /* Reduz ainda mais a altura da linha dos itens */
+    }
+
+    .modal-principal #interpretacao-clusters h4 {
+        margin-bottom: 6px !important; /* Reduz ainda mais a margem dos títulos */
+        line-height: 1.1 !important; /* Reduz ainda mais a altura da linha dos títulos */
+    }
+
     /* Reduz o tamanho do texto do título */
     header h1 {
         font-size: 1rem !important;
