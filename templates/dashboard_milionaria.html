@@ -3345,7 +3345,7 @@
         card.innerHTML = `
           <div class="flex items-center justify-between mb-3">
             <h4 class="text-lg font-semibold text-text">${cluster.id}</h4>
-            <span class="px-2 py-1 rounded text-xs font-bold" style="background-color: ${cluster.cor}; color: white;">
+            <span class="px-2 py-1 rounded text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity click-cluster-badge" data-cluster-id="${cluster.id}" style="background-color: ${cluster.cor}; color: white;">
               ${cluster.tipo}
             </span>
           </div>
@@ -3363,14 +3363,59 @@
               <div><strong>Volatilidade:</strong> ${cluster.caracteristicas_principais.volatilidade}</div>
             </div>
           </div>
-          
-          <div class="text-xs text-textSecondary">
-            <strong>Exemplos:</strong> ${cluster.numeros_exemplos.join(', ')}
-          </div>
         `;
         
         container.appendChild(card);
       });
+      
+      // Adicionar event listeners para as caixinhas clicáveis
+      const clusterBadges = document.querySelectorAll('.click-cluster-badge');
+      clusterBadges.forEach(badge => {
+        badge.addEventListener('click', () => {
+          const clusterId = badge.dataset.clusterId;
+          const clusterData = Object.values(resumoClusters).find(cluster => cluster.id === clusterId);
+          if (clusterData && clusterData.todos_numeros_do_cluster) {
+            exibirNumerosDoCluster(clusterData.id, clusterData.todos_numeros_do_cluster);
+          } else {
+            console.error('Dados completos do cluster não encontrados para:', clusterId);
+          }
+        });
+      });
+    }
+    
+    // Função para exibir números do cluster em popup
+    function exibirNumerosDoCluster(titulo, numeros) {
+      const modal = document.getElementById('modal-numeros-cluster');
+      const modalTitulo = document.getElementById('modal-numeros-cluster-titulo');
+      const modalConteudo = document.getElementById('modal-numeros-cluster-conteudo');
+      const fecharBtn = document.getElementById('fechar-modal-numeros-cluster');
+
+      modalTitulo.innerText = `${titulo}: Números`;
+
+      // Limpar conteúdo anterior
+      modalConteudo.innerHTML = ''; 
+
+      // Adicionar os números formatados
+      numeros.forEach(num => {
+        const numDiv = document.createElement('div');
+        numDiv.className = 'bg-surface text-text px-2 py-1 rounded-md';
+        numDiv.innerText = num;
+        modalConteudo.appendChild(numDiv);
+      });
+
+      modal.classList.remove('hidden'); // Mostra o modal
+
+      // Adicionar listener para fechar o modal
+      fecharBtn.onclick = () => {
+        modal.classList.add('hidden');
+      };
+
+      // Fechar ao clicar fora do conteúdo do modal
+      modal.onclick = (event) => {
+        if (event.target === modal) {
+          modal.classList.add('hidden');
+        }
+      };
     }
     
     // Função para criar gráfico de correlação

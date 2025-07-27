@@ -1150,8 +1150,13 @@ function renderizarClusters(analiseClusters) {
             }
 
             htmlClusters += `
-                <div class="bg-card p-4 rounded-lg shadow-lg border border-surface cursor-pointer hover:bg-surface transition-colors click-cluster-card" data-cluster-key="${clusterKey}">
-                    <h4 class="font-bold text-xl mb-2" style="color: ${corCluster}">${clusterData.id || clusterKey.toUpperCase()}</h4>
+                <div class="bg-card p-4 rounded-lg shadow-lg border border-surface">
+                    <div class="flex items-center justify-between mb-3">
+                        <h4 class="font-bold text-xl text-text">${clusterData.id || clusterKey.toUpperCase()}</h4>
+                        <span class="px-2 py-1 rounded text-xs font-bold cursor-pointer hover:opacity-80 transition-opacity click-cluster-badge" data-cluster-key="${clusterKey}" style="background-color: ${clusterData.cor}; color: white;">
+                            ${clusterData.tipo}
+                        </span>
+                    </div>
                     <p class="text-text mt-2 mb-3">${clusterData.descricao_curta}</p>
                     <p class="font-semibold text-textSecondary">Características Médias:</p>
                     <ul class="list-disc list-inside ml-4 mb-3">
@@ -1159,17 +1164,16 @@ function renderizarClusters(analiseClusters) {
                     </ul>
                     <p class="text-textSecondary text-sm">Números no cluster: <span class="font-semibold">${clusterData.tamanho}</span></p>
                     <p class="text-textSecondary text-sm">Exemplos: <span class="font-semibold">${clusterData.numeros_exemplos.join(', ')}</span></p>
-                    <p class="text-xs text-primary mt-2">Clique para ver todos os números</p>
                 </div>
             `;
         }
         interpretacaoClustersDiv.innerHTML = htmlClusters;
 
-        // --- Adicionar Event Listeners aos novos cards ---
-        const clusterCards = document.querySelectorAll('.click-cluster-card');
-        clusterCards.forEach(card => {
-            card.addEventListener('click', () => {
-                const clickedClusterKey = card.dataset.clusterKey;
+        // --- Adicionar Event Listeners aos badges dos clusters ---
+        const clusterBadges = document.querySelectorAll('.click-cluster-badge');
+        clusterBadges.forEach(badge => {
+            badge.addEventListener('click', () => {
+                const clickedClusterKey = badge.dataset.clusterKey;
                 const clusterData = analiseClusters.resumo_clusters[clickedClusterKey];
                 if (clusterData && clusterData.todos_numeros_do_cluster) {
                     exibirNumerosDoCluster(clusterData.id, clusterData.todos_numeros_do_cluster);
