@@ -753,20 +753,13 @@ if (fecharModalPremiumBtn) {
 
 // Função para renderizar o resumo das preferências no modal Premium
 function renderPremiumPreferencesSummary() {
-    console.log('=== RENDERIZANDO RESUMO DE PREFERÊNCIAS ===');
-    console.log('Preferências atuais:', userPremiumPreferences);
-    
-    const listaParametrosDiv = document.getElementById('lista-parametros');
-    if (!listaParametrosDiv) {
-        console.error('Elemento lista-parametros não encontrado!');
-        return;
-    }
-    
     let summaryHtml = '';
+    // Certifique-se de que este ID existe no seu dashboard_milionaria.html
+    const listaParametrosDiv = document.getElementById('lista-parametros'); 
 
     // --- 1. Frequência ---
     const freqPref = userPremiumPreferences.frequencia;
-    if (freqPref.priorizarQuentes || freqPref.priorizarFrios) {
+    if (freqPref && (freqPref.priorizarQuentes || freqPref.priorizarFrios)) {
         let freqDetails = [];
         if (freqPref.priorizarQuentes) {
             freqDetails.push(`Priorizar Top ${freqPref.qtdeQuentes} Números Mais Frequentes`);
@@ -775,11 +768,10 @@ function renderPremiumPreferencesSummary() {
             freqDetails.push(`Priorizar Top ${freqPref.qtdeFrios} Números Menos Frequentes`);
         }
         summaryHtml += `
-            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
-                <p class="font-semibold text-[#00E38C] mb-2">📊 Frequência:</p>
-                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
-                    <li>${freqDetails.join(' e ')}</li>
-                    <li>Período: ${freqPref.considerarPeriodo === 'completa' ? 'Todos os Concursos' : `Últimos ${freqPref.considerarPeriodo} Concursos`}</li>
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Frequência:</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
+                    <li>${freqDetails.join(' e ')} (Período: ${freqPref.considerarPeriodo === 'completa' ? 'Todos os Concursos' : `Últimos ${freqPref.considerarPeriodo} Concursos`})</li>
                 </ul>
             </div>
         `;
@@ -787,7 +779,7 @@ function renderPremiumPreferencesSummary() {
 
     // --- 2. Distribuição ---
     const distPref = userPremiumPreferences.distribuicao;
-    if (distPref.priorizarParesImpares || distPref.priorizarSoma) {
+    if (distPref && (distPref.priorizarParesImpares || distPref.priorizarSoma)) {
         let distDetails = [];
         if (distPref.priorizarParesImpares) {
             let paridadeDesc = '';
@@ -800,18 +792,20 @@ function renderPremiumPreferencesSummary() {
             distDetails.push(`Soma dos Números entre ${distPref.somaMin} e ${distPref.somaMax}`);
         }
         summaryHtml += `
-            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
-                <p class="font-semibold text-[#00E38C] mb-2">🔢 Distribuição:</p>
-                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Distribuição:</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
                     <li>${distDetails.join('; ')}</li>
                 </ul>
             </div>
         `;
     }
 
-    // --- 3. Padrões e Atrasos ---
+    // --- 3. Padrões e Atrasos (Afinidades pode se encaixar aqui ou ter sua própria seção) ---
+    // Assumindo que 'padroes' no userPremiumPreferences cobre 'Afinidades' como padrões específicos.
+    // Se 'Afinidades' for uma seção completamente diferente com parâmetros distintos, precisará de um novo bloco.
     const padroesPref = userPremiumPreferences.padroes;
-    if (padroesPref.evitarConsecutivos || padroesPref.priorizarAtrasados || padroesPref.evitarRepeticoesSeguidas) {
+    if (padroesPref && (padroesPref.evitarConsecutivos || padroesPref.priorizarAtrasados || padroesPref.evitarRepeticoesSeguidas)) {
         let padroesDetails = [];
         if (padroesPref.evitarConsecutivos) {
             padroesDetails.push('Evitar Números Consecutivos');
@@ -823,9 +817,9 @@ function renderPremiumPreferencesSummary() {
             padroesDetails.push('Evitar Números Repetidos do Último Concurso');
         }
         summaryHtml += `
-            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
-                <p class="font-semibold text-[#00E38C] mb-2">🌵 Padrões e Atrasos:</p>
-                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Padrões e Atrasos (Afinidades):</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
                     <li>${padroesDetails.join('; ')}</li>
                 </ul>
             </div>
@@ -833,21 +827,22 @@ function renderPremiumPreferencesSummary() {
     }
 
     // --- 4. Clusters (Análise Estatística Avançada) ---
+    // Note: userPremiumPreferences.clusters é esperado como um array de IDs.
     const clustersPref = userPremiumPreferences.clusters;
-    if (clustersPref.length > 0) {
+    if (clustersPref && clustersPref.length > 0) {
         summaryHtml += `
-            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
-                <p class="font-semibold text-[#00E38C] mb-2">🔗 Clusters (Análise Avançada):</p>
-                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
-                    <li>Priorizar números dos Clusters: ${clustersPref.map(id => `<strong class="text-[#00E38C]">${id}</strong>`).join(', ')}</li>
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Clusters (Estatística Avançada):</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
+                    <li>Priorizar números dos Clusters: ${clustersPref.map(id => `<strong>${id}</strong>`).join(', ')}</li>
                 </ul>
             </div>
         `;
     }
-
+    
     // --- 5. Trevos da Sorte ---
     const trevosPref = userPremiumPreferences.trevos;
-    if (trevosPref.priorizarQuentesTrevos || trevosPref.priorizarFriosTrevos) {
+    if (trevosPref && (trevosPref.priorizarQuentesTrevos || trevosPref.priorizarFriosTrevos)) {
         let trevosDetails = [];
         if (trevosPref.priorizarQuentesTrevos) {
             trevosDetails.push(`Priorizar Top ${trevosPref.qtdeQuentesTrevos} Trevos Mais Frequentes`);
@@ -856,44 +851,41 @@ function renderPremiumPreferencesSummary() {
             trevosDetails.push(`Priorizar Top ${trevosPref.qtdeFriosTrevos} Trevos Menos Frequentes`);
         }
         summaryHtml += `
-            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
-                <p class="font-semibold text-[#00E38C] mb-2">🍀 Trevos da Sorte:</p>
-                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Trevos da Sorte:</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
                     <li>${trevosDetails.join(' e ')}</li>
                 </ul>
             </div>
         `;
     }
 
-    // --- 6. Afinidades ---
-    const afinidadesPref = userPremiumPreferences.afinidades;
-    if (afinidadesPref.priorizarParesFortes || afinidadesPref.priorizarNumerosConectados || afinidadesPref.evitarParesFracos) {
-        let afinidadesDetails = [];
-        if (afinidadesPref.priorizarParesFortes) {
-            afinidadesDetails.push(`Priorizar ${afinidadesPref.qtdePares} Pares com Forte Afinidade`);
+    // --- 6. Seca (se houver uma seção específica de "seca" nas preferências) ---
+    // Exemplo: userPremiumPreferences.seca.evitarNumerosSecos = true;
+    const secaPref = userPremiumPreferences.seca;
+    if (secaPref && (secaPref.evitarNumerosSecos || secaPref.priorizarNumerosSecos)) { // Adicione mais condições conforme seus parâmetros de seca
+        let secaDetails = [];
+        if (secaPref.evitarNumerosSecos) {
+            secaDetails.push(`Evitar Números Secos (Não sorteados em ${secaPref.periodoSeca} concursos)`);
         }
-        if (afinidadesPref.priorizarNumerosConectados) {
-            afinidadesDetails.push(`Priorizar ${afinidadesPref.qtdeNumeros} Números com Alta Conexão Geral`);
-        }
-        if (afinidadesPref.evitarParesFracos) {
-            afinidadesDetails.push('Evitar Pares com Afinidade Fraca');
+        if (secaPref.priorizarNumerosSecos) {
+            secaDetails.push(`Priorizar Números Secos (Não sorteados em ${secaPref.periodoSeca} concursos)`);
         }
         summaryHtml += `
-            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
-                <p class="font-semibold text-[#00E38C] mb-2">🤝 Afinidades:</p>
-                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
-                    <li>${afinidadesDetails.join('; ')}</li>
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Seca:</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
+                    <li>${secaDetails.join('; ')}</li>
                 </ul>
             </div>
         `;
     }
-
+    
     // --- Exibir o resumo ou mensagem de nenhum parâmetro ---
     if (summaryHtml === '') {
-        listaParametrosDiv.innerHTML = '<p class="text-gray-400 text-center p-4">Nenhum parâmetro selecionado ainda. Vá aos modais de análise e marque suas preferências.</p>';
+        listaParametrosDiv.innerHTML = '<p class="text-textSecondary text-center p-4">Nenhum parâmetro selecionado ainda. Vá aos modais de análise e marque suas preferências.</p>';
     } else {
         listaParametrosDiv.innerHTML = summaryHtml;
-        console.log('Resumo renderizado com sucesso!');
     }
 }
 
