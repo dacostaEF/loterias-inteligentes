@@ -258,22 +258,83 @@ def get_analise_seca():
 def get_estatisticas_avancadas():
     """Retorna os dados das estatísticas avançadas."""
     try:
+        print("🔍 Iniciando requisição para /api/estatisticas_avancadas")
+        
         if df_milionaria is None or df_milionaria.empty:
+            print("❌ Dados da +Milionária não carregados")
             return jsonify({'error': 'Dados da +Milionária não carregados.'}), 500
 
         qtd_concursos = request.args.get('qtd_concursos', type=int)
         print(f"📈 Estatísticas Avançadas - Parâmetro qtd_concursos: {qtd_concursos}")
+        print(f"📊 DataFrame disponível: {len(df_milionaria)} concursos")
 
         # Criar instância da classe de análise
+        print("🔧 Criando instância da AnaliseEstatisticaAvancada...")
         analise = AnaliseEstatisticaAvancada(df_milionaria)
         
         # Executar análise completa
+        print("⚡ Executando análise completa...")
         resultado = analise.executar_analise_completa(qtd_concursos)
+        
+        print("✅ Análise concluída! Verificando resultados...")
+        
+        # Log detalhado dos resultados
+        if resultado:
+            print(f"📊 Resultados obtidos:")
+            print(f"   - Desvio padrão: {'✅' if resultado.get('desvio_padrao_distribuicao') else '❌'}")
+            print(f"   - Teste aleatoriedade: {'✅' if resultado.get('teste_aleatoriedade') else '❌'}")
+            print(f"   - Análise clusters: {'✅' if resultado.get('analise_clusters') else '❌'}")
+            print(f"   - Correlação números: {'✅' if resultado.get('analise_correlacao_numeros') else '❌'}")
+            print(f"   - Probabilidades condicionais: {'✅' if resultado.get('probabilidades_condicionais') else '❌'}")
+            print(f"   - Distribuição números: {'✅' if resultado.get('distribuicao_numeros') else '❌'}")
+            
+                    # Log específico para correlação
+        if resultado.get('analise_correlacao_numeros'):
+            correlacao = resultado['analise_correlacao_numeros']
+            print(f"🔍 Dados de correlação enviados ao frontend:")
+            print(f"   - Correlações positivas: {len(correlacao.get('correlacoes_positivas', []))}")
+            print(f"   - Correlações negativas: {len(correlacao.get('correlacoes_negativas', []))}")
+            print(f"   - Correlação média: {correlacao.get('correlacao_media', 0.0):.4f}")
+            if correlacao.get('correlacoes_positivas'):
+                print(f"   - Amostra positivas: {correlacao['correlacoes_positivas'][:3]}")
+            if correlacao.get('correlacoes_negativas'):
+                print(f"   - Amostra negativas: {correlacao['correlacoes_negativas'][:3]}")
+            
+            # Verificar se os dados são serializáveis para JSON
+            try:
+                import json
+                json_test = json.dumps(correlacao)
+                print(f"✅ Dados de correlação são serializáveis para JSON")
+            except Exception as json_error:
+                print(f"❌ Erro ao serializar dados de correlação: {json_error}")
+        else:
+            print("❌ Dados de correlação não encontrados no resultado!")
+        
+        if not resultado:
+            print("❌ Nenhum resultado obtido!")
 
-        return jsonify(resultado)
+        # Verificar se há valores NaN ou infinitos antes de retornar
+        def limpar_valores_problematicos(obj):
+            if isinstance(obj, dict):
+                return {k: limpar_valores_problematicos(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [limpar_valores_problematicos(v) for v in obj]
+            elif isinstance(obj, float):
+                import numpy as np
+                if np.isnan(obj) or np.isinf(obj):
+                    return 0.0
+                return obj
+            else:
+                return obj
+        
+        # Limpar valores problemáticos
+        resultado_limpo = limpar_valores_problematicos(resultado)
+        print("✅ Dados limpos de valores problemáticos")
+
+        return jsonify(resultado_limpo)
 
     except Exception as e:
-        print(f"Erro na API de estatísticas avançadas: {e}")
+        print(f"❌ Erro na API de estatísticas avançadas: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Erro interno: {str(e)}"}), 500

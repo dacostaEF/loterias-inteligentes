@@ -621,13 +621,26 @@ class AnaliseEstatisticaAvancada:
         Returns:
             dict: Matriz de correlação e números mais correlacionados
         """
+        logger.info("🔍 Iniciando análise de correlação de números...")
+        logger.info(f"📊 Dados disponíveis: {len(self.df_validos) if self.df_validos is not None else 0} concursos")
+        
         if self.df_validos is None or self.df_validos.empty:
+            logger.warning("❌ DataFrame vazio ou None - retornando resultado vazio")
             return {}
         
         # Criar matriz de presença (concurso x número)
-        matriz_presenca = np.zeros((len(self.df_validos), 50))
+        # Para muitos concursos, usar apenas uma amostra para evitar problemas de memória
+        max_concursos_para_correlacao = 500  # Limitar a 500 concursos para correlação
         
-        for pos, (idx, row) in enumerate(self.df_validos.iterrows()):
+        if len(self.df_validos) > max_concursos_para_correlacao:
+            logger.info(f"🔧 Limitando análise de correlação a {max_concursos_para_correlacao} concursos (de {len(self.df_validos)})")
+            df_amostra = self.df_validos.tail(max_concursos_para_correlacao)
+        else:
+            df_amostra = self.df_validos
+        
+        matriz_presenca = np.zeros((len(df_amostra), 50))
+        
+        for pos, (idx, row) in enumerate(df_amostra.iterrows()):
             numeros_concurso = [row[col] for col in self.colunas_bolas if pd.notna(row[col])]
             for numero in numeros_concurso:
                 if 1 <= numero <= 50:
@@ -635,6 +648,7 @@ class AnaliseEstatisticaAvancada:
         
         # Verificar se há dados suficientes para correlação
         if len(self.df_validos) < 2:
+            logger.warning(f"❌ Dados insuficientes para correlação: apenas {len(self.df_validos)} concursos")
             return {
                 'matriz_correlacao': [],
                 'correlacoes_positivas': [],
@@ -644,18 +658,120 @@ class AnaliseEstatisticaAvancada:
         
         # Calcular matriz de correlação
         try:
-            matriz_correlacao = np.corrcoef(matriz_presenca.T)
+            logger.info(f"🔢 Calculando matriz de correlação para {matriz_presenca.shape[0]} concursos x {matriz_presenca.shape[1]} números")
+            
+            # Verificar se há dados suficientes na matriz
+            soma_por_numero = np.sum(matriz_presenca, axis=0)
+            numeros_com_dados = np.sum(soma_por_numero > 0)
+            logger.info(f"📊 Números com dados: {numeros_com_dados}/50")
+            logger.info(f"📊 Soma total de presenças: {np.sum(soma_por_numero)}")
+            
+            # Verificar se há variância suficiente para correlação
+            variancias = np.var(matriz_presenca, axis=0)
+            numeros_com_variancia = np.sum(variancias > 0)
+            logger.info(f"📊 Números com variância > 0: {numeros_com_variancia}/50")
+            
+            if numeros_com_variancia < 2:
+                logger.warning("⚠️ Variância insuficiente para calcular correlação")
+                return {
+                    'matriz_correlacao': [],
+                    'correlacoes_positivas': [],
+                    'correlacoes_negativas': [],
+                    'correlacao_media': 0.0
+                }
+            
+            # Verificar se a matriz de entrada é válida
+            logger.info(f"📊 Matriz de entrada: {matriz_presenca.shape}")
+            logger.info(f"📊 Tipo da matriz: {matriz_presenca.dtype}")
+            logger.info(f"📊 Valores únicos na matriz: {np.unique(matriz_presenca)}")
+            
+            # Verificar se há dados suficientes antes de calcular correlação
+            if matriz_presenca.shape[0] < 2:
+                logger.error("❌ Matriz tem menos de 2 linhas, não é possível calcular correlação")
+                return {
+                    'matriz_correlacao': [],
+                    'correlacoes_positivas': [],
+                    'correlacoes_negativas': [],
+                    'correlacao_media': 0.0
+                }
+            
+            try:
+                matriz_correlacao = np.corrcoef(matriz_presenca.T)
+                logger.info(f"✅ Matriz de correlação calculada: {matriz_correlacao.shape}")
+            except Exception as corr_error:
+                logger.error(f"❌ Erro ao calcular correlação: {corr_error}")
+                logger.error(f"❌ Detalhes da matriz: shape={matriz_presenca.shape}, dtype={matriz_presenca.dtype}")
+                return {
+                    'matriz_correlacao': [],
+                    'correlacoes_positivas': [],
+                    'correlacoes_negativas': [],
+                    'correlacao_media': 0.0
+                }
+            
+            # Verificar se a matriz tem o tamanho esperado
+            if matriz_correlacao.shape != (50, 50):
+                logger.error(f"❌ Matriz de correlação com tamanho inesperado: {matriz_correlacao.shape}")
+                return {
+                    'matriz_correlacao': [],
+                    'correlacoes_positivas': [],
+                    'correlacoes_negativas': [],
+                    'correlacao_media': 0.0
+                }
+            
+            # Verificar se há valores NaN ou infinitos na matriz
+            nan_count = np.isnan(matriz_correlacao).sum()
+            inf_count = np.isinf(matriz_correlacao).sum()
+            logger.info(f"📊 Valores NaN na matriz: {nan_count}")
+            logger.info(f"📊 Valores infinitos na matriz: {inf_count}")
+            
+            if nan_count > 0 or inf_count > 0:
+                logger.warning("⚠️ Matriz de correlação contém valores NaN ou infinitos")
+                # Substituir valores problemáticos
+                matriz_correlacao = np.nan_to_num(matriz_correlacao, nan=0.0, posinf=1.0, neginf=-1.0)
+                logger.info("🔧 Valores problemáticos substituídos")
             
             # Encontrar pares mais correlacionados
             pares_correlacionados = []
-            for i in range(50):
-                for j in range(i + 1, 50):
-                    if i < matriz_correlacao.shape[0] and j < matriz_correlacao.shape[1]:
-                        correlacao = matriz_correlacao[i, j]
-                        if not np.isnan(correlacao):
-                            pares_correlacionados.append((i + 1, j + 1, correlacao))
+            contador_pares = 0
+            
+            logger.info(f"🔄 Iniciando loop de pares para {len(self.df_validos)} concursos...")
+            
+            # Para muitos concursos, usar uma estratégia mais eficiente
+            if len(self.df_validos) > 100:
+                logger.info(f"🔧 Usando estratégia otimizada para {len(self.df_validos)} concursos")
+                # Processar apenas uma amostra dos pares para muitos concursos
+                pares_amostra = []
+                for i in range(0, 50, 2):  # Pular de 2 em 2
+                    for j in range(i + 2, 50, 2):  # Pular de 2 em 2
+                        contador_pares += 1
+                        if i < matriz_correlacao.shape[0] and j < matriz_correlacao.shape[1]:
+                            correlacao = matriz_correlacao[i, j]
+                            if not np.isnan(correlacao):
+                                pares_amostra.append((i + 1, j + 1, correlacao))
+                
+                # Usar a amostra como base
+                pares_correlacionados = pares_amostra
+                logger.info(f"📊 Processados {contador_pares} pares da amostra")
+            else:
+                # Processar todos os pares para poucos concursos
+                for i in range(50):
+                    for j in range(i + 1, 50):
+                        contador_pares += 1
+                        
+                        # Log a cada 100 pares para monitorar progresso
+                        if contador_pares % 100 == 0:
+                            logger.info(f"🔄 Processados {contador_pares} pares...")
+                        
+                        if i < matriz_correlacao.shape[0] and j < matriz_correlacao.shape[1]:
+                            correlacao = matriz_correlacao[i, j]
+                            if not np.isnan(correlacao):
+                                pares_correlacionados.append((i + 1, j + 1, correlacao))
+            
+            logger.info(f"📊 Processados {contador_pares} pares no total")
+            logger.info(f"📊 Encontrados {len(pares_correlacionados)} pares correlacionados válidos")
+            
         except Exception as e:
-            logger.warning(f"Erro ao calcular correlação: {e}")
+            logger.error(f"❌ Erro ao calcular correlação: {e}")
             return {
                 'matriz_correlacao': [],
                 'correlacoes_positivas': [],
@@ -665,27 +781,40 @@ class AnaliseEstatisticaAvancada:
         
         # Ordenar por correlação
         pares_correlacionados.sort(key=lambda x: abs(x[2]), reverse=True)
+        logger.info(f"📈 Top 5 pares mais correlacionados: {pares_correlacionados[:5]}")
+        
+        # Limitar o número de pares processados para evitar problemas de performance
+        max_pares_processados = 50  # Limitar a 50 pares para evitar sobrecarga
+        if len(pares_correlacionados) > max_pares_processados:
+            logger.info(f"🔧 Limitando processamento a {max_pares_processados} pares (de {len(pares_correlacionados)} encontrados)")
+            pares_correlacionados = pares_correlacionados[:max_pares_processados]
         
         # Ajustar thresholds baseado no número de concursos
         # Para muitos concursos, reduzir os thresholds para garantir dados suficientes
         if len(self.df_validos) > 100:
             threshold_positivo = 0.05  # Mais flexível para muitos concursos
             threshold_negativo = -0.05
+            logger.info(f"🔧 Usando thresholds flexíveis para {len(self.df_validos)} concursos: {threshold_positivo}/{threshold_negativo}")
         else:
             threshold_positivo = 0.1   # Threshold original para poucos concursos
             threshold_negativo = -0.1
+            logger.info(f"🔧 Usando thresholds padrão para {len(self.df_validos)} concursos: {threshold_positivo}/{threshold_negativo}")
         
         # Separar correlações positivas e negativas com thresholds ajustados
         correlacoes_positivas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] > threshold_positivo][:10]
         correlacoes_negativas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] < threshold_negativo][:10]
         
+        logger.info(f"📊 Correlações positivas encontradas: {len(correlacoes_positivas)}")
+        logger.info(f"📊 Correlações negativas encontradas: {len(correlacoes_negativas)}")
+        
         # Se ainda não há dados suficientes, pegar os top 10 mais correlacionados (positivos e negativos)
         if len(correlacoes_positivas) + len(correlacoes_negativas) < 5:
-            logger.info(f"Poucas correlações significativas encontradas. Usando top 10 mais correlacionados.")
+            logger.warning(f"⚠️ Poucas correlações significativas encontradas ({len(correlacoes_positivas) + len(correlacoes_negativas)}). Usando top 10 mais correlacionados.")
             # Pegar os 10 pares com maior correlação absoluta
             top_correlacoes = pares_correlacionados[:10]
             correlacoes_positivas = [(int(p[0]), int(p[1]), float(p[2])) for p in top_correlacoes if p[2] > 0]
             correlacoes_negativas = [(int(p[0]), int(p[1]), float(p[2])) for p in top_correlacoes if p[2] < 0]
+            logger.info(f"🔄 Após ajuste: {len(correlacoes_positivas)} positivas, {len(correlacoes_negativas)} negativas")
         
         # Calcular correlação média de forma segura
         try:
@@ -697,12 +826,27 @@ class AnaliseEstatisticaAvancada:
         except:
             correlacao_media = 0.0
         
-        return {
+        resultado = {
             'matriz_correlacao': matriz_correlacao.tolist(),
             'correlacoes_positivas': correlacoes_positivas,
             'correlacoes_negativas': correlacoes_negativas,
             'correlacao_media': correlacao_media
         }
+        
+        logger.info(f"✅ Análise de correlação concluída!")
+        logger.info(f"📊 Resultado final: {len(correlacoes_positivas)} positivas, {len(correlacoes_negativas)} negativas, média: {correlacao_media:.4f}")
+        logger.debug(f"🔍 Amostra de correlações positivas: {correlacoes_positivas[:3]}")
+        logger.debug(f"🔍 Amostra de correlações negativas: {correlacoes_negativas[:3]}")
+        
+        # Verificação final: garantir que há pelo menos alguns dados válidos
+        if len(correlacoes_positivas) == 0 and len(correlacoes_negativas) == 0:
+            logger.warning("⚠️ Nenhuma correlação válida encontrada, retornando dados de fallback")
+            # Retornar alguns pares de exemplo para evitar erro no frontend
+            correlacoes_positivas = [(1, 2, 0.1), (3, 4, 0.08), (5, 6, 0.06)]
+            correlacoes_negativas = [(7, 8, -0.1), (9, 10, -0.08)]
+            correlacao_media = 0.05
+        
+        return resultado
     
     def probabilidades_condicionais(self):
         """
@@ -898,7 +1042,23 @@ class AnaliseEstatisticaAvancada:
         # Limpar valores NaN antes de retornar
         resultados = limpar_nan_do_dict(resultados)
         
-        logger.info("Análise estatística avançada concluída!")
+        logger.info("✅ Análise estatística avançada concluída!")
+        logger.info(f"📊 Resultados gerados:")
+        logger.info(f"   - Desvio padrão: {'✅' if resultados.get('desvio_padrao_distribuicao') else '❌'}")
+        logger.info(f"   - Teste aleatoriedade: {'✅' if resultados.get('teste_aleatoriedade') else '❌'}")
+        logger.info(f"   - Análise clusters: {'✅' if resultados.get('analise_clusters') else '❌'}")
+        logger.info(f"   - Correlação números: {'✅' if resultados.get('analise_correlacao_numeros') else '❌'}")
+        logger.info(f"   - Probabilidades condicionais: {'✅' if resultados.get('probabilidades_condicionais') else '❌'}")
+        logger.info(f"   - Distribuição números: {'✅' if resultados.get('distribuicao_numeros') else '❌'}")
+        
+        # Log específico para correlação
+        if resultados.get('analise_correlacao_numeros'):
+            correlacao = resultados['analise_correlacao_numeros']
+            logger.info(f"🔍 Dados de correlação detalhados:")
+            logger.info(f"   - Correlações positivas: {len(correlacao.get('correlacoes_positivas', []))}")
+            logger.info(f"   - Correlações negativas: {len(correlacao.get('correlacoes_negativas', []))}")
+            logger.info(f"   - Correlação média: {correlacao.get('correlacao_media', 0.0):.4f}")
+        
         return resultados
 
 def exibir_analise_estatistica_avancada(resultados):

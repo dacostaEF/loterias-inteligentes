@@ -173,25 +173,63 @@ document.addEventListener('DOMContentLoaded', loadPremiumPreferences);
 
 // Função para inicializar o estado dos checkboxes/inputs de preferência
 function initializePreferenceUI(modalId, prefType, prefName, value, period = null) {
-    let elementId = `${modalId}-${prefName}`;
-    if (period) {
-        elementId = `${modalId}-${period}-${prefName}`; // For frequency, use period in ID
+    let elementId = '';
+    
+    // Mapear os nomes das preferências para os IDs corretos dos elementos HTML
+    if (modalId === 'dist') {
+        if (prefName === 'priorizarParesImpares') {
+            elementId = 'dist-priorizar-pares-impares';
+        } else if (prefName === 'paridadeDesejada') {
+            elementId = 'dist-paridade-desejada';
+        } else if (prefName === 'priorizarSoma') {
+            elementId = 'dist-priorizar-soma';
+        }
+    } else if (modalId === 'freq') {
+        if (prefName === 'priorizarQuentes') {
+            elementId = 'freq-priorizar-quentes';
+        } else if (prefName === 'priorizarFrios') {
+            elementId = 'freq-priorizar-frios';
+        } else if (prefName === 'considerarPeriodo') {
+            elementId = 'freq-periodo';
+        }
+    } else if (modalId === 'padrao') {
+        if (prefName === 'evitarConsecutivos') {
+            elementId = 'padrao-evitar-consecutivos';
+        } else if (prefName === 'priorizarAtrasados') {
+            elementId = 'padrao-priorizar-atrasados';
+        } else if (prefName === 'evitarRepeticoesSeguidas') {
+            elementId = 'padrao-evitar-repeticoes-seguidas';
+        }
+    } else if (modalId === 'afinidade') {
+        if (prefName === 'priorizarParesFortes') {
+            elementId = 'afinidade-priorizar-pares-fortes';
+        } else if (prefName === 'priorizarNumerosConectados') {
+            elementId = 'afinidade-priorizar-numeros-conectados';
+        } else if (prefName === 'evitarParesFracos') {
+            elementId = 'afinidade-evitar-pares-fracos';
+        }
+    } else {
+        // Fallback para outros modais
+        elementId = `${modalId}-${prefName}`;
+        if (period) {
+            elementId = `${modalId}-${period}-${prefName}`;
+        }
     }
 
-    console.log(`Tentando inicializar: ${elementId} com valor: ${value}`);
+    console.log(`🔍 DEBUG initializePreferenceUI - Tentando inicializar: ${elementId} com valor: ${value}`);
     
     const element = document.getElementById(elementId);
     if (element) {
-        console.log(`Elemento encontrado: ${elementId}, tipo: ${element.type || element.tagName}`);
+        console.log(`✅ Elemento encontrado: ${elementId}, tipo: ${element.type || element.tagName}`);
         if (element.type === 'checkbox') {
             element.checked = value;
-            console.log(`Checkbox ${elementId} marcado como: ${element.checked}`);
+            console.log(`✅ Checkbox ${elementId} marcado como: ${element.checked}`);
         } else if (element.type === 'number' || element.tagName === 'SELECT') {
             element.value = value;
-            console.log(`Input/Select ${elementId} definido como: ${element.value}`);
+            console.log(`✅ Input/Select ${elementId} definido como: ${element.value}`);
         }
     } else {
-        console.warn(`Elemento não encontrado: ${elementId}`);
+        console.warn(`❌ Elemento não encontrado: ${elementId}`);
     }
 }
 
@@ -217,6 +255,10 @@ function loadPreferencesToModalUI(modalPrefix) {
     
     // Para Distribuição:
     if (modalPrefix === 'dist') {
+        console.log('🔍 DEBUG loadPreferencesToModalUI - Carregando distribuição...');
+        console.log('🔍 DEBUG distribuição - priorizarParesImpares:', userPremiumPreferences.distribuicao.priorizarParesImpares);
+        console.log('🔍 DEBUG distribuição - priorizarSoma:', userPremiumPreferences.distribuicao.priorizarSoma);
+        
         initializePreferenceUI('dist', 'distribuicao', 'priorizarParesImpares', userPremiumPreferences.distribuicao.priorizarParesImpares);
         initializePreferenceUI('dist', 'distribuicao', 'paridadeDesejada', userPremiumPreferences.distribuicao.paridadeDesejada);
         initializePreferenceUI('dist', 'distribuicao', 'priorizarSoma', userPremiumPreferences.distribuicao.priorizarSoma);
@@ -230,6 +272,10 @@ function loadPreferencesToModalUI(modalPrefix) {
         if (somaMaxElement) {
             somaMaxElement.value = userPremiumPreferences.distribuicao.somaMax;
         }
+        
+        console.log('🔍 DEBUG distribuição - Checkboxes após carregar:');
+        console.log('dist-priorizar-pares-impares checked:', document.getElementById('dist-priorizar-pares-impares')?.checked);
+        console.log('dist-priorizar-soma checked:', document.getElementById('dist-priorizar-soma')?.checked);
     }
     
     // Para Padrões/Seca:
@@ -407,7 +453,18 @@ function adicionarBotaoFixarEscolhas(modalPrefix) {
     if (modalPrefix === 'freq') {
         dicaDiv = document.querySelector('#freq-periodo')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
     } else if (modalPrefix === 'dist') {
-        dicaDiv = document.querySelector('#dist-soma-min')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+        // Para distribuição, procurar pela div que contém a seção de sugestões
+        dicaDiv = document.querySelector('.mt-8.bg-\\[\\#2E303A\\]');
+        if (!dicaDiv) {
+            // Fallback: procurar por qualquer div com a classe bg-[#2E303A] que contenha o texto "Sugestões"
+            const divs = document.querySelectorAll('.bg-\\[\\#2E303A\\]');
+            for (let div of divs) {
+                if (div.textContent.includes('Sugestões para Aposta Inteligente')) {
+                    dicaDiv = div;
+                    break;
+                }
+            }
+        }
     } else if (modalPrefix === 'padrao') {
         dicaDiv = document.querySelector('#padrao-min-atraso')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
     } else if (modalPrefix === 'avancada') {
@@ -534,7 +591,7 @@ function salvarPreferenciasDoModal(modalPrefix) {
             console.log('✅ somaMax salvo como:', parseInt(somaMaxInput.value));
         }
         
-        console.log('Preferências de distribuição salvas:', userPremiumPreferences.distribuicao);
+        console.log('🔍 DEBUG Distribuição - Preferências após salvar:', JSON.parse(JSON.stringify(userPremiumPreferences.distribuicao)));
     }
     
     if (modalPrefix === 'padrao') {
@@ -574,11 +631,11 @@ function salvarPreferenciasDoModal(modalPrefix) {
     
     if (modalPrefix === 'afinidade') {
         // Salvar preferências de afinidades
-        const paresCheckbox = document.getElementById('afinidade-priorizar-pares');
+        const paresCheckbox = document.getElementById('afinidade-priorizar-pares-fortes');
         const qtdeParesInput = document.getElementById('afinidade-qtde-pares');
-        const numerosCheckbox = document.getElementById('afinidade-priorizar-numeros');
+        const numerosCheckbox = document.getElementById('afinidade-priorizar-numeros-conectados');
         const qtdeNumerosInput = document.getElementById('afinidade-qtde-numeros');
-        const fracosCheckbox = document.getElementById('afinidade-evitar-fracos');
+        const fracosCheckbox = document.getElementById('afinidade-evitar-pares-fracos');
         
         if (paresCheckbox) userPremiumPreferences.afinidades.priorizarParesFortes = paresCheckbox.checked;
         if (qtdeParesInput) userPremiumPreferences.afinidades.qtdePares = parseInt(qtdeParesInput.value);
@@ -618,12 +675,42 @@ function salvarPreferenciasDoModal(modalPrefix) {
 
 // Função para carregar preferências quando o modal de distribuição é aberto
 function carregarPreferenciasDistribuicao() {
-    loadPreferencesToModalUI('dist');
+    console.log('🔍 DEBUG carregarPreferenciasDistribuicao - Iniciando...');
     
-    // Adicionar botão "Fixar Escolhas" se não existir
-    setTimeout(() => {
-        adicionarBotaoFixarEscolhas('dist');
-    }, 200);
+    // Função para verificar se os elementos existem e carregar as preferências
+    function tentarCarregarPreferencias() {
+        const elementosNecessarios = [
+            'dist-priorizar-pares-impares',
+            'dist-paridade-desejada', 
+            'dist-priorizar-soma',
+            'dist-soma-min',
+            'dist-soma-max'
+        ];
+        
+        const elementosExistentes = elementosNecessarios.map(id => document.getElementById(id));
+        const todosExistem = elementosExistentes.every(el => el !== null);
+        
+        console.log('🔍 DEBUG - Verificando elementos necessários:');
+        elementosNecessarios.forEach((id, index) => {
+            console.log(`${id}: ${elementosExistentes[index] ? '✅ Existe' : '❌ Não existe'}`);
+        });
+        
+        if (todosExistem) {
+            console.log('✅ Todos os elementos encontrados, carregando preferências...');
+            loadPreferencesToModalUI('dist');
+            
+            // Adicionar botão "Fixar Escolhas" se não existir
+            setTimeout(() => {
+                adicionarBotaoFixarEscolhas('dist');
+            }, 200);
+        } else {
+            console.log('⏳ Elementos ainda não carregados, tentando novamente em 200ms...');
+            setTimeout(tentarCarregarPreferencias, 200);
+        }
+    }
+    
+    // Iniciar o processo de verificação
+    tentarCarregarPreferencias();
 }
 
 // Função para carregar preferências quando o modal de padrões é aberto
@@ -708,32 +795,120 @@ function carregarPreferenciasAvancadas() {
 
 // Função para carregar preferências quando o modal de trevos é aberto
 function carregarPreferenciasTrevos() {
-    loadPreferencesToModalUI('trevo');
+    console.log('🔍 DEBUG carregarPreferenciasTrevos - Iniciando...');
     
-    // Adicionar botão "Fixar Escolhas" se não existir
-    setTimeout(() => {
-        adicionarBotaoFixarEscolhas('trevo');
-    }, 200);
+    // Função para verificar se os elementos existem e carregar as preferências
+    function tentarCarregarPreferencias() {
+        const elementosNecessarios = [
+            'trevo-priorizar-quentes',
+            'trevo-qtde-quentes',
+            'trevo-priorizar-frios',
+            'trevo-qtde-frios'
+        ];
+        
+        const elementosExistentes = elementosNecessarios.map(id => document.getElementById(id));
+        const todosExistem = elementosExistentes.every(el => el !== null);
+        
+        console.log('🔍 DEBUG Trevos - Verificando elementos necessários:');
+        elementosNecessarios.forEach((id, index) => {
+            console.log(`${id}: ${elementosExistentes[index] ? '✅ Existe' : '❌ Não existe'}`);
+        });
+        
+        if (todosExistem) {
+            console.log('✅ Todos os elementos de trevos encontrados, carregando preferências...');
+            loadPreferencesToModalUI('trevo');
+            
+            // Adicionar botão "Fixar Escolhas" se não existir
+            setTimeout(() => {
+                adicionarBotaoFixarEscolhas('trevo');
+            }, 200);
+        } else {
+            console.log('⏳ Elementos de trevos ainda não carregados, tentando novamente em 200ms...');
+            setTimeout(tentarCarregarPreferencias, 200);
+        }
+    }
+    
+    // Iniciar o processo de verificação
+    tentarCarregarPreferencias();
 }
 
 // Função para carregar preferências quando o modal de afinidades é aberto
 function carregarPreferenciasAfinidades() {
-    loadPreferencesToModalUI('afinidade');
+    console.log('🔍 DEBUG carregarPreferenciasAfinidades - Iniciando...');
     
-    // Adicionar botão "Fixar Escolhas" se não existir
-    setTimeout(() => {
-        adicionarBotaoFixarEscolhas('afinidade');
-    }, 200);
+    // Função para verificar se os elementos existem e carregar as preferências
+    function tentarCarregarPreferencias() {
+        const elementosNecessarios = [
+            'afinidade-priorizar-pares-fortes',
+            'afinidade-qtde-pares',
+            'afinidade-priorizar-numeros-conectados',
+            'afinidade-qtde-numeros',
+            'afinidade-evitar-pares-fracos'
+        ];
+        
+        const elementosExistentes = elementosNecessarios.map(id => document.getElementById(id));
+        const todosExistem = elementosExistentes.every(el => el !== null);
+        
+        console.log('🔍 DEBUG Afinidades - Verificando elementos necessários:');
+        elementosNecessarios.forEach((id, index) => {
+            console.log(`${id}: ${elementosExistentes[index] ? '✅ Existe' : '❌ Não existe'}`);
+        });
+        
+        if (todosExistem) {
+            console.log('✅ Todos os elementos de afinidades encontrados, carregando preferências...');
+            loadPreferencesToModalUI('afinidade');
+            
+            // Adicionar botão "Fixar Escolhas" se não existir
+            setTimeout(() => {
+                adicionarBotaoFixarEscolhas('afinidade');
+            }, 200);
+        } else {
+            console.log('⏳ Elementos de afinidades ainda não carregados, tentando novamente em 200ms...');
+            setTimeout(tentarCarregarPreferencias, 200);
+        }
+    }
+    
+    // Iniciar o processo de verificação
+    tentarCarregarPreferencias();
 }
 
 // Função para carregar preferências quando o modal de seca é aberto
 function carregarPreferenciasSeca() {
-    loadPreferencesToModalUI('seca');
+    console.log('🔍 DEBUG carregarPreferenciasSeca - Iniciando...');
     
-    // Adicionar botão "Fixar Escolhas" se não existir
-    setTimeout(() => {
-        adicionarBotaoFixarEscolhas('seca');
-    }, 200);
+    // Função para verificar se os elementos existem e carregar as preferências
+    function tentarCarregarPreferencias() {
+        const elementosNecessarios = [
+            'padrao-evitar-consecutivos',
+            'padrao-priorizar-atrasados',
+            'padrao-min-atraso',
+            'padrao-evitar-repeticoes-seguidas'
+        ];
+        
+        const elementosExistentes = elementosNecessarios.map(id => document.getElementById(id));
+        const todosExistem = elementosExistentes.every(el => el !== null);
+        
+        console.log('🔍 DEBUG Seca - Verificando elementos necessários:');
+        elementosNecessarios.forEach((id, index) => {
+            console.log(`${id}: ${elementosExistentes[index] ? '✅ Existe' : '❌ Não existe'}`);
+        });
+        
+        if (todosExistem) {
+            console.log('✅ Todos os elementos de seca encontrados, carregando preferências...');
+            loadPreferencesToModalUI('seca');
+            
+            // Adicionar botão "Fixar Escolhas" se não existir
+            setTimeout(() => {
+                adicionarBotaoFixarEscolhas('seca');
+            }, 200);
+        } else {
+            console.log('⏳ Elementos de seca ainda não carregados, tentando novamente em 200ms...');
+            setTimeout(tentarCarregarPreferencias, 200);
+        }
+    }
+    
+    // Iniciar o processo de verificação
+    tentarCarregarPreferencias();
 }
 
 // Event listeners específicos para controles de trevos
@@ -828,8 +1003,12 @@ function renderPremiumPreferencesSummary() {
     // Certifique-se de que este ID existe no seu dashboard_milionaria.html
     const listaParametrosDiv = document.getElementById('lista-parametros'); 
 
+    console.log('🔍 DEBUG renderPremiumPreferencesSummary - Iniciando...');
+    console.log('🔍 DEBUG userPremiumPreferences completo:', JSON.parse(JSON.stringify(userPremiumPreferences)));
+
     // --- 1. Frequência ---
     const freqPref = userPremiumPreferences.frequencia;
+    console.log('🔍 DEBUG Frequência - freqPref:', freqPref);
     if (freqPref && (freqPref.priorizarQuentes || freqPref.priorizarFrios)) {
         let freqDetails = [];
         if (freqPref.priorizarQuentes) {
@@ -846,6 +1025,9 @@ function renderPremiumPreferencesSummary() {
                 </ul>
             </div>
         `;
+        console.log('✅ Frequência adicionada ao resumo');
+    } else {
+        console.log('❌ Frequência não adicionada - nenhuma opção selecionada');
     }
 
     // --- 2. Distribuição ---
@@ -883,6 +1065,7 @@ function renderPremiumPreferencesSummary() {
     // Assumindo que 'padroes' no userPremiumPreferences cobre 'Afinidades' como padrões específicos.
     // Se 'Afinidades' for uma seção completamente diferente com parâmetros distintos, precisará de um novo bloco.
     const padroesPref = userPremiumPreferences.padroes;
+    console.log('🔍 DEBUG Padrões - padroesPref:', padroesPref);
     if (padroesPref && (padroesPref.evitarConsecutivos || padroesPref.priorizarAtrasados || padroesPref.evitarRepeticoesSeguidas)) {
         let padroesDetails = [];
         if (padroesPref.evitarConsecutivos) {
@@ -896,12 +1079,15 @@ function renderPremiumPreferencesSummary() {
         }
         summaryHtml += `
             <div class="bg-card p-3 rounded-md border border-surface mb-3">
-                <p class="font-semibold text-primary">Padrões e Atrasos (Afinidades):</p>
+                <p class="font-semibold text-primary">Padrões e Atrasos (Seca):</p>
                 <ul class="list-disc list-inside ml-4 text-textSecondary">
                     <li>${padroesDetails.join('; ')}</li>
                 </ul>
             </div>
         `;
+        console.log('✅ Padrões adicionados ao resumo');
+    } else {
+        console.log('❌ Padrões não adicionados - nenhuma opção selecionada');
     }
 
     // --- 4. Clusters (Análise Estatística Avançada) ---
@@ -1184,11 +1370,23 @@ function criarGraficoDistribuicao(dados) {
 }
 
 /**
- * 🤝 GRÁFICO DE CORRELAÇÃO
+ * �� GRÁFICO DE CORRELAÇÃO
  */
 function criarGraficoCorrelacao(dados) {
+    console.log("🔍 criarGraficoCorrelacao chamada com dados:", dados);
+    
+    if (!dados || !dados.correlacoes_positivas) {
+        console.error("❌ Dados de correlação inválidos:", dados);
+        return;
+    }
+    
+    console.log("📊 Correlações positivas disponíveis:", dados.correlacoes_positivas);
+    console.log("📊 Correlações negativas disponíveis:", dados.correlacoes_negativas);
+    
     const numeros = Array.from({length: 50}, (_, i) => i + 1);
     const correlacoes = dados.correlacoes_positivas.slice(0, 10);
+    
+    console.log("📈 Usando primeiras 10 correlações positivas:", correlacoes);
     
     const trace = {
         x: correlacoes.map(c => `${c[0]} ↔ ${c[1]}`),
@@ -1204,6 +1402,8 @@ function criarGraficoCorrelacao(dados) {
         name: 'Correlação',
         hovertemplate: '<b>%{x}</b><br>Correlação: %{y:.3f}<extra></extra>'
     };
+    
+    console.log("📊 Trace criado:", trace);
 
     const layout = {
         ...DEFAULT_LAYOUT,
@@ -1226,8 +1426,17 @@ function criarGraficoCorrelacao(dados) {
             range: [-0.3, 0.3]
         }
     };
-
-    Plotly.newPlot('grafico-correlacao', [trace], layout, PLOTLY_CONFIG);
+    
+    console.log("📊 Layout criado:", layout);
+    console.log("🎯 Tentando criar gráfico no container 'grafico-estatisticas-correlacao'...");
+    
+    try {
+        Plotly.newPlot('grafico-estatisticas-correlacao', [trace], layout, PLOTLY_CONFIG);
+        console.log("✅ Gráfico de correlação criado com sucesso!");
+    } catch (error) {
+        console.error("❌ Erro ao criar gráfico de correlação:", error);
+        console.error("❌ Detalhes do erro:", error.message);
+    }
 }
 
 /**
@@ -1650,9 +1859,22 @@ async function carregarEstatisticasAvancadas() {
         console.log("🔍 Estrutura detalhada dos dados:");
         console.log("📊 desvio_padrao_distribuicao:", dados.desvio_padrao_distribuicao);
         console.log("🎲 teste_aleatoriedade:", dados.teste_aleatoriedade);
+        console.log("🔗 analise_clusters:", dados.analise_clusters);
+        console.log("📈 analise_correlacao_numeros:", dados.analise_correlacao_numeros);
+        console.log("🎯 probabilidades_condicionais:", dados.probabilidades_condicionais);
 
         if (dados.desvio_padrao_distribuicao && dados.desvio_padrao_distribuicao.estatisticas_gerais) {
             console.log("📈 estatisticas_gerais:", dados.desvio_padrao_distribuicao.estatisticas_gerais);
+        }
+        
+        // Log específico para correlação
+        if (dados.analise_correlacao_numeros) {
+            const correlacao = dados.analise_correlacao_numeros;
+            console.log("🔍 Dados de correlação detalhados:");
+            console.log("   - Correlações positivas:", correlacao.correlacoes_positivas);
+            console.log("   - Correlações negativas:", correlacao.correlacoes_negativas);
+            console.log("   - Correlação média:", correlacao.correlacao_media);
+            console.log("   - Matriz de correlação (tamanho):", correlacao.matriz_correlacao ? correlacao.matriz_correlacao.length : 'N/A');
         }
 
         // Chamar funções para renderizar cada seção
@@ -1664,7 +1886,9 @@ async function carregarEstatisticasAvancadas() {
         // Debug: Verificar estrutura dos dados de clusters
         console.log("🔍 Dados de clusters recebidos:", dados.analise_clusters);
         renderizarClusters(dados.analise_clusters);
+        console.log("🔧 Chamando renderizarCorrelacoes...");
         renderizarCorrelacoes(dados.analise_correlacao_numeros); // Descomentada conforme discutimos!
+        console.log("🔧 Chamando renderizarProbabilidadesCondicionais...");
         renderizarProbabilidadesCondicionais(dados.probabilidades_condicionais); // Descomente quando implementar
 
     } catch (error) {
@@ -1680,6 +1904,71 @@ async function carregarEstatisticasAvancadas() {
         carregamentoEmAndamento = false;
         console.log("✅ Carregamento finalizado, flag resetada");
     }
+}
+
+function renderizarCorrelacoes(dadosCorrelacao) {
+    console.log("🔍 renderizarCorrelacoes chamada com dados:", dadosCorrelacao);
+    
+    if (!dadosCorrelacao) {
+        console.error("❌ Dados de correlação não disponíveis");
+        return;
+    }
+    
+    // Verificar se os elementos existem
+    const listaTopPositivas = document.getElementById('lista-top-positivas');
+    const listaTopNegativas = document.getElementById('lista-top-negativas');
+    const graficoCorrelacao = document.getElementById('grafico-estatisticas-correlacao');
+    
+    console.log("🔍 Elementos encontrados:");
+    console.log("   - lista-top-positivas:", !!listaTopPositivas);
+    console.log("   - lista-top-negativas:", !!listaTopNegativas);
+    console.log("   - grafico-estatisticas-correlacao:", !!graficoCorrelacao);
+    
+    // Renderizar listas de correlações
+    if (listaTopPositivas && dadosCorrelacao.correlacoes_positivas) {
+        console.log("📊 Renderizando correlações positivas:", dadosCorrelacao.correlacoes_positivas);
+        listaTopPositivas.innerHTML = dadosCorrelacao.correlacoes_positivas
+            .slice(0, 5)
+            .map(corr => `<li class="text-green-600">${corr[0]} ↔ ${corr[1]}: ${corr[2].toFixed(3)}</li>`)
+            .join('');
+    }
+    
+    if (listaTopNegativas && dadosCorrelacao.correlacoes_negativas) {
+        console.log("📊 Renderizando correlações negativas:", dadosCorrelacao.correlacoes_negativas);
+        listaTopNegativas.innerHTML = dadosCorrelacao.correlacoes_negativas
+            .slice(0, 5)
+            .map(corr => `<li class="text-red-600">${corr[0]} ↔ ${corr[1]}: ${corr[2].toFixed(3)}</li>`)
+            .join('');
+    }
+    
+    // Renderizar gráfico de correlação
+    if (graficoCorrelacao && dadosCorrelacao.correlacoes_positivas && dadosCorrelacao.correlacoes_positivas.length > 0) {
+        console.log("📈 Criando gráfico de correlação...");
+        try {
+            // Usar a função existente criarGraficoCorrelacao
+            criarGraficoCorrelacao(dadosCorrelacao);
+            console.log("✅ Gráfico de correlação criado com sucesso!");
+        } catch (error) {
+            console.error("❌ Erro ao criar gráfico de correlação:", error);
+        }
+    } else {
+        console.warn("⚠️ Não há dados suficientes para criar gráfico de correlação");
+        if (graficoCorrelacao) {
+            graficoCorrelacao.innerHTML = '<p class="text-center text-gray-500 p-4">Dados de correlação insuficientes</p>';
+        }
+    }
+}
+
+function renderizarProbabilidadesCondicionais(dadosProbabilidades) {
+    console.log("🔍 renderizarProbabilidadesCondicionais chamada com dados:", dadosProbabilidades);
+    
+    if (!dadosProbabilidades) {
+        console.warn("⚠️ Dados de probabilidades condicionais não disponíveis");
+        return;
+    }
+    
+    // TODO: Implementar renderização das probabilidades condicionais
+    console.log("📊 Dados de probabilidades condicionais:", dadosProbabilidades);
 }
 
 function renderizarDesvioPadrao(dadosDesvioPadrao) {

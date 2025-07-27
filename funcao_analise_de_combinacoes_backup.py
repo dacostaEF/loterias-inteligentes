@@ -286,7 +286,7 @@ def analise_combinacoes_milionaria(df_milionaria, qtd_concursos=None):
     Versão adaptada para trabalhar com DataFrame da Mais Milionária
     
     Args:
-        df_milionaria (pd.DataFrame ou list): DataFrame ou lista com dados da Mais Milionária
+        df_milionaria (pd.DataFrame): DataFrame com dados da Mais Milionária
         qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
                                       Se None, analisa todos os concursos.
         Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6, Trevo1, Trevo2
@@ -295,51 +295,38 @@ def analise_combinacoes_milionaria(df_milionaria, qtd_concursos=None):
         dict: Resultado da análise de combinações
     """
     
-    # Verificação de segurança para dados vazios
-    if df_milionaria is None:
-        print("⚠️  Aviso: Dados da Mais Milionária são None!")
+    # Verificação de segurança para DataFrame vazio
+    if df_milionaria is None or df_milionaria.empty:
+        print("⚠️  Aviso: DataFrame da Mais Milionária está vazio ou é None!")
         return {}
     
-    # Se for lista, verificar se está vazia
-    if isinstance(df_milionaria, list):
-        if len(df_milionaria) == 0:
-            print("⚠️  Aviso: Lista de dados da Mais Milionária está vazia!")
-            return {}
-        # Se for lista, usar diretamente
-        dados_sorteios = df_milionaria
-    else:
-        # Se for DataFrame, verificar se está vazio
-        if hasattr(df_milionaria, 'empty') and df_milionaria.empty:
-            print("⚠️  Aviso: DataFrame da Mais Milionária está vazio!")
-            return {}
+    # Verificar se as colunas necessárias existem
+    colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
+    colunas_faltantes = [col for col in colunas_necessarias if col not in df_milionaria.columns]
+    
+    if colunas_faltantes:
+        print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
+        return {}
+    
+    # Converter DataFrame para formato esperado pela função original
+    dados_sorteios = []
+    
+    for _, row in df_milionaria.iterrows():
+        # Verificar se os dados são válidos
+        if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']):
+            continue  # Pular linhas com dados inválidos
         
-        # Verificar se as colunas necessárias existem
-        colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
-        colunas_faltantes = [col for col in colunas_necessarias if col not in df_milionaria.columns]
-        
-        if colunas_faltantes:
-            print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
-            return {}
-        
-        # Converter DataFrame para formato esperado pela função original
-        dados_sorteios = []
-        
-        for _, row in df_milionaria.iterrows():
-            # Verificar se os dados são válidos
-            if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']):
-                continue  # Pular linhas com dados inválidos
-            
-            sorteio = [
-                row['Concurso'],
-                row['Bola1'], row['Bola2'], row['Bola3'], 
-                row['Bola4'], row['Bola5'], row['Bola6'],
-                row['Trevo1'], row['Trevo2']
-            ]
-            dados_sorteios.append(sorteio)
+        sorteio = [
+            row['Concurso'],
+            row['Bola1'], row['Bola2'], row['Bola3'], 
+            row['Bola4'], row['Bola5'], row['Bola6'],
+            row['Trevo1'], row['Trevo2']
+        ]
+        dados_sorteios.append(sorteio)
     
     # Verificação final antes de executar análise
     if not dados_sorteios:
-        print("⚠️  Aviso: Nenhum sorteio válido encontrado nos dados!")
+        print("⚠️  Aviso: Nenhum sorteio válido encontrado no DataFrame!")
         return {}
     
     # Executar análise original com parâmetro de quantidade de concursos

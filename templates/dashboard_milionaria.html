@@ -903,7 +903,7 @@
             if (typeof carregarPreferenciasDistribuicao === 'function') {
               carregarPreferenciasDistribuicao();
             }
-          }, 500);
+          }, 1000); // Aumentado de 500ms para 1000ms
           break;
         case 'afinidades':
           titulo.textContent = '🤝 Análise de Afinidades';
@@ -913,7 +913,7 @@
             if (typeof carregarPreferenciasAfinidades === 'function') {
               carregarPreferenciasAfinidades();
             }
-          }, 500);
+          }, 1000); // Aumentado de 500ms para 1000ms
           break;
         case 'trevos':
           titulo.textContent = '🍀 Análise dos Trevos';
@@ -923,7 +923,7 @@
             if (typeof carregarPreferenciasTrevos === 'function') {
               carregarPreferenciasTrevos();
             }
-          }, 500);
+          }, 1000); // Aumentado de 500ms para 1000ms
           break;
         case 'seca':
           titulo.textContent = '🌵 Análise de Seca';
@@ -933,7 +933,7 @@
             if (typeof carregarPreferenciasSeca === 'function') {
               carregarPreferenciasSeca();
             }
-          }, 500);
+          }, 1000); // Aumentado de 500ms para 1000ms
           break;
         case 'estatisticas':
           titulo.textContent = '📈 Estatísticas Avançadas';
@@ -1950,11 +1950,10 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-afinidades" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateAfinidadeModal()">
-                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
-                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
+                    <option value="130" ${qtdConcursos === '130' ? 'selected' : ''}>Últimos 130 concursos</option>
                   </select>
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
@@ -2315,7 +2314,7 @@
         
         // Layout do gráfico
         const layout = {
-          title: `Rede de Afinidade ${qtdConcursos ? `(Últimos ${qtdConcursos} concursos)` : '(Todos os concursos)'}`,
+          title: `Rede de Afinidade ${qtdConcursos ? `(Últimos ${qtdConcursos} concursos)` : '(Análise completa)'}`,
           paper_bgcolor: '#1a1a1a',
           plot_bgcolor: '#1a1a1a',
           font: { color: 'white' },
@@ -3440,6 +3439,10 @@
           plotGraficoEstatisticasCorrelacao(correlacao, qtdConcursos);
           plotGraficoEstatisticasProbabilidades(probabilidades, qtdConcursos);
           
+          // Adicionar logs para debug
+          console.log("🔍 Dados de correlação para gráfico:", correlacao);
+          console.log("🔍 Container do gráfico existe:", !!document.getElementById('grafico-estatisticas-correlacao'));
+          
           // Configurar event listeners para os botões de ordenação
           configurarControlesOrdenacao();
           
@@ -3677,8 +3680,10 @@
     
     // Função para criar gráfico de correlação
     function plotGraficoEstatisticasCorrelacao(correlacao, periodo = null) {
+      console.log("🔍 plotGraficoEstatisticasCorrelacao chamada com:", { correlacao, periodo });
+      
       if (!correlacao || !correlacao.correlacoes_positivas) {
-        console.error('Dados de correlação não disponíveis');
+        console.error('❌ Dados de correlação não disponíveis:', correlacao);
         const container = document.getElementById('grafico-estatisticas-correlacao');
         if (container) {
           container.innerHTML = '<p class="text-center text-gray-400 p-4">Dados de correlação não disponíveis para este período.</p>';
@@ -3686,12 +3691,17 @@
         return;
       }
       
+      console.log("📊 Correlações positivas:", correlacao.correlacoes_positivas);
+      console.log("📊 Correlações negativas:", correlacao.correlacoes_negativas);
+      
       // Combinar correlações positivas e negativas
       const todasCorrelacoes = [...(correlacao.correlacoes_positivas || []), ...(correlacao.correlacoes_negativas || [])];
       
+      console.log("📊 Todas as correlações combinadas:", todasCorrelacoes);
+      
       // Verificar se há dados suficientes para plotar
       if (todasCorrelacoes.length === 0) {
-        console.warn('Nenhuma correlação significativa encontrada para este período');
+        console.warn('⚠️ Nenhuma correlação significativa encontrada para este período');
         const container = document.getElementById('grafico-estatisticas-correlacao');
         if (container) {
           container.innerHTML = '<p class="text-center text-gray-400 p-4">Nenhuma correlação significativa encontrada para este período.<br><small>Isso pode indicar que os números são bem distribuídos e independentes.</small></p>';
@@ -3701,6 +3711,9 @@
       
       const pares = todasCorrelacoes.map(pair => `${pair[0]}-${pair[1]}`);
       const valores = todasCorrelacoes.map(pair => pair[2]);
+      
+      console.log("📊 Pares criados:", pares);
+      console.log("📊 Valores criados:", valores);
       
       // Criar título com período
       let titulo = '📈 Correlações Significativas<br>entre Números';
@@ -3753,8 +3766,17 @@
         margin: { l: 40, r: 40, t: 70, b: 80, pad: 5 }
       };
       
-      Plotly.newPlot('grafico-estatisticas-correlacao', data, layout, { displayModeBar: false });
-      console.log(`✅ Gráfico de correlação criado com ${todasCorrelacoes.length} pares significativos`);
+      console.log("🎯 Tentando criar gráfico Plotly...");
+      console.log("📊 Data para Plotly:", data);
+      console.log("📊 Layout para Plotly:", layout);
+      
+      try {
+        Plotly.newPlot('grafico-estatisticas-correlacao', data, layout, { displayModeBar: false });
+        console.log(`✅ Gráfico de correlação criado com ${todasCorrelacoes.length} pares significativos`);
+      } catch (error) {
+        console.error("❌ Erro ao criar gráfico Plotly:", error);
+        console.error("❌ Detalhes do erro:", error.message);
+      }
     }
     
     // Função para criar gráfico de probabilidades condicionais
