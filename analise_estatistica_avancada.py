@@ -617,6 +617,43 @@ class AnaliseEstatisticaAvancada:
             'dependencias_fortes': dependencias[:20],
             'total_concursos': int(total_concursos)
         }
+
+    def calcular_distribuicao_frequencia_numeros(self, df_filtrado):
+        """
+        Calcula a frequência de cada número principal (1-50) em um DataFrame filtrado.
+        Retorna uma lista de dicionários com {numero: frequencia}.
+        
+        Args:
+            df_filtrado (pd.DataFrame): DataFrame filtrado pela janela temporal
+            
+        Returns:
+            list: Lista de dicionários com número e frequência
+        """
+        try:
+            if df_filtrado is None or df_filtrado.empty:
+                logger.warning("DataFrame filtrado vazio para cálculo de distribuição")
+                return []
+            
+            # Concatena todas as colunas de números principais em uma única Series
+            todos_numeros = df_filtrado[self.colunas_bolas].values.flatten()
+            
+            # Conta a frequência de cada número
+            contagem_numeros = Counter(todos_numeros)
+            
+            # Garante que todos os números de 1 a 50 estejam presentes, mesmo com frequência 0
+            distribuicao = []
+            for num in range(1, 51):  # Números de 1 a 50
+                distribuicao.append({
+                    'numero': num, 
+                    'frequencia': contagem_numeros.get(num, 0)
+                })
+            
+            logger.info(f"Distribuição calculada para {len(df_filtrado)} concursos")
+            return distribuicao
+            
+        except Exception as e:
+            logger.error(f"Erro ao calcular distribuição de frequência: {e}")
+            return []
     
     def executar_analise_completa(self, qtd_concursos=None):
         """
@@ -647,7 +684,8 @@ class AnaliseEstatisticaAvancada:
             'teste_aleatoriedade': analise_temp.teste_aleatoriedade(),
             'analise_clusters': analise_temp.analise_clusters(n_clusters=n_clusters),
             'analise_correlacao_numeros': analise_temp.analise_correlacao_numeros(),
-            'probabilidades_condicionais': analise_temp.probabilidades_condicionais()
+            'probabilidades_condicionais': analise_temp.probabilidades_condicionais(),
+            'distribuicao_numeros': self.calcular_distribuicao_frequencia_numeros(df_analise)
         }
         
         # Limpar valores NaN antes de retornar

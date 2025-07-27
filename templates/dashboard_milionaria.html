@@ -3073,6 +3073,12 @@
               </div>
             </div>
 
+            <!-- Gráfico de Distribuição -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">📊 Distribuição de Frequência dos Números${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
+              <div id="grafico-estatisticas-distribuicao" style="height: 400px;"></div>
+            </div>
+
             <!-- Gráficos -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="chart-container">
@@ -3124,6 +3130,7 @@
         
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
+          plotGraficoEstatisticasDistribuicao(data.distribuicao_numeros, qtdConcursos);
           plotGraficoEstatisticasClusters(clusters, qtdConcursos);
           plotGraficoEstatisticasCorrelacao(correlacao, qtdConcursos);
           plotGraficoEstatisticasProbabilidades(probabilidades, qtdConcursos);
@@ -3376,6 +3383,73 @@
       };
       
       Plotly.newPlot('grafico-estatisticas-probabilidades', data, layout, { displayModeBar: false });
+    }
+
+    // Função para criar gráfico de distribuição
+    function plotGraficoEstatisticasDistribuicao(distribuicaoNumeros, periodo = null) {
+      if (!distribuicaoNumeros || distribuicaoNumeros.length === 0) {
+        console.warn('Dados de distribuição de números vazios ou inválidos.');
+        Plotly.purge('grafico-estatisticas-distribuicao');
+        document.getElementById('grafico-estatisticas-distribuicao').innerHTML = '<p class="text-center text-gray-400">Dados de distribuição não disponíveis para este período.</p>';
+        return;
+      }
+
+      const numeros = distribuicaoNumeros.map(item => item.numero);
+      const frequencias = distribuicaoNumeros.map(item => item.frequencia);
+
+      // Criar título com período
+      let titulo = '📊 Distribuição de Frequência dos Números';
+      if (periodo) {
+        titulo += ` (Últimos ${periodo} concursos)`;
+      }
+
+      const data = [{
+        x: numeros,
+        y: frequencias,
+        type: 'bar',
+        marker: {
+          color: '#00E38C',
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 1
+          }
+        },
+        text: frequencias.map(val => val.toString()),
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 8,
+          weight: 'bold'
+        },
+        hovertemplate: '<b>Número %{x}</b><br>Frequência: %{y}<extra></extra>'
+      }];
+
+      const layout = {
+        title: {
+          text: titulo,
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Número',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 10 },
+          tickmode: 'linear',
+          dtick: 5,
+          range: [0.5, 50.5]
+        },
+        yaxis: { 
+          title: 'Frequência',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+      };
+
+      Plotly.newPlot('grafico-estatisticas-distribuicao', data, layout, { displayModeBar: false });
     }
 
     function criarGraficoClusters() {
