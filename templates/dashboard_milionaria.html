@@ -1950,11 +1950,11 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-afinidades" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateAfinidadeModal()">
-                    <option value="">Todos os concursos</option>
-                    <option value="25">Últimos 25 concursos</option>
-                    <option value="50">Últimos 50 concursos</option>
-                    <option value="100">Últimos 100 concursos</option>
-                    <option value="200">Últimos 200 concursos</option>
+                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                    <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                    <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
                   </select>
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
@@ -2411,11 +2411,11 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-trevos" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateTrevosModal()">
-                    <option value="">Todos os concursos</option>
-                    <option value="25">Últimos 25 concursos</option>
-                    <option value="50">Últimos 50 concursos</option>
-                    <option value="100">Últimos 100 concursos</option>
-                    <option value="200">Últimos 200 concursos</option>
+                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                    <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                    <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
                   </select>
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
@@ -2907,11 +2907,11 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectSecaPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSecaModal()">
-                    <option value="">Todos os concursos</option>
-                    <option value="25">Últimos 25 concursos</option>
-                    <option value="50">Últimos 50 concursos</option>
-                    <option value="100">Últimos 100 concursos</option>
-                    <option value="200">Últimos 200 concursos</option>
+                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                    <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                    <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
                   </select>
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
