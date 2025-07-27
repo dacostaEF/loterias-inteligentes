@@ -666,9 +666,26 @@ class AnaliseEstatisticaAvancada:
         # Ordenar por correlação
         pares_correlacionados.sort(key=lambda x: abs(x[2]), reverse=True)
         
-        # Separar correlações positivas e negativas
-        correlacoes_positivas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] > 0.1][:10]
-        correlacoes_negativas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] < -0.1][:10]
+        # Ajustar thresholds baseado no número de concursos
+        # Para muitos concursos, reduzir os thresholds para garantir dados suficientes
+        if len(self.df_validos) > 100:
+            threshold_positivo = 0.05  # Mais flexível para muitos concursos
+            threshold_negativo = -0.05
+        else:
+            threshold_positivo = 0.1   # Threshold original para poucos concursos
+            threshold_negativo = -0.1
+        
+        # Separar correlações positivas e negativas com thresholds ajustados
+        correlacoes_positivas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] > threshold_positivo][:10]
+        correlacoes_negativas = [(int(p[0]), int(p[1]), float(p[2])) for p in pares_correlacionados if p[2] < threshold_negativo][:10]
+        
+        # Se ainda não há dados suficientes, pegar os top 10 mais correlacionados (positivos e negativos)
+        if len(correlacoes_positivas) + len(correlacoes_negativas) < 5:
+            logger.info(f"Poucas correlações significativas encontradas. Usando top 10 mais correlacionados.")
+            # Pegar os 10 pares com maior correlação absoluta
+            top_correlacoes = pares_correlacionados[:10]
+            correlacoes_positivas = [(int(p[0]), int(p[1]), float(p[2])) for p in top_correlacoes if p[2] > 0]
+            correlacoes_negativas = [(int(p[0]), int(p[1]), float(p[2])) for p in top_correlacoes if p[2] < 0]
         
         # Calcular correlação média de forma segura
         try:
@@ -771,14 +788,34 @@ class AnaliseEstatisticaAvancada:
                 'condicionais': condicionais
             }
         
-        # Encontrar as dependências mais fortes
+        # Encontrar as dependências mais fortes (evitando duplicatas)
         dependencias = []
+        pares_ja_processados = set()  # Para evitar duplicatas
+        
         for num1 in range(1, 51):
             for num2 in range(1, 51):
                 if num1 != num2:
-                    dep = probabilidades[num1]['condicionais'][num2]['dependencia']
-                    if dep > 1.5:  # Dependência forte
-                        dependencias.append((int(num1), int(num2), float(dep)))
+                    # Criar chave única para o par (sempre menor primeiro)
+                    par_key = tuple(sorted([num1, num2]))
+                    
+                    # Verificar se já processamos este par
+                    if par_key not in pares_ja_processados:
+                        pares_ja_processados.add(par_key)
+                        
+                        # Pegar a dependência mais forte entre as duas direções
+                        dep1 = probabilidades[num1]['condicionais'][num2]['dependencia']
+                        dep2 = probabilidades[num2]['condicionais'][num1]['dependencia']
+                        
+                        # Usar a dependência mais forte
+                        if dep1 > dep2:
+                            dependencia = dep1
+                            num_origem, num_destino = num1, num2
+                        else:
+                            dependencia = dep2
+                            num_origem, num_destino = num2, num1
+                        
+                        if dependencia > 1.5:  # Dependência forte
+                            dependencias.append((int(num_origem), int(num_destino), float(dependencia)))
         
         dependencias.sort(key=lambda x: x[2], reverse=True)
         

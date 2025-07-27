@@ -3502,14 +3502,35 @@
     
     // Função para criar gráfico de probabilidades condicionais
     function plotGraficoEstatisticasProbabilidades(probabilidades, periodo = null) {
+      console.log('🔍 DEBUG - Dados recebidos em plotGraficoEstatisticasProbabilidades:', probabilidades);
+      
       if (!probabilidades || !probabilidades.dependencias_fortes) {
         console.error('Dados de probabilidades condicionais não disponíveis');
+        const container = document.getElementById('grafico-estatisticas-probabilidades');
+        if (container) {
+          container.innerHTML = '<p class="text-center text-gray-400 p-4">Dados de probabilidades condicionais não disponíveis para este período.</p>';
+        }
         return;
       }
       
       const dependencias = probabilidades.dependencias_fortes || [];
+      console.log('🔍 DEBUG - Dependências encontradas:', dependencias);
+      
+      // Verificar se há dados suficientes para plotar
+      if (dependencias.length === 0) {
+        console.warn('Nenhuma dependência forte encontrada para este período');
+        const container = document.getElementById('grafico-estatisticas-probabilidades');
+        if (container) {
+          container.innerHTML = '<p class="text-center text-gray-400 p-4">Nenhuma dependência forte encontrada para este período.<br><small>Isso pode indicar que os números são bem independentes.</small></p>';
+        }
+        return;
+      }
+      
       const pares = dependencias.map(dep => `${dep[0]}-${dep[1]}`);
       const valores = dependencias.map(dep => dep[2]);
+      
+      console.log('🔍 DEBUG - Pares processados:', pares);
+      console.log('🔍 DEBUG - Valores processados:', valores);
       
       // Criar título com período
       let titulo = '🎯 Probabilidades Condicionais';
@@ -3539,6 +3560,8 @@
         hovertemplate: '<b>%{x}</b><br>Probabilidade: %{y}<extra></extra>'
       }];
       
+      console.log('🔍 DEBUG - Dados finais para Plotly:', data);
+      
       const layout = {
         title: {
           text: titulo,
@@ -3547,7 +3570,9 @@
         xaxis: { 
           title: 'Pares de Números',
           titlefont: { color: 'white' },
-          tickfont: { color: 'white', size: 10 }
+          tickfont: { color: 'white', size: 10 },
+          type: 'category', // Força o eixo X a ser categórico
+          automargin: true // Ajuda com labels longos
         },
         yaxis: { 
           title: 'Probabilidade',
@@ -3561,6 +3586,7 @@
       };
       
       Plotly.newPlot('grafico-estatisticas-probabilidades', data, layout, { displayModeBar: false });
+      console.log(`✅ Gráfico de probabilidades condicionais criado com ${dependencias.length} dependências`);
     }
 
     // Função para criar gráfico de distribuição com ordenação
