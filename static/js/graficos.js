@@ -562,6 +562,488 @@ async function carregarDadosEGraficos(tipo, qtdConcursos = null) {
     }
 }
 
+// ========================================
+// 🎯 FUNÇÕES PARA ESTATÍSTICAS AVANÇADAS
+// ========================================
+
+// Flag para evitar chamadas duplicadas
+let carregamentoEmAndamento = false;
+
+async function carregarEstatisticasAvancadas() {
+    console.log("🚀 Iniciando carregamento das estatísticas avançadas...");
+
+    // Evitar chamadas duplicadas
+    if (carregamentoEmAndamento) {
+        console.log("⚠️ Carregamento já em andamento, ignorando chamada duplicada");
+        return;
+    }
+    
+    carregamentoEmAndamento = true;
+
+    // Aguardar um pouco para garantir que o HTML seja renderizado
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Verificar se os elementos existem
+    const elementos = {
+        'chi2-status': document.getElementById('chi2-status'),
+        'paridade-status': document.getElementById('paridade-status'),
+        'chi2-pvalue': document.getElementById('chi2-pvalue'),
+        'paridade-pvalue': document.getElementById('paridade-pvalue'),
+        'corpo-tabela-clusters': document.getElementById('corpo-tabela-clusters'),
+        'lista-top-positivas': document.getElementById('lista-top-positivas'),
+        'lista-top-negativas': document.getElementById('lista-top-negativas')
+    };
+
+    console.log("📋 Elementos encontrados:", elementos);
+
+    // Verificar se todos os elementos existem
+    const elementosFaltando = Object.entries(elementos)
+        .filter(([id, element]) => !element)
+        .map(([id]) => id);
+
+    if (elementosFaltando.length > 0) {
+        console.error("❌ Elementos não encontrados:", elementosFaltando);
+        console.error("🔄 Aguardando mais tempo...");
+        
+        // Reset da flag para permitir nova tentativa
+        carregamentoEmAndamento = false;
+        
+        // Tentar novamente após mais tempo
+        setTimeout(async () => {
+            await carregarEstatisticasAvancadas();
+        }, 2000);
+        return;
+    }
+
+        console.log("✅ Todos os elementos encontrados! Iniciando carregamento...");
+
+        // Exibir um estado de carregamento inicial (agora seguro)
+        try {
+            elementos['chi2-status'].innerText = 'Carregando...';
+            elementos['paridade-status'].innerText = 'Carregando...';
+            elementos['chi2-pvalue'].innerText = 'P-valor: --';
+            elementos['paridade-pvalue'].innerText = 'P-valor: --';
+            elementos['corpo-tabela-clusters'].innerHTML = '<tr><td colspan="3" class="text-center p-4">Carregando clusters...</td></tr>';
+            elementos['lista-top-positivas'].innerHTML = '<li>Carregando...</li>';
+            elementos['lista-top-negativas'].innerHTML = '<li>Carregando...</li>';
+
+            // Limpar gráficos anteriores de forma segura
+            const containersParaLimpar = [
+                'grafico-desvio-padrao-numeros',
+                'grafico-desvio-padrao-trevos',
+                'grafico-paridade',
+                'grafico-clusters',
+                'grafico-correlacao',
+                'grafico-probabilidade-condicional'
+            ];
+
+            containersParaLimpar.forEach(containerId => {
+                const container = document.getElementById(containerId);
+                if (container) {
+                    try {
+                        Plotly.purge(containerId);
+                        console.log(`✅ Limpo: ${containerId}`);
+                    } catch (e) {
+                        console.log(`⚠️ Container ${containerId} não tinha gráfico para limpar`);
+                    }
+                } else {
+                    console.log(`⚠️ Container não encontrado: ${containerId}`);
+                }
+            });
+
+        } catch (domError) {
+            console.error("❌ Erro ao tentar inicializar estado de carregamento do DOM:", domError);
+            return; // Impede a continuação se os elementos básicos não forem encontrados
+        }
+
+        try {
+            console.log("🌐 Fazendo requisição para /api/estatisticas_avancadas...");
+            const response = await fetch('/api/estatisticas_avancadas'); // URL do endpoint Flask
+            console.log("📡 Resposta recebida:", response.status, response.statusText);
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Erro HTTP ${response.status}: ${errorData.error || 'Erro desconhecido'}`);
+            }
+            
+            const dados = await response.json();
+                    console.log("✅ Dados da análise avançada recebidos:", dados);
+        
+        // DEBUG: Verificar estrutura dos dados
+        console.log("🔍 Estrutura detalhada dos dados:");
+        console.log("📊 desvio_padrao_distribuicao:", dados.desvio_padrao_distribuicao);
+        console.log("🎲 teste_aleatoriedade:", dados.teste_aleatoriedade);
+        
+        if (dados.desvio_padrao_distribuicao && dados.desvio_padrao_distribuicao.estatisticas_gerais) {
+            console.log("📈 estatisticas_gerais:", dados.desvio_padrao_distribuicao.estatisticas_gerais);
+        }
+
+        // Chamar funções para renderizar cada seção
+        renderizarDesvioPadrao(dados.desvio_padrao_distribuicao);
+        renderizarTestesAleatoriedade(dados.teste_aleatoriedade); // ✅ IMPLEMENTADA
+        renderizarClusters(dados.analise_clusters); // ✅ IMPLEMENTADA
+        // As próximas funções serão implementadas nas próximas doses
+        // renderizarCorrelacoes(dados.analise_correlacao_numeros); // Será implementada
+        // renderizarProbabilidadesCondicionais(dados.probabilidades_condicionais); // Será implementada
+
+        } catch (error) {
+            console.error('❌ Erro ao carregar estatísticas avançadas:', error);
+            // Exibir mensagem de erro amigável no modal (usando elementos já verificados)
+            if (elementos['chi2-status']) elementos['chi2-status'].innerText = 'Erro ao carregar.';
+            if (elementos['paridade-status']) elementos['paridade-status'].innerText = 'Erro ao carregar.';
+            if (elementos['corpo-tabela-clusters']) elementos['corpo-tabela-clusters'].innerHTML = '<tr><td colspan="3" class="text-center p-4 text-red-500">Erro ao carregar dados.</td></tr>';
+            if (elementos['lista-top-positivas']) elementos['lista-top-positivas'].innerHTML = '<li class="text-red-500">Erro ao carregar dados.</li>';
+            if (elementos['lista-top-negativas']) elementos['lista-top-negativas'].innerHTML = '<li class="text-red-500">Erro ao carregar dados.</li>';
+        } finally {
+            // Reset da flag no final (sucesso ou erro)
+            carregamentoEmAndamento = false;
+            console.log("✅ Carregamento finalizado, flag resetada");
+        }
+    }, 0); // O atraso de 0ms faz com que essa função seja executada após o loop de eventos atual
+}
+
+function renderizarDesvioPadrao(dadosDesvioPadrao) {
+    console.log("Renderizando Desvio Padrão:", dadosDesvioPadrao);
+
+    if (!dadosDesvioPadrao || !dadosDesvioPadrao.estatisticas_gerais) {
+        console.error('Dados de desvio padrão não disponíveis');
+        return;
+    }
+
+    // Verificar se os containers existem
+    const containerNumeros = document.getElementById('grafico-desvio-padrao-numeros');
+    const containerTrevos = document.getElementById('grafico-desvio-padrao-trevos');
+    
+    console.log('Container números existe:', !!containerNumeros);
+    console.log('Container trevos existe:', !!containerTrevos);
+    
+    if (!containerNumeros) {
+        console.error('Container grafico-desvio-padrao-numeros não encontrado!');
+        return;
+    }
+
+    const stats = dadosDesvioPadrao.estatisticas_gerais;
+
+    // Gráfico para Números
+    const traceNumeros = {
+        x: ['Números (1-50)'], // Rótulo para o eixo X
+        y: [stats.desvio_padrao_numeros || stats.desvio_padrao], // Valor do desvio padrão dos números
+        type: 'bar',
+        name: 'Desvio Padrão dos Números',
+        marker: {
+            color: MILIONARIA_COLORS.primary // Cor verde para números
+        },
+        text: [(stats.desvio_padrao_numeros || stats.desvio_padrao).toFixed(2)], // Texto sobre a barra
+        textposition: 'auto',
+        hoverinfo: 'y',
+    };
+
+    const layoutNumeros = {
+        title: {
+            text: 'Desvio Padrão dos Números',
+            font: { color: MILIONARIA_COLORS.text, size: 14 }
+        },
+        xaxis: {
+            visible: false, // Não precisamos de ticks no eixo X para uma única barra
+            fixedrange: true // Impede zoom no eixo X
+        },
+        yaxis: {
+            title: { text: 'Valor do Desvio Padrão', font: { color: MILIONARIA_COLORS.textSecondary, size: 10 } },
+            gridcolor: MILIONARIA_COLORS.surface,
+            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+            zerolinecolor: MILIONARIA_COLORS.textSecondary,
+            fixedrange: true // Impede zoom no eixo Y
+        },
+        plot_bgcolor: MILIONARIA_COLORS.card,
+        paper_bgcolor: MILIONARIA_COLORS.surface, // Fundo do "card" da análise
+        showlegend: false,
+        autosize: true,
+        margin: { l: 40, r: 40, b: 40, t: 40, pad: 0 } // Margens ajustadas
+    };
+
+    console.log('Criando gráfico de números...');
+    Plotly.newPlot('grafico-desvio-padrao-numeros', [traceNumeros], layoutNumeros, PLOTLY_CONFIG);
+    console.log('Gráfico de números criado!');
+
+    // Gráfico para Trevos (se disponível)
+    if (stats.desvio_padrao_trevos || dadosDesvioPadrao.trevos) {
+        const desvioTrevos = stats.desvio_padrao_trevos || dadosDesvioPadrao.trevos;
+        const traceTrevos = {
+            x: ['Trevos (1-6)'], // Rótulo para o eixo X
+            y: [desvioTrevos], // Valor do desvio padrão dos trevos
+            type: 'bar',
+            name: 'Desvio Padrão dos Trevos',
+            marker: {
+                color: MILIONARIA_COLORS.secondary // Cor roxa para trevos
+            },
+            text: [desvioTrevos.toFixed(2)], // Texto sobre a barra
+            textposition: 'auto',
+            hoverinfo: 'y',
+        };
+
+        const layoutTrevos = {
+            title: {
+                text: 'Desvio Padrão dos Trevos',
+                font: { color: MILIONARIA_COLORS.text, size: 14 }
+            },
+            xaxis: {
+                visible: false,
+                fixedrange: true
+            },
+            yaxis: {
+                title: { text: 'Valor do Desvio Padrão', font: { color: MILIONARIA_COLORS.textSecondary, size: 10 } },
+                gridcolor: MILIONARIA_COLORS.surface,
+                tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+                zerolinecolor: MILIONARIA_COLORS.textSecondary,
+                fixedrange: true
+            },
+            plot_bgcolor: MILIONARIA_COLORS.card,
+            paper_bgcolor: MILIONARIA_COLORS.surface,
+            showlegend: false,
+            autosize: true,
+            margin: { l: 40, r: 40, b: 40, t: 40, pad: 0 } // Margens ajustadas
+        };
+
+        Plotly.newPlot('grafico-desvio-padrao-trevos', [traceTrevos], layoutTrevos, PLOTLY_CONFIG);
+    }
+}
+
+// ========================================
+// 🎲 FUNÇÃO PARA TESTES DE ALEATORIEDADE
+// ========================================
+
+function renderizarTestesAleatoriedade(dadosTesteAleatoriedade) {
+    console.log("🎲 Renderizando Testes de Aleatoriedade:", dadosTesteAleatoriedade);
+
+    // DEBUG: Verificar estrutura real dos dados
+    console.log("🔍 Estrutura detalhada de teste_aleatoriedade:");
+    console.log("📊 teste_chi_quadrado:", dadosTesteAleatoriedade.teste_chi_quadrado);
+    console.log("📊 teste_paridade:", dadosTesteAleatoriedade.teste_paridade);
+    console.log("📊 teste_sequencias:", dadosTesteAleatoriedade.teste_sequencias);
+
+    // Certifique-se de que a estrutura dos dados recebidos do backend é como esperado
+    const chi2Data = dadosTesteAleatoriedade.teste_chi_quadrado;
+    const paridadeData = dadosTesteAleatoriedade.teste_paridade;
+
+    // --- Resultado do Teste Qui-quadrado ---
+    const chi2StatusElement = document.getElementById('chi2-status');
+    const chi2PValueElement = document.getElementById('chi2-pvalue');
+
+    if (chi2Data && chi2Data.p_valor !== undefined && chi2StatusElement && chi2PValueElement) {
+        chi2PValueElement.innerText = `P-valor: ${chi2Data.p_valor.toFixed(3)}`;
+        if (chi2Data.p_valor < 0.05) { // Limiar comum para significância estatística
+            chi2StatusElement.innerText = 'NÃO ALEATÓRIO (possível viés)';
+            chi2StatusElement.classList.remove('text-green-500'); // Remove verde se houver
+            chi2StatusElement.classList.add('text-red-500'); // Adiciona vermelho
+        } else {
+            chi2StatusElement.innerText = 'ALEATÓRIO (não há evidências de viés)';
+            chi2StatusElement.classList.remove('text-red-500'); // Remove vermelho se houver
+            chi2StatusElement.classList.add('text-green-500'); // Adiciona verde
+        }
+    } else {
+        console.warn("⚠️ Elementos HTML para Teste Qui-quadrado não encontrados ou dados ausentes.");
+        console.log("🔍 chi2Data:", chi2Data);
+        console.log("🔍 chi2Data.p_valor:", chi2Data?.p_valor);
+        if(chi2StatusElement) chi2StatusElement.innerText = 'Erro ao carregar dados.';
+        if(chi2PValueElement) chi2PValueElement.innerText = 'P-valor: N/A';
+    }
+
+    // --- Resultado da Análise de Paridade ---
+    const paridadeStatusElement = document.getElementById('paridade-status');
+    const paridadePValueElement = document.getElementById('paridade-pvalue');
+
+    if (paridadeData && paridadeData.p_valor !== undefined && paridadeStatusElement && paridadePValueElement) {
+        paridadePValueElement.innerText = `P-valor: ${paridadeData.p_valor.toFixed(3)}`;
+        if (paridadeData.p_valor < 0.05) {
+            paridadeStatusElement.innerText = 'VIÉS DE PARIDADE DETECTADO';
+            paridadeStatusElement.classList.remove('text-green-500');
+            paridadeStatusElement.classList.add('text-red-500');
+        } else {
+            paridadeStatusElement.innerText = 'NÃO HÁ VIÉS DE PARIDADE SIGNIFICATIVO';
+            paridadeStatusElement.classList.remove('text-red-500');
+            paridadeStatusElement.classList.add('text-green-500');
+        }
+
+        // --- Gráfico de Paridade (Plotly) ---
+        const observed = paridadeData.observado_par_impar; // Ex: { par: 28, impar: 22 }
+        const expected = paridadeData.esperado_par_impar;   // Ex: { par: 25, impar: 25 }
+
+        // Verifique se observed e expected têm os dados esperados
+        if (observed && expected && typeof observed.par === 'number' && typeof observed.impar === 'number') {
+            const traceObserved = {
+                x: ['Pares', 'Ímpares'],
+                y: [observed.par, observed.impar],
+                name: 'Observado',
+                type: 'bar',
+                marker: { color: MILIONARIA_COLORS.primary }
+            };
+
+            const traceExpected = {
+                x: ['Pares', 'Ímpares'],
+                y: [expected.par, expected.impar],
+                name: 'Esperado',
+                type: 'bar',
+                marker: { color: MILIONARIA_COLORS.secondary }
+            };
+
+            const layout = {
+                barmode: 'group',
+                title: {
+                    text: 'Distribuição Par/Ímpar (Observado vs. Esperado)',
+                    font: { color: MILIONARIA_COLORS.text, size: 14 }
+                },
+                xaxis: {
+                    title: { text: 'Tipo de Número', font: { color: MILIONARIA_COLORS.textSecondary, size: 10 } },
+                    tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+                    gridcolor: MILIONARIA_COLORS.surface,
+                    linecolor: MILIONARIA_COLORS.surfaceDark,
+                    fixedrange: true
+                },
+                yaxis: {
+                    title: { text: 'Quantidade de Números', font: { color: MILIONARIA_COLORS.textSecondary, size: 10 } },
+                    gridcolor: MILIONARIA_COLORS.surface,
+                    tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+                    zerolinecolor: MILIONARIA_COLORS.textSecondary,
+                    fixedrange: true
+                },
+                plot_bgcolor: MILIONARIA_COLORS.card,
+                paper_bgcolor: MILIONARIA_COLORS.surface,
+                showlegend: true,
+                legend: {
+                    x: 0, y: 1.15, // Posição da legenda (acima do gráfico)
+                    orientation: 'h', // Horizontal
+                    font: { color: MILIONARIA_COLORS.text }
+                },
+                autosize: true,
+                margin: { l: 40, r: 40, b: 40, t: 60, pad: 0 }
+            };
+
+            Plotly.newPlot('grafico-paridade', [traceObserved, traceExpected], layout, PLOTLY_CONFIG);
+            console.log('✅ Gráfico de paridade criado!');
+        } else {
+            console.warn("⚠️ Dados de paridade (observado/esperado) incompletos ou mal formatados.");
+            Plotly.purge('grafico-paridade'); // Limpa se houver algo e não puder renderizar
+            // Opcional: Mensagem de erro no div do gráfico
+            const container = document.getElementById('grafico-paridade');
+            if (container) {
+                container.innerHTML = '<p class="text-red-500 text-center p-4">Não foi possível carregar o gráfico de paridade.</p>';
+            }
+        }
+
+    } else {
+        console.warn("⚠️ Elementos HTML para Análise de Paridade não encontrados ou dados ausentes.");
+        if(paridadeStatusElement) paridadeStatusElement.innerText = 'Erro ao carregar dados.';
+        if(paridadePValueElement) paridadePValueElement.innerText = 'P-valor: N/A';
+    }
+}
+
+// ========================================
+// 🔗 FUNÇÃO PARA ANÁLISE DE CLUSTERS
+// ========================================
+
+function renderizarClusters(dadosClusters) {
+    console.log("🔗 Renderizando Análise de Clusters:", dadosClusters);
+
+    // Verificar se os dados existem
+    if (!dadosClusters || !dadosClusters.clusters) {
+        console.error('❌ Dados de clusters não disponíveis');
+        return;
+    }
+
+    const clusters = dadosClusters.clusters;
+    const tabelaBody = document.getElementById('corpo-tabela-clusters');
+
+    if (!tabelaBody) {
+        console.error('❌ Elemento corpo-tabela-clusters não encontrado');
+        return;
+    }
+
+    // Limpar tabela atual
+    tabelaBody.innerHTML = '';
+
+    // Preencher tabela com os clusters
+    clusters.forEach((cluster, index) => {
+        const row = document.createElement('tr');
+        row.className = 'border-b border-gray-600 hover:bg-gray-700';
+        
+        const numerosFormatados = cluster.numeros.join(', ');
+        const frequenciaFormatada = (cluster.frequencia_relativa * 100).toFixed(1) + '%';
+        
+        row.innerHTML = `
+            <td class="p-3 font-semibold text-[#00E38C]">C${index + 1}</td>
+            <td class="p-3">${numerosFormatados}</td>
+            <td class="p-3 text-center">${frequenciaFormatada}</td>
+        `;
+        
+        tabelaBody.appendChild(row);
+    });
+
+    console.log('✅ Tabela de clusters atualizada!');
+
+    // Criar gráfico de clusters (gráfico de bolhas)
+    const containerGrafico = document.getElementById('grafico-clusters');
+    if (!containerGrafico) {
+        console.error('❌ Container grafico-clusters não encontrado');
+        return;
+    }
+
+    // Preparar dados para o gráfico
+    const traces = clusters.map((cluster, index) => {
+        return {
+            x: cluster.numeros.map((_, i) => i + 1), // Posições dos números no cluster
+            y: cluster.numeros, // Números do cluster
+            mode: 'markers',
+            type: 'scatter',
+            name: `Cluster ${index + 1}`,
+            marker: {
+                size: 15,
+                color: MILIONARIA_COLORS.primary,
+                opacity: 0.7,
+                line: {
+                    color: MILIONARIA_COLORS.secondary,
+                    width: 2
+                }
+            },
+            text: cluster.numeros.map(num => `Número ${num}`),
+            hoverinfo: 'text+name'
+        };
+    });
+
+    const layout = {
+        title: {
+            text: 'Análise de Clusters - Grupos de Números',
+            font: { color: MILIONARIA_COLORS.text, size: 16 }
+        },
+        xaxis: {
+            title: { text: 'Posição no Cluster', font: { color: MILIONARIA_COLORS.textSecondary, size: 12 } },
+            gridcolor: MILIONARIA_COLORS.surface,
+            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+            linecolor: MILIONARIA_COLORS.surfaceDark,
+            fixedrange: true
+        },
+        yaxis: {
+            title: { text: 'Números', font: { color: MILIONARIA_COLORS.textSecondary, size: 12 } },
+            gridcolor: MILIONARIA_COLORS.surface,
+            tickfont: { color: MILIONARIA_COLORS.textSecondary, size: 10 },
+            zerolinecolor: MILIONARIA_COLORS.textSecondary,
+            fixedrange: true
+        },
+        plot_bgcolor: MILIONARIA_COLORS.card,
+        paper_bgcolor: MILIONARIA_COLORS.surface,
+        showlegend: true,
+        legend: {
+            x: 0, y: 1.1,
+            orientation: 'h',
+            font: { color: MILIONARIA_COLORS.text }
+        },
+        autosize: true,
+        margin: { l: 50, r: 50, b: 50, t: 80, pad: 0 }
+    };
+
+    Plotly.newPlot('grafico-clusters', traces, layout, PLOTLY_CONFIG);
+    console.log('✅ Gráfico de clusters criado!');
+}
+
 // Exportar funções para uso global
 window.MilionariaGraficos = {
     criarGraficoFrequencia,
@@ -575,5 +1057,9 @@ window.MilionariaGraficos = {
     atualizarGrafico,
     carregarDadosEGraficos,
     MILIONARIA_COLORS,
-    PLOTLY_CONFIG
+    PLOTLY_CONFIG,
+    carregarEstatisticasAvancadas,
+    renderizarDesvioPadrao,
+    renderizarTestesAleatoriedade,
+    renderizarClusters
 }; 
