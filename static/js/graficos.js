@@ -271,6 +271,17 @@ function loadPreferencesToModalUI(modalPrefix) {
         document.getElementById('afinidade-qtde-numeros').value = userPremiumPreferences.afinidades.qtdeNumeros;
         initializePreferenceUI('afinidade', 'afinidades', 'evitarParesFracos', userPremiumPreferences.afinidades.evitarParesFracos);
     }
+    
+    // Para Seca:
+    if (modalPrefix === 'seca') {
+        initializePreferenceUI('padrao', 'padroes', 'evitarConsecutivos', userPremiumPreferences.padroes.evitarConsecutivos);
+        initializePreferenceUI('padrao', 'padroes', 'priorizarAtrasados', userPremiumPreferences.padroes.priorizarAtrasados);
+        initializePreferenceUI('padrao', 'padroes', 'evitarRepeticoesSeguidas', userPremiumPreferences.padroes.evitarRepeticoesSeguidas);
+        const minAtrasoElement = document.getElementById('padrao-min-atraso');
+        if (minAtrasoElement) {
+            minAtrasoElement.value = userPremiumPreferences.padroes.minAtraso;
+        }
+    }
     // ... (Adicione lógica para outros modais aqui)
 }
 
@@ -405,6 +416,19 @@ function adicionarBotaoFixarEscolhas(modalPrefix) {
         dicaDiv = document.querySelector('#trevo-qtde-quentes')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
     } else if (modalPrefix === 'afinidade') {
         dicaDiv = document.querySelector('#afinidade-qtde-pares')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+    } else if (modalPrefix === 'seca') {
+        // Para seca, procurar pela div que contém a seção de sugestões
+        dicaDiv = document.querySelector('.mt-8.bg-\\[\\#2E303A\\]');
+        if (!dicaDiv) {
+            // Fallback: procurar por qualquer div com a classe bg-[#2E303A] que contenha o texto "Sugestões"
+            const divs = document.querySelectorAll('.bg-\\[\\#2E303A\\]');
+            for (let div of divs) {
+                if (div.textContent.includes('Sugestões para Aposta Inteligente')) {
+                    dicaDiv = div;
+                    break;
+                }
+            }
+        }
     }
     
     if (!dicaDiv) {
@@ -476,17 +500,39 @@ function salvarPreferenciasDoModal(modalPrefix) {
     
     if (modalPrefix === 'dist') {
         // Salvar preferências de distribuição
-        const paridadeCheckbox = document.getElementById('dist-priorizar-paridade');
+        const paridadeCheckbox = document.getElementById('dist-priorizar-pares-impares');
         const paridadeSelect = document.getElementById('dist-paridade-desejada');
         const somaCheckbox = document.getElementById('dist-priorizar-soma');
         const somaMinInput = document.getElementById('dist-soma-min');
         const somaMaxInput = document.getElementById('dist-soma-max');
         
-        if (paridadeCheckbox) userPremiumPreferences.distribuicao.priorizarParesImpares = paridadeCheckbox.checked;
-        if (paridadeSelect) userPremiumPreferences.distribuicao.paridadeDesejada = paridadeSelect.value;
-        if (somaCheckbox) userPremiumPreferences.distribuicao.priorizarSoma = somaCheckbox.checked;
-        if (somaMinInput) userPremiumPreferences.distribuicao.somaMin = parseInt(somaMinInput.value);
-        if (somaMaxInput) userPremiumPreferences.distribuicao.somaMax = parseInt(somaMaxInput.value);
+        console.log('🔍 DEBUG Distribuição - Elementos encontrados:');
+        console.log('paridadeCheckbox:', paridadeCheckbox);
+        console.log('paridadeSelect:', paridadeSelect);
+        console.log('somaCheckbox:', somaCheckbox);
+        console.log('somaMinInput:', somaMinInput);
+        console.log('somaMaxInput:', somaMaxInput);
+        
+        if (paridadeCheckbox) {
+            userPremiumPreferences.distribuicao.priorizarParesImpares = paridadeCheckbox.checked;
+            console.log('✅ priorizarParesImpares salvo como:', paridadeCheckbox.checked);
+        }
+        if (paridadeSelect) {
+            userPremiumPreferences.distribuicao.paridadeDesejada = paridadeSelect.value;
+            console.log('✅ paridadeDesejada salvo como:', paridadeSelect.value);
+        }
+        if (somaCheckbox) {
+            userPremiumPreferences.distribuicao.priorizarSoma = somaCheckbox.checked;
+            console.log('✅ priorizarSoma salvo como:', somaCheckbox.checked);
+        }
+        if (somaMinInput) {
+            userPremiumPreferences.distribuicao.somaMin = parseInt(somaMinInput.value);
+            console.log('✅ somaMin salvo como:', parseInt(somaMinInput.value));
+        }
+        if (somaMaxInput) {
+            userPremiumPreferences.distribuicao.somaMax = parseInt(somaMaxInput.value);
+            console.log('✅ somaMax salvo como:', parseInt(somaMaxInput.value));
+        }
         
         console.log('Preferências de distribuição salvas:', userPremiumPreferences.distribuicao);
     }
@@ -496,7 +542,7 @@ function salvarPreferenciasDoModal(modalPrefix) {
         const consecutivosCheckbox = document.getElementById('padrao-evitar-consecutivos');
         const atrasadosCheckbox = document.getElementById('padrao-priorizar-atrasados');
         const minAtrasoInput = document.getElementById('padrao-min-atraso');
-        const repeticoesCheckbox = document.getElementById('padrao-evitar-repeticoes');
+        const repeticoesCheckbox = document.getElementById('padrao-evitar-repeticoes-seguidas');
         
         if (consecutivosCheckbox) userPremiumPreferences.padroes.evitarConsecutivos = consecutivosCheckbox.checked;
         if (atrasadosCheckbox) userPremiumPreferences.padroes.priorizarAtrasados = atrasadosCheckbox.checked;
@@ -541,6 +587,21 @@ function salvarPreferenciasDoModal(modalPrefix) {
         if (fracosCheckbox) userPremiumPreferences.afinidades.evitarParesFracos = fracosCheckbox.checked;
         
         console.log('Preferências de afinidades salvas:', userPremiumPreferences.afinidades);
+    }
+    
+    if (modalPrefix === 'seca') {
+        // Salvar preferências de seca (usando os IDs do modal de seca que são 'padrao-*')
+        const consecutivosCheckbox = document.getElementById('padrao-evitar-consecutivos');
+        const atrasadosCheckbox = document.getElementById('padrao-priorizar-atrasados');
+        const minAtrasoInput = document.getElementById('padrao-min-atraso');
+        const repeticoesCheckbox = document.getElementById('padrao-evitar-repeticoes-seguidas');
+        
+        if (consecutivosCheckbox) userPremiumPreferences.padroes.evitarConsecutivos = consecutivosCheckbox.checked;
+        if (atrasadosCheckbox) userPremiumPreferences.padroes.priorizarAtrasados = atrasadosCheckbox.checked;
+        if (minAtrasoInput) userPremiumPreferences.padroes.minAtraso = parseInt(minAtrasoInput.value);
+        if (repeticoesCheckbox) userPremiumPreferences.padroes.evitarRepeticoesSeguidas = repeticoesCheckbox.checked;
+        
+        console.log('Preferências de padrões (seca) salvas:', userPremiumPreferences.padroes);
     }
     
     // Salvar no localStorage
@@ -665,6 +726,16 @@ function carregarPreferenciasAfinidades() {
     }, 200);
 }
 
+// Função para carregar preferências quando o modal de seca é aberto
+function carregarPreferenciasSeca() {
+    loadPreferencesToModalUI('seca');
+    
+    // Adicionar botão "Fixar Escolhas" se não existir
+    setTimeout(() => {
+        adicionarBotaoFixarEscolhas('seca');
+    }, 200);
+}
+
 // Event listeners específicos para controles de trevos
 document.addEventListener('DOMContentLoaded', function() {
     // Listener para priorizar trevos quentes
@@ -779,6 +850,10 @@ function renderPremiumPreferencesSummary() {
 
     // --- 2. Distribuição ---
     const distPref = userPremiumPreferences.distribuicao;
+    console.log('🔍 DEBUG Distribuição - distPref:', distPref);
+    console.log('🔍 DEBUG Distribuição - priorizarParesImpares:', distPref?.priorizarParesImpares);
+    console.log('🔍 DEBUG Distribuição - priorizarSoma:', distPref?.priorizarSoma);
+    
     if (distPref && (distPref.priorizarParesImpares || distPref.priorizarSoma)) {
         let distDetails = [];
         if (distPref.priorizarParesImpares) {
@@ -799,6 +874,9 @@ function renderPremiumPreferencesSummary() {
                 </ul>
             </div>
         `;
+        console.log('✅ Distribuição adicionada ao resumo');
+    } else {
+        console.log('❌ Distribuição não adicionada - nenhuma opção selecionada');
     }
 
     // --- 3. Padrões e Atrasos (Afinidades pode se encaixar aqui ou ter sua própria seção) ---
@@ -860,7 +938,30 @@ function renderPremiumPreferencesSummary() {
         `;
     }
 
-    // --- 6. Seca (se houver uma seção específica de "seca" nas preferências) ---
+    // --- 6. Afinidades ---
+    const afinidadesPref = userPremiumPreferences.afinidades;
+    if (afinidadesPref && (afinidadesPref.priorizarParesFortes || afinidadesPref.priorizarNumerosConectados || afinidadesPref.evitarParesFracos)) {
+        let afinidadesDetails = [];
+        if (afinidadesPref.priorizarParesFortes) {
+            afinidadesDetails.push(`Priorizar ${afinidadesPref.qtdePares} Pares com Forte Afinidade`);
+        }
+        if (afinidadesPref.priorizarNumerosConectados) {
+            afinidadesDetails.push(`Priorizar ${afinidadesPref.qtdeNumeros} Números com Alta Conexão Geral`);
+        }
+        if (afinidadesPref.evitarParesFracos) {
+            afinidadesDetails.push('Evitar Pares com Afinidade Fraca');
+        }
+        summaryHtml += `
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Afinidades:</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
+                    <li>${afinidadesDetails.join('; ')}</li>
+                </ul>
+            </div>
+        `;
+    }
+
+    // --- 7. Seca (se houver uma seção específica de "seca" nas preferências) ---
     // Exemplo: userPremiumPreferences.seca.evitarNumerosSecos = true;
     const secaPref = userPremiumPreferences.seca;
     if (secaPref && (secaPref.evitarNumerosSecos || secaPref.priorizarNumerosSecos)) { // Adicione mais condições conforme seus parâmetros de seca

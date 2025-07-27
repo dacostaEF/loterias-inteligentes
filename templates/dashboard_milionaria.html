@@ -930,8 +930,8 @@
           carregarAnaliseSeca(conteudo);
           // Carregar preferências salvas após o modal ser carregado
           setTimeout(() => {
-            if (typeof carregarPreferenciasPadroes === 'function') {
-              carregarPreferenciasPadroes();
+            if (typeof carregarPreferenciasSeca === 'function') {
+              carregarPreferenciasSeca();
             }
           }, 500);
           break;
