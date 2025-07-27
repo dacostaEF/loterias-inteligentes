@@ -577,7 +577,7 @@ async function carregarEstatisticasAvancadas() {
         console.log("⚠️ Carregamento já em andamento, ignorando chamada duplicada");
         return;
     }
-    
+
     carregamentoEmAndamento = true;
 
     // Aguardar um pouco para garantir que o HTML seja renderizado
@@ -604,10 +604,10 @@ async function carregarEstatisticasAvancadas() {
     if (elementosFaltando.length > 0) {
         console.error("❌ Elementos não encontrados:", elementosFaltando);
         console.error("🔄 Aguardando mais tempo...");
-        
+
         // Reset da flag para permitir nova tentativa
         carregamentoEmAndamento = false;
-        
+
         // Tentar novamente após mais tempo
         setTimeout(async () => {
             await carregarEstatisticasAvancadas();
@@ -615,91 +615,98 @@ async function carregarEstatisticasAvancadas() {
         return;
     }
 
-        console.log("✅ Todos os elementos encontrados! Iniciando carregamento...");
+    console.log("✅ Todos os elementos encontrados! Iniciando carregamento...");
 
-        // Exibir um estado de carregamento inicial (agora seguro)
-        try {
-            elementos['chi2-status'].innerText = 'Carregando...';
-            elementos['paridade-status'].innerText = 'Carregando...';
-            elementos['chi2-pvalue'].innerText = 'P-valor: --';
-            elementos['paridade-pvalue'].innerText = 'P-valor: --';
-            elementos['corpo-tabela-clusters'].innerHTML = '<tr><td colspan="3" class="text-center p-4">Carregando clusters...</td></tr>';
-            elementos['lista-top-positivas'].innerHTML = '<li>Carregando...</li>';
-            elementos['lista-top-negativas'].innerHTML = '<li>Carregando...</li>';
+    // Exibir um estado de carregamento inicial (agora seguro)
+    try {
+        elementos['chi2-status'].innerText = 'Carregando...';
+        elementos['paridade-status'].innerText = 'Carregando...';
+        elementos['chi2-pvalue'].innerText = 'P-valor: --';
+        elementos['paridade-pvalue'].innerText = 'P-valor: --';
+        elementos['corpo-tabela-clusters'].innerHTML = '<tr><td colspan="3" class="text-center p-4">Carregando clusters...</td></tr>';
+        elementos['lista-top-positivas'].innerHTML = '<li>Carregando...</li>';
+        elementos['lista-top-negativas'].innerHTML = '<li>Carregando...</li>';
 
-            // Limpar gráficos anteriores de forma segura
-            const containersParaLimpar = [
-                'grafico-desvio-padrao-numeros',
-                'grafico-desvio-padrao-trevos',
-                'grafico-paridade',
-                'grafico-clusters',
-                'grafico-correlacao',
-                'grafico-probabilidade-condicional'
-            ];
+        // Limpar gráficos anteriores de forma segura
+        const containersParaLimpar = [
+            'grafico-desvio-padrao-numeros',
+            'grafico-desvio-padrao-trevos',
+            'grafico-paridade',
+            'grafico-clusters',
+            'grafico-correlacao',
+            'grafico-probabilidade-condicional',
+            'grafico-distribuicao-numeros' // Adicionei este aqui para garantir que seja limpo
+        ];
 
-            containersParaLimpar.forEach(containerId => {
-                const container = document.getElementById(containerId);
-                if (container) {
-                    try {
-                        Plotly.purge(containerId);
-                        console.log(`✅ Limpo: ${containerId}`);
-                    } catch (e) {
-                        console.log(`⚠️ Container ${containerId} não tinha gráfico para limpar`);
-                    }
-                } else {
-                    console.log(`⚠️ Container não encontrado: ${containerId}`);
+        containersParaLimpar.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                try {
+                    Plotly.purge(containerId);
+                    console.log(`✅ Limpo: ${containerId}`);
+                } catch (e) {
+                    console.log(`⚠️ Container ${containerId} não tinha gráfico para limpar ou erro ao purgar: ${e.message}`);
                 }
-            });
+            } else {
+                console.log(`⚠️ Container não encontrado: ${containerId}`);
+            }
+        });
 
-        } catch (domError) {
-            console.error("❌ Erro ao tentar inicializar estado de carregamento do DOM:", domError);
-            return; // Impede a continuação se os elementos básicos não forem encontrados
+    } catch (domError) {
+        console.error("❌ Erro ao tentar inicializar estado de carregamento do DOM:", domError);
+        return; // Impede a continuação se os elementos básicos não forem encontrados
+    }
+
+    try {
+        console.log("🌐 Fazendo requisição para /api/estatisticas_avancadas...");
+        // AQUI: Você precisa adicionar o parâmetro qtd_concursos na URL
+        // Para isso, você precisa saber qual foi a seleção do usuário (10, 25, 50, todos)
+        // Se essa função está sendo chamada de um listener, esse parâmetro deve ser passado.
+        // Por exemplo: const response = await fetch(`/api/estatisticas_avancadas?qtd_concursos=${qtdConcursosSelecionados}`);
+        // Se ela é sempre chamada sem um parâmetro, a API vai considerar 'todos'.
+        const response = await fetch('/api/estatisticas_avancadas'); // AQUI DEVE SER MODIFICADO
+
+        console.log("📡 Resposta recebida:", response.status, response.statusText);
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Erro HTTP ${response.status}: ${errorData.error || 'Erro desconhecido'}`);
         }
 
-        try {
-            console.log("🌐 Fazendo requisição para /api/estatisticas_avancadas...");
-            const response = await fetch('/api/estatisticas_avancadas'); // URL do endpoint Flask
-            console.log("📡 Resposta recebida:", response.status, response.statusText);
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Erro HTTP ${response.status}: ${errorData.error || 'Erro desconhecido'}`);
-            }
-            
-            const dados = await response.json();
-                    console.log("✅ Dados da análise avançada recebidos:", dados);
-        
+        const dados = await response.json();
+        console.log("✅ Dados da análise avançada recebidos:", dados);
+
         // DEBUG: Verificar estrutura dos dados
         console.log("🔍 Estrutura detalhada dos dados:");
         console.log("📊 desvio_padrao_distribuicao:", dados.desvio_padrao_distribuicao);
         console.log("🎲 teste_aleatoriedade:", dados.teste_aleatoriedade);
-        
+
         if (dados.desvio_padrao_distribuicao && dados.desvio_padrao_distribuicao.estatisticas_gerais) {
             console.log("📈 estatisticas_gerais:", dados.desvio_padrao_distribuicao.estatisticas_gerais);
         }
 
         // Chamar funções para renderizar cada seção
+        // Assumo que essas funções estão definidas e exportadas em window.MilionariaGraficos
+        // e que recebem os dados no formato correto.
         renderizarDesvioPadrao(dados.desvio_padrao_distribuicao);
-        renderizarTestesAleatoriedade(dados.teste_aleatoriedade); // ✅ IMPLEMENTADA
-        renderizarClusters(dados.analise_clusters); // ✅ IMPLEMENTADA
-        // As próximas funções serão implementadas nas próximas doses
-        // renderizarCorrelacoes(dados.analise_correlacao_numeros); // Será implementada
-        // renderizarProbabilidadesCondicionais(dados.probabilidades_condicionais); // Será implementada
+        renderizarTestesAleatoriedade(dados.teste_aleatoriedade);
+        renderizarClusters(dados.analise_clusters);
+        renderizarCorrelacoes(dados.analise_correlacao_numeros); // Descomentada conforme discutimos!
+        renderizarProbabilidadesCondicionais(dados.probabilidades_condicionais); // Descomente quando implementar
 
-        } catch (error) {
-            console.error('❌ Erro ao carregar estatísticas avançadas:', error);
-            // Exibir mensagem de erro amigável no modal (usando elementos já verificados)
-            if (elementos['chi2-status']) elementos['chi2-status'].innerText = 'Erro ao carregar.';
-            if (elementos['paridade-status']) elementos['paridade-status'].innerText = 'Erro ao carregar.';
-            if (elementos['corpo-tabela-clusters']) elementos['corpo-tabela-clusters'].innerHTML = '<tr><td colspan="3" class="text-center p-4 text-red-500">Erro ao carregar dados.</td></tr>';
-            if (elementos['lista-top-positivas']) elementos['lista-top-positivas'].innerHTML = '<li class="text-red-500">Erro ao carregar dados.</li>';
-            if (elementos['lista-top-negativas']) elementos['lista-top-negativas'].innerHTML = '<li class="text-red-500">Erro ao carregar dados.</li>';
-        } finally {
-            // Reset da flag no final (sucesso ou erro)
-            carregamentoEmAndamento = false;
-            console.log("✅ Carregamento finalizado, flag resetada");
-        }
-    }, 0); // O atraso de 0ms faz com que essa função seja executada após o loop de eventos atual
+    } catch (error) {
+        console.error('❌ Erro ao carregar estatísticas avançadas:', error);
+        // Exibir mensagem de erro amigável no modal (usando elementos já verificados)
+        if (elementos['chi2-status']) elementos['chi2-status'].innerText = 'Erro ao carregar.';
+        if (elementos['paridade-status']) elementos['paridade-status'].innerText = 'Erro ao carregar.';
+        if (elementos['corpo-tabela-clusters']) elementos['corpo-tabela-clusters'].innerHTML = '<tr><td colspan="3" class="text-center p-4 text-red-500">Erro ao carregar dados.</td></tr>';
+        if (elementos['lista-top-positivas']) elementos['lista-top-positivas'].innerHTML = '<li class="text-red-500">Erro ao carregar dados.</li>';
+        if (elementos['lista-top-negativas']) elementos['lista-top-negativas'].innerHTML = '<li class="text-red-500">Erro ao carregar dados.</li>';
+    } finally {
+        // Reset da flag no final (sucesso ou erro)
+        carregamentoEmAndamento = false;
+        console.log("✅ Carregamento finalizado, flag resetada");
+    }
 }
 
 function renderizarDesvioPadrao(dadosDesvioPadrao) {

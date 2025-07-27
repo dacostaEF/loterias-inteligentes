@@ -367,7 +367,6 @@
   <header class="flex justify-between items-center mb-8">
     <div>
       <h1 class="text-2xl sm:text-3xl font-bold text-white flex items-center gap-2">
-        <img src="/static/img/Favicon_LI.png" alt="Favicon" class="w-8 h-8 sm:w-10 sm:h-10">
         +Milionária
       </h1>
       <p class="text-sm sm:text-base text-gray-400">Dashboard Inteligente de Análise Estatística</p>
@@ -3258,7 +3257,7 @@
       // Criar título com período
       let titulo = '🔗 Clusters de Números Identificados';
       if (periodo) {
-        titulo += ` (Últimos ${periodo} concursos)`;
+        titulo += `<br>(Últimos ${periodo} concursos)`;
       }
       
       const data = [{
@@ -3286,7 +3285,7 @@
       const layout = {
         title: {
           text: titulo,
-          font: { size: 18, color: 'white' }
+          font: { size: 14, color: 'white' }
         },
         xaxis: { 
           title: 'Cluster',
@@ -3301,7 +3300,7 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+        margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 }
       };
       
       Plotly.newPlot('grafico-estatisticas-clusters', data, layout, { displayModeBar: false });
@@ -3320,9 +3319,9 @@
       const valores = todasCorrelacoes.map(pair => pair[2]);
       
       // Criar título com período
-      let titulo = '📈 Correlações Significativas entre Números';
+      let titulo = '📈 Correlações Significativas<br>entre Números';
       if (periodo) {
-        titulo += ` (Últimos ${periodo} concursos)`;
+        titulo += `<br>(Últimos ${periodo} concursos)`;
       }
       
       const data = [{
@@ -3350,7 +3349,7 @@
       const layout = {
         title: {
           text: titulo,
-          font: { size: 18, color: 'white' }
+          font: { size: 14, color: 'white' }
         },
         xaxis: { 
           title: 'Pares de Números',
@@ -3365,7 +3364,7 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+        margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 }
       };
       
       Plotly.newPlot('grafico-estatisticas-correlacao', data, layout, { displayModeBar: false });
@@ -3385,7 +3384,7 @@
       // Criar título com período
       let titulo = '🎯 Probabilidades Condicionais';
       if (periodo) {
-        titulo += ` (Últimos ${periodo} concursos)`;
+        titulo += `<br>(Últimos ${periodo} concursos)`;
       }
       
       const data = [{
@@ -3413,7 +3412,7 @@
       const layout = {
         title: {
           text: titulo,
-          font: { size: 18, color: 'white' }
+          font: { size: 14, color: 'white' }
         },
         xaxis: { 
           title: 'Pares de Números',
@@ -3428,7 +3427,7 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 }
+        margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 }
       };
       
       Plotly.newPlot('grafico-estatisticas-probabilidades', data, layout, { displayModeBar: false });
@@ -3471,11 +3470,11 @@
       if (maximoElement) maximoElement.textContent = maximo;
 
       // Criar título com período e ordenação
-      let titulo = '📊 Distribuição de Frequência dos Números';
+      let titulo = '📊 Distribuição de Frequência<br>dos Números';
       if (periodo) {
-        titulo += ` (Últimos ${periodo} concursos)`;
+        titulo += `<br>(Últimos ${periodo} concursos)`;
       }
-      titulo += ordenacao === 'frequencia' ? ' - Ordenado por Frequência' : ' - Ordem Numérica';
+      titulo += ordenacao === 'frequencia' ? '<br>- Ordenado por Frequência' : '<br>- Ordem Numérica';
 
       const data = [{
         x: numeros,
@@ -3518,7 +3517,7 @@
       const layout = {
         title: {
           text: titulo,
-          font: { size: 18, color: 'white' }
+          font: { size: 14, color: 'white' }
         },
         xaxis: {
           title: { text: 'Número', font: { color: 'white' } },
@@ -3537,7 +3536,7 @@
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
+        margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 },
         showlegend: ordenacao === 'frequencia'
       };
 
