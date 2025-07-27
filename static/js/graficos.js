@@ -178,13 +178,20 @@ function initializePreferenceUI(modalId, prefType, prefName, value, period = nul
         elementId = `${modalId}-${period}-${prefName}`; // For frequency, use period in ID
     }
 
+    console.log(`Tentando inicializar: ${elementId} com valor: ${value}`);
+    
     const element = document.getElementById(elementId);
     if (element) {
+        console.log(`Elemento encontrado: ${elementId}, tipo: ${element.type || element.tagName}`);
         if (element.type === 'checkbox') {
             element.checked = value;
+            console.log(`Checkbox ${elementId} marcado como: ${element.checked}`);
         } else if (element.type === 'number' || element.tagName === 'SELECT') {
             element.value = value;
+            console.log(`Input/Select ${elementId} definido como: ${element.value}`);
         }
+    } else {
+        console.warn(`Elemento não encontrado: ${elementId}`);
     }
 }
 
@@ -192,21 +199,20 @@ function initializePreferenceUI(modalId, prefType, prefName, value, period = nul
 function loadPreferencesToModalUI(modalPrefix) {
     // Exemplo para Frequência:
     if (modalPrefix === 'freq') {
-        ['completa', '25', '50'].forEach(period => {
-            initializePreferenceUI(modalPrefix, 'frequencia', 'priorizarQuentes', userPremiumPreferences.frequencia.priorizarQuentes, period);
-            const qtdeQuentesElement = document.getElementById(`${modalPrefix}-${period}-qtde-quentes`);
-            if (qtdeQuentesElement) {
-                qtdeQuentesElement.value = userPremiumPreferences.frequencia.qtdeQuentes;
-            }
+        // Para frequência, os elementos têm IDs simples sem período
+        initializePreferenceUI('freq', 'frequencia', 'priorizarQuentes', userPremiumPreferences.frequencia.priorizarQuentes);
+        const qtdeQuentesElement = document.getElementById('freq-qtde-quentes');
+        if (qtdeQuentesElement) {
+            qtdeQuentesElement.value = userPremiumPreferences.frequencia.qtdeQuentes;
+        }
 
-            initializePreferenceUI(modalPrefix, 'frequencia', 'priorizarFrios', userPremiumPreferences.frequencia.priorizarFrios, period);
-            const qtdeFriosElement = document.getElementById(`${modalPrefix}-${period}-qtde-frios`);
-            if (qtdeFriosElement) {
-                qtdeFriosElement.value = userPremiumPreferences.frequencia.qtdeFrios;
-            }
+        initializePreferenceUI('freq', 'frequencia', 'priorizarFrios', userPremiumPreferences.frequencia.priorizarFrios);
+        const qtdeFriosElement = document.getElementById('freq-qtde-frios');
+        if (qtdeFriosElement) {
+            qtdeFriosElement.value = userPremiumPreferences.frequencia.qtdeFrios;
+        }
 
-            initializePreferenceUI(modalPrefix, 'frequencia', 'considerarPeriodo', userPremiumPreferences.frequencia.considerarPeriodo, period);
-        });
+        initializePreferenceUI('freq', 'frequencia', 'considerarPeriodo', userPremiumPreferences.frequencia.considerarPeriodo);
     }
     
     // Para Distribuição:
@@ -349,17 +355,224 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Função para carregar preferências quando o modal de frequência é aberto
 function carregarPreferenciasFrequencia() {
+    console.log('=== CARREGANDO PREFERÊNCIAS DE FREQUÊNCIA ===');
+    console.log('Preferências atuais:', userPremiumPreferences.frequencia);
     loadPreferencesToModalUI('freq');
+    
+    // Adicionar botão "Fixar Escolhas" se não existir
+    setTimeout(() => {
+        adicionarBotaoFixarEscolhas('freq');
+    }, 200);
+    
+    // Debug: verificar se os elementos foram encontrados e marcados
+    setTimeout(() => {
+        const quentesCheckbox = document.getElementById('freq-priorizar-quentes');
+        const friosCheckbox = document.getElementById('freq-priorizar-frios');
+        const qtdeQuentesInput = document.getElementById('freq-qtde-quentes');
+        const qtdeFriosInput = document.getElementById('freq-qtde-frios');
+        const periodoSelect = document.getElementById('freq-periodo');
+        
+        console.log('Elementos encontrados:', {
+            quentesCheckbox: !!quentesCheckbox,
+            friosCheckbox: !!friosCheckbox,
+            qtdeQuentesInput: !!qtdeQuentesInput,
+            qtdeFriosInput: !!qtdeFriosInput,
+            periodoSelect: !!periodoSelect
+        });
+        
+        if (quentesCheckbox) console.log('Checkbox quentes marcado:', quentesCheckbox.checked);
+        if (friosCheckbox) console.log('Checkbox frios marcado:', friosCheckbox.checked);
+        if (qtdeQuentesInput) console.log('Qtde quentes:', qtdeQuentesInput.value);
+        if (qtdeFriosInput) console.log('Qtde frios:', qtdeFriosInput.value);
+        if (periodoSelect) console.log('Período selecionado:', periodoSelect.value);
+    }, 100);
+}
+
+// Função para adicionar botão "Fixar Escolhas" em qualquer modal
+function adicionarBotaoFixarEscolhas(modalPrefix) {
+    // Encontrar a div de dica de diferentes formas dependendo do modal
+    let dicaDiv = null;
+    
+    if (modalPrefix === 'freq') {
+        dicaDiv = document.querySelector('#freq-periodo')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+    } else if (modalPrefix === 'dist') {
+        dicaDiv = document.querySelector('#dist-soma-min')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+    } else if (modalPrefix === 'padrao') {
+        dicaDiv = document.querySelector('#padrao-min-atraso')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+    } else if (modalPrefix === 'avancada') {
+        dicaDiv = document.querySelector('#avancada-opcoes-clusters')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+    } else if (modalPrefix === 'trevo') {
+        dicaDiv = document.querySelector('#trevo-qtde-quentes')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+    } else if (modalPrefix === 'afinidade') {
+        dicaDiv = document.querySelector('#afinidade-qtde-pares')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
+    }
+    
+    if (!dicaDiv) {
+        console.warn(`Div de dica não encontrada para modal: ${modalPrefix}`);
+        return;
+    }
+    
+    // Verificar se o botão já existe
+    if (document.getElementById(`${modalPrefix}-fixar-escolhas`)) return;
+    
+    // Criar o botão e status
+    const botaoContainer = document.createElement('div');
+    botaoContainer.className = 'mt-3 flex justify-between items-center';
+    botaoContainer.innerHTML = `
+        <button id="${modalPrefix}-fixar-escolhas" class="bg-[#00E38C] text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-green-400 transition-colors">
+            📌 Fixar Escolhas
+        </button>
+        <span id="${modalPrefix}-status-salvo" class="text-xs text-gray-400 hidden">✅ Escolhas salvas!</span>
+    `;
+    
+    // Adicionar o botão na div de dica
+    dicaDiv.appendChild(botaoContainer);
+    
+    // Adicionar event listener
+    const botao = document.getElementById(`${modalPrefix}-fixar-escolhas`);
+    const status = document.getElementById(`${modalPrefix}-status-salvo`);
+    
+    botao.addEventListener('click', () => {
+        // Salvar preferências
+        salvarPreferenciasDoModal(modalPrefix);
+        
+        // Mostrar feedback
+        status.classList.remove('hidden');
+        botao.textContent = '✅ Salvo!';
+        botao.classList.remove('bg-[#00E38C]', 'hover:bg-green-400');
+        botao.classList.add('bg-green-500');
+        
+        // Resetar após 3 segundos
+        setTimeout(() => {
+            status.classList.add('hidden');
+            botao.textContent = '📌 Fixar Escolhas';
+            botao.classList.remove('bg-green-500');
+            botao.classList.add('bg-[#00E38C]', 'hover:bg-green-400');
+        }, 3000);
+    });
+}
+
+// Função para salvar preferências de um modal específico
+function salvarPreferenciasDoModal(modalPrefix) {
+    console.log(`=== SALVANDO PREFERÊNCIAS DO MODAL: ${modalPrefix} ===`);
+    console.log('Preferências antes de salvar:', JSON.parse(JSON.stringify(userPremiumPreferences)));
+    
+    if (modalPrefix === 'freq') {
+        // Salvar preferências de frequência
+        const quentesCheckbox = document.getElementById('freq-priorizar-quentes');
+        const friosCheckbox = document.getElementById('freq-priorizar-frios');
+        const qtdeQuentesInput = document.getElementById('freq-qtde-quentes');
+        const qtdeFriosInput = document.getElementById('freq-qtde-frios');
+        const periodoSelect = document.getElementById('freq-periodo');
+        
+        if (quentesCheckbox) userPremiumPreferences.frequencia.priorizarQuentes = quentesCheckbox.checked;
+        if (friosCheckbox) userPremiumPreferences.frequencia.priorizarFrios = friosCheckbox.checked;
+        if (qtdeQuentesInput) userPremiumPreferences.frequencia.qtdeQuentes = parseInt(qtdeQuentesInput.value);
+        if (qtdeFriosInput) userPremiumPreferences.frequencia.qtdeFrios = parseInt(qtdeFriosInput.value);
+        if (periodoSelect) userPremiumPreferences.frequencia.considerarPeriodo = periodoSelect.value;
+        
+        console.log('Preferências de frequência salvas:', userPremiumPreferences.frequencia);
+    }
+    
+    if (modalPrefix === 'dist') {
+        // Salvar preferências de distribuição
+        const paridadeCheckbox = document.getElementById('dist-priorizar-paridade');
+        const paridadeSelect = document.getElementById('dist-paridade-desejada');
+        const somaCheckbox = document.getElementById('dist-priorizar-soma');
+        const somaMinInput = document.getElementById('dist-soma-min');
+        const somaMaxInput = document.getElementById('dist-soma-max');
+        
+        if (paridadeCheckbox) userPremiumPreferences.distribuicao.priorizarParesImpares = paridadeCheckbox.checked;
+        if (paridadeSelect) userPremiumPreferences.distribuicao.paridadeDesejada = paridadeSelect.value;
+        if (somaCheckbox) userPremiumPreferences.distribuicao.priorizarSoma = somaCheckbox.checked;
+        if (somaMinInput) userPremiumPreferences.distribuicao.somaMin = parseInt(somaMinInput.value);
+        if (somaMaxInput) userPremiumPreferences.distribuicao.somaMax = parseInt(somaMaxInput.value);
+        
+        console.log('Preferências de distribuição salvas:', userPremiumPreferences.distribuicao);
+    }
+    
+    if (modalPrefix === 'padrao') {
+        // Salvar preferências de padrões
+        const consecutivosCheckbox = document.getElementById('padrao-evitar-consecutivos');
+        const atrasadosCheckbox = document.getElementById('padrao-priorizar-atrasados');
+        const minAtrasoInput = document.getElementById('padrao-min-atraso');
+        const repeticoesCheckbox = document.getElementById('padrao-evitar-repeticoes');
+        
+        if (consecutivosCheckbox) userPremiumPreferences.padroes.evitarConsecutivos = consecutivosCheckbox.checked;
+        if (atrasadosCheckbox) userPremiumPreferences.padroes.priorizarAtrasados = atrasadosCheckbox.checked;
+        if (minAtrasoInput) userPremiumPreferences.padroes.minAtraso = parseInt(minAtrasoInput.value);
+        if (repeticoesCheckbox) userPremiumPreferences.padroes.evitarRepeticoesSeguidas = repeticoesCheckbox.checked;
+        
+        console.log('Preferências de padrões salvas:', userPremiumPreferences.padroes);
+    }
+    
+    if (modalPrefix === 'avancada') {
+        // Salvar preferências de clusters (já está sendo feito automaticamente)
+        console.log('Preferências de clusters salvas:', userPremiumPreferences.clusters);
+    }
+    
+    if (modalPrefix === 'trevo') {
+        // Salvar preferências de trevos
+        const quentesCheckbox = document.getElementById('trevo-priorizar-quentes');
+        const qtdeQuentesInput = document.getElementById('trevo-qtde-quentes');
+        const friosCheckbox = document.getElementById('trevo-priorizar-frios');
+        const qtdeFriosInput = document.getElementById('trevo-qtde-frios');
+        
+        if (quentesCheckbox) userPremiumPreferences.trevos.priorizarQuentesTrevos = quentesCheckbox.checked;
+        if (qtdeQuentesInput) userPremiumPreferences.trevos.qtdeQuentesTrevos = parseInt(qtdeQuentesInput.value);
+        if (friosCheckbox) userPremiumPreferences.trevos.priorizarFriosTrevos = friosCheckbox.checked;
+        if (qtdeFriosInput) userPremiumPreferences.trevos.qtdeFriosTrevos = parseInt(qtdeFriosInput.value);
+        
+        console.log('Preferências de trevos salvas:', userPremiumPreferences.trevos);
+    }
+    
+    if (modalPrefix === 'afinidade') {
+        // Salvar preferências de afinidades
+        const paresCheckbox = document.getElementById('afinidade-priorizar-pares');
+        const qtdeParesInput = document.getElementById('afinidade-qtde-pares');
+        const numerosCheckbox = document.getElementById('afinidade-priorizar-numeros');
+        const qtdeNumerosInput = document.getElementById('afinidade-qtde-numeros');
+        const fracosCheckbox = document.getElementById('afinidade-evitar-fracos');
+        
+        if (paresCheckbox) userPremiumPreferences.afinidades.priorizarParesFortes = paresCheckbox.checked;
+        if (qtdeParesInput) userPremiumPreferences.afinidades.qtdePares = parseInt(qtdeParesInput.value);
+        if (numerosCheckbox) userPremiumPreferences.afinidades.priorizarNumerosConectados = numerosCheckbox.checked;
+        if (qtdeNumerosInput) userPremiumPreferences.afinidades.qtdeNumeros = parseInt(qtdeNumerosInput.value);
+        if (fracosCheckbox) userPremiumPreferences.afinidades.evitarParesFracos = fracosCheckbox.checked;
+        
+        console.log('Preferências de afinidades salvas:', userPremiumPreferences.afinidades);
+    }
+    
+    // Salvar no localStorage
+    savePremiumPreferences();
+    
+    // Atualizar o resumo no modal premium se estiver aberto
+    if (!document.getElementById('modal-premium').classList.contains('hidden')) {
+        renderPremiumPreferencesSummary();
+    }
+    
+    console.log('Preferências após salvar:', JSON.parse(JSON.stringify(userPremiumPreferences)));
+    console.log('=== FIM SALVAMENTO ===');
 }
 
 // Função para carregar preferências quando o modal de distribuição é aberto
 function carregarPreferenciasDistribuicao() {
     loadPreferencesToModalUI('dist');
+    
+    // Adicionar botão "Fixar Escolhas" se não existir
+    setTimeout(() => {
+        adicionarBotaoFixarEscolhas('dist');
+    }, 200);
 }
 
 // Função para carregar preferências quando o modal de padrões é aberto
 function carregarPreferenciasPadroes() {
     loadPreferencesToModalUI('padrao');
+    
+    // Adicionar botão "Fixar Escolhas" se não existir
+    setTimeout(() => {
+        adicionarBotaoFixarEscolhas('padrao');
+    }, 200);
 }
 
 // Função para renderizar/atualizar os checkboxes de cluster
@@ -425,16 +638,31 @@ function renderClusterCheckboxes() {
 // Função para carregar preferências quando o modal de estatísticas avançadas é aberto
 function carregarPreferenciasAvancadas() {
     loadPreferencesToModalUI('avancada');
+    
+    // Adicionar botão "Fixar Escolhas" se não existir
+    setTimeout(() => {
+        adicionarBotaoFixarEscolhas('avancada');
+    }, 200);
 }
 
 // Função para carregar preferências quando o modal de trevos é aberto
 function carregarPreferenciasTrevos() {
     loadPreferencesToModalUI('trevo');
+    
+    // Adicionar botão "Fixar Escolhas" se não existir
+    setTimeout(() => {
+        adicionarBotaoFixarEscolhas('trevo');
+    }, 200);
 }
 
 // Função para carregar preferências quando o modal de afinidades é aberto
 function carregarPreferenciasAfinidades() {
     loadPreferencesToModalUI('afinidade');
+    
+    // Adicionar botão "Fixar Escolhas" se não existir
+    setTimeout(() => {
+        adicionarBotaoFixarEscolhas('afinidade');
+    }, 200);
 }
 
 // Event listeners específicos para controles de trevos
@@ -525,87 +753,147 @@ if (fecharModalPremiumBtn) {
 
 // Função para renderizar o resumo das preferências no modal Premium
 function renderPremiumPreferencesSummary() {
+    console.log('=== RENDERIZANDO RESUMO DE PREFERÊNCIAS ===');
+    console.log('Preferências atuais:', userPremiumPreferences);
+    
+    const listaParametrosDiv = document.getElementById('lista-parametros');
+    if (!listaParametrosDiv) {
+        console.error('Elemento lista-parametros não encontrado!');
+        return;
+    }
+    
     let summaryHtml = '';
 
-    // Frequência
-    if (userPremiumPreferences.frequencia.priorizarQuentes || userPremiumPreferences.frequencia.priorizarFrios) {
-        summaryHtml += `<p><strong>📊 Frequência:</strong>`;
-        if (userPremiumPreferences.frequencia.priorizarQuentes) {
-            summaryHtml += ` Priorizar Top ${userPremiumPreferences.frequencia.qtdeQuentes} Números Quentes (${userPremiumPreferences.frequencia.considerarPeriodo === 'completa' ? 'Todos' : userPremiumPreferences.frequencia.considerarPeriodo} Conc.).`;
+    // --- 1. Frequência ---
+    const freqPref = userPremiumPreferences.frequencia;
+    if (freqPref.priorizarQuentes || freqPref.priorizarFrios) {
+        let freqDetails = [];
+        if (freqPref.priorizarQuentes) {
+            freqDetails.push(`Priorizar Top ${freqPref.qtdeQuentes} Números Mais Frequentes`);
         }
-        if (userPremiumPreferences.frequencia.priorizarFrios) {
-            summaryHtml += ` Priorizar Top ${userPremiumPreferences.frequencia.qtdeFrios} Números Frios (${userPremiumPreferences.frequencia.considerarPeriodo === 'completa' ? 'Todos' : userPremiumPreferences.frequencia.considerarPeriodo} Conc.).`;
+        if (freqPref.priorizarFrios) {
+            freqDetails.push(`Priorizar Top ${freqPref.qtdeFrios} Números Menos Frequentes`);
         }
-        summaryHtml += `</p>`;
+        summaryHtml += `
+            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
+                <p class="font-semibold text-[#00E38C] mb-2">📊 Frequência:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+                    <li>${freqDetails.join(' e ')}</li>
+                    <li>Período: ${freqPref.considerarPeriodo === 'completa' ? 'Todos os Concursos' : `Últimos ${freqPref.considerarPeriodo} Concursos`}</li>
+                </ul>
+            </div>
+        `;
     }
 
-    // Distribuição
-    if (userPremiumPreferences.distribuicao.priorizarParesImpares || userPremiumPreferences.distribuicao.priorizarSoma) {
-        summaryHtml += `<p><strong>🔢 Distribuição:</strong>`;
-        if (userPremiumPreferences.distribuicao.priorizarParesImpares) {
-            summaryHtml += ` Paridade ${userPremiumPreferences.distribuicao.paridadeDesejada}.`;
+    // --- 2. Distribuição ---
+    const distPref = userPremiumPreferences.distribuicao;
+    if (distPref.priorizarParesImpares || distPref.priorizarSoma) {
+        let distDetails = [];
+        if (distPref.priorizarParesImpares) {
+            let paridadeDesc = '';
+            if (distPref.paridadeDesejada === 'equilibrado') paridadeDesc = 'Equilibrada (3 pares/3 ímpares)';
+            else if (distPref.paridadeDesejada === 'mais_pares') paridadeDesc = 'Mais Pares';
+            else if (distPref.paridadeDesejada === 'mais_impares') paridadeDesc = 'Mais Ímpares';
+            distDetails.push(`Paridade: ${paridadeDesc}`);
         }
-        if (userPremiumPreferences.distribuicao.priorizarSoma) {
-            summaryHtml += ` Soma entre ${userPremiumPreferences.distribuicao.somaMin} e ${userPremiumPreferences.distribuicao.somaMax}.`;
+        if (distPref.priorizarSoma) {
+            distDetails.push(`Soma dos Números entre ${distPref.somaMin} e ${distPref.somaMax}`);
         }
-        summaryHtml += `</p>`;
+        summaryHtml += `
+            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
+                <p class="font-semibold text-[#00E38C] mb-2">🔢 Distribuição:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+                    <li>${distDetails.join('; ')}</li>
+                </ul>
+            </div>
+        `;
     }
 
-    // Padrões
-    if (userPremiumPreferences.padroes.evitarConsecutivos || userPremiumPreferences.padroes.priorizarAtrasados || userPremiumPreferences.padroes.evitarRepeticoesSeguidas) {
-        summaryHtml += `<p><strong>🌵 Padrões:</strong>`;
-        if (userPremiumPreferences.padroes.evitarConsecutivos) {
-            summaryHtml += ` Evitar Consecutivos.`;
+    // --- 3. Padrões e Atrasos ---
+    const padroesPref = userPremiumPreferences.padroes;
+    if (padroesPref.evitarConsecutivos || padroesPref.priorizarAtrasados || padroesPref.evitarRepeticoesSeguidas) {
+        let padroesDetails = [];
+        if (padroesPref.evitarConsecutivos) {
+            padroesDetails.push('Evitar Números Consecutivos');
         }
-        if (userPremiumPreferences.padroes.priorizarAtrasados) {
-            summaryHtml += ` Priorizar Números Atrasados (Min. ${userPremiumPreferences.padroes.minAtraso} conc.).`;
+        if (padroesPref.priorizarAtrasados) {
+            padroesDetails.push(`Priorizar Números MUITO Atrasados (Mínimo ${padroesPref.minAtraso} concursos sem sair)`);
         }
-        if (userPremiumPreferences.padroes.evitarRepeticoesSeguidas) {
-            summaryHtml += ` Evitar Repetições do Último Concurso.`;
+        if (padroesPref.evitarRepeticoesSeguidas) {
+            padroesDetails.push('Evitar Números Repetidos do Último Concurso');
         }
-        summaryHtml += `</p>`;
+        summaryHtml += `
+            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
+                <p class="font-semibold text-[#00E38C] mb-2">🌵 Padrões e Atrasos:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+                    <li>${padroesDetails.join('; ')}</li>
+                </ul>
+            </div>
+        `;
     }
 
-    // Clusters
-    if (userPremiumPreferences.clusters.length > 0) {
-        summaryHtml += `<p><strong>🔗 Clusters:</strong> Priorizar números dos Clusters: ${userPremiumPreferences.clusters.join(', ')}.</p>`;
+    // --- 4. Clusters (Análise Estatística Avançada) ---
+    const clustersPref = userPremiumPreferences.clusters;
+    if (clustersPref.length > 0) {
+        summaryHtml += `
+            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
+                <p class="font-semibold text-[#00E38C] mb-2">🔗 Clusters (Análise Avançada):</p>
+                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+                    <li>Priorizar números dos Clusters: ${clustersPref.map(id => `<strong class="text-[#00E38C]">${id}</strong>`).join(', ')}</li>
+                </ul>
+            </div>
+        `;
     }
 
-    // Trevos
-    if (userPremiumPreferences.trevos.priorizarQuentesTrevos || userPremiumPreferences.trevos.priorizarFriosTrevos) {
-        summaryHtml += `<p><strong>🍀 Trevos:</strong>`;
-        if (userPremiumPreferences.trevos.priorizarQuentesTrevos) {
-            summaryHtml += ` Priorizar Top ${userPremiumPreferences.trevos.qtdeQuentesTrevos} Trevos Quentes.`;
+    // --- 5. Trevos da Sorte ---
+    const trevosPref = userPremiumPreferences.trevos;
+    if (trevosPref.priorizarQuentesTrevos || trevosPref.priorizarFriosTrevos) {
+        let trevosDetails = [];
+        if (trevosPref.priorizarQuentesTrevos) {
+            trevosDetails.push(`Priorizar Top ${trevosPref.qtdeQuentesTrevos} Trevos Mais Frequentes`);
         }
-        if (userPremiumPreferences.trevos.priorizarFriosTrevos) {
-            summaryHtml += ` Priorizar Top ${userPremiumPreferences.trevos.qtdeFriosTrevos} Trevos Frios.`;
+        if (trevosPref.priorizarFriosTrevos) {
+            trevosDetails.push(`Priorizar Top ${trevosPref.qtdeFriosTrevos} Trevos Menos Frequentes`);
         }
-        summaryHtml += `</p>`;
+        summaryHtml += `
+            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
+                <p class="font-semibold text-[#00E38C] mb-2">🍀 Trevos da Sorte:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+                    <li>${trevosDetails.join(' e ')}</li>
+                </ul>
+            </div>
+        `;
     }
 
-    // Afinidades
-    if (userPremiumPreferences.afinidades.priorizarParesFortes || userPremiumPreferences.afinidades.priorizarNumerosConectados || userPremiumPreferences.afinidades.evitarParesFracos) {
-        summaryHtml += `<p><strong>🤝 Afinidades:</strong>`;
-        if (userPremiumPreferences.afinidades.priorizarParesFortes) {
-            summaryHtml += ` Priorizar ${userPremiumPreferences.afinidades.qtdePares} Pares com Forte Afinidade.`;
+    // --- 6. Afinidades ---
+    const afinidadesPref = userPremiumPreferences.afinidades;
+    if (afinidadesPref.priorizarParesFortes || afinidadesPref.priorizarNumerosConectados || afinidadesPref.evitarParesFracos) {
+        let afinidadesDetails = [];
+        if (afinidadesPref.priorizarParesFortes) {
+            afinidadesDetails.push(`Priorizar ${afinidadesPref.qtdePares} Pares com Forte Afinidade`);
         }
-        if (userPremiumPreferences.afinidades.priorizarNumerosConectados) {
-            summaryHtml += ` Priorizar ${userPremiumPreferences.afinidades.qtdeNumeros} Números com Alta Conexão.`;
+        if (afinidadesPref.priorizarNumerosConectados) {
+            afinidadesDetails.push(`Priorizar ${afinidadesPref.qtdeNumeros} Números com Alta Conexão Geral`);
         }
-        if (userPremiumPreferences.afinidades.evitarParesFracos) {
-            summaryHtml += ` Evitar Pares com Afinidade Fraca.`;
+        if (afinidadesPref.evitarParesFracos) {
+            afinidadesDetails.push('Evitar Pares com Afinidade Fraca');
         }
-        summaryHtml += `</p>`;
+        summaryHtml += `
+            <div class="bg-[#2E303A] p-3 rounded-md border border-[#3E404A] mb-3">
+                <p class="font-semibold text-[#00E38C] mb-2">🤝 Afinidades:</p>
+                <ul class="list-disc list-inside ml-4 text-gray-300 text-sm">
+                    <li>${afinidadesDetails.join('; ')}</li>
+                </ul>
+            </div>
+        `;
     }
 
+    // --- Exibir o resumo ou mensagem de nenhum parâmetro ---
     if (summaryHtml === '') {
-        if (listaParametrosDiv) {
-            listaParametrosDiv.innerHTML = '<p class="text-gray-400">Nenhum parâmetro selecionado ainda. Vá aos modais de análise e marque suas preferências.</p>';
-        }
+        listaParametrosDiv.innerHTML = '<p class="text-gray-400 text-center p-4">Nenhum parâmetro selecionado ainda. Vá aos modais de análise e marque suas preferências.</p>';
     } else {
-        if (listaParametrosDiv) {
-            listaParametrosDiv.innerHTML = summaryHtml;
-        }
+        listaParametrosDiv.innerHTML = summaryHtml;
+        console.log('Resumo renderizado com sucesso!');
     }
 }
 
