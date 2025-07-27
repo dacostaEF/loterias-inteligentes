@@ -3429,6 +3429,10 @@
             }
         };
         
+        // Debug: verificar se os dados estão sendo armazenados corretamente
+        console.log('Dados dos clusters armazenados:', window.analiseResultados.avancada.clusters);
+        console.log('Resumo dos clusters:', window.analiseResultados.avancada.clusters?.resumo_clusters);
+        
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
           plotGraficoEstatisticasDistribuicao(data.distribuicao_numeros, 'numerica', qtdConcursos);
@@ -3438,6 +3442,11 @@
           
           // Configurar event listeners para os botões de ordenação
           configurarControlesOrdenacao();
+          
+          // Renderizar checkboxes de clusters para as preferências premium
+          if (typeof renderClusterCheckboxes === 'function') {
+            renderClusterCheckboxes();
+          }
         }, 100);
         
       } catch (error) {

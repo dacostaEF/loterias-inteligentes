@@ -372,9 +372,18 @@ function renderClusterCheckboxes() {
     
     opcoesClustersDiv.innerHTML = '<p class="col-span-2 text-gray-300 text-center">Carregando...</p>';
 
+    // Debug: verificar a estrutura dos dados
+    console.log('=== DEBUG RENDER CLUSTER CHECKBOXES ===');
+    console.log('window.analiseResultados:', window.analiseResultados);
+    console.log('window.analiseResultados?.avancada:', window.analiseResultados?.avancada);
+    console.log('window.analiseResultados?.avancada?.clusters:', window.analiseResultados?.avancada?.clusters);
+    console.log('window.analiseResultados?.avancada?.clusters?.resumo_clusters:', window.analiseResultados?.avancada?.clusters?.resumo_clusters);
+
     // Use window.analiseResultados.avancada.clusters.resumo_clusters que deve ser carregado
     if (window.analiseResultados && window.analiseResultados.avancada && window.analiseResultados.avancada.clusters && window.analiseResultados.avancada.clusters.resumo_clusters) {
         const resumoClusters = window.analiseResultados.avancada.clusters.resumo_clusters;
+        console.log('Resumo clusters encontrado:', resumoClusters);
+        
         let clusterHtml = '';
         for (const key in resumoClusters) {
             const cluster = resumoClusters[key];
@@ -403,6 +412,12 @@ function renderClusterCheckboxes() {
             });
         });
     } else {
+        console.log('Dados de clusters não disponíveis. Estrutura:', {
+            analiseResultados: !!window.analiseResultados,
+            avancada: !!(window.analiseResultados && window.analiseResultados.avancada),
+            clusters: !!(window.analiseResultados && window.analiseResultados.avancada && window.analiseResultados.avancada.clusters),
+            resumo_clusters: !!(window.analiseResultados && window.analiseResultados.avancada && window.analiseResultados.avancada.clusters && window.analiseResultados.avancada.clusters.resumo_clusters)
+        });
         opcoesClustersDiv.innerHTML = '<p class="col-span-2 text-red-500 text-center">Dados de clusters não disponíveis. Execute a análise avançada primeiro.</p>';
     }
 }
