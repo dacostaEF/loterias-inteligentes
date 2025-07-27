@@ -3422,11 +3422,26 @@
     function plotGraficoEstatisticasCorrelacao(correlacao, periodo = null) {
       if (!correlacao || !correlacao.correlacoes_positivas) {
         console.error('Dados de correlação não disponíveis');
+        const container = document.getElementById('grafico-estatisticas-correlacao');
+        if (container) {
+          container.innerHTML = '<p class="text-center text-gray-400 p-4">Dados de correlação não disponíveis para este período.</p>';
+        }
         return;
       }
       
       // Combinar correlações positivas e negativas
       const todasCorrelacoes = [...(correlacao.correlacoes_positivas || []), ...(correlacao.correlacoes_negativas || [])];
+      
+      // Verificar se há dados suficientes para plotar
+      if (todasCorrelacoes.length === 0) {
+        console.warn('Nenhuma correlação significativa encontrada para este período');
+        const container = document.getElementById('grafico-estatisticas-correlacao');
+        if (container) {
+          container.innerHTML = '<p class="text-center text-gray-400 p-4">Nenhuma correlação significativa encontrada para este período.<br><small>Isso pode indicar que os números são bem distribuídos e independentes.</small></p>';
+        }
+        return;
+      }
+      
       const pares = todasCorrelacoes.map(pair => `${pair[0]}-${pair[1]}`);
       const valores = todasCorrelacoes.map(pair => pair[2]);
       
@@ -3466,7 +3481,9 @@
         xaxis: { 
           title: 'Pares de Números',
           titlefont: { color: 'white' },
-          tickfont: { color: 'white', size: 10 }
+          tickfont: { color: 'white', size: 10 },
+          type: 'category', // Força o eixo X a ser categórico
+          automargin: true // Ajuda com labels longos
         },
         yaxis: { 
           title: 'Coeficiente de Correlação',
@@ -3480,6 +3497,7 @@
       };
       
       Plotly.newPlot('grafico-estatisticas-correlacao', data, layout, { displayModeBar: false });
+      console.log(`✅ Gráfico de correlação criado com ${todasCorrelacoes.length} pares significativos`);
     }
     
     // Função para criar gráfico de probabilidades condicionais
@@ -4031,7 +4049,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong>⚠️ Lembre-se:</strong> Estes gráficos e a matriz não garantem acertos, mas ajudam a apostar com mais consciência estatística e a explorar os dados históricos do jogo.
+        <strong⚠️ Lembre-se:</strong> Estes gráficos e a matriz não garantem acertos, mas ajudam a apostar com mais consciência estatística e a explorar os dados históricos do jogo.
       </p>
     </div>
   </div>
@@ -4047,35 +4065,35 @@
       <p>
         O que mostra: A frequência de sorteios com diferentes combinações de números pares e ímpares para os números principais e trevos. (Ex: 3 Pares-3 Ímpares, 4 Pares-2 Ímpares, etc.).<br>
         <strong>✔ Útil para:</strong> Equilibrar sua aposta e identificar padrões comuns ou combinações historicamente raras.<br>
-        <strong>💡 Dica:</strong> A maioria dos sorteios tem 3 números pares e 3 números ímpares.
+        <strong💡 Dica:</strong> A maioria dos sorteios tem 3 números pares e 3 números ímpares.
       </p>
 
       <h3>🔢 Distribuição por Faixas Numéricas</h3>
       <p>
         O que mostra: Quantas vezes os números sorteados caem em diferentes faixas numéricas (1-10, 11-20, etc.). Também exibe a média e a moda de ocorrências por faixa.<br>
         <strong>✔ Útil para:</strong> Observar se algumas faixas são historicamente mais sorteadas do que outras.<br>
-        <strong>💡 Dica:</strong> Ajuda a balancear sua aposta para incluir números de faixas mais ativas ou, se preferir, de faixas menos exploradas.
+        <strong💡 Dica:</strong> Ajuda a balancear sua aposta para incluir números de faixas mais ativas ou, se preferir, de faixas menos exploradas.
       </p>
 
       <h3>➕ Soma dos Números Principais</h3>
       <p>
         O que mostra: Um histograma da frequência da soma total dos 6 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
         <strong>✔ Útil para:</strong> Escolher combinações com somas que estejam dentro da faixa de valores mais comuns historicamente.<br>
-        <strong>💡 Dica:</strong> Evite somas muito altas ou muito baixas, que são estatisticamente menos frequentes.
+        <strong💡 Dica:</strong> Evite somas muito altas ou muito baixas, que são estatisticamente menos frequentes.
       </p>
 
       <h3>🍀 Soma dos Trevos da Sorte</h3>
       <p>
         O que mostra: Um histograma da distribuição das somas dos 2 trevos da sorte. Exibe o mínimo, máximo, média e a(s) moda(s) das somas dos trevos.<br>
         <strong>✔ Útil para:</strong> Escolher trevos que somem valores que ocorrem com mais frequência nos sorteios.<br>
-        <strong>💡 Dica:</strong> Trevos com soma entre 3 e 7 são historicamente mais comuns.
+        <strong💡 Dica:</strong> Trevos com soma entre 3 e 7 são historicamente mais comuns.
       </p>
 
       <h3>↔️ Amplitude dos Números Principais</h3>
       <p>
         O que mostra: Um histograma da frequência da diferença entre o maior e o menor número sorteado em cada concurso. (Ex: Números 1 e 50 = amplitude 49).<br>
         <strong>✔ Útil para:</strong> Avaliar a "dispersão" dos números sorteados e evitar apostar em números muito próximos ou muito distantes entre si.<br>
-        <strong>💡 Dica:</strong> Amplitudes entre 30 e 45 são as mais frequentes historicamente.
+        <strong💡 Dica:</strong> Amplitudes entre 30 e 45 são as mais frequentes historicamente.
       </p>
 
       <h3>🎯 Como Usar na Prática</h3>
@@ -4087,7 +4105,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong>Importante:</strong> A Loteria é um jogo de azar. Estas análises estatísticas não garantem acertos, mas ajudam você a criar apostas mais equilibradas e estatisticamente mais prováveis, baseadas em dados históricos reais.
+        <strongImportante:</strong> A Loteria é um jogo de azar. Estas análises estatísticas não garantem acertos, mas ajudam você a criar apostas mais equilibradas e estatisticamente mais prováveis, baseadas em dados históricos reais.
       </p>
     </div>
   </div>
@@ -4126,7 +4144,7 @@
 
       <h3>🎯 Estratégias de Uso</h3>
       <p>
-        <strong>✅ Estratégia de Inclusão:</strong> Incluir pares com alta afinidade em sua aposta, pois eles têm histórico de sair juntos.<br>
+        <strong✅ Estratégia de Inclusão:</strong> Incluir pares com alta afinidade em sua aposta, pois eles têm histórico de sair juntos.<br>
         <strong❌ Estratégia de Evitação:</strong> Evitar pares com alta afinidade para não "concentrar" demais sua aposta.<br>
         <strong🔄 Estratégia Mista:</strong> Usar números com alta afinidade geral como base e complementar com números menos frequentes.<br>
         <strong⚖️ Balanceamento:</strong> Combinar números com diferentes níveis de afinidade para criar apostas mais equilibradas.
@@ -4179,7 +4197,7 @@
 
       <h3>🎯 Estratégias de Uso</h3>
       <p>
-        <strong>✅ Estratégia de Frequência:</strong> Escolher trevos com alta frequência histórica.<br>
+        <strong✅ Estratégia de Frequência:</strong> Escolher trevos com alta frequência histórica.<br>
         <strong🤝 Estratégia de Combinação:</strong> Usar duplas de trevos que têm histórico de sair juntas.<br>
         <strong🔗 Estratégia de Correlação:</strong> Combinar trevos com números principais que têm alta correlação.<br>
         <strong⚖️ Estratégia Balanceada:</strong> Misturar trevos quentes e frios para diversificar.
