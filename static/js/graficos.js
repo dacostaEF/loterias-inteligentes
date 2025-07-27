@@ -735,7 +735,7 @@ function renderizarDesvioPadrao(dadosDesvioPadrao) {
         },
         text: [(stats.desvio_padrao_numeros || stats.desvio_padrao).toFixed(2)], // Texto sobre a barra
         textposition: 'auto',
-        hoverinfo: 'y',
+        hoverinfo: 'y'
     };
 
     const layoutNumeros = {
@@ -778,7 +778,7 @@ function renderizarDesvioPadrao(dadosDesvioPadrao) {
             },
             text: [desvioTrevos.toFixed(2)], // Texto sobre a barra
             textposition: 'auto',
-            hoverinfo: 'y',
+            hoverinfo: 'y'
         };
 
         const layoutTrevos = {
