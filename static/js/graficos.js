@@ -208,6 +208,12 @@ function initializePreferenceUI(modalId, prefType, prefName, value, period = nul
         } else if (prefName === 'evitarParesFracos') {
             elementId = 'afinidade-evitar-pares-fracos';
         }
+    } else if (modalId === 'trevo') {
+        if (prefName === 'priorizarQuentesTrevos') {
+            elementId = 'trevo-priorizar-quentes';
+        } else if (prefName === 'priorizarFriosTrevos') {
+            elementId = 'trevo-priorizar-frios';
+        }
     } else {
         // Fallback para outros modais
         elementId = `${modalId}-${prefName}`;
@@ -340,6 +346,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const prefName = event.target.dataset.prefName;
             const period = event.target.dataset.prefPeriod; // Para frequência
             const value = event.target.checked;
+            
+            console.log('🔍 DEBUG - Checkbox alterado:', {
+                prefType: prefType,
+                prefName: prefName,
+                value: value,
+                elementId: event.target.id
+            });
 
             if (prefType === 'frequencia') {
                 userPremiumPreferences.frequencia[prefName] = value;
@@ -357,7 +370,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         userPremiumPreferences.frequencia.priorizarQuentes = false;
                     }
                 }
+            } else if (prefType === 'distribuicao') {
+                userPremiumPreferences.distribuicao[prefName] = value;
+            } else if (prefType === 'padroes') {
+                userPremiumPreferences.padroes[prefName] = value;
+            } else if (prefType === 'afinidades') {
+                userPremiumPreferences.afinidades[prefName] = value;
+            } else if (prefType === 'trevos') {
+                userPremiumPreferences.trevos[prefName] = value;
+            } else if (prefType === 'seca') {
+                userPremiumPreferences.seca[prefName] = value;
             }
+            
+            console.log('🔍 DEBUG - Preferências salvas:', {
+                prefType: prefType,
+                prefName: prefName,
+                value: value,
+                userPremiumPreferences: JSON.parse(JSON.stringify(userPremiumPreferences))
+            });
+            
             savePremiumPreferences();
         }
     });
@@ -447,19 +478,41 @@ function carregarPreferenciasFrequencia() {
 
 // Função para adicionar botão "Fixar Escolhas" em qualquer modal
 function adicionarBotaoFixarEscolhas(modalPrefix) {
+    console.log(`🔍 DEBUG - adicionarBotaoFixarEscolhas chamada para modal: ${modalPrefix}`);
+    
     // Encontrar a div de dica de diferentes formas dependendo do modal
     let dicaDiv = null;
     
     if (modalPrefix === 'freq') {
         dicaDiv = document.querySelector('#freq-periodo')?.closest('.mt-4.p-3.bg-\\[\\#1A1D25\\]');
-    } else if (modalPrefix === 'dist') {
+    } else     if (modalPrefix === 'dist') {
         // Para distribuição, procurar pela div que contém a seção de sugestões
         dicaDiv = document.querySelector('.mt-8.bg-\\[\\#2E303A\\]');
+        console.log('🔍 DEBUG - Procurando div de dica para distribuição');
+        console.log('🔍 DEBUG - dicaDiv encontrada?', !!dicaDiv);
+        
         if (!dicaDiv) {
             // Fallback: procurar por qualquer div com a classe bg-[#2E303A] que contenha o texto "Sugestões"
             const divs = document.querySelectorAll('.bg-\\[\\#2E303A\\]');
+            console.log('🔍 DEBUG - divs com bg-[#2E303A] encontradas:', divs.length);
+            
             for (let div of divs) {
+                console.log('🔍 DEBUG - Conteúdo da div:', div.textContent.substring(0, 100));
                 if (div.textContent.includes('Sugestões para Aposta Inteligente')) {
+                    dicaDiv = div;
+                    console.log('✅ Div de sugestões encontrada!');
+                    break;
+                }
+            }
+        }
+        
+        if (!dicaDiv) {
+            console.warn('❌ Nenhuma div de dica encontrada para distribuição');
+            // Tentar encontrar qualquer div que contenha "Sugestões"
+            const todasDivs = document.querySelectorAll('div');
+            for (let div of todasDivs) {
+                if (div.textContent.includes('Sugestões')) {
+                    console.log('🔍 DEBUG - Div com "Sugestões" encontrada:', div);
                     dicaDiv = div;
                     break;
                 }
@@ -489,12 +542,17 @@ function adicionarBotaoFixarEscolhas(modalPrefix) {
     }
     
     if (!dicaDiv) {
-        console.warn(`Div de dica não encontrada para modal: ${modalPrefix}`);
+        console.warn(`❌ Div de dica não encontrada para modal: ${modalPrefix}`);
         return;
     }
     
+    console.log(`✅ Div de dica encontrada para modal: ${modalPrefix}`, dicaDiv);
+    
     // Verificar se o botão já existe
-    if (document.getElementById(`${modalPrefix}-fixar-escolhas`)) return;
+    if (document.getElementById(`${modalPrefix}-fixar-escolhas`)) {
+        console.log(`⚠️ Botão já existe para modal: ${modalPrefix}`);
+        return;
+    }
     
     // Criar o botão e status
     const botaoContainer = document.createElement('div');
@@ -508,10 +566,14 @@ function adicionarBotaoFixarEscolhas(modalPrefix) {
     
     // Adicionar o botão na div de dica
     dicaDiv.appendChild(botaoContainer);
+    console.log(`✅ Botão "Fixar Escolhas" adicionado para modal: ${modalPrefix}`);
     
     // Adicionar event listener
     const botao = document.getElementById(`${modalPrefix}-fixar-escolhas`);
     const status = document.getElementById(`${modalPrefix}-status-salvo`);
+    
+    console.log(`🔍 DEBUG - Botão criado?`, !!botao);
+    console.log(`🔍 DEBUG - Status criado?`, !!status);
     
     botao.addEventListener('click', () => {
         // Salvar preferências
@@ -570,6 +632,13 @@ function salvarPreferenciasDoModal(modalPrefix) {
         console.log('somaMinInput:', somaMinInput);
         console.log('somaMaxInput:', somaMaxInput);
         
+        console.log('🔍 DEBUG Distribuição - Valores dos elementos:');
+        console.log('paridadeCheckbox.checked:', paridadeCheckbox?.checked);
+        console.log('paridadeSelect.value:', paridadeSelect?.value);
+        console.log('somaCheckbox.checked:', somaCheckbox?.checked);
+        console.log('somaMinInput.value:', somaMinInput?.value);
+        console.log('somaMaxInput.value:', somaMaxInput?.value);
+        
         if (paridadeCheckbox) {
             userPremiumPreferences.distribuicao.priorizarParesImpares = paridadeCheckbox.checked;
             console.log('✅ priorizarParesImpares salvo como:', paridadeCheckbox.checked);
@@ -592,6 +661,11 @@ function salvarPreferenciasDoModal(modalPrefix) {
         }
         
         console.log('🔍 DEBUG Distribuição - Preferências após salvar:', JSON.parse(JSON.stringify(userPremiumPreferences.distribuicao)));
+        console.log('🔍 DEBUG Distribuição - userPremiumPreferences completo após salvar:', JSON.parse(JSON.stringify(userPremiumPreferences)));
+        
+        // Salvar no localStorage
+        savePremiumPreferences();
+        console.log('🔍 DEBUG Distribuição - Preferências salvas no localStorage');
     }
     
     if (modalPrefix === 'padrao') {
@@ -1005,6 +1079,18 @@ function renderPremiumPreferencesSummary() {
 
     console.log('🔍 DEBUG renderPremiumPreferencesSummary - Iniciando...');
     console.log('🔍 DEBUG userPremiumPreferences completo:', JSON.parse(JSON.stringify(userPremiumPreferences)));
+    
+    // === DIAGNÓSTICO DETALHADO ===
+    console.log('🔍 DEBUG - distribuicao:', userPremiumPreferences.distribuicao);
+    console.log('🔍 DEBUG - padroes:', userPremiumPreferences.padroes);
+    console.log('🔍 DEBUG - afinidades:', userPremiumPreferences.afinidades);
+    console.log('🔍 DEBUG - seca:', userPremiumPreferences.seca);
+    
+    // Verificar se as propriedades existem
+    console.log('🔍 DEBUG - distribuicao existe?', !!userPremiumPreferences.distribuicao);
+    console.log('🔍 DEBUG - padroes existe?', !!userPremiumPreferences.padroes);
+    console.log('🔍 DEBUG - afinidades existe?', !!userPremiumPreferences.afinidades);
+    console.log('🔍 DEBUG - seca existe?', !!userPremiumPreferences.seca);
 
     // --- 1. Frequência ---
     const freqPref = userPremiumPreferences.frequencia;
@@ -1035,6 +1121,10 @@ function renderPremiumPreferencesSummary() {
     console.log('🔍 DEBUG Distribuição - distPref:', distPref);
     console.log('🔍 DEBUG Distribuição - priorizarParesImpares:', distPref?.priorizarParesImpares);
     console.log('🔍 DEBUG Distribuição - priorizarSoma:', distPref?.priorizarSoma);
+    console.log('🔍 DEBUG Distribuição - distPref existe?', !!distPref);
+    console.log('🔍 DEBUG Distribuição - priorizarParesImpares é true?', distPref?.priorizarParesImpares === true);
+    console.log('🔍 DEBUG Distribuição - priorizarSoma é true?', distPref?.priorizarSoma === true);
+    console.log('🔍 DEBUG Distribuição - condição if será executada?', !!(distPref && (distPref.priorizarParesImpares || distPref.priorizarSoma)));
     
     if (distPref && (distPref.priorizarParesImpares || distPref.priorizarSoma)) {
         let distDetails = [];
