@@ -1523,32 +1523,110 @@ span.rounded-full {
     padding: 0.25rem 0.5rem !important;
   }
 
-  /* Botão final da IA */
-  #abrir-modal-premium {
+  /* Substitui texto explicativo em smartphones */
+  .bg-\[#1A1D25\] p[style*="text-align: center"] {
     font-size: 0.9rem !important;
-    padding: 0.75rem 1rem !important;
-    width: 100% !important;
+    line-height: 1.4 !important;
   }
 
-  /* Reduz espaço entre blocos principais */
-  .container > div {
-    margin-bottom: 1rem !important;
+  /* Regra mais específica para substituir o texto */
+  .bg-\[#1A1D25\] .p-8 p[style*="text-align: center"]::before {
+    content: "Configure filtros, selecione padrões e use suas próprias decisões estratégicas para orientar o sistema de análise estatística. O controle está nas suas mãos — com o apoio da tecnologia de dados reais.";
+    display: block !important;
   }
 
-  /* Reduz espaçamento superior do header */
-  header {
-    margin-bottom: 1rem !important;
-    padding-bottom: 0.25rem !important;
+  .bg-\[#1A1D25\] .p-8 p[style*="text-align: center"] > * {
+    display: none !important;
   }
 
-  /* Centraliza melhor o conteúdo */
-  .text-center {
-    text-align: center !important;
+  /* Regra ultra específica para garantir funcionamento */
+  div.bg-\[#1A1D25\].p-8.rounded-2xl.shadow-md p[style*="text-align: center"]::before {
+    content: "Configure filtros, selecione padrões e use suas próprias decisões estratégicas para orientar o sistema de análise estatística. O controle está nas suas mãos — com o apoio da tecnologia de dados reais." !important;
+    display: block !important;
   }
 
-  /* Ajuste para modal-content */
-  .modal-content {
-    padding: 1rem !important;
+  div.bg-\[#1A1D25\].p-8.rounded-2xl.shadow-md p[style*="text-align: center"] > * {
+    display: none !important;
+  }
+
+  /* Regra específica para a classe texto-explicativo-premium */
+  @media (max-width: 640px) {
+    .texto-explicativo-premium {
+      display: none !important;
+    }
+    
+    .texto-explicativo-premium::before {
+      content: "Configure filtros, selecione padrões e use suas próprias decisões estratégicas para orientar o sistema de análise estatística. O controle está nas suas mãos — com o apoio da tecnologia de dados reais.";
+      display: block !important;
+      text-align: center !important;
+      color: #ccc !important;
+      font-size: 0.9rem !important;
+      line-height: 1.4 !important;
+    }
+  }
+
+  /* CONTROLE DE TEXTO POR DISPOSITIVO */
+  /* Por padrão, mostra apenas o texto para desktop */
+  .texto-desktop {
+    display: block;
+  }
+
+  .texto-mobile {
+    display: none;
+  }
+
+  /* Quando for uma tela menor que 640px (smartphone), inverte a lógica */
+  @media (max-width: 640px) {
+    .texto-desktop {
+      display: none !important;
+    }
+
+    .texto-mobile {
+      display: block !important;
+    }
+  }
+
+  /* Oculta/mostra textos conforme o tamanho da tela */
+  .texto-desktop {
+    display: block;
+  }
+
+  .texto-mobile {
+    display: none;
+  }
+
+  /* Exibir versão mobile em telas pequenas */
+  @media (max-width: 768px) {
+    .texto-desktop {
+      display: none !important;
+    }
+
+    .texto-mobile {
+      display: block !important;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  /* SOLUÇÃO GARANTIDA - CSS PURO PARA CONTROLE DE TEXTO */
+  .texto-desktop {
+    display: block;
+  }
+
+  .texto-mobile {
+    display: none;
+  }
+
+  /* Aplica a troca de visibilidade para smartphones */
+  @media only screen and (max-width: 640px) {
+    .texto-desktop {
+      display: none !important;
+    }
+
+    .texto-mobile {
+      display: block !important;
+    }
   }
 }
 

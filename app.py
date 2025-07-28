@@ -510,5 +510,11 @@ def gerar_aposta_premium():
         }), 500
 
 if __name__ == '__main__':
-    # Para rodar em produção, desative o debug=True
-    app.run(debug=True, host='0.0.0.0', port=5000) # Aceita conexões externas 
+    # Configurações otimizadas para melhor performance
+    app.run(
+        debug=False,  # Desabilita debug para melhor performance
+        host='0.0.0.0', 
+        port=5000,
+        threaded=True,  # Habilita threading
+        use_reloader=False  # Desabilita reloader automático
+    ) 
