@@ -372,129 +372,112 @@
       <p class="text-sm sm:text-base text-gray-400">Dashboard Inteligente de Análise Estatística</p>
     </div>
     
-    <!-- Logo centralizada -->
-    <div class="flex justify-center items-center">
+    <!-- Logo movida para o canto direito -->
+    <div class="flex justify-end items-center">
       <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
     </div>
-    
-    <button class="bg-[#8B5CF6] px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all text-sm sm:text-base">
-      Login / Criar Conta
-    </button>
   </header>
 
-  <!-- Cartão de jogo -->
-  <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8 flex flex-col">
-    <h2 class="text-xl font-semibold mb-4">🎯 Selecione de 1 a 6 números entre 50</h2>
-    <div class="grid grid-cols-10 gap-2 mb-6" id="numeros-container">
-      <!-- Números serão gerados dinamicamente -->
+  <!-- Conteúdo Premium será adicionado aqui -->
+  <div class="container mx-auto">
+    <h2 class="text-2xl font-bold text-white mb-6 text-center">🎯 Aposta Inteligente Premium</h2>
+    
+    <!-- Conteúdo será adicionado posteriormente -->
+    <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-md">
+      <p class="text-gray-400 text-center">Conteúdo Premium será adicionado aqui...</p>
     </div>
-
-    <!-- Container único de trevos -->
-    <div class="mt-6">
-      <h3 class="text-lg mb-2 text-center"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Selecione de 2 a 6 Trevos</h3>
-      <div class="flex gap-4 flex-wrap justify-center" id="trevos-container">
-        <!-- Trevos serão gerados dinamicamente -->
-      </div>
-    </div>
-
-    <!-- Números selecionados -->
-    <div class="mt-6 p-4 bg-[#2E303A] rounded-xl">
-      <div class="grid grid-cols-3 gap-6">
-        <!-- Coluna 1: Números principais -->
-        <div>
-          <h4 class="text-sm font-semibold mb-2">Números Selecionados:</h4>
-          <div class="flex gap-2 flex-wrap" id="numeros-selecionados">
-            <span class="text-gray-400">Nenhum número selecionado</span>
+    
+    <!-- Bloco Explicativo com Passo a Passo -->
+    <div class="mt-8 bg-[#1A1D25] p-6 rounded-2xl shadow-md">
+      <h3 class="text-xl font-bold text-white mb-6 text-center">📘 COMO USAR A APOSTA INTELIGENTE:</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Passo 1: Frequência -->
+        <div class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 1</span>
+            <h4 class="text-lg font-semibold text-white">Frequência</h4>
           </div>
+          <p class="text-gray-300 text-sm mb-3">Veja os números que mais saem e use essa informação no seu jogo.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('frequencia')">
+            🔍 Ver Análise Frequência
+          </button>
         </div>
-        
-        <!-- Coluna 2: Trevos -->
-        <div>
-          <h4 class="text-sm font-semibold mb-2">Trevos Selecionados:</h4>
-          <div class="flex gap-2 flex-wrap" id="trevos-selecionados">
-            <span class="text-gray-400">Nenhum trevo selecionado</span>
+
+        <!-- Passo 2: Distribuição -->
+        <div class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 2</span>
+            <h4 class="text-lg font-semibold text-white">Distribuição</h4>
           </div>
+          <p class="text-gray-300 text-sm mb-3">Entenda como os números se espalham entre grupos e padrões.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('distribuicao')">
+            📊 Ver Análise Distribuição
+          </button>
         </div>
-        
-        <!-- Coluna 3: Valor da aposta -->
-        <div class="flex flex-col justify-center items-center">
-          <div id="valor-aposta-container" class="text-center">
-            <div class="text-gray-400 text-sm">Aposta não configurada</div>
+
+        <!-- Passo 3: Afinidades -->
+        <div class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 3</span>
+            <h4 class="text-lg font-semibold text-white">Afinidades</h4>
           </div>
+          <p class="text-gray-300 text-sm mb-3">Descubra combinações que costumam sair juntas.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('afinidades')">
+            🔗 Ver Análise Afinidades
+          </button>
+        </div>
+
+        <!-- Passo 4: Trevos -->
+        <div class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 4</span>
+            <h4 class="text-lg font-semibold text-white">Trevos</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Veja os trevos com maior frequência e distribuição.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('trevos')">
+            🍀 Ver Análise Trevos
+          </button>
+        </div>
+
+        <!-- Passo 5: Seca -->
+        <div class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 5</span>
+            <h4 class="text-lg font-semibold text-white">Números Secos</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Evite números que estão há muito tempo sem sair.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('seca')">
+            🚫 Ver Análise Seca
+          </button>
+        </div>
+
+        <!-- Passo 6: Estatísticas Avançadas -->
+        <div class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 6</span>
+            <h4 class="text-lg font-semibold text-white">Estatísticas Avançadas</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Explore correlações, padrões ocultos e tendências com IA.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('estatisticas')">
+            🤖 Ver Análise Avançada
+          </button>
         </div>
       </div>
     </div>
-
-    <!-- Container específico para o Gerador de Números +Milionária -->
-    <div class="gerador-container mt-6 p-6 bg-[#1A1D25] rounded-xl shadow-md">
-      <h3 class="text-lg font-semibold mb-4 text-center">🎯 Gerador de Números +Milionária</h3>
-                      <p class="text-gray-400 text-center mb-4 text-sm">Opções para gerar seus palpites</p>
-      
-      <div class="botoes-mobile-ajustados">
-        <button class="bg-[#00E38C] text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="abrirModalConfiguracao()">
-          🍀 Gerar Palpite da Sorte
-        </button>
-      
-        <button class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" id="abrir-modal-premium">
-          🎯 Aposta Inteligente (Premium)
-        </button>
-      
-        <button class="bg-red-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="limparSelecao()">
-          🗑️ Limpar Tudo<br><small>&nbsp;</small>
+    
+    <!-- Botão principal do Machine Learning - NO FINAL -->
+    <div class="mt-8 text-center">
+      <div class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] p-1 rounded-xl inline-block">
+        <button class="bg-[#1A1D25] text-white font-bold px-8 py-4 rounded-lg hover:bg-[#2E303A] transition-all text-lg" id="abrir-modal-premium">
+          🎯 Gerar Aposta Inteligente (Premium)
         </button>
       </div>
-      
-      <div class="mt-4 text-center">
-        <p class="text-xs text-gray-500">
-                                  💡 Experimente o gerador de Palpite da Sorte!
-        </p>
-      </div>
+      <p class="text-gray-400 text-sm mt-3">Após configurar suas preferências, clique aqui para gerar apostas com IA</p>
     </div>
+  </div>
 
-    <!-- Botões de análise -->
-    <div class="mt-8 flex flex-wrap gap-4">
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('frequencia')">
-        📊 Frequência
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('distribuicao')">
-        🔢 Distribuição
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('afinidades')">
-        🤝 Afinidades
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('trevos')">
-        <img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Trevos
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('seca')">
-        🌵 Seca
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('estatisticas')">
-        📈 Estatísticas Avançadas
-      </button>
-    </div>
-  </section>
 
-  <!-- Seção de Estatísticas Rápidas -->
-  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">🔥 Números Quentes</h3>
-      <div class="text-sm text-gray-300" id="numeros-quentes">
-        Carregando...
-      </div>
-    </div>
-    <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">❄️ Números Frios</h3>
-      <div class="text-sm text-gray-300" id="numeros-frios">
-        Carregando...
-      </div>
-    </div>
-    <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Trevos Mais Frequentes</h3>
-      <div class="text-sm text-gray-300" id="trevos-frequentes">
-        Carregando...
-      </div>
-    </div>
-  </section>
 
 
 
@@ -641,36 +624,16 @@
     
 
 
-    // Gerar números de 1 a 50
+    // Gerar números de 1 a 50 - DESABILITADO NA PÁGINA PREMIUM
     function gerarNumeros() {
-      const container = document.getElementById('numeros-container');
-      container.innerHTML = '';
-      
-      for (let i = 1; i <= 50; i++) {
-        const div = document.createElement('div');
-        div.className = 'numero p-3 rounded-xl text-center font-semibold';
-        div.textContent = i.toString().padStart(2, '0');
-        div.onclick = () => selecionarNumero(i, div);
-        container.appendChild(div);
-      }
+      // Função desabilitada na página premium - não há grid de números
+      console.log('Função gerarNumeros() desabilitada na página premium');
     }
 
-    // Gerar trevos (container único) - Versão elegante com ícones
+    // Gerar trevos (container único) - DESABILITADO NA PÁGINA PREMIUM
     function gerarTrevos() {
-      const container = document.getElementById('trevos-container');
-      container.innerHTML = '';
-      
-      for (let i = 1; i <= 6; i++) {
-        const div = document.createElement('div');
-        div.className = 'trevo-icon-container';
-        div.innerHTML = `
-          <div class="trevo-icon">
-            <span class="trevo-number">${i}</span>
-          </div>
-        `;
-        div.onclick = () => selecionarTrevo(i, div);
-        container.appendChild(div);
-      }
+      // Função desabilitada na página premium - não há container de trevos
+      console.log('Função gerarTrevos() desabilitada na página premium');
     }
 
     // Selecionar número (manual - limite de 12)
@@ -848,22 +811,10 @@
       }
     }
 
-    // Carregar estatísticas rápidas
+    // Carregar estatísticas rápidas - DESABILITADO NA PÁGINA PREMIUM
     function carregarEstatisticasRapidas() {
-      document.getElementById('numeros-quentes').innerHTML = 
-        dadosMilionaria.frequencia.numeros.quentes.slice(0, 5)
-          .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-          .join('');
-
-      document.getElementById('numeros-frios').innerHTML = 
-        dadosMilionaria.frequencia.numeros.frios.slice(0, 5)
-          .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-          .join('');
-
-      document.getElementById('trevos-frequentes').innerHTML = 
-        dadosMilionaria.frequencia.trevos.frequentes.slice(0, 3)
-          .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
-          .join('');
+      // Função desabilitada na página premium - não há seção de estatísticas rápidas
+      console.log('Função carregarEstatisticasRapidas() desabilitada na página premium');
     }
 
     // Abrir modal
@@ -4892,4 +4843,5 @@
     </div>
   </div>
 </body>
+</html> 
 </html> 

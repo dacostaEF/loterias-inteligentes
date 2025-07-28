@@ -1301,7 +1301,10 @@ if (gerarSugestaoBtn) {
             ...userPremiumPreferences // Envia o objeto completo de preferências
         };
 
-        console.log("Preferências enviadas para ML:", preferenciasParaML);
+        console.log("📊 Preferências enviadas para ML:", preferenciasParaML);
+        console.log("🎯 numApostasGerar:", preferenciasParaML.numApostasGerar);
+        console.log("🔢 qtdeNumerosAposta:", preferenciasParaML.qtdeNumerosAposta);
+        console.log("🍀 qtdeTrevosAposta:", preferenciasParaML.qtdeTrevosAposta);
 
         try {
             const response = await fetch('/api/gerar_aposta_premium', {

@@ -384,7 +384,7 @@
 
   <!-- Cartão de jogo -->
   <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8 flex flex-col">
-    <h2 class="text-xl font-semibold mb-4">🎯 Selecione de 1 a 6 números entre 50</h2>
+    <h2 class="text-xl font-semibold mb-4">🎯 Selecione de 6 a 12 números entre 50</h2>
     <div class="grid grid-cols-10 gap-2 mb-6" id="numeros-container">
       <!-- Números serão gerados dinamicamente -->
     </div>
@@ -419,7 +419,7 @@
         <!-- Coluna 3: Valor da aposta -->
         <div class="flex flex-col justify-center items-center">
           <div id="valor-aposta-container" class="text-center">
-            <div class="text-gray-400 text-sm">Aposta não configurada</div>
+            <div class="text-gray-400 text-sm">Aguardando sua seleção de números e trevos para calcular o valor</div>
           </div>
         </div>
       </div>
@@ -435,8 +435,10 @@
           🍀 Gerar Palpite da Sorte
         </button>
       
-        <button class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" id="abrir-modal-premium">
-          🎯 Aposta Inteligente (Premium)
+
+      
+        <button class="bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4] text-white font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="window.location.href='/aposta_inteligente_premium'">
+          📊 Estatística Avançada / Machine Learning
         </button>
       
         <button class="bg-red-600 text-white font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="limparSelecao()">
@@ -451,27 +453,7 @@
       </div>
     </div>
 
-    <!-- Botões de análise -->
-    <div class="mt-8 flex flex-wrap gap-4">
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('frequencia')">
-        📊 Frequência
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('distribuicao')">
-        🔢 Distribuição
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('afinidades')">
-        🤝 Afinidades
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('trevos')">
-        <img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Trevos
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('seca')">
-        🌵 Seca
-      </button>
-      <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-xl hover:opacity-80 transition-all text-sm sm:text-base" onclick="abrirModal('estatisticas')">
-        📈 Estatísticas Avançadas
-      </button>
-    </div>
+
   </section>
 
   <!-- Seção de Estatísticas Rápidas -->
