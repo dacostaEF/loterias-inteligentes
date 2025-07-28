@@ -1420,3 +1420,135 @@ body {
     }  
 
 }
+
+/* Reduzir tamanho dos títulos dos módulos em smartphones */
+@media (max-width: 640px) {
+    .bg-\[#2E303A\] h4 {
+        font-size: 14px !important;
+    }
+    
+    /* Preservar layout ovalado dos módulos em smartphones - REGRAS MAIS ESPECÍFICAS */
+    div.bg-\[#2E303A\].p-4.rounded-xl {
+        border-radius: 0.75rem !important; /* Manter rounded-xl */
+        padding: 1rem !important; /* Manter padding */
+        margin-bottom: 1.5rem !important; /* Espaçamento entre módulos */
+        min-height: 120px !important; /* Altura mínima para preservar forma */
+        width: 100% !important; /* Largura total */
+        box-sizing: border-box !important; /* Incluir padding na largura */
+        min-width: 280px !important; /* Largura mínima para preservar forma */
+    }
+    
+    /* Preservar container principal */
+    div.bg-\[#1A1D25\].p-6.rounded-2xl.shadow-md {
+        padding: 1.5rem !important; /* Padding preservado */
+        border-radius: 1rem !important; /* Bordas preservadas */
+    }
+    
+    /* Preservar grid layout */
+    div.grid.grid-cols-1.md\:grid-cols-2.gap-6 {
+        gap: 1.5rem !important; /* Manter gap entre módulos */
+    }
+    
+    /* Preservar badges dos passos */
+    span.bg-\[#00E38C\].text-black.font-bold.px-3.py-1.rounded-full.text-sm.mr-3 {
+        border-radius: 9999px !important; /* Manter rounded-full */
+        padding: 0.25rem 0.75rem !important; /* Manter padding */
+    }
+}
+
+/* REGRAS ULTRA ESPECÍFICAS PARA GARANTIR QUE FUNCIONEM */
+@media (max-width: 640px) {
+    /* Forçar especificidade máxima para os módulos */
+    div.bg-\[#2E303A\].p-4.rounded-xl[class*="bg-[#2E303A]"] {
+        border-radius: 0.75rem !important;
+        padding: 1rem !important;
+        min-height: 120px !important;
+        min-width: 280px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+}
+
+/* Regras adicionais para telas muito pequenas */
+@media (max-width: 480px) {
+    /* Forçar layout ovalado mesmo em telas muito pequenas */
+    div.bg-\[#2E303A\].p-4.rounded-xl {
+        min-width: 260px !important; /* Largura mínima ajustada */
+        min-height: 110px !important; /* Altura mínima ajustada */
+        border-radius: 0.75rem !important; /* Manter bordas arredondadas */
+        padding: 0.75rem !important; /* Padding reduzido mas mantido */
+    }
+    
+    /* Preservar grid mesmo em telas pequenas */
+    div.grid.grid-cols-1.md\:grid-cols-2.gap-6 {
+        gap: 1rem !important; /* Gap reduzido mas mantido */
+    }
+}
+
+/* BADGES DOS PASSOS - DIMENSÕES FIXAS PARA TODOS OS AMBIENTES */
+span.rounded-full {
+  width: 60px !important; /* Largura fixa */
+  height: 24px !important; /* Altura fixa */
+  display: inline-flex !important; /* Para centralizar o texto */
+  align-items: center !important; /* Centraliza verticalmente */
+  justify-content: center !important; /* Centraliza horizontalmente */
+  text-align: center !important; /* Centraliza o texto */
+  white-space: nowrap !important; /* Impede quebra de linha */
+  overflow: hidden !important; /* Esconde texto que ultrapassar */
+  text-overflow: ellipsis !important; /* Adiciona "..." se necessário */
+}
+
+/* MELHORIAS SIMPLES E EFICAZES PARA RESPONSIVIDADE */
+@media (max-width: 640px) {
+  /* Reduz altura e padding dos cards dos passos */
+  .bg-\[\#2E303A\] {
+    padding: 0.75rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .bg-\[\#2E303A\] h4 {
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .bg-\[\#2E303A\] p {
+    font-size: 0.75rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  /* Reduz tamanho dos badges dos passos - APENAS FONTE */
+  span.rounded-full {
+    font-size: 0.61rem !important; /* ~9.8px - redução de 30% de 14px */
+    padding: 0.25rem 0.5rem !important;
+  }
+
+  /* Botão final da IA */
+  #abrir-modal-premium {
+    font-size: 0.9rem !important;
+    padding: 0.75rem 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Reduz espaço entre blocos principais */
+  .container > div {
+    margin-bottom: 1rem !important;
+  }
+
+  /* Reduz espaçamento superior do header */
+  header {
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.25rem !important;
+  }
+
+  /* Centraliza melhor o conteúdo */
+  .text-center {
+    text-align: center !important;
+  }
+
+  /* Ajuste para modal-content */
+  .modal-content {
+    padding: 1rem !important;
+  }
+}
+

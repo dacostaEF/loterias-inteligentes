@@ -57,9 +57,13 @@
       }
     }
     
-    /* Reduzir tamanho dos títulos dos gráficos - APENAS para smartphones */
+    /* Reduzir tamanho dos títulos dos gráficos e módulos - APENAS para smartphones */
     @media (max-width: 640px) {
       .chart-container h3 {
+        font-size: 14px !important;
+      }
+      
+      .bg-[#2E303A] h4 {
         font-size: 14px !important;
       }
     }
@@ -384,7 +388,13 @@
     
     <!-- Conteúdo será adicionado posteriormente -->
     <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-md">
-      <p class="text-gray-400 text-center">Conteúdo Premium será adicionado aqui...</p>
+      <p style="text-align: center; color: #ccc; font-size: 1.05rem;">
+Com a <strong>Aposta Inteligente Premium</strong>, você vai além da sorte:  
+você define os parâmetros, analisa os dados reais e usa <strong>inteligência estatística</strong> e <strong>machine learning</strong> para gerar apostas fundamentadas.<br><br>
+
+<em>Configure filtros, selecione padrões e alimente o sistema com suas próprias decisões estratégicas.</em><br>
+O controle está nas suas mãos — com o apoio da tecnologia.
+</p>
     </div>
     
     <!-- Bloco Explicativo com Passo a Passo -->
@@ -395,8 +405,8 @@
         <!-- Passo 1: Frequência -->
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
-            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 1</span>
-            <h4 class="text-lg font-semibold text-white">Frequência</h4>
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 1</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Descubra os Números Mais Sorteados</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Veja os números que mais saem e use essa informação no seu jogo.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('frequencia')">
@@ -407,8 +417,8 @@
         <!-- Passo 2: Distribuição -->
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
-            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 2</span>
-            <h4 class="text-lg font-semibold text-white">Distribuição</h4>
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 2</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Entenda Como os Números se Distribuem</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Entenda como os números se espalham entre grupos e padrões.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('distribuicao')">
@@ -419,8 +429,8 @@
         <!-- Passo 3: Afinidades -->
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
-            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 3</span>
-            <h4 class="text-lg font-semibold text-white">Afinidades</h4>
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 3</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Encontre Combinações que Saem Juntas</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Descubra combinações que costumam sair juntas.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('afinidades')">
@@ -431,8 +441,8 @@
         <!-- Passo 4: Trevos -->
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
-            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 4</span>
-            <h4 class="text-lg font-semibold text-white">Trevos</h4>
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 4</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Analise os Trevos da Sorte</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Veja os trevos com maior frequência e distribuição.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('trevos')">
@@ -443,8 +453,8 @@
         <!-- Passo 5: Seca -->
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
-            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 5</span>
-            <h4 class="text-lg font-semibold text-white">Números Secos</h4>
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 5</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Identifique Números que Não Saem</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Evite números que estão há muito tempo sem sair.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('seca')">
@@ -455,8 +465,8 @@
         <!-- Passo 6: Estatísticas Avançadas -->
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
-            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">✅ Passo 6</span>
-            <h4 class="text-lg font-semibold text-white">Estatísticas Avançadas</h4>
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 6</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Use IA para Padrões Ocultos</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Explore correlações, padrões ocultos e tendências com IA.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('estatisticas')">
