@@ -511,10 +511,11 @@ def gerar_aposta_premium():
 
 if __name__ == '__main__':
     # Configurações otimizadas para melhor performance
+    port = int(os.environ.get('PORT', 5000))
     app.run(
         debug=False,  # Desabilita debug para melhor performance
         host='0.0.0.0', 
-        port=5000,
+        port=port,
         threaded=True,  # Habilita threading
         use_reloader=False  # Desabilita reloader automático
     ) 
