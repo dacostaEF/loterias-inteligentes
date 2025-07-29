@@ -424,6 +424,11 @@ def bolao_interesse():
 
     return jsonify({"message": "Interesse registrado com sucesso! Entraremos em contato."}), 200
 
+@app.route('/boloes')
+def boloes_loterias():
+    """Renderiza a página de bolões de loterias."""
+    return render_template('boloes_loterias.html')
+
 @app.route('/aposta_inteligente_premium')
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
