@@ -435,7 +435,7 @@
       </div>
       <ul>
         <li><a href="/dashboard">🏠 Início</a></li>
-        <li><a href="/milionaria">💰 +Milionária</a></li>
+        <li><a href="/dashboard">💰 +Milionária</a></li>
         <li><a href="/megasena">🎯 Mega Sena</a></li>
         <li><a href="/lotofacil">🎲 Lotofácil</a></li>
         <li><a href="/quimica">🔢 Quina</a></li>
@@ -512,6 +512,13 @@
             navPanel.classList.remove('open');
             navOverlay.classList.remove('open'); // Fecha o overlay
             document.body.style.overflow = '';
+            
+            // Evento específico para o link +Milionária
+            if (link.textContent.includes('+Milionária')) {
+              // Comportamento específico para o link +Milionária
+              console.log('Navegando para o Dashboard via menu +Milionária');
+              // O link href="/dashboard" já está configurado, então a navegação acontece automaticamente
+            }
           });
         });
 
