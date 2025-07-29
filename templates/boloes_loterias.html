@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bolões inteligentes para a +Milionária e outras loterias. Aposte com análise estatística e confiança.">
+  
+  <!-- Meta tags para colorir a status bar dos dispositivos móveis -->
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="msapplication-navbutton-color" content="#7C3AED">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  
+  <title>Bolões Inteligentes - Loterias Inteligente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="16x16">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png">
+  <link rel="preload" href="{{ url_for('static', filename='css/estilo.css') }}" as="style"
+        onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}"></noscript>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background-color: #1e1b29;
+      color: white;
+      min-height: 100vh;
+    }
+
+    .main-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 3rem 1rem !important;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-container {
+      margin-bottom: 2rem;
+      margin-top: 0 !important;
+    }
+
+    .logo {
+      max-width: 270px;
+      margin-bottom: 0.5rem;
+    }
+
+    .container {
+      padding: 1rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2rem;
+      color: #bba5ff;
+      margin-bottom: 2rem;
+      font-weight: 600;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #5e4cb0;
+      overflow-x: auto;
+      margin-bottom: 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px 8px 0 0;
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      color: #ccc;
+      border: none;
+      background: none;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      flex: 1;
+      text-align: center;
+    }
+
+    .tab:hover, .tab.active {
+      color: #fff;
+      background-color: #5e4cb0;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 2rem 1rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 0 0 8px 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .tab-content h2 {
+      color: #bba5ff;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .tab-content p {
+      color: #ddd;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    /* Estilos para sub-abas */
+    .sub-tabs {
+      display: flex;
+      border-bottom: 1px solid #5e4cb0;
+      overflow-x: auto;
+      margin-bottom: 1.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 6px 6px 0 0;
+    }
+
+    .sub-tab {
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      color: #ccc;
+      border: none;
+      background: none;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      flex: 1;
+      text-align: center;
+    }
+
+    .sub-tab:hover, .sub-tab.active {
+      color: #fff;
+      background-color: #5e4cb0;
+    }
+
+    .sub-tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .sub-tab-content.active {
+      display: block;
+    }
+
+    .sub-tab-content h3 {
+      color: #bba5ff;
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .bolao-card {
+      background-color: #2a2340;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .bolao-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .bolao-card h3 {
+      margin: 0 0 1rem 0;
+      color: #cdbaff;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .bolao-card p {
+      margin: 0.5rem 0;
+      color: #ddd;
+    }
+
+    .bolao-card .status {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .status.forming {
+      background-color: #ffd700;
+      color: #333;
+    }
+
+    .status.almost {
+      background-color: #ff6b6b;
+      color: white;
+    }
+
+    /* Estilos para o menu hambúrguer */
+    .hamburger-menu {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 1000;
+      display: none;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .hamburger-icon {
+      width: 30px;
+      height: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .hamburger-icon span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: #bba5ff;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-icon.open span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger-icon.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-icon.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Sidebar deslizante */
+    .nav-panel {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: linear-gradient(135deg, #1e1b29 0%, #2a2340 100%);
+      display: flex;
+      flex-direction: column;
+      transition: left 0.3s ease-in-out;
+      z-index: 999;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-panel.open {
+      left: 0;
+    }
+
+    /* Header do sidebar */
+    .nav-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .nav-header h3 {
+      color: #bba5ff;
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .nav-panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .nav-panel li {
+      margin: 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-panel a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 20px 25px;
+      display: block;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-panel a:hover {
+      color: #bba5ff;
+      background: rgba(255, 255, 255, 0.1);
+      border-left-color: #bba5ff;
+    }
+
+    /* Overlay */
+    .nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 998;
+    }
+
+    .nav-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Media queries para responsividade */
+    @media (max-width: 768px) {
+      .hamburger-menu {
+        display: block;
+      }
+      
+      .hamburger-menu {
+        position: fixed !important;
+        top: 1rem !important;
+        left: 1rem !important;
+        z-index: 1001 !important;
+      }
+      
+      .container {
+        padding: 0.5rem;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+         border-radius: 0;
+       }
+       
+       .tab-content {
+         padding: 1rem 0.5rem;
+       }
+       
+       /* Responsividade para sub-abas */
+       .sub-tabs {
+         flex-direction: column;
+         border-radius: 6px;
+       }
+       
+       .sub-tab {
+         border-radius: 0;
+         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+       }
+       
+       .sub-tab:last-child {
+         border-bottom: none;
+       }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <div class="hamburger-menu">
+      <div class="hamburger-icon" id="hamburgerIcon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- Overlay para escurecer o fundo -->
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    <nav class="nav-panel" id="navPanel">
+      <div class="nav-header">
+        <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="nav-logo">
+        <h3>Menu</h3>
+      </div>
+      <ul>
+        <li><a href="/dashboard">🏠 Início</a></li>
+        <li><a href="/dashboard">💰 +Milionária</a></li>
+        <li><a href="/megasena">🎯 Mega Sena</a></li>
+        <li><a href="/lotofacil">🎲 Lotofácil</a></li>
+        <li><a href="/quimica">🔢 Quina</a></li>
+        <li><a href="/contato">📞 Contato</a></li>
+        </ul>
+    </nav>
+
+    <div class="logo-container">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="logo">
+    </div>
+
+    <div class="container">
+      <h1>Participe dos Bolões +Milionária</h1>
+      <div class="tabs">
+        <button class="tab active" onclick="abrirAba(event, 'por-que')">Por que jogar em grupo?</button>
+        <button class="tab" onclick="abrirAba(event, 'como-funciona')">Como funcionam nossos bolões</button>
+        <button class="tab" onclick="abrirAba(event, 'loterias')">Loterias</button>
+      </div>
+
+      <div id="por-que" class="tab-content active">
+        <h2>Jogue em grupo e aumente suas chances!</h2>
+        <p>Ao jogar em grupo, você participa de apostas maiores por um custo muito menor. Com mais números e combinações, as chances de ganhar aumentam significativamente. Além disso, você compartilha a experiência com outras pessoas — o que torna tudo mais divertido e emocionante!</p>
+        <p>Nossos bolões são organizados com análise estatística avançada, garantindo que cada aposta tenha fundamentação matemática sólida.</p>
+      </div>
+
+      <div id="como-funciona" class="tab-content">
+        <h2>Como funcionam nossos bolões?</h2>
+        <p>Nossos grupos são organizados por loteria. Quando um número mínimo de cotistas é alcançado, a aposta é realizada automaticamente. Todos os participantes recebem notificações de status e podem acompanhar o fechamento do grupo. O jogo só acontece com o valor total garantido.</p>
+        <p>Utilizamos análise de clusters, padrões sequenciais e distribuição estatística para otimizar as probabilidades de cada bolão.</p>
+      </div>
+
+      <div id="loterias" class="tab-content">
+        <h2>Bolões por Loterias</h2>
+        
+        <!-- Sub-abas para loterias -->
+        <div class="sub-tabs">
+          <button class="sub-tab active" onclick="abrirSubAba(event, 'milionaria')">+Milionária</button>
+          <button class="sub-tab" onclick="abrirSubAba(event, 'lotofacil')">Lotofácil</button>
+          <button class="sub-tab" onclick="abrirSubAba(event, 'megasena')">Mega Sena</button>
+          <button class="sub-tab" onclick="abrirSubAba(event, 'quina')">Quina</button>
+        </div>
+
+        <!-- Conteúdo das sub-abas -->
+        <div id="milionaria" class="sub-tab-content active">
+          <h3>Bolões +Milionária</h3>
+          <div class="bolao-card">
+            <h3>Grupo MM-LDO-01</h3>
+            <p>Probabilidade: Alta</p>
+            <p>Valor da cota: R$ 10,00</p>
+            <p>Participantes: 7 / 15</p>
+            <span class="status forming">🔄 Em formação</span>
+          </div>
+          <div class="bolao-card">
+            <h3>Grupo MM-LDO-02</h3>
+            <p>Probabilidade: Boa</p>
+            <p>Valor da cota: R$ 12,00</p>
+            <p>Participantes: 12 / 15</p>
+            <span class="status almost">⚡ Quase fechado</span>
+          </div>
+          <div class="bolao-card">
+            <h3>Grupo MM-LDO-03</h3>
+            <p>Probabilidade: Muito Alta</p>
+            <p>Valor da cota: R$ 15,00</p>
+            <p>Participantes: 5 / 20</p>
+            <span class="status forming">🔄 Em formação</span>
+          </div>
+        </div>
+
+        <div id="lotofacil" class="sub-tab-content">
+          <h3>Bolões Lotofácil</h3>
+          <div class="bolao-card">
+            <h3>Grupo LF-LDO-01</h3>
+            <p>Probabilidade: Muito Alta</p>
+            <p>Valor da cota: R$ 8,00</p>
+            <p>Participantes: 18 / 25</p>
+            <span class="status almost">⚡ Quase fechado</span>
+          </div>
+          <div class="bolao-card">
+            <h3>Grupo LF-LDO-02</h3>
+            <p>Probabilidade: Alta</p>
+            <p>Valor da cota: R$ 10,00</p>
+            <p>Participantes: 12 / 20</p>
+            <span class="status forming">🔄 Em formação</span>
+          </div>
+        </div>
+
+        <div id="megasena" class="sub-tab-content">
+          <h3>Bolões Mega Sena</h3>
+          <div class="bolao-card">
+            <h3>Grupo MS-LDO-01</h3>
+            <p>Probabilidade: Média</p>
+            <p>Valor da cota: R$ 20,00</p>
+            <p>Participantes: 8 / 15</p>
+            <span class="status forming">🔄 Em formação</span>
+          </div>
+          <div class="bolao-card">
+            <h3>Grupo MS-LDO-02</h3>
+            <p>Probabilidade: Boa</p>
+            <p>Valor da cota: R$ 25,00</p>
+            <p>Participantes: 10 / 12</p>
+            <span class="status almost">⚡ Quase fechado</span>
+          </div>
+        </div>
+
+        <div id="quina" class="sub-tab-content">
+          <h3>Bolões Quina</h3>
+          <div class="bolao-card">
+            <h3>Grupo QN-LDO-01</h3>
+            <p>Probabilidade: Alta</p>
+            <p>Valor da cota: R$ 6,00</p>
+            <p>Participantes: 15 / 20</p>
+            <span class="status forming">🔄 Em formação</span>
+          </div>
+          <div class="bolao-card">
+            <h3>Grupo QN-LDO-02</h3>
+            <p>Probabilidade: Muito Alta</p>
+            <p>Valor da cota: R$ 8,00</p>
+            <p>Participantes: 22 / 25</p>
+            <span class="status almost">⚡ Quase fechado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function abrirAba(evt, nomeAba) {
+      var i, conteudos, abas;
+      conteudos = document.getElementsByClassName("tab-content");
+      for (i = 0; i < conteudos.length; i++) {
+        conteudos[i].classList.remove("active");
+      }
+      abas = document.getElementsByClassName("tab");
+      for (i = 0; i < abas.length; i++) {
+        abas[i].classList.remove("active");
+      }
+      document.getElementById(nomeAba).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+
+    function abrirSubAba(evt, nomeSubAba) {
+      var i, subConteudos, subAbas;
+      subConteudos = document.getElementsByClassName("sub-tab-content");
+      for (i = 0; i < subConteudos.length; i++) {
+        subConteudos[i].classList.remove("active");
+      }
+      subAbas = document.getElementsByClassName("sub-tab");
+      for (i = 0; i < subAbas.length; i++) {
+        subAbas[i].classList.remove("active");
+      }
+      document.getElementById(nomeSubAba).classList.add("active");
+      evt.currentTarget.classList.add("active");
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+
+      if (hamburgerIcon && navPanel && navOverlay) {
+        hamburgerIcon.addEventListener('click', () => {
+          hamburgerIcon.classList.toggle('open');
+          navPanel.classList.toggle('open');
+          navOverlay.classList.toggle('open');
+          
+          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
+        });
+
+        // Fechar o menu ao clicar em um link
+        navPanel.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+            
+            // Evento específico para o link +Milionária
+            if (link.textContent.includes('+Milionária')) {
+              console.log('Navegando para o Dashboard via menu +Milionária');
+            }
+          });
+        });
+
+        // Fechar o menu ao clicar fora dele
+        navPanel.addEventListener('click', (e) => {
+          if (e.target === navPanel) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        });
+
+        // Fechar o menu com tecla ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
