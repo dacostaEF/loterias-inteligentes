@@ -364,11 +364,261 @@
         margin: 0px !important;
       }
     }
+
+    /* Estilos para os menus responsivos */
+    /* Menu Desktop */
+    .desktop-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .desktop-nav .logo {
+      max-width: 150px;
+      height: auto;
+    }
+
+    .desktop-nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .desktop-nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .desktop-nav-links a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Esconder menu desktop em mobile */
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+    }
+
+    /* Mostrar menu desktop em telas maiores */
+    @media (min-width: 769px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    /* Estilos para o menu hambúrguer */
+    .hamburger-menu {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 1000;
+      display: none;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .hamburger-icon {
+      width: 30px;
+      height: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .hamburger-icon span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: #A855F7;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-icon.open span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger-icon.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-icon.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Sidebar deslizante */
+    .nav-panel {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+      display: flex;
+      flex-direction: column;
+      transition: left 0.3s ease-in-out;
+      z-index: 999;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+      border-right: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .nav-panel.open {
+      left: 0;
+    }
+
+    /* Header do sidebar */
+    .nav-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      text-align: center;
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .nav-logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .nav-header h3 {
+      color: #A855F7;
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .nav-panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .nav-panel li {
+      margin: 0;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+    }
+
+    .nav-panel a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 20px 25px;
+      display: block;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-panel a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      border-left-color: #A855F7;
+    }
+
+    /* Overlay para escurecer o fundo */
+    .nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 998;
+    }
+
+    .nav-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Mostrar menu hambúrguer em mobile */
+    @media (max-width: 768px) {
+      .hamburger-menu {
+        display: block;
+      }
+    }
+
+    /* Ajuste do padding do body para o menu desktop */
+    body {
+      padding-top: 80px !important;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-top: 1rem !important;
+      }
+    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
 <body class="p-4 sm:p-6">
+  <!-- Menu Desktop -->
+  <nav class="desktop-nav">
+    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
+    <div class="desktop-nav-links">
+      <a href="/dashboard">🏠 Início</a>
+      <a href="/dashboard">💰 +Milionária</a>
+      <a href="/megasena">🎯 Mega Sena</a>
+      <a href="/lotofacil">🎲 Lotofácil</a>
+      <a href="/quimica">🔢 Quina</a>
+      <a href="/boloes">🎯 Bolões</a>
+      <a href="/contato">📞 Contato</a>
+    </div>
+  </nav>
+
+  <!-- Menu Mobile (Hambúrguer) -->
+  <div class="hamburger-menu">
+    <div class="hamburger-icon" id="hamburgerIcon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- Overlay para escurecer o fundo -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
+  <!-- Sidebar deslizante -->
+  <nav class="nav-panel" id="navPanel">
+    <div class="nav-header">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="nav-logo">
+      <h3>Menu</h3>
+    </div>
+    <ul>
+      <li><a href="/dashboard">🏠 Início</a></li>
+      <li><a href="/dashboard">💰 +Milionária</a></li>
+      <li><a href="/megasena">🎯 Mega Sena</a></li>
+      <li><a href="/lotofacil">🎲 Lotofácil</a></li>
+      <li><a href="/quimica">🔢 Quina</a></li>
+      <li><a href="/boloes">🎯 Bolões</a></li>
+      <li><a href="/contato">📞 Contato</a></li>
+    </ul>
+  </nav>
+
   <!-- Header -->
   <header class="flex justify-between items-center mb-8">
     <div>
@@ -4859,6 +5109,54 @@
   </style>
 
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+
+  <!-- Script para controlar os menus responsivos -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+
+      if (hamburgerIcon && navPanel && navOverlay) {
+        hamburgerIcon.addEventListener('click', () => {
+          hamburgerIcon.classList.toggle('open');
+          navPanel.classList.toggle('open');
+          navOverlay.classList.toggle('open');
+          
+          // Previne scroll do body quando menu está aberto
+          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
+        });
+
+        // Fechar o menu ao clicar em um link
+        navPanel.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Fechar o menu ao clicar no overlay
+        navOverlay.addEventListener('click', () => {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        });
+
+        // Fechar o menu com tecla ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+    });
+  </script>
 
   <!-- Modal para Números do Cluster -->
   <div id="modal-numeros-cluster" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">

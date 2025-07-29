@@ -393,9 +393,92 @@
          border-bottom: none;
        }
     }
+
+    /* Estilos para os menus responsivos */
+    /* Menu Desktop */
+    .desktop-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .desktop-nav .logo {
+      max-width: 150px;
+      height: auto;
+    }
+
+    .desktop-nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .desktop-nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .desktop-nav-links a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Esconder menu desktop em mobile */
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+    }
+
+    /* Mostrar menu desktop em telas maiores */
+    @media (min-width: 769px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    /* Ajuste do padding do body para o menu desktop */
+    .main-container {
+      padding-top: 80px !important;
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        padding-top: 3rem !important;
+      }
+    }
   </style>
 </head>
 <body>
+  <!-- Menu Desktop -->
+  <nav class="desktop-nav">
+    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
+    <div class="desktop-nav-links">
+      <a href="/dashboard">🏠 Início</a>
+      <a href="/dashboard">💰 +Milionária</a>
+      <a href="/megasena">🎯 Mega Sena</a>
+      <a href="/lotofacil">🎲 Lotofácil</a>
+      <a href="/quimica">🔢 Quina</a>
+      <a href="/boloes">🎯 Bolões</a>
+      <a href="/contato">📞 Contato</a>
+    </div>
+  </nav>
+
   <div class="main-container">
     <div class="hamburger-menu">
       <div class="hamburger-icon" id="hamburgerIcon">
@@ -419,6 +502,7 @@
         <li><a href="/megasena">🎯 Mega Sena</a></li>
         <li><a href="/lotofacil">🎲 Lotofácil</a></li>
         <li><a href="/quimica">🔢 Quina</a></li>
+        <li><a href="/boloes">🎯 Bolões</a></li>
         <li><a href="/contato">📞 Contato</a></li>
         </ul>
     </nav>
