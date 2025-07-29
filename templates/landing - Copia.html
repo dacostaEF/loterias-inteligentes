@@ -6,6 +6,7 @@
   <meta name="description" content="Análise estatística avançada para a +Milionária. Tome decisões conscientes com dados reais e inteligência artificial.">
   <title>+Milionária Inteligente - Análise Estatística Científica</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Favicon -->
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="16x16">
   <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png">
@@ -20,7 +21,6 @@
       color: #ffffff;
       min-height: 100vh;
       text-align: center;
-      background-color: #1a1a1a; /* Adicionado para garantir um fundo escuro */
     }
 
     .main-container {
@@ -30,8 +30,6 @@
       justify-content: flex-start;
       min-height: 100vh;
       padding-top: 3rem !important;
-      position: relative; /* Necessário para posicionar o menu */
-      z-index: 1; /* Para garantir que o conteúdo fique abaixo do menu */
     }
 
     .logo-container {
@@ -167,138 +165,6 @@
       font-weight: 600;
     }
 
-    /* Estilos para o menu hambúrguer */
-    .hamburger-menu {
-      position: fixed;
-      top: 1.5rem;
-      left: 1.5rem; /* Mudou de right para left */
-      z-index: 1000;
-      display: none;
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 8px;
-      padding: 8px;
-    }
-
-    .hamburger-icon {
-      width: 30px;
-      height: 25px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-    }
-
-    .hamburger-icon span {
-      display: block;
-      width: 100%;
-      height: 3px;
-      background-color: #A855F7;
-      border-radius: 3px;
-      transition: all 0.3s ease;
-    }
-
-    .hamburger-icon.open span:nth-child(1) {
-      transform: rotate(45deg) translate(5px, 5px);
-    }
-
-    .hamburger-icon.open span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .hamburger-icon.open span:nth-child(3) {
-      transform: rotate(-45deg) translate(5px, -5px);
-    }
-
-    /* Sidebar deslizante no lugar do modal fullscreen */
-    .nav-panel {
-      position: fixed;
-      top: 0;
-      left: -280px; /* Começa fora da tela à esquerda */
-      width: 280px;
-      height: 100%;
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
-      display: flex;
-      flex-direction: column;
-      transition: left 0.3s ease-in-out;
-      z-index: 999;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-      border-right: 1px solid rgba(168, 85, 247, 0.2);
-    }
-
-    .nav-panel.open {
-      left: 0; /* Desliza para dentro da tela */
-    }
-
-    /* Header do sidebar */
-    .nav-header {
-      padding: 20px 25px;
-      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-      text-align: center;
-      background: rgba(168, 85, 247, 0.05);
-    }
-
-    .nav-logo {
-      width: 120px;
-      height: auto;
-      margin-bottom: 10px;
-    }
-
-    .nav-header h3 {
-      color: #A855F7;
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-
-    .nav-panel ul {
-      list-style: none;
-      padding: 0;
-      margin: 0; /* Removido o margin-top pois agora temos header */
-      text-align: left;
-    }
-
-    .nav-panel li {
-      margin: 0;
-      border-bottom: 1px solid rgba(168, 85, 247, 0.1);
-    }
-
-    .nav-panel a {
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      padding: 20px 25px;
-      display: block;
-      border-left: 3px solid transparent;
-    }
-
-    .nav-panel a:hover {
-      color: #A855F7;
-      background: rgba(168, 85, 247, 0.1);
-      border-left-color: #A855F7;
-    }
-
-    /* Overlay para escurecer o fundo quando menu está aberto */
-    .nav-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
-      z-index: 998;
-    }
-
-    .nav-overlay.open {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    /* Media queries para responsividade */
     @media (max-width: 768px) {
       body {
         padding: 1rem;
@@ -350,20 +216,8 @@
         margin: 0.8rem 0;
       }
       
-      .logo { 
+            .logo { 
         max-width: 210px; 
-      }
-
-      .hamburger-menu {
-        display: block; /* Mostra o menu hambúrguer em telas menores */
-      }
-      
-      /* Ajuste para garantir que o menu hambúrguer seja visível */
-      .hamburger-menu {
-        position: fixed !important;
-        top: 1rem !important;
-        left: 1rem !important;
-        z-index: 1001 !important;
       }
     }
     
@@ -410,32 +264,6 @@
 </head>
 <body>
   <div class="main-container">
-    <div class="hamburger-menu">
-      <div class="hamburger-icon" id="hamburgerIcon">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
-
-    <!-- Overlay para escurecer o fundo -->
-    <div class="nav-overlay" id="navOverlay"></div>
-
-    <nav class="nav-panel" id="navPanel">
-      <div class="nav-header">
-        <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="nav-logo">
-        <h3>Menu</h3>
-      </div>
-      <ul>
-        <li><a href="/dashboard">🏠 Início</a></li>
-        <li><a href="/milionaria">💰 +Milionária</a></li>
-        <li><a href="/megasena">🎯 Mega Sena</a></li>
-        <li><a href="/lotofacil">🎲 Lotofácil</a></li>
-        <li><a href="/quimica">🔢 Quina</a></li>
-        <li><a href="/contato">📞 Contato</a></li>
-        </ul>
-    </nav>
-
     <div class="logo-container">
       <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="logo">
     </div>
@@ -479,56 +307,5 @@
     * Loterias envolvem resultados imprevisíveis. Embora não seja possível garantir acertos, usamos estatística para reduzir a aleatoriedade e tornar suas escolhas mais inteligentes.
   </p>
   </div>
-
-  # Inserindo Menu Hamburguer 
-
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const hamburgerIcon = document.getElementById('hamburgerIcon');
-      const navPanel = document.getElementById('navPanel');
-      const navOverlay = document.getElementById('navOverlay'); // Adicionado para controlar o overlay
-
-      if (hamburgerIcon && navPanel && navOverlay) {
-        hamburgerIcon.addEventListener('click', () => {
-          hamburgerIcon.classList.toggle('open');
-          navPanel.classList.toggle('open');
-          navOverlay.classList.toggle('open'); // Alterna a classe do overlay
-          
-          // Previne scroll do body quando menu está aberto
-          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
-        });
-
-        // Fechar o menu ao clicar em um link
-        navPanel.querySelectorAll('a').forEach(link => {
-          link.addEventListener('click', () => {
-            hamburgerIcon.classList.remove('open');
-            navPanel.classList.remove('open');
-            navOverlay.classList.remove('open'); // Fecha o overlay
-            document.body.style.overflow = '';
-          });
-        });
-
-        // Fechar o menu ao clicar fora dele
-        navPanel.addEventListener('click', (e) => {
-          if (e.target === navPanel) {
-            hamburgerIcon.classList.remove('open');
-            navPanel.classList.remove('open');
-            navOverlay.classList.remove('open'); // Fecha o overlay
-            document.body.style.overflow = '';
-          }
-        });
-
-        // Fechar o menu com tecla ESC
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
-            hamburgerIcon.classList.remove('open');
-            navPanel.classList.remove('open');
-            navOverlay.classList.remove('open'); // Fecha o overlay
-            document.body.style.overflow = '';
-          }
-        });
-      }
-    });
-  </script>
 </body>
-</html>
+</html> 
