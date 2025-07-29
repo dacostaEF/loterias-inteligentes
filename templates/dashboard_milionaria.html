@@ -3,6 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Meta tags para colorir a status bar dos dispositivos móveis -->
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="msapplication-navbutton-color" content="#7C3AED">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  
   <title>+Milionária | Dashboard Inteligente</title>
   
   <!-- Favicon -->
@@ -360,7 +367,6 @@
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
-
 </head>
 <body class="p-4 sm:p-6">
   <!-- Header -->
@@ -1155,7 +1161,6 @@
       { numeros: [7, 9, 11, 20, 37, 40], trevos: [3, 5] },
       { numeros: [5, 8, 18, 26, 39, 43], trevos: [1, 2] }
     ];
-
     function aplicarEstiloCelula(div) {
       // Removido: div.style.fontSize = '9px';
       // Removido: div.style.fontFamily = 'Arial, sans-serif';
@@ -1164,7 +1169,6 @@
       // Removido: div.style.width = '22px';
       // Removido: div.style.height = '22px';
     }
-
     function montarMatriz(concursos) {
       console.log('montarMatriz chamada com:', concursos);
       const container = document.getElementById('matriz-frequencia');
@@ -1876,7 +1880,6 @@
 
       Plotly.newPlot('grafico-amplitude-numeros', data, layout);
     }
-
     // Carregar análise de afinidades
     async function carregarAnaliseAfinidades(container, qtdConcursos = null) {
       container.innerHTML = "🔄 Carregando análise de afinidades...";
@@ -2659,7 +2662,6 @@
         responsive: true
       });
     }
-
     function criarGraficoCombinacoesTrevos(combinacoesOrdenadas) {
       const labels = combinacoesOrdenadas.map(combinacao => {
         // Combinacao[0] agora é uma string como "2,4", então precisamos dividir
@@ -3458,7 +3460,6 @@
     function criarGraficoSeca() {
       console.log('Criando gráfico de seca...');
     }
-
     // Função para atualizar o modal quando o filtro de período é alterado
     function updateEstatisticasAvancadasModal() {
       const selectElement = document.getElementById('selectEstatisticasAvancadasPeriodo');
@@ -4162,7 +4163,6 @@
       gerarApostaAleatoria(qtdeNum, qtdeTrevos);
       modalConfiguracao.classList.add('hidden'); // Fecha o modal após gerar
     });
-
     // Função para chamar o backend Flask
     async function gerarApostaAleatoria(qtdeNum, qtdeTrevos) {
       try {
