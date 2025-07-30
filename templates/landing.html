@@ -13,9 +13,36 @@
   
   <title>+Milionária Inteligente - Análise Estatística Científica</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Favicons otimizados para todos os dispositivos -->
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="16x16">
-  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="48x48">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="192x192">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="512x512">
+  
+  <!-- Apple Touch Icons para iOS -->
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="180x180">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="152x152">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="144x144">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="120x120">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="114x114">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="76x76">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="72x72">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="60x60">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="57x57">
+  
+  <!-- Android Chrome Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/img/Favicon_LI.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/static/img/Favicon_LI.png">
+  
+  <!-- Windows Tiles -->
+  <meta name="msapplication-TileColor" content="#7C3AED">
+  <meta name="msapplication-TileImage" content="/static/img/Favicon_LI.png">
+  <meta name="msapplication-config" content="none">
+  
+  <!-- Manifest para PWA -->
+  <link rel="manifest" href="/static/manifest.json">
   <link rel="preload" href="{{ url_for('static', filename='css/estilo.css') }}" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}"></noscript>
@@ -446,6 +473,89 @@
       background: rgba(0, 227, 140, 0.15) !important;
     }
 
+    /* Estilos para Breadcrumbs */
+    .breadcrumbs-container {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(0, 227, 140, 0.05) 100%);
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      padding: 8px 0;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 999;
+      margin-top: 80px;
+    }
+    
+    .breadcrumbs {
+      max-width: 1200px;
+      margin: 0;
+      padding: 0 20px;
+      text-align: left;
+    }
+    
+    .breadcrumb-list {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 0.9rem;
+    }
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      color: #94a3b8;
+    }
+    
+    .breadcrumb-item:not(:last-child)::after {
+      content: "›";
+      margin: 0 8px;
+      color: #64748b;
+      font-weight: bold;
+    }
+    
+    .breadcrumb-link {
+      color: #cbd5e1;
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .breadcrumb-item:not(.active) .breadcrumb-link:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+    }
+    
+    .breadcrumb-item.active .breadcrumb-link {
+      color: #00E38C;
+      font-weight: 600;
+    }
+    
+    /* Responsividade para breadcrumbs */
+    @media (max-width: 768px) {
+      .breadcrumbs-container {
+        padding: 6px 0;
+        margin-bottom: 15px;
+        margin-top: 0;
+      }
+      
+      .breadcrumbs {
+        padding: 0 15px;
+        margin: 0;
+        text-align: left;
+      }
+      
+      .breadcrumb-list {
+        font-size: 0.85rem;
+        justify-content: flex-start;
+      }
+      
+      .breadcrumb-item:not(:last-child)::after {
+        margin: 0 6px;
+      }
+    }
+
     /* Overlay para escurecer o fundo quando menu está aberto */
     .nav-overlay {
       position: fixed;
@@ -596,6 +706,17 @@
     </div>
   </nav>
 
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs-container">
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+          <ol class="breadcrumb-list">
+              <li class="breadcrumb-item active">
+                  <span class="breadcrumb-link">🏠 Início</span>
+              </li>
+          </ol>
+      </nav>
+  </div>
+
   <div class="main-container">
     <div class="hamburger-menu">
       <div class="hamburger-icon" id="hamburgerIcon">
@@ -630,9 +751,7 @@
       </ul>
     </nav>
 
-    <div class="logo-container">
-      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="logo">
-    </div>
+    <!-- Conteúdo principal -->
 
   <h1>Aposte com Inteligência,<br class="mobile-break"> Jogue com Confiança</h1>
   <h2>Uma iniciativa do portal <span class="portal-highlight">Loterias Inteligente</span></h2>
