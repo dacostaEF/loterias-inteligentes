@@ -374,6 +374,78 @@
       background: rgba(0, 227, 140, 0.2) !important;
     }
 
+    /* Estilos para submenu dropdown */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: #1a1a2e;
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      border-radius: 8px;
+      z-index: 1000;
+      border: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .dropdown-content a {
+      color: #e2e8f0;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-left: 3px solid transparent;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .dropdown-content a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      border-left-color: #A855F7;
+    }
+
+    .dropdown-content a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    /* Submenu para mobile */
+    .mobile-dropdown {
+      display: none;
+      background: rgba(168, 85, 247, 0.05);
+      border-left: 3px solid rgba(168, 85, 247, 0.3);
+      margin-left: 20px;
+    }
+
+    .mobile-dropdown.show {
+      display: block;
+    }
+
+    .mobile-dropdown a {
+      padding: 10px 20px 10px 40px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .mobile-dropdown a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+    }
+
+    .mobile-dropdown a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+    }
+
     /* Overlay para escurecer o fundo quando menu está aberto */
     .nav-overlay {
       position: fixed;
@@ -509,7 +581,13 @@
     <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
     <div class="desktop-nav-links">
       <a href="/" class="active">🏠 Início</a>
-      <a href="/dashboard">💰 +Milionária</a>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle">💰 +Milionária ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard">🎯 Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium">📊 Inteligência Estatística</a>
+        </div>
+      </div>
       <a href="#">🎯 Mega Sena</a>
       <a href="#">🎲 Lotofácil</a>
       <a href="#">🔢 Quina</a>
@@ -537,7 +615,13 @@
       </div>
       <ul>
         <li><a href="/" class="active">🏠 Início</a></li>
-        <li><a href="/dashboard">💰 +Milionária</a></li>
+        <li>
+          <a href="#" class="mobile-dropdown-toggle">💰 +Milionária ▼</a>
+          <div class="mobile-dropdown">
+            <a href="/dashboard">🎯 Palpite da Sorte</a>
+            <a href="/aposta_inteligente_premium">📊 Inteligência Estatística</a>
+          </div>
+        </li>
         <li><a href="#">🎯 Mega Sena</a></li>
         <li><a href="#">🎲 Lotofácil</a></li>
         <li><a href="#">🔢 Quina</a></li>
@@ -602,20 +686,23 @@
           document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
         });
 
-        // Fechar o menu ao clicar em um link
-        navPanel.querySelectorAll('a').forEach(link => {
+        // Controle do submenu mobile
+        const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+        mobileDropdownToggles.forEach(toggle => {
+          toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const dropdown = toggle.nextElementSibling;
+            dropdown.classList.toggle('show');
+          });
+        });
+
+        // Fechar o menu ao clicar em um link (exceto dropdown toggles)
+        navPanel.querySelectorAll('a:not(.mobile-dropdown-toggle)').forEach(link => {
           link.addEventListener('click', () => {
             hamburgerIcon.classList.remove('open');
             navPanel.classList.remove('open');
             navOverlay.classList.remove('open'); // Fecha o overlay
             document.body.style.overflow = '';
-            
-            // Evento específico para o link +Milionária
-            if (link.textContent.includes('+Milionária')) {
-              // Comportamento específico para o link +Milionária
-              console.log('Navegando para o Dashboard via menu +Milionária');
-              // O link href="/dashboard" já está configurado, então a navegação acontece automaticamente
-            }
           });
         });
 
