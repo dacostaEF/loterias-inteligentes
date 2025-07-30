@@ -71,16 +71,23 @@
     .logo-container {
       margin-bottom: 1rem;
       margin-top: 0 !important;
+      text-align: center;
     }
 
     .logo {
-      max-width: 270px;
+      max-width: 300px;
+      height: auto;
       margin-bottom: 0.5rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      object-fit: contain;
     }
 
     h1 {
       font-size: 1.75rem;
       margin-bottom: 0.5rem;
+      margin-top: 0.5rem;
       color: #ffffff;
       font-weight: 700;
     }
@@ -222,8 +229,10 @@
     }
 
     .desktop-nav .logo {
-      max-width: 150px;
+      max-width: 180px;
       height: auto;
+      display: block;
+      object-fit: contain;
     }
 
     .desktop-nav-links {
@@ -347,9 +356,11 @@
     }
 
     .nav-logo {
-      width: 120px;
+      width: 140px;
       height: auto;
       margin-bottom: 10px;
+      display: block;
+      object-fit: contain;
     }
 
     .nav-header h3 {
@@ -602,13 +613,17 @@
       }
       
       .logo-container img {
-        max-width: 180px;
-        margin-bottom: 1rem;
+        max-width: 200px;
+        margin-bottom: 0.5rem;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
       }
       
       h1 { 
         font-size: 1.8rem; 
         margin-bottom: 0.3rem;
+        margin-top: 0.3rem;
       }
       
       h2 { 
@@ -645,6 +660,19 @@
       .logo { 
         max-width: 210px; 
       }
+      
+      /* Garantir que a logo seja exibida corretamente */
+      .desktop-nav .logo {
+        max-width: 160px !important;
+        display: block !important;
+        visibility: visible !important;
+      }
+      
+      .nav-logo {
+        width: 120px !important;
+        display: block !important;
+        visibility: visible !important;
+      }
 
       .hamburger-menu {
         display: block; /* Mostra o menu hambúrguer em telas menores */
@@ -670,13 +698,17 @@
       }
       
       .logo-container img {
-        max-width: 150px;
-        margin-bottom: 0.8rem;
+        max-width: 160px;
+        margin-bottom: 0.3rem;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
       }
       
       h1 {
         font-size: 1.05rem;
         margin-bottom: 0.2rem;
+        margin-top: 0.2rem;
       }
 
       .mobile-break {
@@ -694,6 +726,19 @@
         margin-top: 0.3rem;
       }
       
+      /* Garantir que a logo seja exibida em telas pequenas */
+      .desktop-nav .logo {
+        max-width: 140px !important;
+        display: block !important;
+        visibility: visible !important;
+      }
+      
+      .nav-logo {
+        width: 100px !important;
+        display: block !important;
+        visibility: visible !important;
+      }
+      
       .nota {
         margin-top: 0.8rem;
       }
@@ -703,7 +748,7 @@
 <body>
   <!-- Menu Desktop -->
   <nav class="desktop-nav">
-    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
+    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="logo">
     <div class="desktop-nav-links">
       <a href="/" class="active">🏠 Início</a>
       <div class="dropdown">
@@ -746,7 +791,7 @@
 
     <nav class="nav-panel" id="navPanel">
       <div class="nav-header">
-        <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="nav-logo">
+        <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="nav-logo">
         <h3>Menu</h3>
       </div>
       <ul>
@@ -767,6 +812,11 @@
     </nav>
 
     <!-- Conteúdo principal -->
+    
+    <!-- Logo central da página -->
+    <div class="logo-container">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="logo">
+    </div>
 
   <h1>Aposte com Inteligência,<br class="mobile-break"> Jogue com Confiança</h1>
   <h2>Uma iniciativa do portal <span class="portal-highlight">Loterias Inteligente</span></h2>

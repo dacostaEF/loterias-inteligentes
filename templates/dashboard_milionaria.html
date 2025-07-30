@@ -960,7 +960,7 @@
 
   <!-- Modal de Configuração de Aposta -->
   <div id="modalConfiguracao" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-purple-950 bg-opacity-60 p-8 rounded-2xl shadow-xl w-96 text-white">
+    <div class="modal-content p-8 rounded-2xl shadow-xl w-96 text-white">
       <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Configurar Aposta Aleatória</h3>
 
       <div class="mb-5">
@@ -5318,9 +5318,16 @@
     }
   }
 
+  /* Estilo do modal com propriedades do selo-confianca */
+  .modal-content {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(255, 255, 255, 0.15));
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 12px;
+  }
+
   /* Responsividade para modal de configuração de aposta */
   @media (max-width: 768px) {
-    #modalConfiguracao .bg-purple-950 {
+    #modalConfiguracao .modal-content {
       width: 95% !important;
       max-width: 400px !important;
       padding: 1.5rem !important;
@@ -5355,7 +5362,7 @@
   }
 
   @media (max-width: 480px) {
-    #modalConfiguracao .bg-purple-950 {
+    #modalConfiguracao .modal-content {
       width: 98% !important;
       padding: 1rem !important;
     }
