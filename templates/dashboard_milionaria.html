@@ -960,7 +960,7 @@
 
   <!-- Modal de Configuração de Aposta -->
   <div id="modalConfiguracao" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-    <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-xl w-96 text-white">
+    <div class="bg-purple-950 bg-opacity-60 p-8 rounded-2xl shadow-xl w-96 text-white">
       <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Configurar Aposta Aleatória</h3>
 
       <div class="mb-5">
@@ -5315,6 +5315,56 @@
       margin: 2% auto; /* Margem ainda menor */
       width: 99%; /* Quase toda a largura */
       padding: 12px; /* Padding menor */
+    }
+  }
+
+  /* Responsividade para modal de configuração de aposta */
+  @media (max-width: 768px) {
+    #modalConfiguracao .bg-purple-950 {
+      width: 95% !important;
+      max-width: 400px !important;
+      padding: 1.5rem !important;
+    }
+    
+    #modalConfiguracao .mb-5 {
+      margin-bottom: 1rem !important;
+    }
+    
+    #modalConfiguracao .mb-8 {
+      margin-bottom: 1.5rem !important;
+    }
+    
+    /* Aproximar números das barras */
+    #modalConfiguracao #valorNumeros,
+    #modalConfiguracao #valorTrevos {
+      margin-top: 0.5rem !important;
+      font-size: 1.25rem !important;
+      font-weight: bold !important;
+    }
+    
+    /* Aumentar fonte dos números coloridos */
+    #modalConfiguracao #valorNumeros {
+      color: #00E38C !important;
+      font-size: 1.5rem !important;
+    }
+    
+    #modalConfiguracao #valorTrevos {
+      color: #8B5CF6 !important;
+      font-size: 1.5rem !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #modalConfiguracao .bg-purple-950 {
+      width: 98% !important;
+      padding: 1rem !important;
+    }
+    
+    /* Aproximar ainda mais os números das barras */
+    #modalConfiguracao #valorNumeros,
+    #modalConfiguracao #valorTrevos {
+      margin-top: 0.25rem !important;
+      font-size: 1.75rem !important;
     }
   }
   </style>
