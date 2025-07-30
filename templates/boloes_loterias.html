@@ -326,6 +326,19 @@
       border-left-color: #bba5ff;
     }
 
+    /* Estilo para destacar a página atual no menu mobile */
+    .nav-panel a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .nav-panel a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
     /* Overlay */
     .nav-overlay {
       position: fixed;
@@ -516,7 +529,7 @@
         <li><a href="#">🎯 Mega Sena</a></li>
         <li><a href="#">🎲 Lotofácil</a></li>
         <li><a href="#">🔢 Quina</a></li>
-        <li><a href="/boloes">🎯 Bolões</a></li>
+        <li><a href="/boloes" class="active">🎯 Bolões</a></li>
         <li><a href="#">📞 Contato</a></li>
         </ul>
     </nav>

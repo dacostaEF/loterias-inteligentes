@@ -361,6 +361,19 @@
       border-left-color: #A855F7;
     }
 
+    /* Estilo para destacar a página atual no menu mobile */
+    .nav-panel a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .nav-panel a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
     /* Overlay para escurecer o fundo quando menu está aberto */
     .nav-overlay {
       position: fixed;
@@ -523,7 +536,7 @@
         <h3>Menu</h3>
       </div>
       <ul>
-        <li><a href="/">🏠 Início</a></li>
+        <li><a href="/" class="active">🏠 Início</a></li>
         <li><a href="/dashboard">💰 +Milionária</a></li>
         <li><a href="#">🎯 Mega Sena</a></li>
         <li><a href="#">🎲 Lotofácil</a></li>
