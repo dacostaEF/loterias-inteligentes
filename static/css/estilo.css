@@ -821,9 +821,10 @@ p {
     
 
     
-    /* 📱 Oculta subtítulo em tablets também */
+    /* 📱 Mantém subtítulo visível em tablets */
     header p {
-        display: none !important;
+        display: block !important;
+        font-size: 0.8rem !important;
     }
     
     /* 📱 Botão login mais compacto em tablets */
@@ -1222,9 +1223,10 @@ p {
         font-size: 1rem !important;
     }
     
-    /* Oculta o subtítulo no mobile */
+    /* Mantém o subtítulo visível no mobile */
     header p {
-        display: none !important;
+        display: block !important;
+        font-size: 0.7rem !important;
     }
 
     /* Ajusta o botão Login / Criar Conta - ainda menor */
