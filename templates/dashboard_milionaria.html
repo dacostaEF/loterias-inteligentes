@@ -409,6 +409,20 @@
       transform: translateY(-1px);
     }
 
+    /* Estilo para destacar a página atual */
+    .desktop-nav-links a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border: 1px solid rgba(0, 227, 140, 0.3) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .desktop-nav-links a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
     /* Esconder menu desktop em mobile */
     @media (max-width: 768px) {
       .desktop-nav {
@@ -580,13 +594,13 @@
   <nav class="desktop-nav">
     <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
     <div class="desktop-nav-links">
-      <a href="/dashboard">🏠 Início</a>
-      <a href="/dashboard">💰 +Milionária</a>
-      <a href="/megasena">🎯 Mega Sena</a>
-      <a href="/lotofacil">🎲 Lotofácil</a>
-      <a href="/quimica">🔢 Quina</a>
+      <a href="/">🏠 Início</a>
+      <a href="/dashboard" class="active">💰 +Milionária</a>
+      <a href="#">🎯 Mega Sena</a>
+      <a href="#">🎲 Lotofácil</a>
+      <a href="#">🔢 Quina</a>
       <a href="/boloes">🎯 Bolões</a>
-      <a href="/contato">📞 Contato</a>
+      <a href="#">📞 Contato</a>
     </div>
   </nav>
 
@@ -609,13 +623,13 @@
       <h3>Menu</h3>
     </div>
     <ul>
-      <li><a href="/dashboard">🏠 Início</a></li>
+      <li><a href="/">🏠 Início</a></li>
       <li><a href="/dashboard">💰 +Milionária</a></li>
-      <li><a href="/megasena">🎯 Mega Sena</a></li>
-      <li><a href="/lotofacil">🎲 Lotofácil</a></li>
-      <li><a href="/quimica">🔢 Quina</a></li>
+      <li><a href="#">🎯 Mega Sena</a></li>
+      <li><a href="#">🎲 Lotofácil</a></li>
+      <li><a href="#">🔢 Quina</a></li>
       <li><a href="/boloes">🎯 Bolões</a></li>
-      <li><a href="/contato">📞 Contato</a></li>
+      <li><a href="#">📞 Contato</a></li>
     </ul>
   </nav>
 
