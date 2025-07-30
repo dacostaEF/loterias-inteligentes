@@ -885,7 +885,7 @@
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Passo 1: Frequência -->
-        <div class="bg-[#2E303A] p-4 rounded-xl">
+        <div id="passo1" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 1</span>
             <h4 class="text-lg font-semibold" style="color: #A855F7;">Descubra os Números Mais Sorteados</h4>
@@ -897,7 +897,7 @@
         </div>
 
         <!-- Passo 2: Distribuição -->
-        <div class="bg-[#2E303A] p-4 rounded-xl">
+        <div id="passo2" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 2</span>
             <h4 class="text-lg font-semibold" style="color: #A855F7;">Entenda Como os Números se Distribuem</h4>
@@ -909,7 +909,7 @@
         </div>
 
         <!-- Passo 3: Afinidades -->
-        <div class="bg-[#2E303A] p-4 rounded-xl">
+        <div id="passo3" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 3</span>
             <h4 class="text-lg font-semibold" style="color: #A855F7;">Encontre Combinações que Saem Juntas</h4>
@@ -921,7 +921,7 @@
         </div>
 
         <!-- Passo 4: Trevos -->
-        <div class="bg-[#2E303A] p-4 rounded-xl">
+        <div id="passo4" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 4</span>
             <h4 class="text-lg font-semibold" style="color: #A855F7;">Analise os Trevos da Sorte</h4>
@@ -933,7 +933,7 @@
         </div>
 
         <!-- Passo 5: Seca -->
-        <div class="bg-[#2E303A] p-4 rounded-xl">
+        <div id="passo5" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 5</span>
             <h4 class="text-lg font-semibold" style="color: #A855F7;">Identifique Números que Não Saem</h4>
@@ -948,9 +948,9 @@
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 6</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Use IA para Padrões Ocultos</h4>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Estatística Avançada para Padrões Ocultos</h4>
           </div>
-          <p class="text-gray-300 text-sm mb-3">Explore correlações, padrões ocultos e tendências com IA.</p>
+          <p class="text-gray-300 text-sm mb-3">Explore correlações, padrões ocultos e tendências com análise estatística avançada.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('estatisticas')">
             🤖 Ver Análise Avançada
           </button>
@@ -959,7 +959,7 @@
     </div>
     
     <!-- Botão principal do Machine Learning - NO FINAL -->
-    <div class="mt-8 text-center">
+    <div id="passo6" class="mt-8 text-center">
       <div class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] p-1 rounded-xl inline-block">
         <button class="bg-[#1A1D25] text-white font-bold px-8 py-4 rounded-lg hover:bg-[#2E303A] transition-all text-lg" id="abrir-modal-premium">
           🎯 Gerar Aposta Inteligente (Premium)
@@ -1050,7 +1050,31 @@
     </div>
   </div>
 
-
+  <!-- Tour Guiado -->
+  <div id="tour-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[9999]">
+    <div id="tour-tip" class="absolute bg-[#2a2a3e] border-2 border-[rgba(168,85,247,0.6)] rounded-lg p-4 shadow-2xl max-w-sm text-white" style="box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);">
+      <div id="tour-content" class="mb-4">
+        <!-- Conteúdo do tip será inserido dinamicamente -->
+      </div>
+      <div class="flex justify-between items-center">
+        <button id="tour-prev" class="bg-[#2E303A] hover:bg-[#3E404A] text-white px-3 py-2 rounded-lg transition-colors">
+          ← Anterior
+        </button>
+        <div class="flex items-center space-x-2">
+          <span id="tour-progress" class="text-sm text-gray-400">1/9</span>
+          <button id="tour-skip" class="text-gray-400 hover:text-white text-sm">Pular Tour</button>
+        </div>
+        <button id="tour-next" class="bg-[#00E38C] hover:bg-[#00C973] text-black px-3 py-2 rounded-lg transition-colors">
+          Próximo →
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Botão de ativação do Tour -->
+  <button id="tour-activate" class="fixed top-20 right-4 bg-[#00E38C] hover:bg-[#00C973] text-black px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-200 hover:scale-105">
+    🎯 Tour Guiado
+  </button>
 
   <!-- Scripts -->
   <script>
@@ -1096,6 +1120,202 @@
     // Variáveis globais
     let numerosSelecionados = [];
     let trevosSelecionados = []; // Array único para os 2 trevos selecionados
+
+    // Tour Guiado - Inteligência Estatística
+    let currentTourStep = 0;
+    const tourSteps = [
+      {
+        target: 'h1',
+        content: '<strong>Bem-vindo à Aposta Inteligente Premium!</strong><br><br>Descubra o coração da nossa inteligência aqui! Esta página combina múltiplas análises estatísticas e algoritmos avançados para transformar seus "achismos" em decisões de aposta fundamentadas em dados. Vamos começar?',
+        position: 'bottom'
+      },
+      {
+        target: '#passo1',
+        content: '<strong>Passo 1: Análises Estatísticas de Frequência e Tendências</strong><br><br>Explore os Números Quentes e Frios, visualize a Matriz de Frequência dos concursos e veja o "tempo de seca" de cada número e trevo. Você controla o período temporal de análise para identificar tendências recentes ou históricas.',
+        position: 'left'
+      },
+      {
+        target: '#passo2',
+        content: '<strong>Passo 2: Mergulhe na Distribuição Estatística dos Sorteios</strong><br><br>Vá além da frequência! Analise padrões de pares/ímpares, faixas numéricas e a soma dos números sorteados. Entenda como as distribuições se comportam ao longo do tempo.',
+        position: 'left'
+      },
+      {
+        target: '#passo3',
+        content: '<strong>Passo 3: Encontre Combinações que Saem Juntas</strong><br><br>Descubra combinações que costumam sair juntas através de análise estatística avançada. Identifique padrões de afinidade entre números e trevos.',
+        position: 'left'
+      },
+      {
+        target: '#passo4',
+        content: '<strong>Passo 4: Analise os Trevos da Sorte</strong><br><br>Veja os trevos com maior frequência e distribuição. Analise padrões estatísticos específicos dos trevos para otimizar suas escolhas.',
+        position: 'left'
+      },
+      {
+        target: '#passo5',
+        content: '<strong>Passo 5: Identifique Números que Não Saem</strong><br><br>Evite números que estão há muito tempo sem sair. Analise estatisticamente os períodos de "seca" para tomar decisões mais informadas.',
+        position: 'left'
+      },
+      {
+        target: '#passo6',
+        content: '<strong>Passo 6: Estatística Avançada para Padrões Ocultos</strong><br><br>Explore correlações, padrões ocultos e tendências com análise estatística avançada. Descubra relações complexas entre números e trevos.',
+        position: 'bottom'
+      },
+      {
+        target: '#abrir-modal-premium',
+        content: '<strong>Gerador de Aposta Inteligente: Sua Estratégia em Ação</strong><br><br>Após suas análises, use nosso Gerador de Aposta Inteligente. Com base em suas preferências, ele combina múltiplas análises estatísticas e gera até 10 apostas otimizadas.',
+        position: 'left'
+      },
+      {
+        target: 'h1',
+        content: '<strong>Sua Vantagem Premium: Análise Estatística Avançada</strong><br><br>Esta ferramenta Premium oferece análise estatística avançada e algoritmos proprietários que você não encontra em outro lugar. Personalize sua estratégia e use dados reais para ir além do palpite aleatório. O futuro das suas apostas começa aqui!',
+        position: 'center'
+      }
+    ];
+
+    // Função para mostrar o tour
+    function showTour() {
+      document.getElementById('tour-overlay').classList.remove('hidden');
+      currentTourStep = 0;
+      showStep();
+    }
+
+    // Função para mostrar cada passo do tour
+    function showStep() {
+      const step = tourSteps[currentTourStep];
+      const target = document.querySelector(step.target);
+      const tip = document.getElementById('tour-tip');
+      const content = document.getElementById('tour-content');
+      const progress = document.getElementById('tour-progress');
+
+      if (!target) {
+        console.error('Target não encontrado:', step.target);
+        return;
+      }
+
+      content.innerHTML = step.content;
+      progress.textContent = `${currentTourStep + 1}/${tourSteps.length}`;
+
+      const targetRect = target.getBoundingClientRect();
+      const tipRect = tip.getBoundingClientRect();
+
+      let left, top;
+
+      switch (step.position) {
+        case 'left':
+          left = targetRect.left - tipRect.width - 20;
+          top = targetRect.top + (targetRect.height / 2) - (tipRect.height / 2);
+          break;
+        case 'bottom':
+          left = targetRect.left + (targetRect.width / 2) - (tipRect.width / 2);
+          top = targetRect.bottom + 20;
+          break;
+        case 'center':
+          left = (window.innerWidth / 2) - (tipRect.width / 2);
+          top = (window.innerHeight / 2) - (tipRect.height / 2);
+          break;
+        default:
+          left = targetRect.left + (targetRect.width / 2) - (tipRect.width / 2);
+          top = targetRect.top - tipRect.height - 20;
+      }
+
+      // Garantir que a dica não saia da tela
+      if (left < 20) left = 20;
+      if (left + tipRect.width > window.innerWidth - 20) {
+        left = window.innerWidth - tipRect.width - 20;
+      }
+      if (top < 20) top = 20;
+      if (top + tipRect.height > window.innerHeight - 20) {
+        top = window.innerHeight - tipRect.height - 20;
+      }
+
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+
+      // Atualizar botões
+      document.getElementById('tour-prev').disabled = currentTourStep === 0;
+      document.getElementById('tour-next').textContent = currentTourStep === tourSteps.length - 1 ? 'Finalizar' : 'Próximo →';
+    }
+
+    // Função para mostrar mensagem de conclusão
+    function showCompletionMessage() {
+      const tip = document.getElementById('tour-tip');
+      const content = document.getElementById('tour-content');
+      
+      content.innerHTML = '<strong>🎉 Tour Concluído!</strong><br><br>Agora você conhece todas as funcionalidades da nossa Inteligência Estatística Premium. Comece a explorar e transforme suas apostas com dados e algoritmos avançados!';
+      
+      document.getElementById('tour-prev').style.display = 'none';
+      document.getElementById('tour-next').style.display = 'none';
+      document.getElementById('tour-skip').textContent = 'Fechar';
+      
+      // Centralizar a mensagem
+      const tipRect = tip.getBoundingClientRect();
+      tip.style.left = (window.innerWidth / 2) - (tipRect.width / 2) + 'px';
+      tip.style.top = (window.innerHeight / 2) - (tipRect.height / 2) + 'px';
+    }
+
+    // Event listeners para o tour
+    document.addEventListener('DOMContentLoaded', function() {
+      // Botão de ativação
+      const tourActivate = document.getElementById('tour-activate');
+      if (tourActivate) {
+        tourActivate.addEventListener('click', showTour);
+      }
+
+      // Navegação do tour
+      const tourNext = document.getElementById('tour-next');
+      if (tourNext) {
+        tourNext.addEventListener('click', function() {
+          if (currentTourStep < tourSteps.length - 1) {
+            currentTourStep++;
+            showStep();
+          } else {
+            showCompletionMessage();
+          }
+        });
+      }
+
+      const tourPrev = document.getElementById('tour-prev');
+      if (tourPrev) {
+        tourPrev.addEventListener('click', function() {
+          if (currentTourStep > 0) {
+            currentTourStep--;
+            showStep();
+          }
+        });
+      }
+
+      const tourSkip = document.getElementById('tour-skip');
+      if (tourSkip) {
+        tourSkip.addEventListener('click', function() {
+          document.getElementById('tour-overlay').classList.add('hidden');
+          // Resetar botões
+          document.getElementById('tour-prev').style.display = 'block';
+          document.getElementById('tour-next').style.display = 'block';
+          document.getElementById('tour-skip').textContent = 'Pular Tour';
+        });
+      }
+
+      // Fechar tour clicando fora
+      const tourOverlay = document.getElementById('tour-overlay');
+      if (tourOverlay) {
+        tourOverlay.addEventListener('click', function(e) {
+          if (e.target.id === 'tour-overlay') {
+            document.getElementById('tour-overlay').classList.add('hidden');
+          }
+        });
+      }
+
+      // Verificar se é a primeira visita
+      if (!localStorage.getItem('tourCompleted')) {
+        setTimeout(() => {
+          showTour();
+        }, 2000);
+      }
+    });
+
+    // Marcar tour como concluído
+    function completeTour() {
+      localStorage.setItem('tourCompleted', 'true');
+    }
 
     // Inicialização - Aguarda carregamento completo dos estilos
     function inicializarAplicacao() {
