@@ -690,11 +690,56 @@ def exibir_analise_temporal_estruturada(resultado_temporal):
             for trevo, freq in trevos_ordenados:
                 print(f"      Trevo {trevo}: {freq:3d} vezes")
 
+def analisar_frequencia(df_milionaria=None, qtd_concursos=50):
+    """
+    Função wrapper para análise de frequência dos últimos N concursos
+    Retorna dados formatados para uso na API
+    
+    Args:
+        df_milionaria (pd.DataFrame, optional): DataFrame com dados da +Milionária. 
+                                               Se None, tenta carregar automaticamente.
+        qtd_concursos (int): Quantidade de últimos concursos a analisar (padrão: 50)
+    
+    Returns:
+        dict: Dados formatados para a API
+    """
+    try:
+        # Se não foi passado DataFrame, tentar carregar
+        if df_milionaria is None:
+            from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+            df_milionaria = carregar_dados_milionaria()
+        
+        # Executar análise completa
+        resultado_completo = analise_frequencia_milionaria_completa(df_milionaria, qtd_concursos=qtd_concursos)
+        
+        if not resultado_completo or 'analise_frequencia' not in resultado_completo:
+            print("⚠️  Erro: Não foi possível obter dados de frequência")
+            return {}
+        
+        # Extrair dados da análise
+        analise = resultado_completo['analise_frequencia']
+        
+        # Formatar dados para a API
+        dados_formatados = {
+            'periodo_analisado': analise.get('periodo_analisado', {}),
+            'frequencia_absoluta': analise.get('frequencia_absoluta', {}),
+            'frequencia_relativa': analise.get('frequencia_relativa', {}),
+            'numeros_quentes_frios': analise.get('numeros_quentes_frios', {}),
+            'analise_temporal': analise.get('analise_temporal', []),
+            'analise_temporal_estatistica': analise.get('analise_temporal_estatistica', {})
+        }
+        
+        return dados_formatados
+        
+    except Exception as e:
+        print(f"❌ Erro ao analisar frequência: {e}")
+        return {}
+
 # Exemplo de uso com dados da Mais Milionária
 if __name__ == "__main__":
     try:
         # Tentar importar e usar dados reais da Mais Milionária
-        from MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
         
         print("🔄 Carregando dados da Mais Milionária...")
         df_milionaria = carregar_dados_milionaria()

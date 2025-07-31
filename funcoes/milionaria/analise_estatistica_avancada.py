@@ -1138,7 +1138,7 @@ def exibir_analise_estatistica_avancada(resultados):
 # Exemplo de uso
 if __name__ == "__main__":
     try:
-        from MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
         
         print("📊 ANÁLISE ESTATÍSTICA AVANÇADA - +MILIONÁRIA")
         print("="*80)

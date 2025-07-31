@@ -544,7 +544,7 @@ def exibir_analise_padroes_sequencias_detalhada(resultado):
 if __name__ == "__main__":
     try:
         # Tentar importar e usar dados reais da Mais Milionária
-        from MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
         
         print("🔄 Carregando dados da Mais Milionária...")
         df_milionaria = carregar_dados_milionaria()

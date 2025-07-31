@@ -549,7 +549,7 @@ def exibir_analise_frequencia_completa(resultado):
 if __name__ == "__main__":
     # Carregar os dados do arquivo Excel
     try:
-        from MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
         
         print("📊 ANÁLISE COMPLETA DE FREQUÊNCIA DA +MILIONÁRIA")
         print("="*80)

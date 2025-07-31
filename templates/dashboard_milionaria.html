@@ -1526,22 +1526,65 @@
       }
     }
 
-    // Carregar estatísticas rápidas
-    function carregarEstatisticasRapidas() {
-      document.getElementById('numeros-quentes').innerHTML = 
-        dadosMilionaria.frequencia.numeros.quentes.slice(0, 5)
-          .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-          .join('');
+    // Carregar estatísticas rápidas com dados reais da API
+    async function carregarEstatisticasRapidas() {
+      try {
+        // Carregar dados reais da API
+        const response = await fetch('/api/analise-frequencia?qtd_concursos=50');
+        const dados = await response.json();
+        
+        if (dados.error) {
+          console.error('Erro ao carregar dados de frequência:', dados.error);
+          return;
+        }
+        
+        // Extrair números quentes (primeiros 10)
+        const numerosQuentes = dados.numeros_quentes.slice(0, 10).map(item => item[0]);
+        
+        // Extrair números frios (últimos 10)
+        const numerosFrios = dados.numeros_frios.slice(0, 10).map(item => item[0]);
+        
+        // Extrair trevos mais frequentes (primeiros 3)
+        const trevosFrequentes = dados.trevos_quentes.slice(0, 3).map(item => item[0]);
+        
+        // Renderizar números quentes
+        document.getElementById('numeros-quentes').innerHTML = 
+          numerosQuentes
+            .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+            .join('');
 
-      document.getElementById('numeros-frios').innerHTML = 
-        dadosMilionaria.frequencia.numeros.frios.slice(0, 5)
-          .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-          .join('');
+        // Renderizar números frios
+        document.getElementById('numeros-frios').innerHTML = 
+          numerosFrios
+            .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+            .join('');
 
-      document.getElementById('trevos-frequentes').innerHTML = 
-        dadosMilionaria.frequencia.trevos.frequentes.slice(0, 3)
-          .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
-          .join('');
+        // Renderizar trevos mais frequentes
+        document.getElementById('trevos-frequentes').innerHTML = 
+          trevosFrequentes
+            .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
+            .join('');
+            
+        console.log('✅ Estatísticas rápidas carregadas com dados reais');
+        
+      } catch (error) {
+        console.error('❌ Erro ao carregar estatísticas rápidas:', error);
+        // Fallback para dados fake em caso de erro
+        document.getElementById('numeros-quentes').innerHTML = 
+          dadosMilionaria.frequencia.numeros.quentes.slice(0, 10)
+            .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+            .join('');
+
+        document.getElementById('numeros-frios').innerHTML = 
+          dadosMilionaria.frequencia.numeros.frios.slice(0, 10)
+            .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+            .join('');
+
+        document.getElementById('trevos-frequentes').innerHTML = 
+          dadosMilionaria.frequencia.trevos.frequentes.slice(0, 3)
+            .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
+            .join('');
+      }
     }
 
     // Abrir modal

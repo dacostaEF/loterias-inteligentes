@@ -482,7 +482,7 @@ def extrair_features_simplificadas(concurso_atual, concurso_anterior):
 # Exemplo de uso
 if __name__ == "__main__":
     try:
-        from MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
         
         print("🌵 ANÁLISE DE SECA DA +MILIONÁRIA")
         print("="*80)
