@@ -89,9 +89,13 @@
       }
     }
     
-    /* Reduzir tamanho dos títulos dos gráficos - APENAS para smartphones */
+    /* Reduzir tamanho dos títulos dos gráficos e módulos - APENAS para smartphones */
     @media (max-width: 640px) {
       .chart-container h3 {
+        font-size: 14px !important;
+      }
+      
+      .bg-[#2E303A] h4 {
         font-size: 14px !important;
       }
     }
@@ -448,6 +452,145 @@
       background: rgba(0, 227, 140, 0.2) !important;
     }
 
+    /* Esconder menu desktop em mobile */
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+    }
+
+    /* Mostrar menu desktop em telas maiores */
+    @media (min-width: 769px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    /* Estilos para o menu hambúrguer */
+    .hamburger-menu {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 1000;
+      display: none;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .hamburger-icon {
+      width: 30px;
+      height: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .hamburger-icon span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: #A855F7;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-icon.open span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger-icon.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-icon.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Sidebar deslizante */
+    .nav-panel {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+      display: flex;
+      flex-direction: column;
+      transition: left 0.3s ease-in-out;
+      z-index: 999;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+      border-right: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .nav-panel.open {
+      left: 0;
+    }
+
+    /* Header do sidebar */
+    .nav-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      text-align: center;
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .nav-logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .nav-header h3 {
+      color: #A855F7;
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .nav-panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .nav-panel li {
+      margin: 0;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+    }
+
+    .nav-panel a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 20px 25px;
+      display: block;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-panel a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      border-left-color: #A855F7;
+    }
+
+    /* Estilo para destacar a página atual no menu mobile */
+    .nav-panel a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .nav-panel a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
     /* Estilos para submenu dropdown */
     .dropdown {
       position: relative;
@@ -595,145 +738,6 @@
       }
     }
 
-    /* Esconder menu desktop em mobile */
-    @media (max-width: 768px) {
-      .desktop-nav {
-        display: none;
-      }
-    }
-
-    /* Mostrar menu desktop em telas maiores */
-    @media (min-width: 769px) {
-      .desktop-nav {
-        display: flex;
-      }
-    }
-
-    /* Estilos para o menu hambúrguer */
-    .hamburger-menu {
-      position: fixed;
-      top: 1.5rem;
-      left: 1.5rem;
-      z-index: 1000;
-      display: none;
-      background: rgba(0, 0, 0, 0.8);
-      border-radius: 8px;
-      padding: 8px;
-    }
-
-    .hamburger-icon {
-      width: 30px;
-      height: 25px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-    }
-
-    .hamburger-icon span {
-      display: block;
-      width: 100%;
-      height: 3px;
-      background-color: #A855F7;
-      border-radius: 3px;
-      transition: all 0.3s ease;
-    }
-
-    .hamburger-icon.open span:nth-child(1) {
-      transform: rotate(45deg) translate(5px, 5px);
-    }
-
-    .hamburger-icon.open span:nth-child(2) {
-      opacity: 0;
-    }
-
-    .hamburger-icon.open span:nth-child(3) {
-      transform: rotate(-45deg) translate(5px, -5px);
-    }
-
-    /* Sidebar deslizante */
-    .nav-panel {
-      position: fixed;
-      top: 0;
-      left: -280px;
-      width: 280px;
-      height: 100%;
-      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
-      display: flex;
-      flex-direction: column;
-      transition: left 0.3s ease-in-out;
-      z-index: 999;
-      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
-      border-right: 1px solid rgba(168, 85, 247, 0.2);
-    }
-
-    .nav-panel.open {
-      left: 0;
-    }
-
-    /* Header do sidebar */
-    .nav-header {
-      padding: 20px 25px;
-      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-      text-align: center;
-      background: rgba(168, 85, 247, 0.05);
-    }
-
-    .nav-logo {
-      width: 120px;
-      height: auto;
-      margin-bottom: 10px;
-    }
-
-    .nav-header h3 {
-      color: #A855F7;
-      margin: 0;
-      font-size: 1.2rem;
-      font-weight: 600;
-    }
-
-    .nav-panel ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      text-align: left;
-    }
-
-    .nav-panel li {
-      margin: 0;
-      border-bottom: 1px solid rgba(168, 85, 247, 0.1);
-    }
-
-    .nav-panel a {
-      color: #ffffff;
-      text-decoration: none;
-      font-size: 1.1rem;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      padding: 20px 25px;
-      display: block;
-      border-left: 3px solid transparent;
-    }
-
-    .nav-panel a:hover {
-      color: #A855F7;
-      background: rgba(168, 85, 247, 0.1);
-      border-left-color: #A855F7;
-    }
-
-    /* Estilo para destacar a página atual no menu mobile */
-    .nav-panel a.active {
-      color: #00E38C !important;
-      background: rgba(0, 227, 140, 0.15) !important;
-      border-left-color: #00E38C !important;
-      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
-    }
-
-    .nav-panel a.active:hover {
-      color: #00E38C !important;
-      background: rgba(0, 227, 140, 0.2) !important;
-    }
-
     /* Overlay para escurecer o fundo */
     .nav-overlay {
       position: fixed;
@@ -783,8 +787,8 @@
       <div class="dropdown">
         <a href="#" class="dropdown-toggle active">💰 +Milionária ▼</a>
         <div class="dropdown-content">
-          <a href="/dashboard" class="active">🎯 Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium">📊 Inteligência Estatística</a>
+          <a href="/dashboard">🎯 Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium" class="active">📊 Inteligência Estatística</a>
         </div>
       </div>
       <div class="dropdown">
@@ -824,8 +828,8 @@
       <li>
         <a href="#" class="mobile-dropdown-toggle active">💰 +Milionária ▼</a>
         <div class="mobile-dropdown">
-          <a href="/dashboard" class="active">🎯 Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium">📊 Inteligência Estatística</a>
+          <a href="/dashboard">🎯 Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium" class="active">📊 Inteligência Estatística</a>
         </div>
       </li>
               <li>
@@ -850,7 +854,7 @@
                                 <a href="#" class="breadcrumb-link">💰 +Milionária</a>
                             </li>
                             <li class="breadcrumb-item active">
-                                <span class="breadcrumb-link">🎯 Palpite da Sorte</span>
+                                <span class="breadcrumb-link">📊 Inteligência Estatística</span>
                             </li>
                         </ol>
                     </nav>
@@ -871,91 +875,113 @@
     </div>
   </header>
 
-  <!-- Cartão de jogo -->
-  <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8 flex flex-col">
-    <h2 class="text-xl font-semibold mb-4">🎯 Selecione de 6 a 12 números entre 50</h2>
-    <div class="grid grid-cols-10 gap-2 mb-6" id="numeros-container">
-      <!-- Números serão gerados dinamicamente -->
-    </div>
-
-    <!-- Container único de trevos -->
-    <div class="mt-6">
-      <h3 class="text-lg mb-2 text-center"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Selecione de 2 a 6 Trevos</h3>
-      <div class="flex gap-4 flex-wrap justify-center" id="trevos-container">
-        <!-- Trevos serão gerados dinamicamente -->
+  <!-- Conteúdo Premium será adicionado aqui -->
+  <div class="container mx-auto">
+    <h2 class="text-2xl font-bold text-white mb-6 text-center">🎯 Aposta Inteligente Premium</h2>
+    
+    <!-- Conteúdo será adicionado posteriormente -->
+    <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-md">
+      <div class="bloco-texto-aposta">
+        <p class="texto-desktop">
+          Com a Aposta Inteligente Premium, você vai além da sorte: você define os parâmetros, analisa os dados reais e usa inteligência estatística e sistema de pesos computacionais para gerar apostas fundamentadas. 🎯 Configure filtros, selecione padrões e use suas próprias decisões estratégicas para orientar o sistema de análise estatística. O controle está nas suas mãos — com o apoio da tecnologia de dados reais.
+        </p>
+        <p class="texto-mobile">
+          Configure filtros, selecione padrões e use suas próprias decisões estratégicas para orientar o sistema. O controle está nas suas mãos — com apoio dos dados reais.
+        </p>
       </div>
     </div>
-
-    <!-- Números selecionados -->
-    <div class="mt-6 p-4 bg-[#2E303A] rounded-xl">
-      <div class="grid grid-cols-3 gap-6">
-        <!-- Coluna 1: Números principais -->
-        <div>
-          <h4 class="text-sm font-semibold mb-2">Números Selecionados:</h4>
-          <div class="flex gap-2 flex-wrap" id="numeros-selecionados">
-            <span class="text-gray-400">Nenhum número selecionado</span>
-          </div>
-        </div>
-        
-        <!-- Coluna 2: Trevos -->
-        <div>
-          <h4 class="text-sm font-semibold mb-2">Trevos Selecionados:</h4>
-          <div class="flex gap-2 flex-wrap" id="trevos-selecionados">
-            <span class="text-gray-400">Nenhum trevo selecionado</span>
-          </div>
-        </div>
-        
-        <!-- Coluna 3: Valor da aposta -->
-        <div class="flex flex-col justify-center items-center">
-          <div id="valor-aposta-container" class="text-center">
-            <div class="text-gray-400 text-sm">Aguardando sua seleção de números e trevos para calcular o valor</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Container específico para o Gerador de Números +Milionária -->
-    <div class="gerador-container mt-6 p-6 bg-[#1A1D25] rounded-xl shadow-md">
-      <h3 class="text-lg font-semibold mb-4 text-center">🎯 Gerador de Números +Milionária</h3>
-              
+    
+    <!-- Bloco Explicativo com Passo a Passo -->
+    <div class="mt-8 bg-[#1A1D25] p-6 rounded-2xl shadow-md">
+      <h3 class="text-xl font-bold text-white mb-6 text-center">📘 Como usar a aposta inteligente:</h3>
       
-      <div class="botoes-mobile-ajustados">
-        <button class="bg-[#00E38C] text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="abrirModalConfiguracao()">
-          🍀 Gerar Palpite da Sorte
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Passo 1: Frequência -->
+        <div id="passo1" class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 1</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Descubra os Números Mais Sorteados</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Veja os números que mais saem e use essa informação no seu jogo.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('frequencia')">
+            🔍 Ver Análise Frequência
+          </button>
+        </div>
+
+        <!-- Passo 2: Distribuição -->
+        <div id="passo2" class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 2</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Entenda Como os Números se Distribuem</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Entenda como os números se espalham entre grupos e padrões.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('distribuicao')">
+            📊 Ver Análise Distribuição
+          </button>
+        </div>
+
+        <!-- Passo 3: Afinidades -->
+        <div id="passo3" class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 3</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Encontre Combinações que Saem Juntas</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Descubra combinações que costumam sair juntas.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('afinidades')">
+            🔗 Ver Análise Afinidades
+          </button>
+        </div>
+
+        <!-- Passo 4: Trevos -->
+        <div id="passo4" class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 4</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Analise os Trevos da Sorte</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Veja os trevos com maior frequência e distribuição.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('trevos')">
+            🍀 Ver Análise Trevos
+          </button>
+        </div>
+
+        <!-- Passo 5: Seca -->
+        <div id="passo5" class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 5</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Identifique Números que Não Saem</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Evite números que estão há muito tempo sem sair.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('seca')">
+            🚫 Ver Análise Seca
+          </button>
+        </div>
+
+        <!-- Passo 6: Estatísticas Avançadas -->
+        <div class="bg-[#2E303A] p-4 rounded-xl">
+          <div class="flex items-center mb-3">
+            <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 6</span>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Estatística Avançada para Padrões Ocultos</h4>
+          </div>
+          <p class="text-gray-300 text-sm mb-3">Explore correlações, padrões ocultos e tendências com análise estatística avançada.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('estatisticas')">
+            🤖 Ver Análise Avançada
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Botão principal do Machine Learning - NO FINAL -->
+    <div id="passo6" class="mt-8 text-center">
+      <div class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] p-1 rounded-xl inline-block">
+        <button class="bg-[#1A1D25] text-white font-bold px-8 py-4 rounded-lg hover:bg-[#2E303A] transition-all text-lg" id="abrir-modal-premium">
+          🎯 Gerar Aposta Inteligente (Premium)
         </button>
-      
-        <button class="bg-red-600 text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="limparSelecao()">
-          🗑️ Limpar Tudo<br><small>&nbsp;</small>
-        </button>
       </div>
-      
-
+      <p class="text-gray-400 text-sm mt-3">Após configurar suas preferências, clique aqui para gerar apostas com Inteligencia Estatística</p>
     </div>
+  </div>
 
 
-  </section>
-
-  <!-- Seção de Estatísticas Rápidas -->
-  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">🔥 Números Quentes</h3>
-      <div class="text-sm text-gray-300" id="numeros-quentes">
-        Carregando...
-      </div>
-    </div>
-    <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">❄️ Números Frios</h3>
-      <div class="text-sm text-gray-300" id="numeros-frios">
-        Carregando...
-      </div>
-    </div>
-    <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Trevos Mais Frequentes</h3>
-      <div class="text-sm text-gray-300" id="trevos-frequentes">
-        Carregando...
-      </div>
-    </div>
-  </section>
 
 
 
@@ -972,7 +998,7 @@
 
   <!-- Modal de Configuração de Aposta -->
   <div id="modalConfiguracao" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-    <div class="modal-content p-8 rounded-2xl shadow-xl w-96 text-white">
+    <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-xl w-96 text-white">
       <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Configurar Aposta Aleatória</h3>
 
       <div class="mb-5">
@@ -1036,8 +1062,6 @@
     </div>
   </div>
 
-
-
   <!-- Tour Guiado -->
   <div id="tour-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[9999]">
     <div id="tour-tip" class="absolute bg-[#2a2a3e] border-2 border-[rgba(168,85,247,0.6)] rounded-lg p-4 shadow-2xl max-w-sm text-white" style="box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);">
@@ -1049,7 +1073,7 @@
           ← Anterior
         </button>
         <div class="flex items-center space-x-2">
-          <span id="tour-progress" class="text-sm text-gray-400">1/6</span>
+          <span id="tour-progress" class="text-sm text-gray-400">1/9</span>
           <button id="tour-skip" class="text-gray-400 hover:text-white text-sm">Pular Tour</button>
         </div>
         <button id="tour-next" class="bg-[#00E38C] hover:bg-[#00C973] text-black px-3 py-2 rounded-lg transition-colors">
@@ -1058,7 +1082,7 @@
       </div>
     </div>
   </div>
-
+  
   <!-- Botão de ativação do Tour -->
   <button id="tour-activate" class="fixed top-20 right-4 bg-[#00E38C] hover:bg-[#00C973] text-black px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-200 hover:scale-105">
     🎯 Tour Guiado
@@ -1066,197 +1090,6 @@
 
   <!-- Scripts -->
   <script>
-    // Configuração do Tour Guiado
-    const tourSteps = [
-      {
-        target: '#numeros-container',
-        content: '🎯 <strong>Grid de Números Principais (1-50)</strong><br><br>Esta é a área mais importante! Você pode optar por clicar e selecionar seus números ou usar o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 6 a 12 números principais. Os números selecionados ficarão destacados em verde.',
-        position: 'center'
-      },
-      {
-        target: '#numeros-container',
-        content: '🍀 <strong>Seleção de Trevos</strong><br><br>Selecione seus trevos ou use o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 2 a 6 números de trevos para jogar.',
-        position: 'bottom-right'
-      },
-      {
-        target: '#numeros-selecionados',
-        content: '📊 <strong>Acompanhe sua Seleção</strong><br><br>Neste campo você vê a lista dos números selecionados, dos trevos e do valor total da aposta.',
-        position: 'right'
-      },
-      {
-        target: '#valor-aposta-container',
-        content: '💰 <strong>Valor da Aposta</strong><br><br>O sistema calcula automaticamente o valor baseado na quantidade de números e trevos selecionados.',
-        position: 'right'
-      },
-      {
-        target: '.botoes-mobile-ajustados',
-        content: '🎲 <strong>Gerador de Números</strong><br><br>Use "Gerar Palpite da Sorte" para números aleatórios ou "Limpar Tudo" para recomeçar.',
-        position: 'bottom'
-      },
-      {
-        target: '.stat-card',
-        content: '🔥 <strong>Estatísticas Rápidas</strong><br><br>Veja os números mais quentes (frequentes), frios (raros) e trevos mais sorteados para orientar suas escolhas.',
-        position: 'bottom'
-      }
-    ];
-
-    let currentStep = 0;
-    let isFirstVisit = !localStorage.getItem('tourCompleted');
-
-    // Função para mostrar o tour
-    function showTour() {
-      document.getElementById('tour-overlay').classList.remove('hidden');
-      showStep(0);
-    }
-
-    // Função para mostrar um step específico
-    function showStep(stepIndex) {
-      const step = tourSteps[stepIndex];
-      const tip = document.getElementById('tour-tip');
-      const content = document.getElementById('tour-content');
-      const progress = document.getElementById('tour-progress');
-      
-      // Atualizar conteúdo
-      content.innerHTML = step.content;
-      progress.textContent = `${stepIndex + 1}/${tourSteps.length}`;
-      
-      // Posicionar o tip
-      const target = document.querySelector(step.target);
-      if (target) {
-        const rect = target.getBoundingClientRect();
-        const tipRect = tip.getBoundingClientRect();
-        
-        let left, top;
-        
-        switch (step.position) {
-          case 'bottom':
-            left = rect.left + (rect.width / 2) - (tipRect.width / 2);
-            top = rect.bottom + 10;
-            break;
-          case 'top':
-            left = rect.left + (rect.width / 2) - (tipRect.width / 2);
-            top = rect.top - tipRect.height - 10;
-            break;
-          case 'left':
-            left = rect.left - tipRect.width - 10;
-            top = rect.top + (rect.height / 2) - (tipRect.height / 2);
-            break;
-          case 'right':
-            left = rect.right + 10;
-            top = rect.top + (rect.height / 2) - (tipRect.height / 2);
-            break;
-          case 'center':
-            left = rect.left + (rect.width / 2) - (tipRect.width / 2);
-            top = rect.top + (rect.height / 2) - (tipRect.height / 2);
-            break;
-          case 'bottom-right':
-            left = rect.right - tipRect.width - 800;
-            top = rect.bottom + 10;
-            break;
-        }
-        
-        // Ajustar para não sair da tela
-        left = Math.max(10, Math.min(left, window.innerWidth - tipRect.width - 10));
-        top = Math.max(10, Math.min(top, window.innerHeight - tipRect.height - 10));
-        
-        tip.style.left = left + 'px';
-        tip.style.top = top + 'px';
-      }
-      
-      // Atualizar botões
-      const prevBtn = document.getElementById('tour-prev');
-      const nextBtn = document.getElementById('tour-next');
-      
-      prevBtn.style.display = stepIndex === 0 ? 'none' : 'block';
-      nextBtn.textContent = stepIndex === tourSteps.length - 1 ? 'Finalizar' : 'Próximo →';
-    }
-
-    // Event listeners do tour
-    document.addEventListener('DOMContentLoaded', function() {
-      const tourActivate = document.getElementById('tour-activate');
-      const tourNext = document.getElementById('tour-next');
-      const tourPrev = document.getElementById('tour-prev');
-      const tourSkip = document.getElementById('tour-skip');
-      const tourOverlay = document.getElementById('tour-overlay');
-
-      if (tourActivate) {
-        tourActivate.addEventListener('click', showTour);
-      }
-      
-      if (tourNext) {
-        tourNext.addEventListener('click', () => {
-          if (currentStep < tourSteps.length - 1) {
-            currentStep++;
-            showStep(currentStep);
-          } else {
-            // Finalizar tour
-            tourOverlay.classList.add('hidden');
-            localStorage.setItem('tourCompleted', 'true');
-            showCompletionMessage();
-          }
-        });
-      }
-      
-      if (tourPrev) {
-        tourPrev.addEventListener('click', () => {
-          if (currentStep > 0) {
-            currentStep--;
-            showStep(currentStep);
-          }
-        });
-      }
-      
-      if (tourSkip) {
-        tourSkip.addEventListener('click', () => {
-          tourOverlay.classList.add('hidden');
-          localStorage.setItem('tourCompleted', 'true');
-        });
-      }
-      
-      // Fechar tour ao clicar fora
-      if (tourOverlay) {
-        tourOverlay.addEventListener('click', (e) => {
-          if (e.target.id === 'tour-overlay') {
-            tourOverlay.classList.add('hidden');
-            localStorage.setItem('tourCompleted', 'true');
-          }
-        });
-      }
-
-      // Mostrar tour automaticamente na primeira visita
-      if (isFirstVisit) {
-        setTimeout(() => {
-          showTour();
-        }, 2000);
-      }
-    });
-
-    // Função para mostrar mensagem de conclusão
-    function showCompletionMessage() {
-      const message = document.createElement('div');
-      message.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1A1D25] border-2 border-[#00E38C] rounded-xl p-6 shadow-2xl text-white text-center z-[10000]';
-      message.innerHTML = `
-        <h3 class="text-xl font-bold mb-4 text-[#00E38C]">🎉 Tour Concluído!</h3>
-        <p class="mb-4">Agora você conhece todos os elementos principais! Comece selecionando seus números e trevos.</p>
-        <div class="flex space-x-3">
-          <button onclick="abrirModalConfiguracao()" class="bg-[#00E38C] hover:bg-[#00C973] text-black px-4 py-2 rounded-lg transition-colors">
-            🎲 Gerar Primeiro Palpite
-          </button>
-          <button onclick="this.parentElement.parentElement.remove()" class="bg-[#2E303A] hover:bg-[#3E404A] text-white px-4 py-2 rounded-lg transition-colors">
-            Explorar Mais
-          </button>
-        </div>
-      `;
-      document.body.appendChild(message);
-      
-      // Remover mensagem após 10 segundos
-      setTimeout(() => {
-        if (message.parentElement) {
-          message.remove();
-        }
-      }, 10000);
-    }
-
     // Dados simulados (serão substituídos pelos dados reais)
     const dadosMilionaria = {
       frequencia: {
@@ -1300,6 +1133,202 @@
     let numerosSelecionados = [];
     let trevosSelecionados = []; // Array único para os 2 trevos selecionados
 
+    // Tour Guiado - Inteligência Estatística
+    let currentTourStep = 0;
+    const tourSteps = [
+      {
+        target: 'h1',
+        content: '<strong>Bem-vindo à Aposta Inteligente Premium!</strong><br><br>Descubra o coração da nossa inteligência aqui! Esta página combina múltiplas análises estatísticas e algoritmos avançados para transformar seus "achismos" em decisões de aposta fundamentadas em dados. Vamos começar?',
+        position: 'bottom'
+      },
+      {
+        target: '#passo1',
+        content: '<strong>Passo 1: Análises Estatísticas de Frequência e Tendências</strong><br><br>Explore os Números Quentes e Frios, visualize a Matriz de Frequência dos concursos e veja o "tempo de seca" de cada número e trevo. Você controla o período temporal de análise para identificar tendências recentes ou históricas.',
+        position: 'left'
+      },
+      {
+        target: '#passo2',
+        content: '<strong>Passo 2: Mergulhe na Distribuição Estatística dos Sorteios</strong><br><br>Vá além da frequência! Analise padrões de pares/ímpares, faixas numéricas e a soma dos números sorteados. Entenda como as distribuições se comportam ao longo do tempo.',
+        position: 'left'
+      },
+      {
+        target: '#passo3',
+        content: '<strong>Passo 3: Encontre Combinações que Saem Juntas</strong><br><br>Descubra combinações que costumam sair juntas através de análise estatística avançada. Identifique padrões de afinidade entre números e trevos.',
+        position: 'left'
+      },
+      {
+        target: '#passo4',
+        content: '<strong>Passo 4: Analise os Trevos da Sorte</strong><br><br>Veja os trevos com maior frequência e distribuição. Analise padrões estatísticos específicos dos trevos para otimizar suas escolhas.',
+        position: 'left'
+      },
+      {
+        target: '#passo5',
+        content: '<strong>Passo 5: Identifique Números que Não Saem</strong><br><br>Evite números que estão há muito tempo sem sair. Analise estatisticamente os períodos de "seca" para tomar decisões mais informadas.',
+        position: 'left'
+      },
+      {
+        target: '#passo6',
+        content: '<strong>Passo 6: Estatística Avançada para Padrões Ocultos</strong><br><br>Explore correlações, padrões ocultos e tendências com análise estatística avançada. Descubra relações complexas entre números e trevos.',
+        position: 'bottom'
+      },
+      {
+        target: '#abrir-modal-premium',
+        content: '<strong>Gerador de Aposta Inteligente: Sua Estratégia em Ação</strong><br><br>Após suas análises, use nosso Gerador de Aposta Inteligente. Com base em suas preferências, ele combina múltiplas análises estatísticas e gera até 10 apostas otimizadas.',
+        position: 'left'
+      },
+      {
+        target: 'h1',
+        content: '<strong>Sua Vantagem Premium: Análise Estatística Avançada</strong><br><br>Esta ferramenta Premium oferece análise estatística avançada e algoritmos proprietários que você não encontra em outro lugar. Personalize sua estratégia e use dados reais para ir além do palpite aleatório. O futuro das suas apostas começa aqui!',
+        position: 'center'
+      }
+    ];
+
+    // Função para mostrar o tour
+    function showTour() {
+      document.getElementById('tour-overlay').classList.remove('hidden');
+      currentTourStep = 0;
+      showStep();
+    }
+
+    // Função para mostrar cada passo do tour
+    function showStep() {
+      const step = tourSteps[currentTourStep];
+      const target = document.querySelector(step.target);
+      const tip = document.getElementById('tour-tip');
+      const content = document.getElementById('tour-content');
+      const progress = document.getElementById('tour-progress');
+
+      if (!target) {
+        console.error('Target não encontrado:', step.target);
+        return;
+      }
+
+      content.innerHTML = step.content;
+      progress.textContent = `${currentTourStep + 1}/${tourSteps.length}`;
+
+      const targetRect = target.getBoundingClientRect();
+      const tipRect = tip.getBoundingClientRect();
+
+      let left, top;
+
+      switch (step.position) {
+        case 'left':
+          left = targetRect.left - tipRect.width - 20;
+          top = targetRect.top + (targetRect.height / 2) - (tipRect.height / 2);
+          break;
+        case 'bottom':
+          left = targetRect.left + (targetRect.width / 2) - (tipRect.width / 2);
+          top = targetRect.bottom + 20;
+          break;
+        case 'center':
+          left = (window.innerWidth / 2) - (tipRect.width / 2);
+          top = (window.innerHeight / 2) - (tipRect.height / 2);
+          break;
+        default:
+          left = targetRect.left + (targetRect.width / 2) - (tipRect.width / 2);
+          top = targetRect.top - tipRect.height - 20;
+      }
+
+      // Garantir que a dica não saia da tela
+      if (left < 20) left = 20;
+      if (left + tipRect.width > window.innerWidth - 20) {
+        left = window.innerWidth - tipRect.width - 20;
+      }
+      if (top < 20) top = 20;
+      if (top + tipRect.height > window.innerHeight - 20) {
+        top = window.innerHeight - tipRect.height - 20;
+      }
+
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+
+      // Atualizar botões
+      document.getElementById('tour-prev').disabled = currentTourStep === 0;
+      document.getElementById('tour-next').textContent = currentTourStep === tourSteps.length - 1 ? 'Finalizar' : 'Próximo →';
+    }
+
+    // Função para mostrar mensagem de conclusão
+    function showCompletionMessage() {
+      const tip = document.getElementById('tour-tip');
+      const content = document.getElementById('tour-content');
+      
+      content.innerHTML = '<strong>🎉 Tour Concluído!</strong><br><br>Agora você conhece todas as funcionalidades da nossa Inteligência Estatística Premium. Comece a explorar e transforme suas apostas com dados e algoritmos avançados!';
+      
+      document.getElementById('tour-prev').style.display = 'none';
+      document.getElementById('tour-next').style.display = 'none';
+      document.getElementById('tour-skip').textContent = 'Fechar';
+      
+      // Centralizar a mensagem
+      const tipRect = tip.getBoundingClientRect();
+      tip.style.left = (window.innerWidth / 2) - (tipRect.width / 2) + 'px';
+      tip.style.top = (window.innerHeight / 2) - (tipRect.height / 2) + 'px';
+    }
+
+    // Event listeners para o tour
+    document.addEventListener('DOMContentLoaded', function() {
+      // Botão de ativação
+      const tourActivate = document.getElementById('tour-activate');
+      if (tourActivate) {
+        tourActivate.addEventListener('click', showTour);
+      }
+
+      // Navegação do tour
+      const tourNext = document.getElementById('tour-next');
+      if (tourNext) {
+        tourNext.addEventListener('click', function() {
+          if (currentTourStep < tourSteps.length - 1) {
+            currentTourStep++;
+            showStep();
+          } else {
+            showCompletionMessage();
+          }
+        });
+      }
+
+      const tourPrev = document.getElementById('tour-prev');
+      if (tourPrev) {
+        tourPrev.addEventListener('click', function() {
+          if (currentTourStep > 0) {
+            currentTourStep--;
+            showStep();
+          }
+        });
+      }
+
+      const tourSkip = document.getElementById('tour-skip');
+      if (tourSkip) {
+        tourSkip.addEventListener('click', function() {
+          document.getElementById('tour-overlay').classList.add('hidden');
+          // Resetar botões
+          document.getElementById('tour-prev').style.display = 'block';
+          document.getElementById('tour-next').style.display = 'block';
+          document.getElementById('tour-skip').textContent = 'Pular Tour';
+        });
+      }
+
+      // Fechar tour clicando fora
+      const tourOverlay = document.getElementById('tour-overlay');
+      if (tourOverlay) {
+        tourOverlay.addEventListener('click', function(e) {
+          if (e.target.id === 'tour-overlay') {
+            document.getElementById('tour-overlay').classList.add('hidden');
+          }
+        });
+      }
+
+      // Verificar se é a primeira visita
+      if (!localStorage.getItem('tourCompleted')) {
+        setTimeout(() => {
+          showTour();
+        }, 2000);
+      }
+    });
+
+    // Marcar tour como concluído
+    function completeTour() {
+      localStorage.setItem('tourCompleted', 'true');
+    }
+
     // Inicialização - Aguarda carregamento completo dos estilos
     function inicializarAplicacao() {
       gerarNumeros();
@@ -1319,36 +1348,16 @@
     
 
 
-    // Gerar números de 1 a 50
+    // Gerar números de 1 a 50 - DESABILITADO NA PÁGINA PREMIUM
     function gerarNumeros() {
-      const container = document.getElementById('numeros-container');
-      container.innerHTML = '';
-      
-      for (let i = 1; i <= 50; i++) {
-        const div = document.createElement('div');
-        div.className = 'numero p-3 rounded-xl text-center font-semibold';
-        div.textContent = i.toString().padStart(2, '0');
-        div.onclick = () => selecionarNumero(i, div);
-        container.appendChild(div);
-      }
+      // Função desabilitada na página premium - não há grid de números
+      console.log('Função gerarNumeros() desabilitada na página premium');
     }
 
-    // Gerar trevos (container único) - Versão elegante com ícones
+    // Gerar trevos (container único) - DESABILITADO NA PÁGINA PREMIUM
     function gerarTrevos() {
-      const container = document.getElementById('trevos-container');
-      container.innerHTML = '';
-      
-      for (let i = 1; i <= 6; i++) {
-        const div = document.createElement('div');
-        div.className = 'trevo-icon-container';
-        div.innerHTML = `
-          <div class="trevo-icon">
-            <span class="trevo-number">${i}</span>
-          </div>
-        `;
-        div.onclick = () => selecionarTrevo(i, div);
-        container.appendChild(div);
-      }
+      // Função desabilitada na página premium - não há container de trevos
+      console.log('Função gerarTrevos() desabilitada na página premium');
     }
 
     // Selecionar número (manual - limite de 12)
@@ -1526,22 +1535,10 @@
       }
     }
 
-    // Carregar estatísticas rápidas
+    // Carregar estatísticas rápidas - DESABILITADO NA PÁGINA PREMIUM
     function carregarEstatisticasRapidas() {
-      document.getElementById('numeros-quentes').innerHTML = 
-        dadosMilionaria.frequencia.numeros.quentes.slice(0, 5)
-          .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-          .join('');
-
-      document.getElementById('numeros-frios').innerHTML = 
-        dadosMilionaria.frequencia.numeros.frios.slice(0, 5)
-          .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-          .join('');
-
-      document.getElementById('trevos-frequentes').innerHTML = 
-        dadosMilionaria.frequencia.trevos.frequentes.slice(0, 3)
-          .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
-          .join('');
+      // Função desabilitada na página premium - não há seção de estatísticas rápidas
+      console.log('Função carregarEstatisticasRapidas() desabilitada na página premium');
     }
 
     // Abrir modal
@@ -1851,6 +1848,7 @@
       { numeros: [7, 9, 11, 20, 37, 40], trevos: [3, 5] },
       { numeros: [5, 8, 18, 26, 39, 43], trevos: [1, 2] }
     ];
+
     function aplicarEstiloCelula(div) {
       // Removido: div.style.fontSize = '9px';
       // Removido: div.style.fontFamily = 'Arial, sans-serif';
@@ -3516,311 +3514,311 @@
     async function carregarAnaliseSeca(container, qtdConcursos = null) {
       container.innerHTML = `<p class="text-center text-gray-400">🔄 Carregando análise de seca...</p>`;
       
-      try {
-        let url = '/api/analise_seca';
-        if (qtdConcursos !== null && qtdConcursos !== '') {
-          url += `?qtd_concursos=${qtdConcursos}`;
-        }
-        
-        const response = await fetch(url);
-        const data = await response.json();
-      
-      if (data.error) {
-        container.innerHTML = `<p class="text-red-500 text-center">Erro: ${data.error}</p>`;
-        return;
-      }
-      
-      const numerosSeca = data.numeros_seca;
-      const trevosSeca = data.trevos_seca;
-      
-      if (!numerosSeca || !trevosSeca) {
-        container.innerHTML = `<p class="text-red-500 text-center">Dados de seca incompletos ou não encontrados.</p>`;
-        return;
-      }
-      
-      // Preparar dados para exibição
-      const maiorSecaNumeros = numerosSeca.numeros_maior_seca && numerosSeca.numeros_maior_seca.length > 0 
-        ? `${numerosSeca.numeros_maior_seca[0][0]} (${numerosSeca.numeros_maior_seca[0][1].seca_atual} concursos)`
-        : 'N/A';
-      
-      const recentesNumeros = numerosSeca.numeros_recentes && numerosSeca.numeros_recentes.length > 0
-        ? numerosSeca.numeros_recentes.slice(0, 3).join(', ')
-        : 'N/A';
-      
-      const maiorSecaTrevos = trevosSeca.trevos_maior_seca && trevosSeca.trevos_maior_seca.length > 0
-        ? `${trevosSeca.trevos_maior_seca[0][0]} (${trevosSeca.trevos_maior_seca[0][1].seca_atual} concursos)`
-        : 'N/A';
-      
-      const recentesTrevos = trevosSeca.trevos_recentes && trevosSeca.trevos_recentes.length > 0
-        ? trevosSeca.trevos_recentes.slice(0, 3).join(', ')
-        : 'N/A';
-      
-      // Criar HTML completo para o modal genérico
-      container.innerHTML = `
-        <div class="space-y-6">
-          <!-- Explicação -->
-          <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#00E38C]">
-            <h3 class="text-xl font-semibold text-[#00E38C] mb-2">Entendendo a Análise de Seca 🌵</h3>
-            <p class="text-gray-300 mb-2">
-              A análise de seca identifica há quantos concursos um determinado número ou trevo não é sorteado.
-            </p>
-            <p class="text-gray-300">
-              <span class="font-bold text-red-400">"Maior Seca"</span> indica os que estão há mais tempo sem aparecer.
-              <span class="font-bold text-green-400">"Recentemente Sorteados"</span> são os que saíram nos últimos concursos.
-            </p>
-          </div>
-
-          <!-- Cabeçalho com título e ajuda -->
-          <div class="flex justify-between items-start">
-            <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
-              <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
-              <div class="flex flex-wrap gap-3 items-center">
-                <label class="text-sm text-gray-300">Período:</label>
-                <select id="selectSecaPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSecaModal()">
-                  <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
-                  <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
-                  <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
-                  <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
-                  <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
-                </select>
-                <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
-              </div>
-              <div class="mt-2 text-xs text-gray-400" id="secaPeriodoDisplay">
-                ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
-              </div>
-            </div>
-            <button onclick="abrirPopupAjudaSeca()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
-              ❓
-            </button>
-          </div>
-
-          <!-- Números e Trevos -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Números -->
-            <div class="bg-gray-800 p-4 rounded-lg shadow">
-              <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Números Principais (1-50)</h3>
-              <div class="text-gray-300 mb-4">
-                <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaNumeros}</span></p>
-                <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesNumeros}</span></p>
-                <div class="mb-2">
-                  <strong>Estatísticas:</strong>
-                  <ul class="list-disc list-inside ml-4 text-sm">
-                    <li>Média de seca: ${numerosSeca.estatisticas?.seca_media || 'N/A'} concursos</li>
-                    <li>Maior seca: ${numerosSeca.estatisticas?.seca_maxima || 'N/A'} concursos</li>
-                    <li>Menor seca: ${numerosSeca.estatisticas?.seca_mediana || 'N/A'} concursos</li>
-                  </ul>
-                </div>
-              </div>
-              <div id="graficoSecaNumeros" class="w-full h-80 bg-gray-700 rounded"></div>
-            </div>
-
-            <!-- Trevos -->
-            <div class="bg-gray-800 p-4 rounded-lg shadow">
-              <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Trevos da Sorte (1-6)</h3>
-              <div class="text-gray-300 mb-4">
-                <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaTrevos}</span></p>
-                <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesTrevos}</span></p>
-                <div class="mb-2">
-                  <strong>Estatísticas:</strong>
-                  <ul class="list-disc list-inside ml-4 text-sm">
-                    <li>Média de seca: ${trevosSeca.estatisticas?.seca_media || 'N/A'} concursos</li>
-                    <li>Maior seca: ${trevosSeca.estatisticas?.seca_maxima || 'N/A'} concursos</li>
-                    <li>Menor seca: ${trevosSeca.estatisticas?.seca_mediana || 'N/A'} concursos</li>
-                  </ul>
-                </div>
-              </div>
-              <div id="graficoSecaTrevos" class="w-full h-80 bg-gray-700 rounded"></div>
-            </div>
-          </div>
-
-          <!-- Interpretação -->
-          <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#8B5CF6]">
-            <h3 class="text-xl font-semibold text-[#8B5CF6] mb-2">Interpretação dos Gráficos de Seca 📊</h3>
-            <ul class="list-disc list-inside text-gray-300 ml-4">
-              <li><strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).</li>
-              <li><strong>Eixo Y:</strong> Concursos em que estão sem sair.</li>
-              <li><strong>Barras altas:</strong> Maior tempo de seca.</li>
-              <li><strong>Barras baixas:</strong> Sorteados recentemente.</li>
-            </ul>
-          </div>
-
-          <!-- Estratégias -->
-          <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-green-400">
-            <h3 class="text-xl font-semibold text-green-400 mb-2">Estratégias com a Seca ✅</h3>
-            <ul class="list-disc list-inside text-gray-300 ml-4">
-              <li><strong>Atrasados:</strong> Apostar nos que estão em seca.</li>
-              <li><strong>Recentes:</strong> Apostar nos que saíram há pouco.</li>
-              <li><strong>Misto:</strong> Combinar os dois.</li>
-              <li><strong>Aleatoriedade:</strong> Não é garantia. Combine com frequência.</li>
-            </ul>
-          </div>
-
-          <!-- Alerta Final -->
-          <div class="mt-8 text-center text-gray-400">
-            <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística histórica. Não garante resultados futuros. Aposte com responsabilidade.</p>
-          </div>
+        try {
+          let url = '/api/analise_seca';
+          if (qtdConcursos !== null && qtdConcursos !== '') {
+            url += `?qtd_concursos=${qtdConcursos}`;
+          }
           
-          <!-- SUGESTÕES PARA APOSTA PREMIUM -->
-          <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
-            <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
-            <div class="space-y-3">
-              <div class="flex items-center">
-                <input type="checkbox" id="padrao-evitar-consecutivos" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="evitarConsecutivos">
-                <label for="padrao-evitar-consecutivos" class="text-white">Evitar Números Consecutivos (ex: 23-24)</label>
+          const response = await fetch(url);
+          const data = await response.json();
+        
+        if (data.error) {
+          container.innerHTML = `<p class="text-red-500 text-center">Erro: ${data.error}</p>`;
+          return;
+        }
+        
+        const numerosSeca = data.numeros_seca;
+        const trevosSeca = data.trevos_seca;
+        
+        if (!numerosSeca || !trevosSeca) {
+          container.innerHTML = `<p class="text-red-500 text-center">Dados de seca incompletos ou não encontrados.</p>`;
+          return;
+        }
+        
+        // Preparar dados para exibição
+        const maiorSecaNumeros = numerosSeca.numeros_maior_seca && numerosSeca.numeros_maior_seca.length > 0 
+          ? `${numerosSeca.numeros_maior_seca[0][0]} (${numerosSeca.numeros_maior_seca[0][1].seca_atual} concursos)`
+          : 'N/A';
+        
+        const recentesNumeros = numerosSeca.numeros_recentes && numerosSeca.numeros_recentes.length > 0
+          ? numerosSeca.numeros_recentes.slice(0, 3).join(', ')
+          : 'N/A';
+        
+        const maiorSecaTrevos = trevosSeca.trevos_maior_seca && trevosSeca.trevos_maior_seca.length > 0
+          ? `${trevosSeca.trevos_maior_seca[0][0]} (${trevosSeca.trevos_maior_seca[0][1].seca_atual} concursos)`
+          : 'N/A';
+        
+        const recentesTrevos = trevosSeca.trevos_recentes && trevosSeca.trevos_recentes.length > 0
+          ? trevosSeca.trevos_recentes.slice(0, 3).join(', ')
+          : 'N/A';
+        
+        // Criar HTML completo para o modal genérico
+        container.innerHTML = `
+          <div class="space-y-6">
+            <!-- Explicação -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#00E38C]">
+              <h3 class="text-xl font-semibold text-[#00E38C] mb-2">Entendendo a Análise de Seca 🌵</h3>
+              <p class="text-gray-300 mb-2">
+                A análise de seca identifica há quantos concursos um determinado número ou trevo não é sorteado.
+              </p>
+              <p class="text-gray-300">
+                <span class="font-bold text-red-400">"Maior Seca"</span> indica os que estão há mais tempo sem aparecer.
+                <span class="font-bold text-green-400">"Recentemente Sorteados"</span> são os que saíram nos últimos concursos.
+              </p>
+            </div>
+
+            <!-- Cabeçalho com título e ajuda -->
+            <div class="flex justify-between items-start">
+              <div class="bg-[#2E303A] p-4 rounded-xl flex-1">
+                <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
+                <div class="flex flex-wrap gap-3 items-center">
+                  <label class="text-sm text-gray-300">Período:</label>
+                  <select id="selectSecaPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSecaModal()">
+                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
+                    <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
+                    <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
+                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
+                  </select>
+                  <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
+                </div>
+                <div class="mt-2 text-xs text-gray-400" id="secaPeriodoDisplay">
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
+                </div>
               </div>
-              <div class="flex items-center">
-                <input type="checkbox" id="padrao-priorizar-atrasados" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="priorizarAtrasados">
-                <label for="padrao-priorizar-atrasados" class="text-white">Priorizar Números MUITO Atrasados</label>
-                <label for="padrao-min-atraso" class="text-gray-300 text-sm ml-auto mr-2">Mínimo de concursos sem sair:</label>
-                <input type="number" id="padrao-min-atraso" class="w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="20" min="1" max="100">
+              <button onclick="abrirPopupAjudaSeca()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
+                ❓
+              </button>
+            </div>
+
+            <!-- Números e Trevos -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Números -->
+              <div class="bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Números Principais (1-50)</h3>
+                <div class="text-gray-300 mb-4">
+                  <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaNumeros}</span></p>
+                  <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesNumeros}</span></p>
+                  <div class="mb-2">
+                    <strong>Estatísticas:</strong>
+                    <ul class="list-disc list-inside ml-4 text-sm">
+                      <li>Média de seca: ${numerosSeca.estatisticas?.seca_media || 'N/A'} concursos</li>
+                      <li>Maior seca: ${numerosSeca.estatisticas?.seca_maxima || 'N/A'} concursos</li>
+                      <li>Menor seca: ${numerosSeca.estatisticas?.seca_mediana || 'N/A'} concursos</li>
+                    </ul>
+                  </div>
+                </div>
+                <div id="graficoSecaNumeros" class="w-full h-80 bg-gray-700 rounded"></div>
               </div>
-              <div class="flex items-center">
-                <input type="checkbox" id="padrao-evitar-repeticoes-seguidas" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="evitarRepeticoesSeguidas">
-                <label for="padrao-evitar-repeticoes-seguidas" class="text-white">Evitar Números Repetidos do Último Concurso</label>
+
+              <!-- Trevos -->
+              <div class="bg-gray-800 p-4 rounded-lg shadow">
+                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Trevos da Sorte (1-6)</h3>
+                <div class="text-gray-300 mb-4">
+                  <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaTrevos}</span></p>
+                  <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesTrevos}</span></p>
+                  <div class="mb-2">
+                    <strong>Estatísticas:</strong>
+                    <ul class="list-disc list-inside ml-4 text-sm">
+                      <li>Média de seca: ${trevosSeca.estatisticas?.seca_media || 'N/A'} concursos</li>
+                      <li>Maior seca: ${trevosSeca.estatisticas?.seca_maxima || 'N/A'} concursos</li>
+                      <li>Menor seca: ${trevosSeca.estatisticas?.seca_mediana || 'N/A'} concursos</li>
+                    </ul>
+                  </div>
+                </div>
+                <div id="graficoSecaTrevos" class="w-full h-80 bg-gray-700 rounded"></div>
               </div>
             </div>
-            <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
-              <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
-              <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
+
+            <!-- Interpretação -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#8B5CF6]">
+              <h3 class="text-xl font-semibold text-[#8B5CF6] mb-2">Interpretação dos Gráficos de Seca 📊</h3>
+              <ul class="list-disc list-inside text-gray-300 ml-4">
+                <li><strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).</li>
+                <li><strong>Eixo Y:</strong> Concursos em que estão sem sair.</li>
+                <li><strong>Barras altas:</strong> Maior tempo de seca.</li>
+                <li><strong>Barras baixas:</strong> Sorteados recentemente.</li>
+              </ul>
+            </div>
+
+            <!-- Estratégias -->
+            <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-green-400">
+              <h3 class="text-xl font-semibold text-green-400 mb-2">Estratégias com a Seca ✅</h3>
+              <ul class="list-disc list-inside text-gray-300 ml-4">
+                <li><strong>Atrasados:</strong> Apostar nos que estão em seca.</li>
+                <li><strong>Recentes:</strong> Apostar nos que saíram há pouco.</li>
+                <li><strong>Misto:</strong> Combinar os dois.</li>
+                <li><strong>Aleatoriedade:</strong> Não é garantia. Combine com frequência.</li>
+              </ul>
+            </div>
+
+            <!-- Alerta Final -->
+            <div class="mt-8 text-center text-gray-400">
+              <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística histórica. Não garante resultados futuros. Aposte com responsabilidade.</p>
+            </div>
+            
+            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
+              <div class="space-y-3">
+                <div class="flex items-center">
+                  <input type="checkbox" id="padrao-evitar-consecutivos" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="evitarConsecutivos">
+                  <label for="padrao-evitar-consecutivos" class="text-white">Evitar Números Consecutivos (ex: 23-24)</label>
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="padrao-priorizar-atrasados" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="priorizarAtrasados">
+                  <label for="padrao-priorizar-atrasados" class="text-white">Priorizar Números MUITO Atrasados</label>
+                  <label for="padrao-min-atraso" class="text-gray-300 text-sm ml-auto mr-2">Mínimo de concursos sem sair:</label>
+                  <input type="number" id="padrao-min-atraso" class="w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="20" min="1" max="100">
+                </div>
+                <div class="flex items-center">
+                  <input type="checkbox" id="padrao-evitar-repeticoes-seguidas" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="padroes" data-pref-name="evitarRepeticoesSeguidas">
+                  <label for="padrao-evitar-repeticoes-seguidas" class="text-white">Evitar Números Repetidos do Último Concurso</label>
+                </div>
+              </div>
+              <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
+                <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
+                <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
+              </div>
             </div>
           </div>
-        </div>
-      `;
-      
-      // Criar gráficos após o HTML ser inserido
-      setTimeout(() => {
-        plotGraficoSecaNumeros(numerosSeca);
-        plotGraficoSecaTrevos(trevosSeca);
-      }, 100);
-      
-    } catch (error) {
-      console.error('❌ Erro ao carregar dados de seca:', error);
-      console.error('❌ Stack trace:', error.stack);
-      if (container) {
-        container.innerHTML = `<p class="text-red-500 text-center">Erro ao carregar dados: ${error.message}. Verifique a conexão com o servidor.</p>`;
-      } else {
-        // Atualizar elementos do modal diretamente
-        const secaNumerosMaior = document.getElementById('secaNumerosMaior');
-        const secaNumerosRecentes = document.getElementById('secaNumerosRecentes');
-        const secaTrevosMaior = document.getElementById('secaTrevosMaior');
-        const secaTrevosRecentes = document.getElementById('secaTrevosRecentes');
+        `;
         
-        if (secaNumerosMaior) secaNumerosMaior.textContent = `Erro: ${error.message}`;
-        if (secaNumerosRecentes) secaNumerosRecentes.textContent = `Erro: ${error.message}`;
-        if (secaTrevosMaior) secaTrevosMaior.textContent = `Erro: ${error.message}`;
-        if (secaTrevosRecentes) secaTrevosRecentes.textContent = `Erro: ${error.message}`;
+        // Criar gráficos após o HTML ser inserido
+        setTimeout(() => {
+          plotGraficoSecaNumeros(numerosSeca);
+          plotGraficoSecaTrevos(trevosSeca);
+        }, 100);
+        
+      } catch (error) {
+        console.error('❌ Erro ao carregar dados de seca:', error);
+        console.error('❌ Stack trace:', error.stack);
+        if (container) {
+          container.innerHTML = `<p class="text-red-500 text-center">Erro ao carregar dados: ${error.message}. Verifique a conexão com o servidor.</p>`;
+        } else {
+          // Atualizar elementos do modal diretamente
+          const secaNumerosMaior = document.getElementById('secaNumerosMaior');
+          const secaNumerosRecentes = document.getElementById('secaNumerosRecentes');
+          const secaTrevosMaior = document.getElementById('secaTrevosMaior');
+          const secaTrevosRecentes = document.getElementById('secaTrevosRecentes');
+          
+          if (secaNumerosMaior) secaNumerosMaior.textContent = `Erro: ${error.message}`;
+          if (secaNumerosRecentes) secaNumerosRecentes.textContent = `Erro: ${error.message}`;
+          if (secaTrevosMaior) secaTrevosMaior.textContent = `Erro: ${error.message}`;
+          if (secaTrevosRecentes) secaTrevosRecentes.textContent = `Erro: ${error.message}`;
+        }
       }
     }
-  }
-  
+    
 
-  
-  // Função para atualizar o modal quando o filtro de período é alterado
-  function updateSecaModal() {
-    const selectElement = document.getElementById('selectSecaPeriodo');
-    const selectedQtd = selectElement.value;
     
-    // Carregar dados no modal genérico
-    const conteudo = document.getElementById('conteudo-modal');
-    if (conteudo) {
-      carregarAnaliseSeca(conteudo, selectedQtd);
-    }
-  }
-  
-  // Função para abrir popup de ajuda da análise de seca
-  function abrirPopupAjudaSeca() {
-    document.getElementById("popupAjudaSeca").style.display = "block";
-  }
-
-  function fecharPopupAjudaSeca() {
-    document.getElementById("popupAjudaSeca").style.display = "none";
-  }
-  
-  // Função para criar gráfico de seca dos números principais
-  function plotGraficoSecaNumeros(numerosSeca) {
-    if (!numerosSeca || !numerosSeca.seca_por_numero) {
-      console.error('Dados de seca dos números não disponíveis');
-      return;
-    }
-    
-    // Converter seca_por_numero em arrays para o gráfico
-    const secaPorNumero = numerosSeca.seca_por_numero;
-    const labels = Object.keys(secaPorNumero).map(num => parseInt(num)).sort((a, b) => a - b);
-    const valores = labels.map(num => secaPorNumero[num].seca_atual);
-    
-    // Cores baseadas na seca (vermelho para maior seca, verde para menor)
-    const cores = valores.map(valor => {
-      const maxSeca = Math.max(...valores);
-      const minSeca = Math.min(...valores);
-      const normalized = (valor - minSeca) / (maxSeca - minSeca);
+    // Função para atualizar o modal quando o filtro de período é alterado
+    function updateSecaModal() {
+      const selectElement = document.getElementById('selectSecaPeriodo');
+      const selectedQtd = selectElement.value;
       
-      if (normalized > 0.8) return '#EF4444'; // Vermelho (maior seca)
-      if (normalized > 0.6) return '#F97316'; // Laranja
-      if (normalized > 0.4) return '#EAB308'; // Amarelo
-      if (normalized > 0.2) return '#22C55E'; // Verde claro
-      return '#00E38C'; // Verde (menor seca)
-    });
+      // Carregar dados no modal genérico
+      const conteudo = document.getElementById('conteudo-modal');
+      if (conteudo) {
+        carregarAnaliseSeca(conteudo, selectedQtd);
+      }
+    }
     
-    const data = [{
-      x: labels,
-      y: valores,
-      type: 'bar',
-      marker: {
-        color: cores,
-        opacity: 0.9,
-        line: {
+    // Função para abrir popup de ajuda da análise de seca
+    function abrirPopupAjudaSeca() {
+      document.getElementById("popupAjudaSeca").style.display = "block";
+    }
+
+    function fecharPopupAjudaSeca() {
+      document.getElementById("popupAjudaSeca").style.display = "none";
+    }
+    
+    // Função para criar gráfico de seca dos números principais
+    function plotGraficoSecaNumeros(numerosSeca) {
+      if (!numerosSeca || !numerosSeca.seca_por_numero) {
+        console.error('Dados de seca dos números não disponíveis');
+        return;
+      }
+      
+      // Converter seca_por_numero em arrays para o gráfico
+      const secaPorNumero = numerosSeca.seca_por_numero;
+      const labels = Object.keys(secaPorNumero).map(num => parseInt(num)).sort((a, b) => a - b);
+      const valores = labels.map(num => secaPorNumero[num].seca_atual);
+      
+      // Cores baseadas na seca (vermelho para maior seca, verde para menor)
+      const cores = valores.map(valor => {
+        const maxSeca = Math.max(...valores);
+        const minSeca = Math.min(...valores);
+        const normalized = (valor - minSeca) / (maxSeca - minSeca);
+        
+        if (normalized > 0.8) return '#EF4444'; // Vermelho (maior seca)
+        if (normalized > 0.6) return '#F97316'; // Laranja
+        if (normalized > 0.4) return '#EAB308'; // Amarelo
+        if (normalized > 0.2) return '#22C55E'; // Verde claro
+        return '#00E38C'; // Verde (menor seca)
+      });
+      
+      const data = [{
+        x: labels,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: cores,
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 1
+          }
+        },
+        text: valores.map(val => `${val} concursos`),
+        textposition: 'auto',
+        textfont: {
           color: 'white',
-          width: 1
-        }
-      },
-      text: valores.map(val => `${val} concursos`),
-      textposition: 'auto',
-      textfont: {
-        color: 'white',
-        size: 10,
-        weight: 'bold'
-      },
-      hovertemplate: '<b>Número %{x}</b><br>Em seca há: %{y} concursos<extra></extra>'
-    }];
-    
-    const layout = {
-      title: {
-        text: '🌵 Seca dos Números Principais (1-50)',
-        font: { size: 18, color: 'white' }
-      },
-      xaxis: { 
-        title: 'Número',
-        titlefont: { color: 'white' },
-        tickfont: { color: 'white', size: 12 },
-        tickmode: 'linear',
-        tick0: 1,
-        dtick: 5
-      },
-      yaxis: { 
-        title: 'Concursos em Seca',
-        titlefont: { color: 'white' },
-        tickfont: { color: 'white' }
-      },
-      plot_bgcolor: '#1a1a1a',
-      paper_bgcolor: '#1a1a1a',
-      font: { color: 'white' },
-      margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
-      annotations: [{
-        text: 'Barras vermelhas = maior seca | Barras verdes = menor seca',
-        showarrow: false,
-        xref: 'paper',
-        yref: 'paper',
-        x: 0.5,
-        y: -0.15,
-        font: { color: 'gray', size: 12 }
-      }]
-    };
-    
-    Plotly.newPlot('graficoSecaNumeros', data, layout, { 
-      displayModeBar: false,
-      responsive: true
-    });
-  }
+          size: 10,
+          weight: 'bold'
+        },
+        hovertemplate: '<b>Número %{x}</b><br>Em seca há: %{y} concursos<extra></extra>'
+      }];
+      
+      const layout = {
+        title: {
+          text: '🌵 Seca dos Números Principais (1-50)',
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Número',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 12 },
+          tickmode: 'linear',
+          tick0: 1,
+          dtick: 5
+        },
+        yaxis: { 
+          title: 'Concursos em Seca',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
+        annotations: [{
+          text: 'Barras vermelhas = maior seca | Barras verdes = menor seca',
+          showarrow: false,
+          xref: 'paper',
+          yref: 'paper',
+          x: 0.5,
+          y: -0.15,
+          font: { color: 'gray', size: 12 }
+        }]
+      };
+      
+      Plotly.newPlot('graficoSecaNumeros', data, layout, { 
+        displayModeBar: false,
+        responsive: true
+      });
+    }
     
     // Função para criar gráfico de seca dos trevos
     function plotGraficoSecaTrevos(trevosSeca) {
@@ -5546,63 +5544,6 @@
       padding: 12px; /* Padding menor */
     }
   }
-
-  /* Estilo do modal com propriedades do selo-confianca */
-  .modal-content {
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.3), rgba(255, 255, 255, 0.15));
-    border: 1px solid rgba(168, 85, 247, 0.2);
-    border-radius: 12px;
-  }
-
-  /* Responsividade para modal de configuração de aposta */
-  @media (max-width: 768px) {
-    #modalConfiguracao .modal-content {
-      width: 95% !important;
-      max-width: 400px !important;
-      padding: 1.5rem !important;
-    }
-    
-    #modalConfiguracao .mb-5 {
-      margin-bottom: 1rem !important;
-    }
-    
-    #modalConfiguracao .mb-8 {
-      margin-bottom: 1.5rem !important;
-    }
-    
-    /* Aproximar números das barras */
-    #modalConfiguracao #valorNumeros,
-    #modalConfiguracao #valorTrevos {
-      margin-top: 0.5rem !important;
-      font-size: 1.25rem !important;
-      font-weight: bold !important;
-    }
-    
-    /* Aumentar fonte dos números coloridos */
-    #modalConfiguracao #valorNumeros {
-      color: #00E38C !important;
-      font-size: 1.5rem !important;
-    }
-    
-    #modalConfiguracao #valorTrevos {
-      color: #8B5CF6 !important;
-      font-size: 1.5rem !important;
-    }
-  }
-
-  @media (max-width: 480px) {
-    #modalConfiguracao .modal-content {
-      width: 98% !important;
-      padding: 1rem !important;
-    }
-    
-    /* Aproximar ainda mais os números das barras */
-    #modalConfiguracao #valorNumeros,
-    #modalConfiguracao #valorTrevos {
-      margin-top: 0.25rem !important;
-      font-size: 1.75rem !important;
-    }
-  }
   </style>
 
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
@@ -5679,4 +5620,5 @@
     </div>
   </div>
 </body>
+</html> 
 </html> 

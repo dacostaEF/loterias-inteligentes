@@ -9,7 +9,7 @@ import os
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def carregar_dados_milionaria(arquivo_excel: str = 'Milionária_edt.xlsx') -> pd.DataFrame:
+def carregar_dados_milionaria(arquivo_excel: str = 'LoteriasExcel/Milionária_edt.xlsx') -> pd.DataFrame:
     """
     Carrega os dados históricos da Mais Milionária.
 

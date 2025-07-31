@@ -28,7 +28,7 @@ pip install -r requirements.txt
 ```
 
 ### 2. Verificar arquivo de dados
-Certifique-se de que o arquivo `Milionária_edt.xlsx` está na pasta raiz.
+Certifique-se de que o arquivo `Milionária_edt.xlsx` está na pasta `LoteriasExcel/`.
 
 ### 3. Executar aplicação
 ```bash
@@ -45,7 +45,8 @@ Abra o navegador e acesse: `http://localhost:5000`
 ├── app.py                          # Aplicação Flask principal
 ├── requirements.txt                # Dependências Python
 ├── README.md                      # Este arquivo
-├── Milionária_edt.xlsx            # Dados históricos
+├── LoteriasExcel/
+│   └── Milionária_edt.xlsx        # Dados históricos da +Milionária
 ├── templates/
 │   └── dashboard_milionaria.html  # Interface web
 ├── static/                        # Arquivos estáticos (CSS/JS)

@@ -33,7 +33,7 @@ from analise_estatistica_avancada import AnaliseEstatisticaAvancada
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
 
 # Caminho para o arquivo Excel
-EXCEL_FILE = 'Milionária_edt.xlsx'
+EXCEL_FILE = 'LoteriasExcel/Milionária_edt.xlsx'
 df_milionaria = None # Variável global para armazenar o DataFrame
 
 def carregar_dados_milionaria():
@@ -429,10 +429,21 @@ def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
     return render_template('boloes_loterias.html')
 
+# --- Rotas da Mega Sena ---
+@app.route('/dashboard_MS')
+def dashboard_megasena():
+    """Renderiza a página principal do dashboard da Mega Sena."""
+    return render_template('dashboard_megasena.html')
+
+@app.route('/aposta_inteligente_premium_MS')
+def aposta_inteligente_premium_megasena():
+    """Renderiza a página de Aposta Inteligente Premium da Mega Sena."""
+    return render_template('analise_estatistica_avancada_megasena.html')
+
 @app.route('/aposta_inteligente_premium')
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
-    return render_template('aposta_inteligente_premium.html')
+    return render_template('analise_estatistica_avancada_milionaria.html')
 
 @app.route('/api/gerar_aposta_premium', methods=['POST'])
 def gerar_aposta_premium():
