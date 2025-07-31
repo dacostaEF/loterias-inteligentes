@@ -10,24 +10,24 @@ import os
 # ou em um subdiretório acessível (no caso, eles estão todos no mesmo nível da pasta +Milionaria/)
 
 # Importa a função de análise de frequência geral
-from funcao_analise_de_frequencia import analise_frequencia_milionaria_completa, analise_frequencia
+from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia_milionaria_completa
 
 # Importa a função de análise de distribuição
-from funcao_analise_de_distribuicao import analise_distribuicao_milionaria
+from funcoes.milionaria.funcao_analise_de_distribuicao import analise_distribuicao_milionaria
 
 # Importa a função de análise de combinações
-from funcao_analise_de_combinacoes import analise_combinacoes_milionaria
+from funcoes.milionaria.funcao_analise_de_combinacoes import analise_combinacoes_milionaria
 
 # Importa a função de análise de padrões e sequências
-from funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
+from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
 
 # Importa a função de análise dos trevos da sorte (frequência e combinações)
 # Assumo que 'analise_trevos_da_sorte' é a função principal deste arquivo
-from funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
+from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
 
 # As funções de 'calculos.py' e a classe 'AnaliseEstatisticaAvancada' de 'analise_estatistica_avancada.py'
-from calculos import calcular_seca_numeros, calcular_seca_trevos
-from analise_estatistica_avancada import AnaliseEstatisticaAvancada
+from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
+from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -79,15 +79,26 @@ def dashboard():
 
 @app.route('/api/analise-frequencia')
 def get_analise_frequencia_nova():
-    """Nova rota para análise de frequência com formato JSON otimizado para frontend."""
+    """Nova rota para análise de frequência com dados reais dos últimos 50 concursos."""
     try:
-        if df_milionaria is None or df_milionaria.empty:
-            return jsonify({'error': 'Dados da +Milionária não carregados.'}), 500
-
-        dados_sorteios_list = df_milionaria[['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']].values.tolist()
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
-
-        resultado = analise_frequencia(dados_sorteios_list, qtd_concursos)
+        print("🔍 Iniciando API de frequência...")
+        
+        # Usar a nova função que carrega dados reais
+        from funcoes.milionaria.funcao_analise_de_frequencia import analisar_frequencia
+        
+        # Obter parâmetro de quantidade de concursos (padrão: 50)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
+        print(f"🔍 qtd_concursos: {qtd_concursos}")
+        
+        # Executar análise com dados reais
+        print("🔍 Chamando analisar_frequencia...")
+        resultado = analisar_frequencia(df_milionaria=df_milionaria, qtd_concursos=qtd_concursos)
+        print(f"🔍 Resultado tipo: {type(resultado)}")
+        print(f"🔍 Resultado: {resultado}")
+        
+        if not resultado or resultado == {}:
+            print("❌ Resultado vazio ou None")
+            return jsonify({'error': 'Erro ao carregar dados de frequência.'}), 500
 
         return jsonify({
             'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
@@ -98,9 +109,11 @@ def get_analise_frequencia_nova():
             'numeros_frios': resultado['numeros_quentes_frios']['numeros_frios'],
             'trevos_quentes': resultado['numeros_quentes_frios']['trevos_quentes'],
             'trevos_frios': resultado['numeros_quentes_frios']['trevos_frios'],
-            'analise_temporal': resultado['analise_temporal']
+            'analise_temporal': resultado['analise_temporal'],
+            'periodo_analisado': resultado['periodo_analisado']
         })
     except Exception as e:
+        print(f"❌ Erro na API de frequência: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise_padroes_sequencias', methods=['GET'])
@@ -384,7 +397,7 @@ def gerar_aposta_milionaria_api():
             return jsonify({'error': 'Parâmetros qtde_num, qtde_trevo1 e qtde_trevo2 são obrigatórios.'}), 400
 
         # Importar a função de geração personalizada
-        from gerarCombinacao_numeros_aleatoriosMilionaria import gerar_aposta_personalizada
+        from funcoes.milionaria.gerarCombinacao_numeros_aleatoriosMilionaria import gerar_aposta_personalizada
         
         # Chama a função principal de geração de aposta
         numeros, trevo1, trevo2, valor, qtde_apostas = gerar_aposta_personalizada(qtde_num, qtde_trevo1, qtde_trevo2)
@@ -449,7 +462,7 @@ def aposta_inteligente_premium():
 def gerar_aposta_premium():
     """Gera aposta inteligente usando Machine Learning."""
     try:
-        from geracao_inteligente import gerar_aposta_inteligente
+        from funcoes.milionaria.geracao_inteligente import gerar_aposta_inteligente
         
         # Obter dados do request
         data = request.get_json()
@@ -465,19 +478,19 @@ def gerar_aposta_premium():
         # Carregar dados de frequência se necessário
         if any(key in preferencias_ml for key in ['frequencia', 'trevos']):
             try:
-                from funcao_analise_de_frequencia import analisar_frequencia
-                dados_freq = analisar_frequencia()
+                from funcoes.milionaria.funcao_analise_de_frequencia import analisar_frequencia
+                dados_freq = analisar_frequencia(qtd_concursos=50)  # Últimos 50 concursos
                 analysis_cache['frequencia_completa'] = dados_freq
-                analysis_cache['frequencia_25'] = dados_freq  # Usar mesmo dados para período de 25
-                print("✅ Dados de frequência carregados")
+                analysis_cache['frequencia_25'] = analisar_frequencia(qtd_concursos=25)  # Últimos 25 concursos
+                print("✅ Dados de frequência carregados (50 e 25 concursos)")
             except Exception as e:
                 print(f"⚠️ Erro ao carregar frequência: {e}")
         
         # Carregar dados de padrões se necessário
         if any(key in preferencias_ml for key in ['padroes']):
             try:
-                from funcao_analise_de_padroes_sequencia import analisar_padroes_sequencia
-                dados_padroes = analisar_padroes_sequencia()
+                from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
+                dados_padroes = analise_padroes_sequencias_milionaria()
                 analysis_cache['padroes_completa'] = dados_padroes
                 print("✅ Dados de padrões carregados")
             except Exception as e:
@@ -486,8 +499,8 @@ def gerar_aposta_premium():
         # Carregar dados de trevos se necessário
         if any(key in preferencias_ml for key in ['trevos']):
             try:
-                from funcao_analise_de_trevodasorte_frequencia import analisar_trevos_da_sorte
-                dados_trevos = analisar_trevos_da_sorte()
+                from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
+                dados_trevos = analise_trevos_da_sorte()
                 analysis_cache['trevos_completa'] = dados_trevos
                 print("✅ Dados de trevos carregados")
             except Exception as e:
@@ -496,7 +509,7 @@ def gerar_aposta_premium():
         # Carregar dados avançados se necessário
         if any(key in preferencias_ml for key in ['clusters']):
             try:
-                from analise_estatistica_avancada import realizar_analise_estatistica_avancada
+                from funcoes.milionaria.analise_estatistica_avancada import realizar_analise_estatistica_avancada
                 dados_avancados = realizar_analise_estatistica_avancada()
                 analysis_cache['avancada'] = dados_avancados
                 print("✅ Dados avançados carregados")
