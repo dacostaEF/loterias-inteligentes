@@ -4716,15 +4716,10 @@
     const btnGerarNoModal = document.getElementById('btnGerarNoModal');
     const sliderNumeros = document.getElementById('sliderNumeros');
     const valorNumeros = document.getElementById('valorNumeros');
-    const sliderTrevos = document.getElementById('sliderTrevos');
-    const valorTrevos = document.getElementById('valorTrevos');
 
     // Atualiza os valores exibidos pelos sliders
     sliderNumeros.oninput = () => {
       valorNumeros.textContent = sliderNumeros.value;
-    };
-    sliderTrevos.oninput = () => {
-      valorTrevos.textContent = sliderTrevos.value;
     };
 
     // Abrir o modal
@@ -4740,28 +4735,21 @@
     // Gerar aposta ao clicar no botão dentro do modal
     btnGerarNoModal.addEventListener('click', () => {
       const qtdeNum = parseInt(sliderNumeros.value);
-      const qtdeTrevos = parseInt(sliderTrevos.value);
-      gerarApostaAleatoria(qtdeNum, qtdeTrevos);
+      gerarApostaAleatoria(qtdeNum);
       modalConfiguracao.classList.add('hidden'); // Fecha o modal após gerar
     });
     // Função para chamar o backend Flask
-    async function gerarApostaAleatoria(qtdeNum, qtdeTrevos) {
+    async function gerarApostaAleatoria(qtdeNum) {
       try {
         mostrarMensagem('🎲 Gerando sua aposta...', 'info');
         
-        // Para compatibilidade com o backend, dividimos os trevos em 2 grupos
-        const qtdeTrevo1 = Math.ceil(qtdeTrevos / 2);
-        const qtdeTrevo2 = Math.floor(qtdeTrevos / 2);
-        
-        const response = await fetch('/api/gerar-aposta-milionaria', {
+        const response = await fetch('/api/gerar-aposta-megasena', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            qtde_num: qtdeNum,
-            qtde_trevo1: qtdeTrevo1,
-            qtde_trevo2: qtdeTrevo2
+            qtde_num: qtdeNum
           })
         });
 
@@ -4774,9 +4762,6 @@
         
         // Limpar seleções anteriores
         limparSelecaoSilenciosa();
-        
-        // Atualizar limite de trevos baseado no modal
-        const limiteTrevos = qtdeTrevos;
         
         // Selecionar números aleatórios automaticamente
         data.numeros.forEach(numero => {
