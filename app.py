@@ -29,12 +29,18 @@ from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise
 from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
 from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
 
+# --- Importações para Mega Sena ---
+from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
+
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
 
 # Caminho para o arquivo Excel
 EXCEL_FILE = 'LoteriasExcel/Milionária_edt.xlsx'
 df_milionaria = None # Variável global para armazenar o DataFrame
+
+# Variável global para armazenar o DataFrame da Mega Sena
+df_megasena = None
 
 def carregar_dados_milionaria():
     """Carrega os dados da +Milionária do arquivo Excel."""
@@ -58,9 +64,22 @@ def carregar_dados_milionaria():
             df_milionaria = pd.DataFrame() # Retorna DataFrame vazio se o arquivo não existir
     return df_milionaria
 
+def carregar_dados_megasena_app():
+    """Carrega os dados da Mega Sena do arquivo Excel."""
+    global df_megasena
+    if df_megasena is None:
+        try:
+            df_megasena = carregar_dados_megasena(limite_concursos=500)
+            print(f"Dados da Mega Sena carregados. Total de concursos: {len(df_megasena)}")
+        except Exception as e:
+            print(f"Erro ao carregar dados da Mega Sena: {e}")
+            df_megasena = pd.DataFrame() # Retorna DataFrame vazio em caso de erro
+    return df_megasena
+
 # Carrega os dados na inicialização do aplicativo
 with app.app_context():
     carregar_dados_milionaria()
+    carregar_dados_megasena_app()
 
 @app.route('/')
 def landing_page():
@@ -105,15 +124,46 @@ def get_analise_frequencia_nova():
             'frequencia_absoluta_trevos': [{'trevo': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['trevos'].items())],
             'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
             'frequencia_relativa_trevos': [{'trevo': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['trevos'].items())],
-            'numeros_quentes': resultado['numeros_quentes_frios']['numeros_quentes'],
-            'numeros_frios': resultado['numeros_quentes_frios']['numeros_frios'],
-            'trevos_quentes': resultado['numeros_quentes_frios']['trevos_quentes'],
-            'trevos_frios': resultado['numeros_quentes_frios']['trevos_frios'],
+            'numeros_quentes_frios': resultado['numeros_quentes_frios'],
             'analise_temporal': resultado['analise_temporal'],
             'periodo_analisado': resultado['periodo_analisado']
         })
     except Exception as e:
         print(f"❌ Erro na API de frequência: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/analise-frequencia-MS')
+def get_analise_frequencia_megasena():
+    """Nova rota para análise de frequência da Mega Sena com dados reais dos últimos 50 concursos."""
+    try:
+        print("🔍 Iniciando API de frequência Mega Sena...")
+        
+        # Usar a função da Mega Sena
+        from funcoes.megasena.funcao_analise_de_frequencia_MS import analisar_frequencia
+        
+        # Obter parâmetro de quantidade de concursos (padrão: 50)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
+        print(f"🔍 qtd_concursos: {qtd_concursos}")
+        
+        # Executar análise com dados reais da Mega Sena
+        print("🔍 Chamando analisar_frequencia Mega Sena...")
+        resultado = analisar_frequencia(df_megasena=df_megasena, qtd_concursos=qtd_concursos)
+        print(f"🔍 Resultado tipo: {type(resultado)}")
+        print(f"🔍 Resultado: {resultado}")
+        
+        if not resultado or resultado == {}:
+            print("❌ Resultado vazio ou None")
+            return jsonify({'error': 'Erro ao carregar dados de frequência da Mega Sena.'}), 500
+
+        return jsonify({
+            'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
+            'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
+            'numeros_quentes_frios': resultado['numeros_quentes_frios'],
+            'analise_temporal': resultado['analise_temporal'],
+            'periodo_analisado': resultado['periodo_analisado']
+        })
+    except Exception as e:
+        print(f"❌ Erro na API de frequência Mega Sena: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise_padroes_sequencias', methods=['GET'])

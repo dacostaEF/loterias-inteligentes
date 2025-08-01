@@ -9,12 +9,13 @@ import os
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def carregar_dados_megasena(arquivo_excel: str = '../../LoteriasExcel/MegaSena_edt.xlsx') -> pd.DataFrame:
+def carregar_dados_megasena(arquivo_excel: str = 'LoteriasExcel/MegaSena_edt.xlsx', limite_concursos: int = 500) -> pd.DataFrame:
     """
-    Carrega os dados históricos da Mega Sena.
+    Carrega os dados históricos da Mega Sena, limitando aos últimos N concursos.
 
     Args:
         arquivo_excel (str): O nome do arquivo Excel com os dados da Mega Sena.
+        limite_concursos (int): Quantidade de últimos concursos a carregar (padrão: 500).
 
     Returns:
         pd.DataFrame: DataFrame contendo os dados dos concursos, com números
@@ -44,7 +45,12 @@ def carregar_dados_megasena(arquivo_excel: str = '../../LoteriasExcel/MegaSena_e
         # Remover linhas com valores NaN nas colunas de números se houver
         df.dropna(subset=num_cols, inplace=True)
 
-        logger.info("Pré-processamento de dados da Mega Sena concluído.")
+        # Limitar aos últimos N concursos para otimizar performance
+        if len(df) > limite_concursos:
+            df = df.tail(limite_concursos).reset_index(drop=True)
+            logger.info(f"Limitado aos últimos {limite_concursos} concursos para otimizar performance.")
+
+        logger.info(f"Pré-processamento de dados da Mega Sena concluído. Total de concursos: {len(df)}")
         return df
 
     except Exception as e:
@@ -81,7 +87,7 @@ def converter_para_matrizes_binarias_megasena(df: pd.DataFrame) -> tuple[np.ndar
 # Exemplo de uso
 if __name__ == '__main__':
     try:
-        df_megasena = carregar_dados_megasena()
+        df_megasena = carregar_dados_megasena(limite_concursos=500)
         matriz_numeros, concursos_nums = converter_para_matrizes_binarias_megasena(df_megasena)
         
         print("\n--- Carregamento de Dados Mega Sena ---")
