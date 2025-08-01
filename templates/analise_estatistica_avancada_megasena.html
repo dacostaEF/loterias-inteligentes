@@ -2534,10 +2534,10 @@
       container.innerHTML = "🔄 Carregando análise de afinidades...";
 
       try {
-        let url = '/api/analise_de_combinacoes';
-        if (qtdConcursos !== null && qtdConcursos !== '') {
-          url += `?qtd_concursos=${qtdConcursos}`;
-        }
+        let url = '/api/analise_de_combinacoes-MS';
+        // Sempre enviar qtd_concursos, default para '500' se não especificado
+        const qtdToSend = qtdConcursos || '500';
+        url += `?qtd_concursos=${qtdToSend}`;
 
         console.log("=== REQUISIÇÃO AFINIDADES ===");
         console.log("URL:", url);
@@ -2581,10 +2581,11 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-afinidades" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateAfinidadeModal()">
+                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
-                    <option value="130" ${qtdConcursos === '130' ? 'selected' : ''}>Últimos 130 concursos</option>
+                    <option value="200" ${qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
                   </select>
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
@@ -2980,7 +2981,7 @@
     // Função para atualizar o modal quando o filtro de período é alterado
     function updateAfinidadeModal() {
       const selectElement = document.getElementById('janela-analise-afinidades');
-      const selectedQtd = selectElement.value;
+      const selectedQtd = selectElement.value || '500'; // Default para 500 se não houver valor
       const container = document.getElementById('conteudo-modal');
       if (container) {
         carregarAnaliseAfinidades(container, selectedQtd);

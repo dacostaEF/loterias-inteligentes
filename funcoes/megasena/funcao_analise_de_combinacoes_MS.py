@@ -437,6 +437,305 @@ def exibir_analise_combinacoes_detalhada(resultado):
     else:
         print("  ⚠️  Nenhuma sequência aritmética significativa encontrada.")
 
+# Função específica para Mega Sena (sem trevos)
+def analise_de_combinacoes_megasena(dados_sorteios, qtd_concursos=None):
+    """
+    Análise completa de combinações e padrões especiais dos números da Mega Sena (sem trevos).
+
+    Args:
+        dados_sorteios (list): Lista de listas com os sorteios.
+        qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
+                                      Se None, analisa todos os concursos.
+        Formato esperado: [[concurso, bola1, ..., bola6], ...]
+
+    Returns:
+        dict: Dicionário com as análises de combinações.
+    """
+    
+    # Verificação de segurança para dados vazios
+    if not dados_sorteios:
+        print("⚠️  Aviso: Lista de dados de sorteios está vazia!")
+        return {}
+
+    # Preparar dados: Converter para DataFrame para facilitar o processamento.
+    colunas = ['concurso'] + [f'bola{i}' for i in range(1, 7)]
+    
+    # Validação dos dados antes de criar DataFrame
+    dados_validos = []
+    for sorteio in dados_sorteios:
+        if len(sorteio) >= 7:  # Garantir que tem todos os dados (concurso + 6 bolas)
+            concurso = sorteio[0]
+            numeros = sorteio[1:7]
+            
+            # Validação dos dados (1-60 para Mega Sena)
+            numeros_validos = [n for n in numeros if isinstance(n, (int, float)) and 1 <= n <= 60]
+            
+            if len(numeros_validos) == 6:
+                dados_validos.append([concurso] + numeros_validos)
+    
+    # Verificação adicional após processamento
+    if not dados_validos:
+        print("⚠️  Aviso: Nenhum sorteio válido encontrado nos dados!")
+        return {}
+    
+    # Aplicar filtro por quantidade de concursos se especificado
+    if qtd_concursos is not None:
+        if qtd_concursos > len(dados_validos):
+            print(f"⚠️  Aviso: Solicitados {qtd_concursos} concursos, mas só há {len(dados_validos)} disponíveis.")
+            qtd_concursos = len(dados_validos)
+        
+        # Pegar os últimos N concursos (mais recentes primeiro)
+        dados_validos = dados_validos[-qtd_concursos:]
+        print(f"📊 Analisando os últimos {qtd_concursos} concursos...")
+    
+    df_sorteios_pd = pd.DataFrame(dados_validos, columns=colunas)
+
+    num_cols = [f'bola{i}' for i in range(1, 7)]
+
+    for col in num_cols:
+        df_sorteios_pd[col] = pd.to_numeric(df_sorteios_pd[col], errors='coerce').astype('Int64')
+
+    df_sorteios_pd.dropna(subset=num_cols, inplace=True)
+    
+    # Verificação final após filtragem
+    if df_sorteios_pd.empty:
+        print("⚠️  Aviso: Nenhum dado válido após processamento!")
+        return {}
+    
+    # Adicionar coluna com números principais ordenados
+    df_sorteios_pd['numeros_principais_ordenados'] = df_sorteios_pd[num_cols].apply(
+        lambda row: sorted(row.dropna().tolist()), axis=1
+    )
+
+    # 1. Duplas, Ternas, Quadras: Combinações que mais se repetem
+    def analisar_combinacoes_frequentes():
+        combinacoes_stats = {
+            'duplas': Counter(),
+            'ternas': Counter(),
+            'quadras': Counter()
+        }
+
+        for _, row in df_sorteios_pd.iterrows():
+            numeros = tuple(row['numeros_principais_ordenados'])
+
+            # Duplas de números principais
+            for dupla in combinations(numeros, 2):
+                combinacoes_stats['duplas'][tuple(sorted(dupla))] += 1
+            
+            # Ternas de números principais
+            if len(numeros) >= 3:
+                for terna in combinations(numeros, 3):
+                    combinacoes_stats['ternas'][tuple(sorted(terna))] += 1
+
+            # Quadras de números principais
+            if len(numeros) >= 4:
+                for quadra in combinations(numeros, 4):
+                    combinacoes_stats['quadras'][tuple(sorted(quadra))] += 1
+
+        return {
+            'duplas_mais_frequentes': combinacoes_stats['duplas'].most_common(10),
+            'ternas_mais_frequentes': combinacoes_stats['ternas'].most_common(10),
+            'quadras_mais_frequentes': combinacoes_stats['quadras'].most_common(10)
+        }
+
+    # 2. Afinidade entre Números
+    def analisar_afinidade():
+        afinidade_stats = defaultdict(Counter)
+        
+        for _, row in df_sorteios_pd.iterrows():
+            numeros = row['numeros_principais_ordenados']
+            
+            # Calcular afinidade entre todos os pares de números
+            for i, n1 in enumerate(numeros):
+                for n2 in numeros[i+1:]:
+                    afinidade_stats[n1][n2] += 1
+                    afinidade_stats[n2][n1] += 1
+        
+        # Encontrar pares com maior afinidade
+        pares_afinidade = []
+        for n1, counter in afinidade_stats.items():
+            for n2, freq in counter.items():
+                if n1 < n2:  # Evitar duplicatas
+                    pares_afinidade.append(((n1, n2), freq))
+        
+        pares_afinidade.sort(key=lambda x: x[1], reverse=True)
+        
+        # Calcular afinidade total por número
+        numero_afinidade_total = {n: sum(c.values()) for n, c in afinidade_stats.items()}
+        numeros_com_maior_afinidade_geral = sorted(numero_afinidade_total.items(), key=lambda item: item[1], reverse=True)[:10]
+        
+        return {
+            'pares_com_maior_afinidade': pares_afinidade[:20],
+            'numeros_com_maior_afinidade_geral': numeros_com_maior_afinidade_geral
+        }
+
+    # 3. Padrões Geométricos no Volante (ajustado para 1-60)
+    def analisar_padroes_geometricos():
+        # Definir as regiões do volante da Mega Sena (1-60)
+        # Linhas: 1-10 (L1), 11-20 (L2), 21-30 (L3), 31-40 (L4), 41-50 (L5), 51-60 (L6)
+        # Colunas: X1, X2, ..., X10 (números terminados em 1, 2, ..., 0)
+        
+        # Cantos: 1, 10, 51, 60
+        cantos = {1, 10, 51, 60}
+        # Bordas: números nas bordas do volante
+        bordas = set(range(1, 11)) | set(range(51, 61)) | {10, 20, 30, 40, 50}
+        # Centro: números no centro do volante
+        centro = set(range(21, 50)) - {30, 40}
+        
+        ocorrencias_cantos = 0
+        ocorrencias_bordas = 0
+        ocorrencias_centro = 0
+        
+        for _, row in df_sorteios_pd.iterrows():
+            numeros = set(row['numeros_principais_ordenados'])
+            
+            ocorrencias_cantos += len(numeros & cantos)
+            ocorrencias_bordas += len(numeros & bordas)
+            ocorrencias_centro += len(numeros & centro)
+        
+        total_concursos = len(df_sorteios_pd)
+        
+        # Determinar região mais frequente
+        regioes = {
+            'cantos': ocorrencias_cantos / total_concursos,
+            'bordas': ocorrencias_bordas / total_concursos,
+            'centro': ocorrencias_centro / total_concursos
+        }
+        regiao_mais_frequente_geral = max(regioes, key=regioes.get)
+        
+        return {
+            'ocorrencias_cantos': ocorrencias_cantos,
+            'ocorrencias_bordas': ocorrencias_bordas,
+            'ocorrencias_centro': ocorrencias_centro,
+            'regiao_mais_frequente_geral': regiao_mais_frequente_geral
+        }
+
+    # 4. Sequências Aritméticas
+    def analisar_sequencias_aritmeticas():
+        sequencias_encontradas = {}
+        
+        for _, row in df_sorteios_pd.iterrows():
+            numeros = sorted(row['numeros_principais_ordenados'])
+            
+            # Verificar sequências de 3 números
+            for i in range(len(numeros) - 2):
+                for j in range(i + 1, len(numeros) - 1):
+                    for k in range(j + 1, len(numeros)):
+                        n1, n2, n3 = numeros[i], numeros[j], numeros[k]
+                        
+                        # Verificar se formam sequência aritmética
+                        if n2 - n1 == n3 - n2 and n2 - n1 > 0:
+                            razao = n2 - n1
+                            seq_key = f'sequencia_razao_{razao}'
+                            
+                            if seq_key not in sequencias_encontradas:
+                                sequencias_encontradas[seq_key] = {
+                                    'count': 0,
+                                    'exemplos': set()
+                                }
+                            
+                            sequencias_encontradas[seq_key]['count'] += 1
+                            sequencias_encontradas[seq_key]['exemplos'].add((n1, n2, n3))
+        
+        # Converter sets para listas para serialização JSON
+        for seq_data in sequencias_encontradas.values():
+            seq_data['exemplos'] = list(seq_data['exemplos'])
+        
+        return sequencias_encontradas
+
+    # Executar todas as análises
+    combinacoes_frequentes = analisar_combinacoes_frequentes()
+    afinidade_entre_numeros = analisar_afinidade()
+    padroes_geometricos = analisar_padroes_geometricos()
+    sequencias_aritmeticas = analisar_sequencias_aritmeticas()
+    
+    # Informações do período analisado
+    periodo_analisado = {
+        'total_concursos_disponiveis': len(dados_sorteios),
+        'concursos_analisados': len(df_sorteios_pd),
+        'qtd_concursos_solicitada': qtd_concursos,
+        'concursos_do_periodo': df_sorteios_pd['concurso'].tolist()
+    }
+    
+    resultado = {
+        'periodo_analisado': periodo_analisado,
+        'combinacoes_mais_frequentes': combinacoes_frequentes,
+        'afinidade_entre_numeros': afinidade_entre_numeros,
+        'padroes_geometricos': padroes_geometricos,
+        'sequencias_aritmeticas': sequencias_aritmeticas
+    }
+    
+    return resultado
+
+def analise_combinacoes_megasena(df_megasena, qtd_concursos=None):
+    """
+    Versão adaptada para trabalhar com DataFrame da Mega Sena (sem trevos)
+    
+    Args:
+        df_megasena (pd.DataFrame): DataFrame com dados da Mega Sena
+        qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
+                                      Se None, analisa todos os concursos.
+        Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6
+    
+    Returns:
+        dict: Resultado da análise de combinações para Mega Sena
+    """
+    
+    print(f"🔍 DEBUG: Iniciando análise de combinações Mega Sena")
+    print(f"🔍 DEBUG: Tipo de df_megasena: {type(df_megasena)}")
+    print(f"🔍 DEBUG: Colunas disponíveis: {list(df_megasena.columns)}")
+    
+    # Verificação de segurança para dados vazios
+    if df_megasena is None:
+        print("⚠️  Aviso: Dados da Mega Sena são None!")
+        return {}
+    
+    # Se for DataFrame, verificar se está vazio
+    if hasattr(df_megasena, 'empty') and df_megasena.empty:
+        print("⚠️  Aviso: DataFrame da Mega Sena está vazio!")
+        return {}
+    
+    # Verificar se as colunas necessárias existem (apenas números, sem trevos)
+    colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']
+    colunas_faltantes = [col for col in colunas_necessarias if col not in df_megasena.columns]
+    
+    if colunas_faltantes:
+        print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
+        return {}
+    
+    # Converter DataFrame para formato esperado pela função original
+    dados_sorteios = []
+    
+    for _, row in df_megasena.iterrows():
+        # Verificar se os dados são válidos (apenas números 1-60)
+        if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']):
+            continue  # Pular linhas com dados inválidos
+        
+        # Validar range de números (1-60 para Mega Sena)
+        numeros_validos = [row[col] for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']]
+        if all(1 <= n <= 60 for n in numeros_validos):
+            sorteio = [
+                row['Concurso'],
+                row['Bola1'], row['Bola2'], row['Bola3'], 
+                row['Bola4'], row['Bola5'], row['Bola6']
+            ]
+            dados_sorteios.append(sorteio)
+    
+    # Verificação final antes de executar análise
+    if not dados_sorteios:
+        print("⚠️  Aviso: Nenhum sorteio válido encontrado nos dados!")
+        return {}
+    
+    print(f"🔍 DEBUG: Dados convertidos com sucesso. Total de sorteios: {len(dados_sorteios)}")
+    print(f"🔍 DEBUG: Primeiro sorteio: {dados_sorteios[0] if dados_sorteios else 'N/A'}")
+    
+    # Executar análise específica para Mega Sena com parâmetro de quantidade de concursos
+    resultado = analise_de_combinacoes_megasena(dados_sorteios, qtd_concursos)
+    print(f"🔍 DEBUG: Análise concluída. Tipo do resultado: {type(resultado)}")
+    print(f"🔍 DEBUG: Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+    
+    return resultado
+
 # Exemplo de uso com dados da Mais Milionária
 if __name__ == "__main__":
     try:
