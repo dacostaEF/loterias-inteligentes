@@ -122,15 +122,12 @@ def analise_padroes_sequencias(dados_sorteios):
         repeticoes_stats = {
             'repeticoes_por_concurso': [],
             'numeros_que_mais_repetem': Counter(),
-            'trevos_que_mais_repetem': Counter(),
             'concursos_consecutivos_sem_repeticao': 0,
             'maior_sequencia_sem_repeticao': 0,
-            'media_repeticoes_numeros': 0,
-            'media_repeticoes_trevos': 0
+            'media_repeticoes_numeros': 0
         }
         
         repeticoes_numeros = []
-        repeticoes_trevos = []
         sequencia_sem_repeticao = 0
         maior_seq = 0
         
@@ -138,22 +135,17 @@ def analise_padroes_sequencias(dados_sorteios):
             sorteio_atual = historico_sorteios[i]
             sorteio_anterior = historico_sorteios[i-1]
             
-            # Analisar repetições nos números
+            # Analisar repetições nos números (Mega Sena: 1-60)
             numeros_repetidos = list(set(sorteio_atual['numeros']) & set(sorteio_anterior['numeros']))
-            trevos_repetidos = list(set(sorteio_atual['trevos']) & set(sorteio_anterior['trevos']))
             
             repeticoes_numeros.append(len(numeros_repetidos))
-            repeticoes_trevos.append(len(trevos_repetidos))
             
             # Contar números que mais repetem
             for num in numeros_repetidos:
                 repeticoes_stats['numeros_que_mais_repetem'][num] += 1
             
-            for trevo in trevos_repetidos:
-                repeticoes_stats['trevos_que_mais_repetem'][trevo] += 1
-            
             # Sequência sem repetição
-            if len(numeros_repetidos) == 0 and len(trevos_repetidos) == 0:
+            if len(numeros_repetidos) == 0:
                 sequencia_sem_repeticao += 1
             else:
                 if sequencia_sem_repeticao > maior_seq:
@@ -163,9 +155,7 @@ def analise_padroes_sequencias(dados_sorteios):
             repeticoes_stats['repeticoes_por_concurso'].append({
                 'concurso': sorteio_atual['concurso'],
                 'numeros_repetidos': numeros_repetidos,
-                'trevos_repetidos': trevos_repetidos,
-                'total_numeros_repetidos': len(numeros_repetidos),
-                'total_trevos_repetidos': len(trevos_repetidos)
+                'total_numeros_repetidos': len(numeros_repetidos)
             })
         
         # Finalizar sequência sem repetição
@@ -176,7 +166,9 @@ def analise_padroes_sequencias(dados_sorteios):
         
         # Tratamento seguro para divisão por zero
         repeticoes_stats['media_repeticoes_numeros'] = np.mean(repeticoes_numeros) if repeticoes_numeros else 0
-        repeticoes_stats['media_repeticoes_trevos'] = np.mean(repeticoes_trevos) if repeticoes_trevos else 0
+        
+        print(f"🎯 DEBUG - Repetições - Total de números que repetem: {len(repeticoes_stats['numeros_que_mais_repetem'])}")
+        print(f"🎯 DEBUG - Repetições - Top 10: {dict(repeticoes_stats['numeros_que_mais_repetem'].most_common(10))}")
         
         return repeticoes_stats
     
@@ -187,16 +179,13 @@ def analise_padroes_sequencias(dados_sorteios):
             'maior_intervalo_historico': {},  # Maior intervalo já registrado
             'intervalos_medios': {},  # Intervalo médio de cada número
             'numeros_mais_ausentes': [],  # Números há mais tempo sem sair
-            'trevos_intervalos': {}
+            'intervalo_medio': 0,
+            'maior_intervalo': 0
         }
         
-        # Para números (1-50)
+        # Para números (Mega Sena: 1-60)
         ultima_aparicao_num = {}
         intervalos_historicos_num = defaultdict(list)
-        
-        # Para trevos (1-6) 
-        ultima_aparicao_trevo = {}
-        intervalos_historicos_trevo = defaultdict(list)
         
         for idx, sorteio in enumerate(historico_sorteios):
             concurso = sorteio['concurso']
@@ -207,17 +196,10 @@ def analise_padroes_sequencias(dados_sorteios):
                     intervalo = idx - ultima_aparicao_num[num]
                     intervalos_historicos_num[num].append(intervalo)
                 ultima_aparicao_num[num] = idx
-            
-            # Processar trevos
-            for trevo in sorteio['trevos']:
-                if trevo in ultima_aparicao_trevo:
-                    intervalo = idx - ultima_aparicao_trevo[trevo]
-                    intervalos_historicos_trevo[trevo].append(intervalo)
-                ultima_aparicao_trevo[trevo] = idx
         
-        # Calcular estatísticas finais para números
+        # Calcular estatísticas finais para números (Mega Sena: 1-60)
         ultimo_idx = len(historico_sorteios) - 1
-        for num in range(1, 51):
+        for num in range(1, 61):
             if num in ultima_aparicao_num:
                 intervalos_stats['intervalos_atuais'][num] = ultimo_idx - ultima_aparicao_num[num]
                 if intervalos_historicos_num[num]:
@@ -231,27 +213,16 @@ def analise_padroes_sequencias(dados_sorteios):
                 intervalos_stats['maior_intervalo_historico'][num] = len(historico_sorteios)
                 intervalos_stats['intervalos_medios'][num] = len(historico_sorteios)
         
-        # Calcular para trevos
-        for trevo in range(1, 7):
-            if trevo in ultima_aparicao_trevo:
-                interval_atual = ultimo_idx - ultima_aparicao_trevo[trevo]
-                intervalos_stats['trevos_intervalos'][trevo] = {
-                    'intervalo_atual': interval_atual,
-                    'maior_intervalo': max(intervalos_historicos_trevo[trevo]) if intervalos_historicos_trevo[trevo] else interval_atual,
-                    'intervalo_medio': np.mean(intervalos_historicos_trevo[trevo]) if intervalos_historicos_trevo[trevo] else interval_atual
-                }
-            else:
-                intervalos_stats['trevos_intervalos'][trevo] = {
-                    'intervalo_atual': len(historico_sorteios),
-                    'maior_intervalo': len(historico_sorteios),
-                    'intervalo_medio': len(historico_sorteios)
-                }
-        
         # Top 10 números mais ausentes
         intervalos_stats['numeros_mais_ausentes'] = sorted(
             intervalos_stats['intervalos_atuais'].items(),
             key=lambda x: x[1], reverse=True
         )[:10]
+        
+        # Calcular estatísticas gerais
+        if intervalos_stats['intervalos_atuais']:
+            intervalos_stats['intervalo_medio'] = np.mean(list(intervalos_stats['intervalos_atuais'].values()))
+            intervalos_stats['maior_intervalo'] = max(intervalos_stats['intervalos_atuais'].values())
         
         return intervalos_stats
     
@@ -259,39 +230,29 @@ def analise_padroes_sequencias(dados_sorteios):
     def analisar_ciclos():
         ciclos_stats = {
             'ciclo_medio_numeros': {},
-            'ciclo_medio_trevos': {},
-            'numeros_ciclo_curto': [],  # Números que voltam rapidamente
-            'numeros_ciclo_longo': [],  # Números que demoram para voltar
-            'previsao_proximo_sorteio': {}  # Baseado em ciclos médios
+            'numeros_ciclos_curtos': {},  # Números que voltam rapidamente
+            'ciclo_medio': 0,
+            'ciclo_mais_comum': 0
         }
         
         # Calcular ciclos baseados nos intervalos já calculados
         intervalos_data = analisar_intervalos()
         
-        # Para números
-        for num in range(1, 51):
+        # Para números (Mega Sena: 1-60)
+        for num in range(1, 61):
             ciclo_medio = intervalos_data['intervalos_medios'].get(num, 0)
             ciclos_stats['ciclo_medio_numeros'][num] = round(ciclo_medio, 2)
         
-        # Para trevos
-        for trevo in range(1, 7):
-            if trevo in intervalos_data['trevos_intervalos']:
-                ciclo_medio = intervalos_data['trevos_intervalos'][trevo]['intervalo_medio']
-                ciclos_stats['ciclo_medio_trevos'][trevo] = round(ciclo_medio, 2)
-        
-        # Classificar números por ciclo
+        # Classificar números por ciclo (top 10 com ciclos curtos)
         ciclos_ordenados = sorted(ciclos_stats['ciclo_medio_numeros'].items(), key=lambda x: x[1])
-        ciclos_stats['numeros_ciclo_curto'] = ciclos_ordenados[:10]  # 10 menores ciclos
-        ciclos_stats['numeros_ciclo_longo'] = ciclos_ordenados[-10:]  # 10 maiores ciclos
+        ciclos_stats['numeros_ciclos_curtos'] = dict(ciclos_ordenados[:10])  # 10 menores ciclos
         
-        # Previsão simples baseada em ciclos (números que "deveriam" sair em breve)
-        for num in range(1, 51):
-            intervalo_atual = intervalos_data['intervalos_atuais'][num]
-            ciclo_medio = ciclos_stats['ciclo_medio_numeros'][num]
-            
-            if ciclo_medio > 0:
-                probabilidade_relativa = min(intervalo_atual / ciclo_medio, 2.0)  # Cap em 200%
-                ciclos_stats['previsao_proximo_sorteio'][num] = round(probabilidade_relativa, 2)
+        # Calcular estatísticas gerais
+        if ciclos_stats['ciclo_medio_numeros']:
+            ciclos_stats['ciclo_medio'] = np.mean(list(ciclos_stats['ciclo_medio_numeros'].values()))
+            # Encontrar o ciclo mais comum (moda)
+            valores_ciclos = list(ciclos_stats['ciclo_medio_numeros'].values())
+            ciclos_stats['ciclo_mais_comum'] = max(set(valores_ciclos), key=valores_ciclos.count)
         
         return ciclos_stats
     
@@ -300,6 +261,11 @@ def analise_padroes_sequencias(dados_sorteios):
     repeticoes = analisar_repeticoes()
     intervalos = analisar_intervalos()
     ciclos = analisar_ciclos()
+    
+    print(f"🎯 DEBUG - Consecutivos: {len(consecutivos.get('sequencias_encontradas', []))}")
+    print(f"🎯 DEBUG - Repetições: {len(repeticoes.get('numeros_que_mais_repetem', {}))}")
+    print(f"🎯 DEBUG - Intervalos: {len(intervalos.get('numeros_mais_ausentes', []))}")
+    print(f"🎯 DEBUG - Ciclos: {len(ciclos.get('numeros_ciclos_curtos', {}))}")
     
     # Organizar resultado final
     resultado = {
@@ -314,9 +280,7 @@ def analise_padroes_sequencias(dados_sorteios):
         
         'repeticoes_entre_concursos': {
             'media_repeticoes_numeros': round(repeticoes['media_repeticoes_numeros'], 2),
-            'media_repeticoes_trevos': round(repeticoes['media_repeticoes_trevos'], 2),
             'numeros_que_mais_repetem': dict(repeticoes['numeros_que_mais_repetem'].most_common(10)),
-            'trevos_que_mais_repetem': dict(repeticoes['trevos_que_mais_repetem'].most_common()),
             'maior_sequencia_sem_repeticao': repeticoes['maior_sequencia_sem_repeticao'],
             'detalhes_por_concurso': repeticoes['repeticoes_por_concurso']
         },
@@ -326,15 +290,15 @@ def analise_padroes_sequencias(dados_sorteios):
             'intervalos_atuais': intervalos['intervalos_atuais'],
             'maiores_intervalos_historicos': intervalos['maior_intervalo_historico'],
             'intervalos_medios': {k: round(v, 2) for k, v in intervalos['intervalos_medios'].items()},
-            'trevos_intervalos': intervalos['trevos_intervalos']
+            'intervalo_medio': round(intervalos['intervalo_medio'], 2) if 'intervalo_medio' in intervalos else 0,
+            'maior_intervalo': intervalos['maior_intervalo'] if 'maior_intervalo' in intervalos else 0
         },
         
         'ciclos_de_retorno': {
             'ciclo_medio_numeros': ciclos['ciclo_medio_numeros'],
-            'ciclo_medio_trevos': ciclos['ciclo_medio_trevos'],
-            'numeros_ciclo_curto': ciclos['numeros_ciclo_curto'],
-            'numeros_ciclo_longo': ciclos['numeros_ciclo_longo'],
-            'previsao_baseada_em_ciclos': ciclos['previsao_proximo_sorteio']
+            'numeros_ciclo_curto': ciclos['numeros_ciclos_curtos'],
+            'ciclo_medio': round(ciclos['ciclo_medio'], 2) if 'ciclo_medio' in ciclos else 0,
+            'ciclo_mais_comum': round(ciclos['ciclo_mais_comum'], 2) if 'ciclo_mais_comum' in ciclos else 0
         }
     }
     
@@ -569,3 +533,89 @@ if __name__ == "__main__":
         
         resultado = analise_padroes_sequencias(dados_exemplo)
         exibir_analise_padroes_sequencias_detalhada(resultado)
+
+def analise_padroes_sequencias_megasena(df_megasena, qtd_concursos=None):
+    """
+    Versão adaptada para trabalhar com DataFrame da Mega Sena
+    
+    Args:
+        df_megasena (pd.DataFrame): DataFrame com dados da Mega Sena
+        qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
+                                      Se None, analisa todos os concursos.
+        Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6
+    
+    Returns:
+        dict: Resultado da análise de padrões
+    """
+    
+    # Verificação de segurança para DataFrame vazio
+    if df_megasena is None or df_megasena.empty:
+        print("⚠️  Aviso: DataFrame da Mega Sena está vazio ou é None!")
+        return {}
+    
+    # Verificar se as colunas necessárias existem
+    colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']
+    colunas_faltantes = [col for col in colunas_necessarias if col not in df_megasena.columns]
+    
+    if colunas_faltantes:
+        print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
+        return {}
+    
+    # Converter DataFrame para formato esperado pela função original
+    dados_sorteios = []
+    
+    for _, row in df_megasena.iterrows():
+        # Verificar se os dados são válidos
+        if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']):
+            continue  # Pular linhas com dados inválidos
+        
+        # Para Mega Sena, não temos trevos, então adicionamos valores fictícios (0,0) para manter compatibilidade
+        sorteio = [
+            row['Concurso'],
+            row['Bola1'], row['Bola2'], row['Bola3'], 
+            row['Bola4'], row['Bola5'], row['Bola6'],
+            0, 0  # Trevos fictícios para manter compatibilidade com a função original
+        ]
+        dados_sorteios.append(sorteio)
+    
+    # Verificação final antes de executar análise
+    if not dados_sorteios:
+        print("⚠️  Aviso: Nenhum sorteio válido encontrado no DataFrame!")
+        return {}
+    
+    # Aplicar filtro por quantidade de concursos se especificado
+    if qtd_concursos is not None:
+        print(f"🎯 Padrões/Sequências Mega Sena - Filtro solicitado: {qtd_concursos} concursos")
+        print(f"📊 Total de concursos disponíveis: {len(dados_sorteios)}")
+        
+        # Ordenar por concurso (assumindo que o primeiro elemento é o número do concurso)
+        dados_sorteios = sorted(dados_sorteios, key=lambda x: x[0])
+        
+        if qtd_concursos > len(dados_sorteios):
+            print(f"⚠️  Aviso: Solicitados {qtd_concursos} concursos, mas só há {len(dados_sorteios)} disponíveis.")
+            qtd_concursos = len(dados_sorteios)
+        
+        # Pegar os últimos N concursos (mais recentes primeiro)
+        dados_sorteios = dados_sorteios[-qtd_concursos:]
+        print(f"📊 Analisando os últimos {qtd_concursos} concursos...")
+    
+    # Executar análise original
+    resultado = analise_padroes_sequencias(dados_sorteios)
+    
+    print(f"🎯 DEBUG - Resultado da análise: {type(resultado)}")
+    print(f"🎯 DEBUG - Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+    
+    # Remover dados de trevos do resultado para Mega Sena
+    if 'repeticoes_entre_concursos' in resultado:
+        if 'trevos_que_mais_repetem' in resultado['repeticoes_entre_concursos']:
+            del resultado['repeticoes_entre_concursos']['trevos_que_mais_repetem']
+        if 'media_repeticoes_trevos' in resultado['repeticoes_entre_concursos']:
+            del resultado['repeticoes_entre_concursos']['media_repeticoes_trevos']
+    
+    if 'intervalos_de_ausencia' in resultado:
+        if 'trevos_intervalos' in resultado['intervalos_de_ausencia']:
+            del resultado['intervalos_de_ausencia']['trevos_intervalos']
+    
+    print(f"🎯 DEBUG - Resultado final: {list(resultado.keys()) if resultado else 'N/A'}")
+    
+    return resultado

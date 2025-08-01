@@ -133,7 +133,10 @@
     .js-plotly-plot .g-ytick2 text,
     .js-plotly-plot .g-ytick2 .tick text,
     .js-plotly-plot .g-ytick2 .tick-label text,
-    .js-plotly-plot .g-ytick2 .tick-label,
+    .js-plotly-plot .g-ytick2 .tick-label {
+      fill: red !important;
+      color: red !important;
+    }
     
     /* Estilos para a matriz visual */
     .matriz-container {
@@ -932,15 +935,15 @@
           </button>
         </div>
 
-        <!-- Passo 4: Trevos -->
+        <!-- Passo 4: Sequências -->
         <div id="passo4" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 4</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Analise os Trevos da Sorte</h4>
+            <h4 class="text-lg font-semibold" style="color: #A855F7;">Análise de Sequências</h4>
           </div>
-          <p class="text-gray-300 text-sm mb-3">Veja os trevos com maior frequência e distribuição.</p>
-          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('trevos')">
-            🍀 Ver Análise Trevos
+          <p class="text-gray-300 text-sm mb-3">Identifique padrões de números consecutivos e sequências.</p>
+          <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('sequencias')">
+            🔢 Ver Análise Sequências
           </button>
         </div>
 
@@ -1158,7 +1161,7 @@
       },
       {
         target: '#passo4',
-        content: '<strong>Passo 4: Analise os Trevos da Sorte</strong><br><br>Veja os trevos com maior frequência e distribuição. Analise padrões estatísticos específicos dos trevos para otimizar suas escolhas.',
+        content: '<strong>Passo 4: Análise de Sequências</strong><br><br>Identifique padrões de números consecutivos e sequências. Analise estatísticas de repetições e ciclos de retorno para otimizar suas escolhas.',
         position: 'left'
       },
       {
@@ -1588,13 +1591,13 @@
             }
           }, 1000); // Aumentado de 500ms para 1000ms
           break;
-        case 'trevos':
-          titulo.textContent = '🍀 Análise dos Trevos';
-          carregarAnaliseTrevos(conteudo);
+        case 'sequencias':
+          titulo.textContent = '🔢 Análise de Sequências';
+          carregarAnaliseSequencias(conteudo);
           // Carregar preferências salvas após o modal ser carregado
           setTimeout(() => {
-            if (typeof carregarPreferenciasTrevos === 'function') {
-              carregarPreferenciasTrevos();
+            if (typeof carregarPreferenciasSequencias === 'function') {
+              carregarPreferenciasSequencias();
             }
           }, 1000); // Aumentado de 500ms para 1000ms
           break;
@@ -2211,13 +2214,13 @@
         document.getElementById("popupAjudaAfinidades").style.display = "none";
       }
 
-      // Funções para o popup de ajuda de trevos
-      function abrirPopupAjudaTrevos() {
-        document.getElementById("popupAjudaTrevos").style.display = "block";
+      // Funções para o popup de ajuda de sequências
+      function abrirPopupAjudaSequencias() {
+        document.getElementById("popupAjudaSequencias").style.display = "block";
       }
 
-      function fecharPopupAjudaTrevos() {
-        document.getElementById("popupAjudaTrevos").style.display = "none";
+      function fecharPopupAjudaSequencias() {
+        document.getElementById("popupAjudaSequencias").style.display = "none";
       }
 
     // Carregar análise de distribuição
@@ -2988,17 +2991,17 @@
       }
     }
 
-    // Carregar análise de trevos
-    async function carregarAnaliseTrevos(container, qtdConcursos = null) {
-      container.innerHTML = "🔄 Carregando análise dos Trevos da Sorte...";
+    // Carregar análise de sequências
+    async function carregarAnaliseSequencias(container, qtdConcursos = null) {
+      container.innerHTML = "🔄 Carregando análise de Sequências...";
 
       try {
-        let url = '/api/analise_trevos_da_sorte';
+        let url = '/api/analise_padroes_sequencias-MS';
         if (qtdConcursos !== null && qtdConcursos !== '') {
           url += `?qtd_concursos=${qtdConcursos}`;
         }
 
-        console.log("=== REQUISIÇÃO TREVOS ===");
+        console.log("=== REQUISIÇÃO SEQUÊNCIAS ===");
         console.log("URL:", url);
         console.log("qtdConcursos:", qtdConcursos);
 
@@ -3013,25 +3016,19 @@
           return;
         }
 
-        // Extrair dados da resposta da API
-        const frequenciaTrevos = data.frequencia_trevos || {};
-        const combinacoesTrevos = data.combinacoes_trevos || {};
-        const correlacaoTrevosBolas = data.correlacao_trevos_bolas || {};
-        const periodoInfo = data.periodo_analisado || {};
+                    // Extrair dados da resposta da API
+                    const numerosConsecutivos = data.numeros_consecutivos || {};
+                    const repeticoes = data.repeticoes_entre_concursos || {};
+                    const intervalos = data.intervalos_de_ausencia || {};
+                    const ciclos = data.ciclos_de_retorno || {};
+                    const periodoInfo = data.periodo_analisado || {};
 
-        console.log("=== DEBUG TREVOS ===");
-        console.log("Frequência trevos:", frequenciaTrevos);
-        console.log("Combinações trevos:", combinacoesTrevos);
-        console.log("Correlação trevos-bolas:", correlacaoTrevosBolas);
-
-        // Converter dados para arrays ordenados
-        const trevosOrdenados = Object.entries(frequenciaTrevos)
-          .sort((a, b) => b[1] - a[1])
-          .map(([trevo, freq]) => ({ trevo: parseInt(trevo), frequencia: freq }));
-
-        const combinacoesOrdenadas = Object.entries(combinacoesTrevos)
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 10);
+                            console.log("=== DEBUG SEQUÊNCIAS ===");
+                    console.log("Números consecutivos:", numerosConsecutivos);
+                    console.log("Repetições:", repeticoes);
+                    console.log("Repetições - numeros_que_mais_repetem:", repeticoes.numeros_que_mais_repetem);
+                    console.log("Intervalos:", intervalos);
+                    console.log("Ciclos:", ciclos);
 
         container.innerHTML = `
           <div class="space-y-6">
@@ -3041,7 +3038,7 @@
                 <h3 class="text-lg font-semibold mb-3 text-[#00E38C]">🎯 Janela de Análise Temporal</h3>
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
-                  <select id="janela-analise-trevos" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateTrevosModal()">
+                  <select id="janela-analise-sequencias" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSequenciasModal()">
                     <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
@@ -3051,426 +3048,373 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
               </div>
-              <button onclick="abrirPopupAjudaTrevos()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
+              <button onclick="abrirPopupAjudaSequencias()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
                 ❓
               </button>
             </div>
             
-            <!-- Frequência dos Trevos -->
+            <!-- Números Consecutivos -->
             <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🍀 Frequência dos Trevos (1-6)</h3>
-              <div class="grid grid-cols-6 gap-4">
-                ${trevosOrdenados.map((item, index) => 
-                  `<div class="bg-[#8B5CF6] text-white p-4 rounded text-center">
-                    <div class="text-2xl font-bold">${item.trevo}</div>
-                    <div class="text-sm">${item.frequencia} vezes</div>
-                    <div class="text-xs">${index + 1}º mais frequente</div>
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
-            
-            <!-- Combinações de Trevos -->
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🤝 Combinações de Trevos Mais Frequentes</h3>
-              
-              <!-- Cards visuais das top 5 combinações -->
-              <div class="grid grid-cols-5 gap-3 mb-6">
-                ${combinacoesOrdenadas.slice(0, 5).map((combinacao, index) => {
-                  const [trevo1, trevo2] = combinacao[0].split(',');
-                  const cores = ['#00E38C', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4'];
-                  return `<div class="bg-gradient-to-br ${index === 0 ? 'from-yellow-400 to-orange-500' : 'from-gray-700 to-gray-800'} text-white p-4 rounded-lg text-center font-bold shadow-lg transform hover:scale-105 transition-transform duration-200">
-                    <div class="text-2xl mb-1">${trevo1} + ${trevo2}</div>
-                    <div class="text-sm opacity-90">${combinacao[1]} vezes</div>
-                    <div class="text-xs opacity-75 mt-1">${index === 0 ? '🥇 1º lugar' : index === 1 ? '🥈 2º lugar' : index === 2 ? '🥉 3º lugar' : `${index + 1}º lugar`}</div>
-                  </div>`;
-                }).join('')}
-              </div>
-              
-              <!-- Tabela detalhada das top 10 combinações -->
-              <div class="bg-[#1A1D25] p-4 rounded-lg">
-                <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📋 Ranking Completo das Combinações</h4>
-                <div class="overflow-x-auto">
-                  <table class="w-full text-sm">
-                    <thead>
-                      <tr class="border-b border-gray-700">
-                        <th class="text-left py-2 text-gray-300">#</th>
-                        <th class="text-left py-2 text-gray-300">Combinação</th>
-                        <th class="text-left py-2 text-gray-300">Frequência</th>
-                        <th class="text-left py-2 text-gray-300">% dos Concursos</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      ${combinacoesOrdenadas.slice(0, 10).map((combinacao, index) => {
-                        const [trevo1, trevo2] = combinacao[0].split(',');
-                        const percentual = ((combinacao[1] / periodoInfo.concursos_analisados) * 100).toFixed(1);
-                        return `<tr class="border-b border-gray-800 hover:bg-gray-800 transition-colors">
-                          <td class="py-2 text-gray-400">${index + 1}</td>
-                          <td class="py-2 font-semibold text-white">${trevo1} + ${trevo2}</td>
-                          <td class="py-2 text-[#00E38C] font-bold">${combinacao[1]} vezes</td>
-                          <td class="py-2 text-gray-300">${percentual}%</td>
-                        </tr>`;
-                      }).join('')}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Gráfico de Frequência dos Trevos -->
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Frequência dos Trevos</h3>
-              <div id="grafico-frequencia-trevos" style="height: 400px;"></div>
-            </div>
-            
-            <!-- Gráfico de Combinações de Trevos -->
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🤝 Gráfico de Combinações de Trevos</h3>
-              <div id="grafico-combinacoes-trevos" style="height: 400px;"></div>
-            </div>
-            
-            <!-- Correlação Trevos ↔ Bolas -->
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">🔗 Correlação Trevos ↔ Números Principais</h3>
-              <div id="grafico-correlacao-trevos-bolas" style="height: 400px;"></div>
-            </div>
-            
-            <!-- Insights Estratégicos -->
-            <div class="chart-container">
-              <h3 class="text-lg font-semibold mb-4">💡 Insights Estratégicos</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                
-                <!-- Trevo Mais Frequente -->
-                <div class="bg-gradient-to-r from-purple-600 to-purple-800 p-4 rounded-lg">
-                  <h4 class="font-bold text-white mb-2">🥇 Trevo Mais Quente</h4>
-                  <div class="text-2xl font-bold text-yellow-300 mb-1">
-                    ${trevosOrdenados.length > 0 ? `Trevo ${trevosOrdenados[0].trevo}` : 'N/A'}
-                  </div>
-                  <div class="text-sm text-purple-200">
-                    ${trevosOrdenados.length > 0 ? `${trevosOrdenados[0].frequencia} vezes (${((trevosOrdenados[0].frequencia / periodoInfo.concursos_analisados) * 100).toFixed(1)}%)` : 'Dados insuficientes'}
-                  </div>
-                </div>
-                
-                <!-- Combinação Mais Frequente -->
-                <div class="bg-gradient-to-r from-green-600 to-green-800 p-4 rounded-lg">
-                  <h4 class="font-bold text-white mb-2">🤝 Dupla Mais Poderosa</h4>
-                  <div class="text-2xl font-bold text-yellow-300 mb-1">
-                    ${combinacoesOrdenadas.length > 0 ? combinacoesOrdenadas[0][0].replace(',', ' + ') : 'N/A'}
-                  </div>
-                  <div class="text-sm text-green-200">
-                    ${combinacoesOrdenadas.length > 0 ? `${combinacoesOrdenadas[0][1]} vezes (${((combinacoesOrdenadas[0][1] / periodoInfo.concursos_analisados) * 100).toFixed(1)}%)` : 'Dados insuficientes'}
-                  </div>
-                </div>
-                
-                <!-- Trevo Mais Frio -->
-                <div class="bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg">
-                  <h4 class="font-bold text-white mb-2">❄️ Trevo Mais Frio</h4>
-                  <div class="text-2xl font-bold text-yellow-300 mb-1">
-                    ${trevosOrdenados.length > 0 ? `Trevo ${trevosOrdenados[trevosOrdenados.length - 1].trevo}` : 'N/A'}
-                  </div>
-                  <div class="text-sm text-red-200">
-                    ${trevosOrdenados.length > 0 ? `${trevosOrdenados[trevosOrdenados.length - 1].frequencia} vezes (${((trevosOrdenados[trevosOrdenados.length - 1].frequencia / periodoInfo.concursos_analisados) * 100).toFixed(1)}%)` : 'Dados insuficientes'}
-                  </div>
-                </div>
-                
+              <h3 class="text-lg font-semibold mb-4">🔢 Números Consecutivos</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- Estatísticas Gerais -->
-                <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 rounded-lg">
-                  <h4 class="font-bold text-white mb-2">📊 Estatísticas</h4>
-                  <div class="text-sm text-blue-200 space-y-1">
-                    <div>• ${periodoInfo.concursos_analisados} concursos analisados</div>
-                    <div>• ${Object.keys(combinacoesTrevos).length} combinações únicas</div>
-                    <div>• Média: ${(periodoInfo.concursos_analisados / 6).toFixed(1)} por trevo</div>
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📊 Estatísticas Gerais</h4>
+                  <div class="space-y-2">
+                    <p class="text-sm text-gray-300">Concursos com consecutivos: <span class="text-[#00E38C] font-bold">${numerosConsecutivos.total_concursos_com_consecutivos || 0}</span></p>
+                    <p class="text-sm text-gray-300">Percentual: <span class="text-[#00E38C] font-bold">${numerosConsecutivos.percentual_concursos_com_consecutivos || 0}%</span></p>
+                    <p class="text-sm text-gray-300">Maior sequência: <span class="text-[#00E38C] font-bold">${numerosConsecutivos.maior_sequencia_consecutiva || 0} números</span></p>
+                  </div>
+                </div>
+                
+                <!-- Tipos de Consecutivos -->
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">🎯 Tipos de Consecutivos</h4>
+                  <div class="space-y-2">
+                    ${Object.entries(numerosConsecutivos.tipos_consecutivos || {}).map(([tipo, qtd]) => 
+                      `<p class="text-sm text-gray-300">${tipo}: <span class="text-[#00E38C] font-bold">${qtd}</span></p>`
+                    ).join('')}
                   </div>
                 </div>
               </div>
               
-              <!-- Dicas de Estratégia -->
-              <div class="mt-6 bg-gradient-to-r from-gray-800 to-gray-900 p-4 rounded-lg border-l-4 border-[#00E38C]">
-                <h4 class="font-bold text-[#00E38C] mb-3">🎯 Dicas de Estratégia</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
-                  <div>
-                    <div class="font-semibold text-white mb-2">✅ Estratégia Conservadora:</div>
-                    <ul class="list-disc list-inside space-y-1 text-gray-400">
-                      <li>Use o trevo mais frequente como base</li>
-                      <li>Combine com números que têm alta correlação</li>
-                      <li>Inclua a dupla mais poderosa</li>
-                    </ul>
+              <!-- Gráfico de Consecutivos -->
+              <div class="mt-6">
+                <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Distribuição de Consecutivos</h4>
+                <div id="grafico-consecutivos" style="height: 400px;"></div>
+              </div>
+            </div>
+            
+            <!-- Repetições entre Concursos -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🔄 Repetições entre Concursos</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Estatísticas de Repetições -->
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📊 Estatísticas</h4>
+                  <div class="space-y-2">
+                    <p class="text-sm text-gray-300">Média de repetições: <span class="text-[#00E38C] font-bold">${repeticoes.media_repeticoes || 0}</span></p>
+                    <p class="text-sm text-gray-300">Maior sequência sem repetição: <span class="text-[#00E38C] font-bold">${repeticoes.maior_sequencia_sem_repeticao || 0} concursos</span></p>
                   </div>
-                  <div>
-                    <div class="font-semibold text-white mb-2">🎲 Estratégia Balanceada:</div>
-                    <ul class="list-disc list-inside space-y-1 text-gray-400">
-                      <li>Misture trevos quentes e frios</li>
-                      <li>Use combinações de média frequência</li>
-                      <li>Diversifique as correlações</li>
-                    </ul>
+                </div>
+                
+                <!-- Números que Mais Repetem -->
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">🏆 Números que Mais Repetem</h4>
+                  <div class="space-y-2">
+                    ${Object.entries(repeticoes.numeros_que_mais_repetem || {}).slice(0, 5).map(([numero, qtd]) => 
+                      `<p class="text-sm text-gray-300">Número ${numero}: <span class="text-[#00E38C] font-bold">${qtd} vezes</span></p>`
+                    ).join('')}
                   </div>
                 </div>
               </div>
               
-              <!-- SUGESTÕES PARA APOSTA PREMIUM -->
-              <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
-                <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestão para Aposta Inteligente (Trevos)</h4>
-                <div class="space-y-3">
-                    <div class="flex items-center">
-                        <input type="checkbox" id="trevo-priorizar-quentes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="trevos" data-pref-name="priorizarQuentesTrevos">
-                        <label for="trevo-priorizar-quentes" class="text-white">Priorizar Trevos MAIS Frequentes</label>
-                        <input type="number" id="trevo-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="2" min="1" max="6">
-                    </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" id="trevo-priorizar-frios" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="trevos" data-pref-name="priorizarFriosTrevos">
-                        <label for="trevo-priorizar-frios" class="text-white">Priorizar Trevos MENOS Frequentes</label>
-                        <input type="number" id="trevo-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="2" min="1" max="6">
-                    </div>
+              <!-- Gráfico de Repetições -->
+              <div class="mt-6">
+                <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Histograma de Repetições</h4>
+                <div id="grafico-repeticoes" style="height: 400px;"></div>
+              </div>
+            </div>
+            
+            <!-- Intervalos de Ausência -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">⏰ Intervalos de Ausência</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Estatísticas de Intervalos -->
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📊 Estatísticas</h4>
+                  <div class="space-y-2">
+                    <p class="text-sm text-gray-300">Intervalo médio: <span class="text-[#00E38C] font-bold">${intervalos.intervalo_medio || 0} concursos</span></p>
+                    <p class="text-sm text-gray-300">Maior intervalo: <span class="text-[#00E38C] font-bold">${intervalos.maior_intervalo || 0} concursos</span></p>
+                  </div>
                 </div>
+                
+                <!-- Números Mais Ausentes -->
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">🚫 Números Mais Ausentes</h4>
+                  <div class="space-y-2">
+                    ${Object.entries(intervalos.numeros_mais_ausentes || {}).slice(0, 5).map(([numero, qtd]) => 
+                      `<p class="text-sm text-gray-300">Número ${numero}: <span class="text-[#00E38C] font-bold">${qtd} concursos</span></p>`
+                    ).join('')}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Gráfico de Intervalos -->
+              <div class="mt-6">
+                <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Distribuição de Intervalos</h4>
+                <div id="grafico-intervalos" style="height: 400px;"></div>
+              </div>
+            </div>
+            
+            <!-- Ciclos de Retorno -->
+            <div class="chart-container">
+              <h3 class="text-lg font-semibold mb-4">🔄 Ciclos de Retorno</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Estatísticas de Ciclos -->
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📊 Estatísticas</h4>
+                  <div class="space-y-2">
+                    <p class="text-sm text-gray-300">Ciclo médio: <span class="text-[#00E38C] font-bold">${ciclos.ciclo_medio || 0} concursos</span></p>
+                    <p class="text-sm text-gray-300">Ciclo mais comum: <span class="text-[#00E38C] font-bold">${ciclos.ciclo_mais_comum || 0} concursos</span></p>
+                  </div>
+                </div>
+                
+                <!-- Números com Ciclos Curtos -->
+                <div class="bg-[#2E303A] p-4 rounded-xl">
+                  <h4 class="text-md font-semibold mb-3 text-[#00E38C]">⚡ Números com Ciclos Curtos</h4>
+                  <div class="space-y-2">
+                    ${Object.entries(ciclos.numeros_ciclos_curtos || {}).slice(0, 5).map(([numero, ciclo]) => 
+                      `<p class="text-sm text-gray-300">Número ${numero}: <span class="text-[#00E38C] font-bold">${ciclo} concursos</span></p>`
+                    ).join('')}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Gráfico de Ciclos -->
+              <div class="mt-6">
+                <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Distribuição de Ciclos</h4>
+                <div id="grafico-ciclos" style="height: 400px;"></div>
               </div>
             </div>
           </div>
         `;
 
-        // Criar gráficos Plotly
-        criarGraficoFrequenciaTrevos(trevosOrdenados);
-        criarGraficoCombinacoesTrevos(combinacoesOrdenadas);
-        criarGraficoCorrelacaoTrevosBolas(correlacaoTrevosBolas);
+        // Criar gráficos
+        criarGraficoConsecutivos(numerosConsecutivos);
+        criarGraficoRepeticoes(repeticoes);
+        criarGraficoIntervalos(intervalos);
+        criarGraficoCiclos(ciclos);
 
       } catch (error) {
-        console.error('Erro ao carregar dados de trevos:', error);
+        console.error("Erro ao carregar análise de sequências:", error);
         container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
       }
     }
 
-    // Função para atualizar o modal de trevos quando o período é alterado
-    function updateTrevosModal() {
-      const selectElement = document.getElementById('janela-analise-trevos');
+    // Função para atualizar o modal de sequências quando o período é alterado
+    function updateSequenciasModal() {
+      const selectElement = document.getElementById('janela-analise-sequencias');
       const selectedQtd = selectElement.value;
       const container = document.getElementById('conteudo-modal');
-      carregarAnaliseTrevos(container, selectedQtd);
+      carregarAnaliseSequencias(container, selectedQtd);
     }
 
-    // Funções para criar gráficos Plotly dos trevos
-    function criarGraficoFrequenciaTrevos(trevosOrdenados) {
-      const labels = trevosOrdenados.map(item => `🍀 ${item.trevo}`);
-      const values = trevosOrdenados.map(item => item.frequencia);
+    // Funções para criar gráficos Plotly das sequências
+    function criarGraficoConsecutivos(numerosConsecutivos) {
+      const tipos = Object.keys(numerosConsecutivos.tipos_consecutivos || {});
+      const valores = Object.values(numerosConsecutivos.tipos_consecutivos || {});
       
-      // Cores gradientes baseadas na posição (1º lugar = dourado, etc.)
-      const cores = ['#FFD700', '#C0C0C0', '#CD7F32', '#8B5CF6', '#F59E0B', '#EF4444'];
-
       const data = [{
-        x: labels,
-        y: values,
+        x: tipos,
+        y: valores,
         type: 'bar',
         marker: {
-          color: cores,
+          color: '#00E38C',
           opacity: 0.9,
           line: {
             color: 'white',
             width: 2
           }
         },
-        text: values.map((val, idx) => `${val} vezes`),
+        text: valores,
         textposition: 'auto',
         textfont: {
           color: 'white',
           size: 12,
           weight: 'bold'
-        },
-        hovertemplate: '<b>%{x}</b><br>Frequência: %{y} vezes<br>Ranking: %{customdata}<extra></extra>',
-        customdata: trevosOrdenados.map((_, idx) => `${idx + 1}º lugar`)
+        }
       }];
 
       const layout = {
         title: {
-          text: '🍀 Frequência dos Trevos da Sorte',
+          text: '🔢 Distribuição de Tipos de Consecutivos',
           font: { size: 18, color: 'white' }
         },
         xaxis: { 
-          title: 'Trevo',
+          title: 'Tipo de Consecutivo',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 14 }
         },
         yaxis: { 
-          title: 'Frequência',
+          title: 'Quantidade',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
         },
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
-        annotations: [{
-          text: 'Trevos ordenados por frequência (mais frequente → menos frequente)',
-          showarrow: false,
-          xref: 'paper',
-          yref: 'paper',
-          x: 0.5,
-          y: -0.15,
-          font: { color: 'gray', size: 12 }
-        }]
+        margin: { t: 60, b: 60, l: 60, r: 40 }
       };
 
-      Plotly.newPlot('grafico-frequencia-trevos', data, layout, { 
-        displayModeBar: false,
-        responsive: true
-      });
+      Plotly.newPlot('grafico-consecutivos', data, layout);
     }
-    function criarGraficoCombinacoesTrevos(combinacoesOrdenadas) {
-      const labels = combinacoesOrdenadas.map(combinacao => {
-        // Combinacao[0] agora é uma string como "2,4", então precisamos dividir
-        const [trevo1, trevo2] = combinacao[0].split(',');
-        return `🍀 ${trevo1} + ${trevo2}`;
-      });
-      const values = combinacoesOrdenadas.map(combinacao => combinacao[1]);
-      
-      // Cores gradientes para as top combinações
-      const cores = values.map((_, idx) => {
-        if (idx === 0) return '#FFD700'; // Dourado para 1º
-        if (idx === 1) return '#C0C0C0'; // Prata para 2º
-        if (idx === 2) return '#CD7F32'; // Bronze para 3º
-        return '#00E38C'; // Verde para os demais
-      });
 
+    function criarGraficoRepeticoes(repeticoes) {
+      // Os dados vêm como objeto {numero: valor}, então precisamos converter para arrays
+      const dados = repeticoes.numeros_que_mais_repetem || {};
+      const numeros = Object.keys(dados).slice(0, 10);
+      const valores = Object.values(dados).slice(0, 10);
+      
+      console.log("=== DEBUG GRÁFICO REPETIÇÕES ===");
+      console.log("Dados brutos:", dados);
+      console.log("Números:", numeros);
+      console.log("Valores:", valores);
+      console.log("Tipo dos números:", typeof numeros[0]);
+      console.log("Primeiros 5 números:", numeros.slice(0, 5));
+      
       const data = [{
-        x: values,
-        y: labels,
+        x: numeros.map(n => String(n)),  // Força conversão para string
+        y: valores,
         type: 'bar',
-        orientation: 'h',
         marker: {
-          color: cores,
+          color: '#8B5CF6',
           opacity: 0.9,
           line: {
             color: 'white',
-            width: 1
+            width: 2
           }
         },
-        text: values.map((val, idx) => `${val} vezes`),
+        text: valores,
         textposition: 'auto',
         textfont: {
           color: 'white',
-          size: 11,
+          size: 12,
           weight: 'bold'
-        },
-        hovertemplate: '<b>%{y}</b><br>Frequência: %{x} vezes<br>Ranking: %{customdata}<extra></extra>',
-        customdata: combinacoesOrdenadas.map((_, idx) => `${idx + 1}º lugar`)
+        }
       }];
 
       const layout = {
         title: {
-          text: '🤝 Combinações de Trevos Mais Frequentes',
+          text: '🔄 Números que Mais Repetem',
           font: { size: 18, color: 'white' }
         },
         xaxis: { 
-          title: 'Frequência',
+          title: 'Número',
           titlefont: { color: 'white' },
-          tickfont: { color: 'white' }
+          tickfont: { color: 'white', size: 14 },
+          type: 'category',  // Força o eixo X a ser categórico
+          tickmode: 'array',
+          tickvals: numeros,  // Define explicitamente os valores do eixo X
+          ticktext: numeros.map(n => `Nº ${n}`)  // Formata os labels
         },
         yaxis: { 
-          title: 'Combinação de Trevos',
+          title: 'Quantidade de Repetições',
           titlefont: { color: 'white' },
-          tickfont: { color: 'white', size: 12 },
-          automargin: true
+          tickfont: { color: 'white' }
         },
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        margin: { l: 140, r: 30, t: 80, b: 80, pad: 5 },
-        annotations: [{
-          text: 'Duplas de trevos que mais saem juntas nos sorteios',
-          showarrow: false,
-          xref: 'paper',
-          yref: 'paper',
-          x: 0.5,
-          y: -0.15,
-          font: { color: 'gray', size: 12 }
-        }]
+        margin: { t: 60, b: 60, l: 60, r: 40 }
       };
 
-      Plotly.newPlot('grafico-combinacoes-trevos', data, layout, { 
-        displayModeBar: false,
-        responsive: true
-      });
+      Plotly.newPlot('grafico-repeticoes', data, layout);
     }
 
-    function criarGraficoCorrelacaoTrevosBolas(correlacaoTrevosBolas) {
-      // Criar matriz de correlação para visualização
-      const trevos = [1, 2, 3, 4, 5, 6];
-      const cores = ['#00E38C', '#8B5CF6', '#F59E0B', '#EF4444', '#06B6D4', '#10B981'];
+    function criarGraficoIntervalos(intervalos) {
+      // Os dados vêm como array de tuplas [[numero, valor], ...]
+      const dados = intervalos.numeros_mais_ausentes || [];
+      const numeros = dados.slice(0, 10).map(item => item[0]);
+      const valores = dados.slice(0, 10).map(item => item[1]);
       
-      // Pegar apenas as top 8 bolas mais correlacionadas para cada trevo (para melhor visualização)
-      const topBolasPorTrevo = {};
-      trevos.forEach(trevo => {
-        if (correlacaoTrevosBolas[trevo]) {
-          const bolasOrdenadas = Object.entries(correlacaoTrevosBolas[trevo])
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 8);
-          topBolasPorTrevo[trevo] = bolasOrdenadas;
+      const data = [{
+        x: numeros,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: '#F59E0B',
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 2
+          }
+        },
+        text: valores,
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 12,
+          weight: 'bold'
         }
-      });
-
-      // Criar dados para o gráfico de barras agrupadas
-      const data = trevos.map((trevo, index) => {
-        if (topBolasPorTrevo[trevo] && topBolasPorTrevo[trevo].length > 0) {
-          return {
-            x: topBolasPorTrevo[trevo].map(item => item[0]),
-            y: topBolasPorTrevo[trevo].map(item => item[1]),
-            type: 'bar',
-            name: `🍀 Trevo ${trevo}`,
-            marker: {
-              color: cores[index],
-              opacity: 0.8
-            },
-            hovertemplate: `<b>🍀 Trevo ${trevo}</b><br>Número %{x}<br>Co-ocorrência: %{y} vezes<extra></extra>`,
-            showlegend: true
-          };
-        }
-        return null;
-      }).filter(item => item !== null);
+      }];
 
       const layout = {
         title: {
-          text: '🔗 Correlação Trevos ↔ Números Principais',
+          text: '⏰ Números Mais Ausentes',
           font: { size: 18, color: 'white' }
         },
         xaxis: { 
-          title: 'Número Principal (1-50)',
+          title: 'Número',
           titlefont: { color: 'white' },
-          tickfont: { color: 'white' }
+          tickfont: { color: 'white', size: 14 }
         },
         yaxis: { 
-          title: 'Frequência de Co-ocorrência',
+          title: 'Concursos sem Sair',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
         },
         plot_bgcolor: '#1a1a1a',
         paper_bgcolor: '#1a1a1a',
         font: { color: 'white' },
-        barmode: 'group',
-        margin: { l: 80, r: 30, t: 80, b: 100, pad: 5 },
-        legend: {
-          orientation: 'h',
-          y: -0.25,
-          x: 0.5,
-          xanchor: 'center',
-          yanchor: 'top',
-          bgcolor: 'rgba(0,0,0,0.8)',
-          bordercolor: '#333',
-          borderwidth: 1,
-          font: { color: 'white', size: 10 }
-        },
-        annotations: [{
-          text: 'Top 8 números que mais saem com cada trevo',
-          showarrow: false,
-          xref: 'paper',
-          yref: 'paper',
-          x: 0.5,
-          y: -0.15,
-          font: { color: 'gray', size: 12 }
-        }]
+        margin: { t: 60, b: 60, l: 60, r: 40 }
       };
 
-      Plotly.newPlot('grafico-correlacao-trevos-bolas', data, layout, { 
-        displayModeBar: false,
-        responsive: true
-      });
+      Plotly.newPlot('grafico-intervalos', data, layout);
     }
+
+    function criarGraficoCiclos(ciclos) {
+      // Os dados vêm como objeto {numero: valor}
+      const dados = ciclos.numeros_ciclo_curto || {};
+      const numeros = Object.keys(dados).slice(0, 10);
+      const valores = Object.values(dados).slice(0, 10);
+      
+      const data = [{
+        x: numeros,
+        y: valores,
+        type: 'bar',
+        marker: {
+          color: '#EF4444',
+          opacity: 0.9,
+          line: {
+            color: 'white',
+            width: 2
+          }
+        },
+        text: valores,
+        textposition: 'auto',
+        textfont: {
+          color: 'white',
+          size: 12,
+          weight: 'bold'
+        }
+      }];
+
+      const layout = {
+        title: {
+          text: '🔄 Números com Ciclos Curtos',
+          font: { size: 18, color: 'white' }
+        },
+        xaxis: { 
+          title: 'Número',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white', size: 14 }
+        },
+        yaxis: { 
+          title: 'Ciclo (concursos)',
+          titlefont: { color: 'white' },
+          tickfont: { color: 'white' }
+        },
+        plot_bgcolor: '#1a1a1a',
+        paper_bgcolor: '#1a1a1a',
+        font: { color: 'white' },
+        margin: { t: 60, b: 60, l: 60, r: 40 }
+      };
+
+      Plotly.newPlot('grafico-ciclos', data, layout);
+    }
+
+
 
         // Carregar análise de seca
     async function carregarAnaliseSeca(container, qtdConcursos = null) {
@@ -5097,55 +5041,62 @@
     </div>
   </div>
 
-  <!-- Popup de Ajuda para Trevos -->
-  <div id="popupAjudaTrevos" class="modal-ajuda">
+  <!-- Popup de Ajuda para Sequências -->
+  <div id="popupAjudaSequencias" class="modal-ajuda">
     <div class="modal-content">
-      <span class="close" onclick="fecharPopupAjudaTrevos()">×</span>
-      <h2>🍀 Entendendo a Análise dos Trevos da Sorte</h2>
-      <p>Esta análise revela os padrões dos Trevos da Sorte (números de 1 a 6) baseada em dados históricos reais. Compreender esses padrões auxilia na escolha estratégica dos trevos.</p>
+      <span class="close" onclick="fecharPopupAjudaSequencias()">×</span>
+      <h2>🔢 Entendendo a Análise de Sequências</h2>
+      <p>Esta análise revela padrões de números consecutivos, repetições entre concursos, intervalos de ausência e ciclos de retorno baseada em dados históricos reais da Mega Sena.</p>
 
-      <h3>🍀 Frequência dos Trevos</h3>
+      <h3>🔢 Números Consecutivos</h3>
       <p>
-        <strong>O que mostra:</strong> Quantas vezes cada trevo (1 a 6) foi sorteado historicamente. Por exemplo, se o Trevo 3 saiu 45 vezes, ele tem alta frequência.<br>
-        <strong>✔ Útil para:</strong> Identificar quais trevos são mais "quentes" e quais são mais "frios" nos sorteios.
+        <strong>O que mostra:</strong> Padrões de números que saem em sequência (ex: 23,24,25 ou 45,46). Identifica quantos concursos têm consecutivos e qual a maior sequência já sorteada.<br>
+        <strong>✔ Útil para:</strong> Evitar apostas com muitas sequências consecutivas, que são menos prováveis de sair.
       </p>
 
-      <h3>🤝 Combinações de Trevos</h3>
+      <h3>🔄 Repetições entre Concursos</h3>
       <p>
-        <strong>O que mostra:</strong> As duplas de trevos que mais frequentemente saem juntas. Por exemplo, se Trevo 2 + Trevo 4 saem juntos 15 vezes, eles têm alta afinidade.<br>
-        <strong>✔ Útil para:</strong> Identificar combinações de trevos que "gostam" de sair juntos.
+        <strong>O que mostra:</strong> Números que se repetem em sorteios seguidos e estatísticas de repetição. Identifica quais números mais repetem e sequências sem repetição.<br>
+        <strong>✔ Útil para:</strong> Identificar números "quentes" que tendem a repetir e padrões de alternância.
       </p>
 
-      <h3>🔗 Correlação Trevos ↔ Números Principais</h3>
+      <h3>⏰ Intervalos de Ausência</h3>
       <p>
-        <strong>O que mostra:</strong> Quais números principais (1-50) mais frequentemente saem junto com cada trevo específico.<br>
-        <strong>✔ Útil para:</strong> Identificar padrões entre trevos e números principais, criando combinações mais estratégicas.
+        <strong>O que mostra:</strong> Há quantos concursos cada número não sai. Identifica números em "seca" prolongada e intervalos médios de ausência.<br>
+        <strong>✔ Útil para:</strong> Identificar números "atrasados" que podem estar próximos de sair.
+      </p>
+
+      <h3>🔄 Ciclos de Retorno</h3>
+      <p>
+        <strong>O que mostra:</strong> Tempo médio que cada número leva para voltar a ser sorteado. Classifica números por ciclo curto/longo.<br>
+        <strong>✔ Útil para:</strong> Identificar números com padrões de retorno previsíveis.
       </p>
 
       <h3>📊 Interpretando os Gráficos</h3>
       <p>
-        <strong>📈 Gráfico de Frequência:</strong> Mostra a frequência de cada trevo em ordem decrescente. Barras mais altas indicam trevos mais sorteados.<br>
-        <strong🤝 Gráfico de Combinações:</strong> Mostra as duplas de trevos mais frequentes. Barras mais altas indicam combinações que saem juntas mais vezes.<br>
-        <strong🔗 Gráfico de Correlação:</strong> Mostra quais números principais mais saem com cada trevo, facilitando a criação de combinações.
+        <strong>📈 Gráfico de Consecutivos:</strong> Mostra a distribuição de tipos de consecutivos encontrados.<br>
+        <strong>🔄 Gráfico de Repetições:</strong> Mostra os números que mais repetem entre concursos.<br>
+        <strong>⏰ Gráfico de Intervalos:</strong> Mostra os números mais ausentes e seus intervalos.<br>
+        <strong>🔄 Gráfico de Ciclos:</strong> Mostra números com ciclos de retorno curtos.
       </p>
 
       <h3>🎯 Estratégias de Uso</h3>
       <p>
-        <strong✅ Estratégia de Frequência:</strong> Escolher trevos com alta frequência histórica.<br>
-        <strong🤝 Estratégia de Combinação:</strong> Usar duplas de trevos que têm histórico de sair juntas.<br>
-        <strong🔗 Estratégia de Correlação:</strong> Combinar trevos com números principais que têm alta correlação.<br>
-        <strong⚖️ Estratégia Balanceada:</strong> Misturar trevos quentes e frios para diversificar.
+        <strong>🔢 Estratégia Anti-Consecutivos:</strong> Evitar apostas com muitas sequências consecutivas.<br>
+        <strong>🔄 Estratégia de Repetições:</strong> Incluir números que tendem a repetir ou evitar os que repetem muito.<br>
+        <strong>⏰ Estratégia de Seca:</strong> Apostar em números em seca prolongada.<br>
+        <strong>🔄 Estratégia de Ciclos:</strong> Incluir números com ciclos de retorno curtos.
       </p>
 
       <h3>⚠️ Considerações Importantes</h3>
       <p>
-        <strong🔍 Padrões podem variar:</strong> Frequências históricas não garantem repetição no futuro.<br>
-        <strong🔄 Análise temporal:</strong> Use a janela de análise para ver padrões recentes vs. históricos.<br>
-        <strong🎯 Use com moderação:</strong> Combine com outras análises para estratégias mais robustas.
+        <strong>🔍 Padrões podem variar:</strong> Análises históricas não garantem repetição no futuro.<br>
+        <strong>🔄 Análise temporal:</strong> Use a janela de análise para ver padrões recentes vs. históricos.<br>
+        <strong>🎯 Use com moderação:</strong> Combine com outras análises para estratégias mais robustas.
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises dos trevos não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+        <strong>⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises de sequências não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
       </p>
     </div>
   </div>

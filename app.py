@@ -19,6 +19,7 @@ from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribui
 # Importa a função de análise de combinações
 from funcoes.milionaria.funcao_analise_de_combinacoes import analise_combinacoes_milionaria
 from funcoes.megasena.funcao_analise_de_combinacoes_MS import analise_combinacoes_megasena
+from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
 
 # Importa a função de análise de padrões e sequências
 from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
@@ -33,6 +34,7 @@ from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAv
 
 # --- Importações para Mega Sena ---
 from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
+from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar_aposta_personalizada
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -255,6 +257,30 @@ def get_analise_de_combinacoes_megasena():
         return jsonify(resultado)
     except Exception as e:
         print(f"❌ Erro na API de combinações Mega Sena: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+
+@app.route('/api/analise_padroes_sequencias-MS', methods=['GET'])
+def get_analise_padroes_sequencias_megasena():
+    """Retorna os dados da análise de padrões e sequências da Mega Sena."""
+    try:
+        if df_megasena.empty:
+            return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
+
+        # Verificar se há parâmetro de quantidade de concursos
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        print(f"🎯 Padrões/Sequências Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
+        print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")
+        print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")
+
+        resultado = analise_padroes_sequencias_megasena(df_megasena, qtd_concursos)
+        print(f"🎯 Resultado da análise: {type(resultado)}")
+        print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+        
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"❌ Erro na API de padrões/sequências Mega Sena: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Erro interno: {str(e)}"}), 500
