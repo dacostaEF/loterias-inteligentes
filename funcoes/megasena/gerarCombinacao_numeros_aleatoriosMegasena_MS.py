@@ -1,136 +1,82 @@
 import random
 
-# Tabela de preços das apostas
+# Tabela de preços das apostas da Mega Sena
 TABELA_PRECOS = {
-    (6, 2): {"apostas": 1, "valor": 6.00},
-    (6, 3): {"apostas": 3, "valor": 18.00},
-    (6, 4): {"apostas": 6, "valor": 36.00},
-    (7, 2): {"apostas": 7, "valor": 42.00},
-    (6, 5): {"apostas": 10, "valor": 60.00},
-    (6, 6): {"apostas": 15, "valor": 90.00},
-    (7, 3): {"apostas": 21, "valor": 126.00},
-    (8, 2): {"apostas": 28, "valor": 168.00},
-    (7, 4): {"apostas": 42, "valor": 252.00},
-    (7, 5): {"apostas": 70, "valor": 420.00},
-    (9, 2): {"apostas": 84, "valor": 504.00},
-    (8, 3): {"apostas": 84, "valor": 504.00},
-    (7, 6): {"apostas": 105, "valor": 630.00},
-    (8, 4): {"apostas": 168, "valor": 1008.00},
-    (10, 2): {"apostas": 210, "valor": 1260.00},
-    (9, 3): {"apostas": 252, "valor": 1512.00},
-    (8, 5): {"apostas": 280, "valor": 1680.00},
-    (8, 6): {"apostas": 420, "valor": 2520.00},
-    (11, 2): {"apostas": 462, "valor": 2772.00},
-    (9, 4): {"apostas": 504, "valor": 3024.00},
-    (10, 3): {"apostas": 630, "valor": 3780.00},
-    (9, 5): {"apostas": 840, "valor": 5040.00},
-    (12, 2): {"apostas": 924, "valor": 5544.00},
-    (9, 6): {"apostas": 1260, "valor": 7560.00},
-    (10, 4): {"apostas": 1260, "valor": 7560.00},
-    (11, 3): {"apostas": 1386, "valor": 8316.00},
-    (10, 5): {"apostas": 2100, "valor": 12600.00},
-    (12, 3): {"apostas": 2772, "valor": 16632.00},
-    (11, 4): {"apostas": 2772, "valor": 16632.00},
-    (10, 6): {"apostas": 3150, "valor": 18900.00},
-    (11, 5): {"apostas": 4620, "valor": 27720.00},
-    (12, 4): {"apostas": 5544, "valor": 33264.00},
-    (11, 6): {"apostas": 6930, "valor": 41580.00},
-    (12, 5): {"apostas": 9240, "valor": 55440.00},
-    (12, 6): {"apostas": 13860, "valor": 83160.00}
+    6: {"apostas": 1, "valor": 5.00},
+    7: {"apostas": 7, "valor": 35.00},
+    8: {"apostas": 28, "valor": 140.00},
+    9: {"apostas": 84, "valor": 420.00},
+    10: {"apostas": 210, "valor": 1050.00},
+    11: {"apostas": 462, "valor": 2310.00},
+    12: {"apostas": 924, "valor": 4620.00},
+    13: {"apostas": 1716, "valor": 8580.00},
+    14: {"apostas": 3003, "valor": 15015.00},
+    15: {"apostas": 5005, "valor": 25025.00}
 }
 
-def gerar_aposta_personalizada(qtde_num, qtde_trevo1, qtde_trevo2):
+def gerar_aposta_personalizada(qtde_num):
     """
-    Gera uma aposta personalizada com base na quantidade de números e trevos escolhidos
+    Gera uma aposta personalizada da Mega Sena com base na quantidade de números escolhidos
     
     Args:
-        qtde_num (int): Quantidade de números principais (6 a 12)
-        qtde_trevo1 (int): Quantidade de números para Trevo 1 (1 a 3)
-        qtde_trevo2 (int): Quantidade de números para Trevo 2 (1 a 3)
+        qtde_num (int): Quantidade de números principais (6 a 15)
     
     Returns:
-        tuple: (N_milionaria, trevo1, trevo2, valor_aposta, qtde_apostas)
+        tuple: (numeros, valor_aposta, qtde_apostas)
     """
     
     # Validação dos parâmetros
-    if qtde_num < 6 or qtde_num > 12:
-        raise ValueError("Quantidade de números deve estar entre 6 e 12")
+    if qtde_num < 6 or qtde_num > 15:
+        raise ValueError("Quantidade de números deve estar entre 6 e 15")
     
-    if qtde_trevo1 < 1 or qtde_trevo1 > 3:
-        raise ValueError("Quantidade de números para Trevo 1 deve estar entre 1 e 3")
+    # Verificar se a quantidade existe na tabela
+    if qtde_num not in TABELA_PRECOS:
+        raise ValueError(f"Quantidade de {qtde_num} números não disponível")
     
-    if qtde_trevo2 < 1 or qtde_trevo2 > 3:
-        raise ValueError("Quantidade de números para Trevo 2 deve estar entre 1 e 3")
-    
-    # Calcular total de trevos para verificar na tabela
-    qtde_trevo_total = qtde_trevo1 + qtde_trevo2
-    
-    # Verificar se a combinação existe na tabela
-    chave = (qtde_num, qtde_trevo_total)
-    if chave not in TABELA_PRECOS:
-        raise ValueError(f"Combinação ({qtde_num} números, {qtde_trevo_total} trevos) não disponível")
-    
-    # Gerar números principais únicos entre 1 e 50
-    N_milionaria = sorted(random.sample(range(1, 51), qtde_num))
-    
-    # Lógica especial para quando total de trevos for 6 (todos os números disponíveis)
-    if qtde_trevo_total == 6:
-        # Retornar todos os números 1-6, divididos entre trevo1 e trevo2
-        todos_trevos = list(range(1, 7))  # [1, 2, 3, 4, 5, 6]
-        trevo1 = sorted(todos_trevos[:qtde_trevo1])
-        trevo2 = sorted(todos_trevos[qtde_trevo1:qtde_trevo1 + qtde_trevo2])
-    else:
-        # Gerar múltiplos números para Trevo 1 (1 a 6)
-        trevo1 = sorted(random.sample(range(1, 7), qtde_trevo1))
-        
-        # Gerar múltiplos números para Trevo 2 (1 a 6)
-        # Garantir que não haja números repetidos entre trevo1 e trevo2
-        numeros_disponiveis = [n for n in range(1, 7) if n not in trevo1]
-        trevo2 = sorted(random.sample(numeros_disponiveis, qtde_trevo2))
+    # Gerar números principais únicos entre 1 e 60 (Mega Sena)
+    numeros = sorted(random.sample(range(1, 61), qtde_num))
     
     # Buscar informações da aposta
-    info_aposta = TABELA_PRECOS[chave]
+    info_aposta = TABELA_PRECOS[qtde_num]
     valor_aposta = info_aposta["valor"]
     qtde_apostas = info_aposta["apostas"]
     
-    return N_milionaria, trevo1, trevo2, valor_aposta, qtde_apostas
+    return numeros, valor_aposta, qtde_apostas
 
 def exibir_opcoes_disponiveis():
     """
-    Exibe todas as opções de apostas disponíveis
+    Exibe todas as opções de apostas disponíveis da Mega Sena
     """
-    print("=" * 60)
-    print("🎲 OPÇÕES DE APOSTAS DISPONÍVEIS 🎲")
-    print("=" * 60)
-    print(f"{'Números':<8} {'Trevos':<8} {'Apostas':<10} {'Valor':<15}")
-    print("-" * 60)
+    print("=" * 50)
+    print("🎲 OPÇÕES DE APOSTAS MEGA SENA 🎲")
+    print("=" * 50)
+    print(f"{'Números':<8} {'Apostas':<10} {'Valor':<15}")
+    print("-" * 50)
     
-    for (nums, trevos), info in sorted(TABELA_PRECOS.items()):
+    for nums, info in sorted(TABELA_PRECOS.items()):
         valor_formatado = f"R$ {info['valor']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-        print(f"{nums:<8} {trevos:<8} {info['apostas']:<10} {valor_formatado:<15}")
+        print(f"{nums:<8} {info['apostas']:<10} {valor_formatado:<15}")
     
-    print("=" * 60)
+    print("=" * 50)
 
-def gerar_e_exibir_personalizada(qtde_num, qtde_trevo):
+def gerar_e_exibir_personalizada(qtde_num):
     """
-    Gera e exibe uma aposta personalizada de forma organizada
+    Gera e exibe uma aposta personalizada da Mega Sena de forma organizada
     """
     try:
-        N_milionaria, trevo1, trevo2, valor, qtde_apostas = gerar_aposta_personalizada(qtde_num, qtde_trevo)
+        numeros, valor, qtde_apostas = gerar_aposta_personalizada(qtde_num)
         
         print("=" * 50)
-        print("🎲 APOSTA PERSONALIZADA GERADA 🎲")
+        print("🎲 APOSTA MEGA SENA GERADA 🎲")
         print("=" * 50)
-        print(f"Configuração: {qtde_num} números + {qtde_trevo} trevos")
-        print(f"N_milionaria: {N_milionaria}")
-        print(f"trevo1: {trevo1}")
-        print(f"trevo2: {trevo2}")
+        print(f"Configuração: {qtde_num} números")
+        print(f"Números: {numeros}")
         print(f"Quantidade de apostas: {qtde_apostas}")
         valor_formatado = f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
         print(f"Valor da aposta: {valor_formatado}")
         print("=" * 50)
         
-        return N_milionaria, trevo1, trevo2, valor, qtde_apostas
+        return numeros, valor, qtde_apostas
         
     except ValueError as e:
         print(f"❌ Erro: {e}")
@@ -138,7 +84,7 @@ def gerar_e_exibir_personalizada(qtde_num, qtde_trevo):
 
 # Exemplo de uso
 if __name__ == "__main__":
-    print("🎯 GERADOR DE APOSTAS EUROMILHÕES 🎯\n")
+    print("🎯 GERADOR DE APOSTAS MEGA SENA 🎯\n")
     
     # Exibir opções disponíveis
     exibir_opcoes_disponiveis()
@@ -156,12 +102,11 @@ if __name__ == "__main__":
                 exibir_opcoes_disponiveis()
                 continue
             
-            # Solicitar quantidade de números e trevos
-            qtde_num = int(input("Quantos números principais? (6-12): "))
-            qtde_trevo = int(input("Quantos trevos? (2-6): "))
+            # Solicitar quantidade de números
+            qtde_num = int(input("Quantos números? (6-15): "))
             
             # Gerar e exibir aposta
-            gerar_e_exibir_personalizada(qtde_num, qtde_trevo)
+            gerar_e_exibir_personalizada(qtde_num)
             
         except ValueError:
             print("❌ Por favor, digite números válidos!")
@@ -171,4 +116,4 @@ if __name__ == "__main__":
 
 # Para usar em outros programas:
 # from nome_do_arquivo import gerar_aposta_personalizada
-# N_milionaria, trevo1, trevo2, valor, qtde_apostas = gerar_aposta_personalizada(8, 3)
+# numeros, valor, qtde_apostas = gerar_aposta_personalizada(8)

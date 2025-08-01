@@ -469,6 +469,37 @@ def gerar_aposta_milionaria_api():
         logger.error(f"Erro inesperado ao gerar aposta: {e}")
         return jsonify({'error': 'Erro interno do servidor ao gerar aposta.'}), 500
 
+@app.route('/api/gerar-aposta-megasena', methods=['POST'])
+def gerar_aposta_megasena_api():
+    """Gera aposta personalizada para Mega Sena com quantidade configurável."""
+    try:
+        data = request.get_json()
+        qtde_num = data.get('qtde_num')
+
+        if qtde_num is None:
+            return jsonify({'error': 'Parâmetro qtde_num é obrigatório.'}), 400
+
+        # Importar a função de geração personalizada da Mega Sena
+        from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar_aposta_personalizada
+        
+        # Chama a função principal de geração de aposta
+        numeros, valor, qtde_apostas = gerar_aposta_personalizada(qtde_num)
+
+        return jsonify({
+            'success': True,
+            'numeros': numeros,
+            'valor': valor,
+            'qtde_apostas': qtde_apostas,
+            'mensagem': 'Aposta gerada com sucesso!'
+        })
+
+    except ValueError as e:
+        logger.error(f"Erro de validação ao gerar aposta Mega Sena: {e}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Erro inesperado ao gerar aposta Mega Sena: {e}")
+        return jsonify({'error': 'Erro interno do servidor ao gerar aposta.'}), 500
+
 @app.route('/api/bolao_interesse', methods=['POST'])
 def bolao_interesse():
     data = request.json
