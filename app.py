@@ -14,6 +14,7 @@ from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia_m
 
 # Importa a função de análise de distribuição
 from funcoes.milionaria.funcao_analise_de_distribuicao import analise_distribuicao_milionaria
+from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribuicao_megasena
 
 # Importa a função de análise de combinações
 from funcoes.milionaria.funcao_analise_de_combinacoes import analise_combinacoes_milionaria
@@ -208,6 +209,30 @@ def get_analise_de_distribuicao():
 
     resultado = analise_distribuicao_milionaria(df_milionaria, qtd_concursos)
     return jsonify(resultado)
+
+@app.route('/api/analise_de_distribuicao-MS', methods=['GET'])
+def get_analise_de_distribuicao_megasena():
+    """Retorna os dados da análise de distribuição da Mega Sena."""
+    try:
+        if df_megasena.empty:
+            return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
+
+        # Verificar se há parâmetro de quantidade de concursos
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        print(f"🎯 Distribuição Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
+        print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")
+        print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")
+
+        resultado = analise_distribuicao_megasena(df_megasena, qtd_concursos)
+        print(f"🎯 Resultado da análise: {type(resultado)}")
+        print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+        
+        return jsonify(resultado)
+    except Exception as e:
+        print(f"❌ Erro na API de distribuição Mega Sena: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
 
 @app.route('/api/analise_de_combinacoes', methods=['GET'])
 def get_analise_de_combinacoes():

@@ -4,13 +4,13 @@ from collections import Counter, defaultdict
 
 def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
     """
-    Análise completa de distribuição dos números e trevos da +Milionária.
+    Análise completa de distribuição dos números da Mega Sena.
 
     Args:
         dados_sorteios (list): Lista de listas com os sorteios.
         qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
                                       Se None, analisa todos os concursos.
-        Formato esperado: [[concurso, bola1, ..., bola6, trevo1, trevo2], ...]
+        Formato esperado: [[concurso, bola1, ..., bola6], ...]
 
     Returns:
         dict: Dicionário com as análises de distribuição.
@@ -23,22 +23,20 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
 
     # Preparar dados: Converter para DataFrame para facilitar o processamento
     # e garantir que os números principais estão ordenados para amplitude.
-    colunas = ['concurso'] + [f'bola{i}' for i in range(1, 7)] + [f'trevo{i}' for i in range(1, 3)]
+    colunas = ['concurso'] + [f'bola{i}' for i in range(1, 7)]
     
     # Validação dos dados antes de criar DataFrame
     dados_validos = []
     for sorteio in dados_sorteios:
-        if len(sorteio) >= 9:  # Garantir que tem todos os dados
+        if len(sorteio) >= 7:  # Garantir que tem todos os dados (concurso + 6 números)
             concurso = sorteio[0]
             numeros = sorteio[1:7]
-            trevos = sorteio[7:9]
             
             # Validação dos dados
-            numeros_validos = [n for n in numeros if isinstance(n, (int, float)) and 1 <= n <= 50]
-            trevos_validos = [t for t in trevos if isinstance(t, (int, float)) and 1 <= t <= 6]
+            numeros_validos = [n for n in numeros if isinstance(n, (int, float)) and 1 <= n <= 60]
             
-            if len(numeros_validos) == 6 and len(trevos_validos) == 2:
-                dados_validos.append([concurso] + numeros_validos + trevos_validos)
+            if len(numeros_validos) == 6:
+                dados_validos.append([concurso] + numeros_validos)
     
     # Verificação adicional após processamento
     if not dados_validos:
@@ -57,15 +55,14 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
     
     df_sorteios_pd = pd.DataFrame(dados_validos, columns=colunas)
 
-    # Garantir que as colunas de números e trevos são numéricas e ordenadas para análise de amplitude
+    # Garantir que as colunas de números são numéricas e ordenadas para análise de amplitude
     num_cols = [f'bola{i}' for i in range(1, 7)]
-    trevo_cols = [f'trevo{i}' for i in range(1, 3)]
 
-    for col in num_cols + trevo_cols:
+    for col in num_cols:
         df_sorteios_pd[col] = pd.to_numeric(df_sorteios_pd[col], errors='coerce').astype('Int64')
 
     # Filtrar linhas com NaNs (se houver após to_numeric)
-    df_sorteios_pd.dropna(subset=num_cols + trevo_cols, inplace=True)
+    df_sorteios_pd.dropna(subset=num_cols, inplace=True)
     
     # Verificação final após filtragem
     if df_sorteios_pd.empty:
@@ -81,41 +78,26 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
     # 1. Paridade: Proporção de números pares vs ímpares por concurso
     def analisar_paridade():
         paridade_stats = {
-            'numeros_principais': {'distribuicao': Counter()},
-            'trevos': {'distribuicao': Counter()}
+            'numeros_principais': {'distribuicao': Counter()}
         }
 
         pares_numeros_por_concurso = []
         impares_numeros_por_concurso = []
-        pares_trevos_por_concurso = []
-        impares_trevos_por_concurso = []
 
         for _, row in df_sorteios_pd.iterrows():
             numeros = row[num_cols].dropna().tolist()
-            trevos = row[trevo_cols].dropna().tolist()
 
             pares_num = sum(1 for n in numeros if n % 2 == 0)
             impares_num = len(numeros) - pares_num
             pares_numeros_por_concurso.append(pares_num)
             impares_numeros_por_concurso.append(impares_num)
             paridade_stats['numeros_principais']['distribuicao'][f'{pares_num}P-{impares_num}I'] += 1
-
-            pares_tre = sum(1 for t in trevos if t % 2 == 0)
-            impares_tre = len(trevos) - pares_tre
-            pares_trevos_por_concurso.append(pares_tre)
-            impares_trevos_por_concurso.append(impares_tre)
-            paridade_stats['trevos']['distribuicao'][f'{pares_tre}P-{impares_tre}I'] += 1
         
         # Estatísticas descritivas
         paridade_stats['numeros_principais']['media_pares'] = np.mean(pares_numeros_por_concurso) if pares_numeros_por_concurso else 0
         paridade_stats['numeros_principais']['media_impares'] = np.mean(impares_numeros_por_concurso) if impares_numeros_por_concurso else 0
         paridade_stats['numeros_principais']['moda_pares'] = Counter(pares_numeros_por_concurso).most_common(1)[0][0] if pares_numeros_por_concurso else None
         paridade_stats['numeros_principais']['moda_impares'] = Counter(impares_numeros_por_concurso).most_common(1)[0][0] if impares_numeros_por_concurso else None
-
-        paridade_stats['trevos']['media_pares'] = np.mean(pares_trevos_por_concurso) if pares_trevos_por_concurso else 0
-        paridade_stats['trevos']['media_impares'] = np.mean(impares_trevos_por_concurso) if impares_trevos_por_concurso else 0
-        paridade_stats['trevos']['moda_pares'] = Counter(pares_trevos_por_concurso).most_common(1)[0][0] if pares_trevos_por_concurso else None
-        paridade_stats['trevos']['moda_impares'] = Counter(impares_trevos_por_concurso).most_common(1)[0][0] if impares_trevos_por_concurso else None
 
         return paridade_stats
 
@@ -128,7 +110,8 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
             '11-20': (11, 20),
             '21-30': (21, 30),
             '31-40': (31, 40),
-            '41-50': (41, 50)
+            '41-50': (41, 50),
+            '51-60': (51, 60)
         }
 
         for idx, row in df_sorteios_pd.iterrows():
@@ -165,22 +148,18 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
         }
 
 
-    # 3. Soma dos números: Valor total dos 6 números sorteados e dos 2 trevos
+    # 3. Soma dos números: Valor total dos 6 números sorteados
     def analisar_soma():
         soma_stats = {
-            'numeros_principais': {'somas': [], 'min': None, 'max': None, 'media': None, 'moda': None},
-            'trevos': {'somas': [], 'min': None, 'max': None, 'media': None, 'moda': None}
+            'numeros_principais': {'somas': [], 'min': None, 'max': None, 'media': None, 'moda': None}
         }
 
         for _, row in df_sorteios_pd.iterrows():
             numeros = row[num_cols].dropna().tolist()
-            trevos = row[trevo_cols].dropna().tolist()
 
             soma_numeros = sum(numeros)
-            soma_trevos = sum(trevos)
             
             soma_stats['numeros_principais']['somas'].append(soma_numeros)
-            soma_stats['trevos']['somas'].append(soma_trevos)
         
         # Calcular estatísticas
         if soma_stats['numeros_principais']['somas']:
@@ -189,13 +168,6 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
             soma_stats['numeros_principais']['max'] = max(somas_num)
             soma_stats['numeros_principais']['media'] = np.mean(somas_num)
             soma_stats['numeros_principais']['moda'] = Counter(somas_num).most_common(1)[0][0]
-
-        if soma_stats['trevos']['somas']:
-            somas_tre = soma_stats['trevos']['somas']
-            soma_stats['trevos']['min'] = min(somas_tre)
-            soma_stats['trevos']['max'] = max(somas_tre)
-            soma_stats['trevos']['media'] = np.mean(somas_tre)
-            soma_stats['trevos']['moda'] = Counter(somas_tre).most_common(1)[0][0]
             
         return soma_stats
 
@@ -240,13 +212,6 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
                 'media_impares': round(paridade_res['numeros_principais']['media_impares'], 2),
                 'moda_pares': paridade_res['numeros_principais']['moda_pares'],
                 'moda_impares': paridade_res['numeros_principais']['moda_impares']
-            },
-            'trevos': {
-                'distribuicao': dict(paridade_res['trevos']['distribuicao']),
-                'media_pares': round(paridade_res['trevos']['media_pares'], 2),
-                'media_impares': round(paridade_res['trevos']['media_impares'], 2),
-                'moda_pares': paridade_res['trevos']['moda_pares'],
-                'moda_impares': paridade_res['trevos']['moda_impares']
             }
         },
         'distribuicao_por_faixa': {
@@ -262,13 +227,6 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
                 'media': round(soma_res['numeros_principais']['media'], 2) if soma_res['numeros_principais']['media'] is not None else None,
                 'moda': soma_res['numeros_principais']['moda'],
                 'somas': soma_res['numeros_principais']['somas']  # Lista completa de somas
-            },
-            'trevos': {
-                'min': soma_res['trevos']['min'],
-                'max': soma_res['trevos']['max'],
-                'media': round(soma_res['trevos']['media'], 2) if soma_res['trevos']['media'] is not None else None,
-                'moda': soma_res['trevos']['moda'],
-                'somas': soma_res['trevos']['somas']  # Lista completa de somas
             }
         },
         'amplitude_dos_numeros': {
@@ -282,33 +240,37 @@ def analise_de_distribuicao(dados_sorteios, qtd_concursos=None):
 
     return resultado
 
-# Função para integrar com dados da Mais Milionária
-def analise_distribuicao_milionaria(df_milionaria, qtd_concursos=None):
+# Função para integrar com dados da Mega Sena
+def analise_distribuicao_megasena(df_megasena, qtd_concursos=None):
     """
-    Versão adaptada para trabalhar com DataFrame da Mais Milionária
+    Versão adaptada para trabalhar com DataFrame da Mega Sena
     
     Args:
-        df_milionaria (pd.DataFrame): DataFrame com dados da Mais Milionária
+        df_megasena (pd.DataFrame): DataFrame com dados da Mega Sena
         qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
                                       Se None, analisa todos os concursos.
-        Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6, Trevo1, Trevo2
+        Colunas esperadas: Concurso, Bola1, Bola2, Bola3, Bola4, Bola5, Bola6
     
     Returns:
         dict: Dicionário com as análises de distribuição.
     """
     
+    print(f"🔍 DEBUG: Iniciando análise de distribuição Mega Sena")
+    print(f"🔍 DEBUG: Tipo de df_megasena: {type(df_megasena)}")
+    print(f"🔍 DEBUG: Colunas disponíveis: {list(df_megasena.columns)}")
+    
     # Verificar se as colunas necessárias existem
-    colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
-    colunas_faltantes = [col for col in colunas_necessarias if col not in df_milionaria.columns]
+    colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']
+    colunas_faltantes = [col for col in colunas_necessarias if col not in df_megasena.columns]
     
     if colunas_faltantes:
         print(f"❌ Erro: Colunas necessárias não encontradas: {colunas_faltantes}")
         return {}
     
     # Filtrar linhas com valores NaN
-    df_filtrado = df_milionaria.copy()
-    for _, row in df_milionaria.iterrows():
-        if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']):
+    df_filtrado = df_megasena.copy()
+    for _, row in df_megasena.iterrows():
+        if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']):
             df_filtrado = df_filtrado.drop(row.name)
     
     # Converter para o formato esperado pela função principal
@@ -316,8 +278,7 @@ def analise_distribuicao_milionaria(df_milionaria, qtd_concursos=None):
     for _, row in df_filtrado.iterrows():
         dados_sorteios.append([
             row['Concurso'],
-            row['Bola1'], row['Bola2'], row['Bola3'], row['Bola4'], row['Bola5'], row['Bola6'],
-            row['Trevo1'], row['Trevo2']
+            row['Bola1'], row['Bola2'], row['Bola3'], row['Bola4'], row['Bola5'], row['Bola6']
         ])
     
     # Verificação final antes de executar análise
@@ -325,8 +286,15 @@ def analise_distribuicao_milionaria(df_milionaria, qtd_concursos=None):
         print("⚠️  Aviso: Nenhum sorteio válido encontrado no DataFrame!")
         return {}
     
+    print(f"🔍 DEBUG: Dados convertidos com sucesso. Total de sorteios: {len(dados_sorteios)}")
+    print(f"🔍 DEBUG: Primeiro sorteio: {dados_sorteios[0] if dados_sorteios else 'N/A'}")
+    
     # Executar análise original com parâmetro de quantidade de concursos
-    return analise_de_distribuicao(dados_sorteios, qtd_concursos)
+    resultado = analise_de_distribuicao(dados_sorteios, qtd_concursos)
+    print(f"🔍 DEBUG: Análise concluída. Tipo do resultado: {type(resultado)}")
+    print(f"🔍 DEBUG: Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+    
+    return resultado
 
 def exibir_analise_distribuicao_detalhada(resultado):
     """
