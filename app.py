@@ -69,7 +69,7 @@ def carregar_dados_megasena_app():
     global df_megasena
     if df_megasena is None:
         try:
-            df_megasena = carregar_dados_megasena(limite_concursos=500)
+            df_megasena = carregar_dados_megasena(limite_concursos=500)  # Limitar aos últimos 500 concursos para melhor sensibilidade estatística
             print(f"Dados da Mega Sena carregados. Total de concursos: {len(df_megasena)}")
         except Exception as e:
             print(f"Erro ao carregar dados da Mega Sena: {e}")
@@ -155,12 +155,28 @@ def get_analise_frequencia_megasena():
             print("❌ Resultado vazio ou None")
             return jsonify({'error': 'Erro ao carregar dados de frequência da Mega Sena.'}), 500
 
+        # Preparar dados dos concursos individuais para a matriz visual
+        concursos_para_matriz = []
+        if 'periodo_analisado' in resultado and 'concursos_do_periodo' in resultado['periodo_analisado']:
+            # Converter dados do DataFrame para formato da matriz
+            # Se qtd_concursos for None (todos os concursos), limitar a 500 para evitar loop
+            limite_efetivo = qtd_concursos if qtd_concursos else 500
+            df_filtrado = df_megasena.tail(limite_efetivo)
+            for _, row in df_filtrado.iterrows():
+                if not pd.isna(row['Concurso']):
+                    concursos_para_matriz.append({
+                        'concurso': int(row['Concurso']),
+                        'numeros': [int(row['Bola1']), int(row['Bola2']), int(row['Bola3']), 
+                                   int(row['Bola4']), int(row['Bola5']), int(row['Bola6'])]
+                    })
+
         return jsonify({
             'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
             'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
             'numeros_quentes_frios': resultado['numeros_quentes_frios'],
             'analise_temporal': resultado['analise_temporal'],
-            'periodo_analisado': resultado['periodo_analisado']
+            'periodo_analisado': resultado['periodo_analisado'],
+            'concursos_para_matriz': concursos_para_matriz  # Dados para a matriz visual
         })
     except Exception as e:
         print(f"❌ Erro na API de frequência Mega Sena: {e}")

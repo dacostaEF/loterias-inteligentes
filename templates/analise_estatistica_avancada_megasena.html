@@ -1335,7 +1335,8 @@
       gerarTrevos();
       carregarEstatisticasRapidas();
       
-
+      // Removido: chamada automática de atualizarAnaliseFrequencia()
+      // A função será chamada apenas quando o modal for aberto
     }
 
     // Aguarda tanto DOM quanto estilos carregados
@@ -1634,19 +1635,38 @@
       }
     }
 
+    // Função auxiliar para renderizar números quentes e frios com segurança
+    function renderizarNumerosQuentesFrios(data) {
+      const numerosQuentes = data.numeros_quentes_frios?.numeros_quentes || [];
+      const numerosFrios = data.numeros_quentes_frios?.numeros_frios || [];
+      
+      return {
+        quentes: numerosQuentes.slice(0, 10).map(n => 
+          `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
+        ).join(''),
+        frios: numerosFrios.slice(0, 10).map(n => 
+          `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
+        ).join('')
+      };
+    }
+
     // Carregar análise de frequência
     async function carregarAnaliseFrequencia(container) {
       container.innerHTML = "🔄 Carregando análise de frequência...";
 
       try {
-        const response = await fetch('/api/analise-frequencia');
+        const response = await fetch('/api/analise-frequencia-MS?qtd_concursos=500');
         const data = await response.json();
+        
+        console.log('Dados recebidos em carregarAnaliseFrequencia:', data);
 
         if (data.error) {
           container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
           return;
         }
 
+        const numerosRenderizados = renderizarNumerosQuentesFrios(data);
+        
         container.innerHTML = `
           <div class="space-y-6">
             <!-- Cabeçalho com título e ajuda -->
@@ -1656,7 +1676,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="">Todos os concursos</option>
+                    <option value="500">Últimos 500 concursos</option>
                     <option value="25">Últimos 25 concursos</option>
                     <option value="50">Últimos 50 concursos</option>
                     <option value="100">Últimos 100 concursos</option>
@@ -1673,18 +1693,14 @@
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_quentes.slice(0, 10).map(n => 
-                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
-                ).join('')}
+                ${numerosRenderizados.quentes}
               </div>
             </div>
             
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_frios.slice(0, 10).map(n => 
-                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
-                ).join('')}
+                ${numerosRenderizados.frios}
               </div>
             </div>
             
@@ -1722,7 +1738,7 @@
                 <div class="flex items-center">
                   <label for="freq-periodo" class="text-white">Considerar período:</label>
                   <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
-                    <option value="completa">Todos os Concursos</option>
+                    <option value="500">Últimos 500 Concursos</option>
                     <option value="25">Últimos 25 Concursos</option>
                     <option value="50">Últimos 50 Concursos</option>
                   </select>
@@ -1829,9 +1845,11 @@
 
         // Aguardar um pouco para garantir que o DOM foi renderizado
         setTimeout(() => {
-          if (data.analise_temporal && Array.isArray(data.analise_temporal)) {
-            montarMatriz(data.analise_temporal);
+          if (data.concursos_para_matriz && Array.isArray(data.concursos_para_matriz) && data.concursos_para_matriz.length > 0) {
+            console.log('Usando dados reais da API para matriz');
+            montarMatriz(data.concursos_para_matriz);
           } else {
+            console.log('Usando dados mock para matriz');
             montarMatriz(concursosMock); // fallback para teste
           }
         }, 100);
@@ -1841,12 +1859,16 @@
       }
     }
 
-    // Mock JS com dados fictícios (até conectar com a API real)
+    // Mock JS com dados fictícios da Mega Sena (até conectar com a API real)
     const concursosMock = [
-      { numeros: [12, 23, 35, 44, 46, 50], trevos: [1, 6] },
-      { numeros: [3, 15, 21, 33, 42, 49], trevos: [2, 4] },
-      { numeros: [7, 9, 11, 20, 37, 40], trevos: [3, 5] },
-      { numeros: [5, 8, 18, 26, 39, 43], trevos: [1, 2] }
+      { concurso: 1, numeros: [12, 23, 35, 44, 46, 50] },
+      { concurso: 2, numeros: [3, 15, 21, 33, 42, 49] },
+      { concurso: 3, numeros: [7, 9, 11, 20, 37, 40] },
+      { concurso: 4, numeros: [5, 8, 18, 26, 39, 43] },
+      { concurso: 5, numeros: [1, 10, 22, 28, 45, 55] },
+      { concurso: 6, numeros: [2, 13, 19, 31, 38, 52] },
+      { concurso: 7, numeros: [4, 14, 25, 36, 47, 58] },
+      { concurso: 8, numeros: [6, 16, 27, 41, 48, 59] }
     ];
 
     function aplicarEstiloCelula(div) {
@@ -1859,6 +1881,10 @@
     }
     function montarMatriz(concursos) {
       console.log('montarMatriz chamada com:', concursos);
+      console.log('Tipo de concursos:', typeof concursos);
+      console.log('É array?', Array.isArray(concursos));
+      console.log('Quantidade de concursos:', concursos ? concursos.length : 'N/A');
+      
       const container = document.getElementById('matriz-frequencia');
       if (!container) {
         console.error('Elemento matriz-frequencia não encontrado');
@@ -1867,15 +1893,27 @@
       console.log('Container encontrado, limpando...');
       container.innerHTML = '';
 
+      if (!Array.isArray(concursos) || concursos.length === 0) {
+        console.error('Dados de concursos inválidos ou vazios');
+        container.innerHTML = '<p style="color: red;">Erro: Dados de concursos não disponíveis</p>';
+        return;
+      }
+
+      let concursosProcessados = 0;
       concursos.forEach((concurso, index) => { // Itera por cada concurso
         console.log(`Processando concurso ${index + 1}:`, concurso);
+        
+        if (!concurso.numeros || !Array.isArray(concurso.numeros)) {
+          console.error(`Concurso ${index + 1} sem dados válidos:`, concurso);
+          return;
+        }
         
         // --- UMA ÚNICA LINHA POR CONCURSO ---
         const linhaConcurso = document.createElement('div');
         linhaConcurso.className = 'linha-concurso';
         
-        // Adicionar todos os 50 números na mesma linha
-        for (let i = 1; i <= 50; i++) {
+        // Adicionar todos os 60 números na mesma linha (Mega Sena)
+        for (let i = 1; i <= 60; i++) {
           const celula = document.createElement('div');
           celula.className = 'celula-numero';
           celula.textContent = i;
@@ -1885,25 +1923,16 @@
           linhaConcurso.appendChild(celula);
         }
         
-        // Adicionar os 6 trevos na mesma linha
-        for (let t = 1; t <= 6; t++) {
-          const celula = document.createElement('div');
-          celula.className = 'celula-numero trevo';
-          celula.textContent = `T${t}`;
-          if (concurso.trevos.includes(t)) {
-            celula.classList.add('sorteado');
-          }
-          linhaConcurso.appendChild(celula);
-        }
-        
         container.appendChild(linhaConcurso);
+        concursosProcessados++;
+        console.log(`Concurso ${index + 1} processado com sucesso. Total processados: ${concursosProcessados}`);
       });
       console.log('Matriz montada com sucesso!');
       
       // Atualizar contador de concursos
       const contadorElement = document.getElementById('matriz-concursos-count');
       if (contadorElement) {
-        contadorElement.textContent = `${concursos.length} concursos exibidos`;
+        contadorElement.textContent = `${concursosProcessados} concursos exibidos`;
       }
       
       // Configuração adicional para melhor experiência de scroll
@@ -1919,15 +1948,22 @@
 
     // Função para atualizar análise quando mudar a janela
     async function atualizarAnaliseFrequencia() {
-      const janela = document.getElementById('janela-analise').value;
+      const janelaElement = document.getElementById('janela-analise');
+      const janela = janelaElement ? janelaElement.value : '500'; // Valor padrão se elemento não existir
       const container = document.getElementById('conteudo-modal');
       
       container.innerHTML = "🔄 Atualizando análise...";
 
       try {
-        const url = janela ? `/api/analise-frequencia?qtd_concursos=${janela}` : '/api/analise-frequencia';
+        // Garantir que sempre envie o parâmetro qtd_concursos, mesmo que seja 500
+        const url = `/api/analise-frequencia-MS?qtd_concursos=${janela}`;
+        console.log('Fazendo requisição para:', url);
         const response = await fetch(url);
         const data = await response.json();
+        
+        console.log('Dados recebidos da API:', data);
+        console.log('data.concursos_para_matriz:', data.concursos_para_matriz);
+        console.log('Tamanho de data.concursos_para_matriz:', data.concursos_para_matriz ? data.concursos_para_matriz.length : 'N/A');
 
         if (data.error) {
           container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
@@ -1944,7 +1980,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="" ${janela === '' ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="500" ${janela === '' || janela === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
                     <option value="25" ${janela === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${janela === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${janela === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -1961,7 +1997,7 @@
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_quentes.slice(0, 10).map(n => 
+                ${data.numeros_quentes_frios.numeros_quentes.slice(0, 10).map(n => 
                   `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
                 ).join('')}
               </div>
@@ -1970,7 +2006,7 @@
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_frios.slice(0, 10).map(n => 
+                ${data.numeros_quentes_frios.numeros_frios.slice(0, 10).map(n => 
                   `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
                 ).join('')}
               </div>
@@ -1998,17 +2034,17 @@
                 <div class="flex items-center">
                   <input type="checkbox" id="freq-priorizar-quentes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarQuentes" data-pref-period="completa">
                   <label for="freq-priorizar-quentes" class="text-white">Priorizar Números MAIS Frequentes</label>
-                  <input type="number" id="freq-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
+                  <input type="number" id="freq-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="60">
                 </div>
                 <div class="flex items-center">
                   <input type="checkbox" id="freq-priorizar-frios" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarFrios" data-pref-period="completa">
                   <label for="freq-priorizar-frios" class="text-white">Priorizar Números MENOS Frequentes</label>
-                  <input type="number" id="freq-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
+                  <input type="number" id="freq-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="60">
                 </div>
                 <div class="flex items-center">
                   <label for="freq-periodo" class="text-white">Considerar período:</label>
                   <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
-                    <option value="completa">Todos os Concursos</option>
+                    <option value="500">Últimos 500 Concursos</option>
                     <option value="25">Últimos 25 Concursos</option>
                     <option value="50">Últimos 50 Concursos</option>
                   </select>
@@ -2116,15 +2152,30 @@
         // Carregar matriz visual com dados reais
         setTimeout(() => {
           console.log('Tentando carregar matriz...');
-          console.log('data.analise_temporal:', data.analise_temporal);
+          console.log('data.concursos_para_matriz:', data.concursos_para_matriz);
           console.log('concursosMock:', concursosMock);
           
-          if (data.analise_temporal && Array.isArray(data.analise_temporal)) {
-            console.log('Usando dados reais da API');
-            montarMatriz(data.analise_temporal);
+          if (data.concursos_para_matriz && Array.isArray(data.concursos_para_matriz) && data.concursos_para_matriz.length > 0) {
+            console.log('Usando dados reais da API para matriz');
+            montarMatriz(data.concursos_para_matriz);
           } else {
-            console.log('Usando dados mock');
-            montarMatriz(concursosMock); // fallback para teste
+            console.log('Dados reais não disponíveis, tentando novamente...');
+            // Se não temos dados reais, tentar fazer uma nova requisição específica para a matriz
+            fetch(`/api/analise-frequencia-MS?qtd_concursos=${janela || '500'}`)
+              .then(response => response.json())
+              .then(dataRetry => {
+                if (dataRetry.concursos_para_matriz && Array.isArray(dataRetry.concursos_para_matriz) && dataRetry.concursos_para_matriz.length > 0) {
+                  console.log('Dados reais obtidos na segunda tentativa');
+                  montarMatriz(dataRetry.concursos_para_matriz);
+                } else {
+                  console.log('Usando dados mock para matriz');
+                  montarMatriz(concursosMock);
+                }
+              })
+              .catch(error => {
+                console.log('Erro na segunda tentativa, usando dados mock');
+                montarMatriz(concursosMock);
+              });
           }
         }, 100);
 
@@ -2201,7 +2252,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectDistribuicaoPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateDistribuicaoModal()">
-                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
                     <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
@@ -2211,7 +2262,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="distribuicaoPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 500 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaDistribuicao()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
@@ -3080,7 +3131,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-trevos" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateTrevosModal()">
-                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -3575,7 +3626,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectSecaPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSecaModal()">
-                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -3584,7 +3635,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="secaPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 500 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaSeca()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
@@ -3938,7 +3989,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectEstatisticasAvancadasPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateEstatisticasAvancadasModal()">
-                    <option value="" ${qtdConcursos === '' || !qtdConcursos ? 'selected' : ''}>Todos os concursos</option>
+                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
                     <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
@@ -3948,7 +3999,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="estatisticasAvancadasPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise de todos os concursos disponíveis.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 500 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaEstatisticasAvancadas()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
@@ -4159,7 +4210,7 @@
         if (selectedQtd) {
           periodoDisplay.textContent = `Análise dos últimos ${selectedQtd} concursos.`;
         } else {
-          periodoDisplay.textContent = 'Análise de todos os concursos disponíveis.';
+          periodoDisplay.textContent = 'Análise dos últimos 500 concursos.';
         }
       }
       
@@ -5206,7 +5257,7 @@
       <h3>🎯 Janela de Análise Temporal</h3>
       <p>
         Use o seletor de período para analisar diferentes janelas de tempo:<br>
-        <strong>Todos os concursos:</strong> Análise completa do histórico disponível.<br>
+        <strong>Últimos 500 concursos:</strong> Análise completa do histórico disponível.<br>
         <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
         <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
       </p>
@@ -5305,7 +5356,7 @@
       <h3>🎯 Janela de Análise Temporal</h3>
       <p>
         Use o seletor de período para analisar diferentes janelas de tempo:<br>
-        <strongTodos os concursos:</strong> Análise completa do histórico disponível.<br>
+        <strong>Últimos 500 concursos:</strong> Análise completa do histórico disponível.<br>
         <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
         <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
       </p>
