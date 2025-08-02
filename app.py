@@ -32,6 +32,7 @@ from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise
 from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
 from funcoes.megasena.calculos_MS import calcular_seca_numeros_megasena
 from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
+from funcoes.megasena.analise_estatistica_avancada_MS import AnaliseEstatisticaAvancada as AnaliseEstatisticaAvancadaMS
 
 # --- Importações para Mega Sena ---
 from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
@@ -527,6 +528,69 @@ def get_estatisticas_avancadas():
 
     except Exception as e:
         print(f"❌ Erro na API de estatísticas avançadas: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+
+
+@app.route('/api/estatisticas_avancadas_MS', methods=['GET'])
+def get_estatisticas_avancadas_megasena():
+    """Retorna os dados das estatísticas avançadas da Mega Sena."""
+    try:
+        print("🔍 Iniciando requisição para /api/estatisticas_avancadas_MS")
+        
+        if df_megasena is None or df_megasena.empty:
+            print("❌ Dados da Mega Sena não carregados")
+            return jsonify({'error': 'Dados da Mega Sena não carregados.'}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        print(f"📈 Estatísticas Avançadas Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
+        print(f"📊 DataFrame disponível: {len(df_megasena)} concursos")
+
+        # Criar instância da classe de análise da Mega Sena
+        print("🔧 Criando instância da AnaliseEstatisticaAvancadaMS...")
+        analise = AnaliseEstatisticaAvancadaMS(df_megasena)
+        
+        # Executar análise completa
+        print("⚡ Executando análise completa da Mega Sena...")
+        resultado = analise.executar_analise_completa(qtd_concursos)
+        
+        print("✅ Análise da Mega Sena concluída! Verificando resultados...")
+        
+        # Log detalhado dos resultados
+        if resultado:
+            print(f"📊 Resultados obtidos:")
+            print(f"   - Desvio padrão: {'✅' if resultado.get('desvio_padrao_distribuicao') else '❌'}")
+            print(f"   - Teste aleatoriedade: {'✅' if resultado.get('teste_aleatoriedade') else '❌'}")
+            print(f"   - Análise clusters: {'✅' if resultado.get('analise_clusters') else '❌'}")
+            print(f"   - Correlação números: {'✅' if resultado.get('analise_correlacao_numeros') else '❌'}")
+            print(f"   - Probabilidades condicionais: {'✅' if resultado.get('probabilidades_condicionais') else '❌'}")
+            print(f"   - Distribuição números: {'✅' if resultado.get('distribuicao_numeros') else '❌'}")
+        else:
+            print("❌ Nenhum resultado obtido!")
+
+        # Verificar se há valores NaN ou infinitos antes de retornar
+        def limpar_valores_problematicos(obj):
+            if isinstance(obj, dict):
+                return {k: limpar_valores_problematicos(v) for k, v in obj.items()}
+            elif isinstance(obj, list):
+                return [limpar_valores_problematicos(v) for v in obj]
+            elif isinstance(obj, float):
+                import numpy as np
+                if np.isnan(obj) or np.isinf(obj):
+                    return 0.0
+                return obj
+            else:
+                return obj
+        
+        # Limpar valores problemáticos
+        resultado_limpo = limpar_valores_problematicos(resultado)
+        print("✅ Dados limpos de valores problemáticos")
+
+        return jsonify(resultado_limpo)
+
+    except Exception as e:
+        print(f"❌ Erro na API de estatísticas avançadas da Mega Sena: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Erro interno: {str(e)}"}), 500
