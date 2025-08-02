@@ -1074,22 +1074,22 @@
     const tourSteps = [
       {
         target: '#numeros-container',
-        content: '🎯 <strong>Grid de Números Principais (1-50)</strong><br><br>Esta é a área mais importante! Você pode optar por clicar e selecionar seus números ou usar o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 6 a 12 números principais. Os números selecionados ficarão destacados em verde.',
+        content: '🎯 <strong>Grid de Números Principais (1-60)</strong><br><br>Esta é a área mais importante! Você pode optar por clicar e selecionar seus números ou usar o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 6 a 15 números principais. Os números selecionados ficarão destacados em verde.',
         position: 'center'
       },
       {
         target: '#numeros-container',
-        content: '🍀 <strong>Seleção de Trevos</strong><br><br>Selecione seus trevos ou use o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 2 a 6 números de trevos para jogar.',
+        content: '🎯 <strong>Seleção de Números</strong><br><br>Selecione seus números ou use o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 6 a 15 números para jogar.',
         position: 'bottom-right'
       },
       {
         target: '#numeros-selecionados',
-        content: '📊 <strong>Acompanhe sua Seleção</strong><br><br>Neste campo você vê a lista dos números selecionados, dos trevos e do valor total da aposta.',
+        content: '📊 <strong>Acompanhe sua Seleção</strong><br><br>Neste campo você vê a lista dos números selecionados e do valor total da aposta.',
         position: 'right'
       },
       {
         target: '#valor-aposta-container',
-        content: '💰 <strong>Valor da Aposta</strong><br><br>O sistema calcula automaticamente o valor baseado na quantidade de números e trevos selecionados.',
+        content: '💰 <strong>Valor da Aposta</strong><br><br>O sistema calcula automaticamente o valor baseado na quantidade de números selecionados.',
         position: 'right'
       },
       {
@@ -1099,7 +1099,7 @@
       },
       {
         target: '.stat-card',
-        content: '🔥 <strong>Estatísticas Rápidas</strong><br><br>Veja os números mais quentes (frequentes), frios (raros) e trevos mais sorteados para orientar suas escolhas.',
+        content: '🔥 <strong>Estatísticas Rápidas</strong><br><br>Veja os números mais quentes (frequentes), frios (raros) e secos para orientar suas escolhas.',
         position: 'bottom'
       }
     ];
@@ -1241,7 +1241,7 @@
       message.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1A1D25] border-2 border-[#00E38C] rounded-xl p-6 shadow-2xl text-white text-center z-[10000]';
       message.innerHTML = `
         <h3 class="text-xl font-bold mb-4 text-[#00E38C]">🎉 Tour Concluído!</h3>
-        <p class="mb-4">Agora você conhece todos os elementos principais! Comece selecionando seus números e trevos.</p>
+        <p class="mb-4">Agora você conhece todos os elementos principais! Comece selecionando seus números de 1 a 60.</p>
         <div class="flex space-x-3">
           <button onclick="abrirModalConfiguracao()" class="bg-[#00E38C] hover:bg-[#00C973] text-black px-4 py-2 rounded-lg transition-colors">
             🎲 Gerar Primeiro Palpite
@@ -4746,7 +4746,26 @@
     // Atualiza os valores exibidos pelos sliders
     sliderNumeros.oninput = () => {
       valorNumeros.textContent = sliderNumeros.value;
+      atualizarCorSlider(sliderNumeros);
     };
+
+    // Função para atualizar a cor da barra do slider dinamicamente
+    function atualizarCorSlider(slider) {
+      const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+      
+      // Atualiza o gradiente da barra baseado no valor
+      slider.style.background = `linear-gradient(to right, #00E38C 0%, #00E38C ${value}%, #2E303A ${value}%, #2E303A 100%)`;
+      
+      // Adiciona efeito de brilho sutil
+      slider.style.boxShadow = `inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 227, 140, ${value * 0.01})`;
+    }
+
+    // Inicializa a cor do slider ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      if (sliderNumeros) {
+        atualizarCorSlider(sliderNumeros);
+      }
+    });
 
     // Abrir o modal
     function abrirModalConfiguracao() {

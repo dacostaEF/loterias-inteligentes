@@ -4789,10 +4789,33 @@
     // Atualiza os valores exibidos pelos sliders
     sliderNumeros.oninput = () => {
       valorNumeros.textContent = sliderNumeros.value;
+      atualizarCorSlider(sliderNumeros);
     };
     sliderTrevos.oninput = () => {
       valorTrevos.textContent = sliderTrevos.value;
+      atualizarCorSlider(sliderTrevos);
     };
+
+    // Função para atualizar a cor da barra do slider dinamicamente
+    function atualizarCorSlider(slider) {
+      const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+      
+      // Atualiza o gradiente da barra baseado no valor
+      slider.style.background = `linear-gradient(to right, #00E38C 0%, #00E38C ${value}%, #2E303A ${value}%, #2E303A 100%)`;
+      
+      // Adiciona efeito de brilho sutil
+      slider.style.boxShadow = `inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 227, 140, ${value * 0.01})`;
+    }
+
+    // Inicializa a cor do slider ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      if (sliderNumeros) {
+        atualizarCorSlider(sliderNumeros);
+      }
+      if (sliderTrevos) {
+        atualizarCorSlider(sliderTrevos);
+      }
+    });
 
     // Abrir o modal
     function abrirModalConfiguracao() {
