@@ -812,6 +812,97 @@ def gerar_aposta_premium():
             'error': f'Erro interno: {str(e)}'
         }), 500
 
+@app.route('/api/gerar_aposta_premium_MS', methods=['POST'])
+def gerar_aposta_premium_megasena():
+    """Gera aposta inteligente da Mega Sena usando Machine Learning."""
+    try:
+        from funcoes.megasena.geracao_inteligente_MS import gerar_aposta_inteligente
+        
+        # Obter dados do request
+        data = request.get_json()
+        
+        # O frontend envia o objeto userPremiumPreferencesMS completo
+        preferencias_ml = data  # Usar diretamente o objeto enviado
+        
+        print(f"📊 Preferências recebidas (Mega Sena): {preferencias_ml}")
+        
+        # Carregar dados da Mega Sena
+        df_megasena = carregar_dados_megasena_app()
+        
+        if df_megasena.empty:
+            return jsonify({
+                'success': False,
+                'error': 'Dados da Mega Sena não disponíveis'
+            }), 500
+        
+        print(f"📊 Dados da Mega Sena carregados: {len(df_megasena)} concursos")
+        
+        # Preparar cache de análise baseado nas preferências
+        analysis_cache = {}
+        
+        # Carregar dados de frequência se necessário
+        if any(key in preferencias_ml for key in ['frequencia']):
+            try:
+                from funcoes.megasena.funcao_analise_de_frequencia_MS import analise_frequencia_megasena_completa
+                dados_freq = analise_frequencia_megasena_completa(df_megasena)
+                analysis_cache['frequencia_completa'] = dados_freq
+                print("✅ Dados de frequência carregados")
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar frequência: {e}")
+        
+        # Carregar dados de distribuição se necessário
+        if any(key in preferencias_ml for key in ['distribuicao']):
+            try:
+                from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribuicao_megasena
+                dados_dist = analise_distribuicao_megasena(df_megasena)
+                analysis_cache['distribuicao_completa'] = dados_dist
+                print("✅ Dados de distribuição carregados")
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar distribuição: {e}")
+        
+        # Carregar dados de padrões se necessário
+        if any(key in preferencias_ml for key in ['padroes', 'sequencias']):
+            try:
+                from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
+                dados_padroes = analise_padroes_sequencias_megasena(df_megasena)
+                analysis_cache['padroes_completa'] = dados_padroes
+                print("✅ Dados de padrões carregados")
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar padrões: {e}")
+        
+        # Carregar dados avançados se necessário
+        if any(key in preferencias_ml for key in ['clusters']):
+            try:
+                from funcoes.megasena.analise_estatistica_avancada_MS import AnaliseEstatisticaAvancada
+                analise = AnaliseEstatisticaAvancada(df_megasena)
+                dados_avancados = analise.executar_analise_completa()
+                analysis_cache['avancada'] = dados_avancados
+                print("✅ Dados avançados carregados")
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar dados avançados: {e}")
+        
+        print(f"📊 Cache de análise preparado: {list(analysis_cache.keys())}")
+        
+        # Gerar apostas usando Machine Learning
+        apostas_geradas = gerar_aposta_inteligente(preferencias_ml, analysis_cache)
+        
+        print(f"🎯 Apostas geradas (Mega Sena): {len(apostas_geradas)}")
+        
+        return jsonify({
+            'success': True,
+            'apostas': apostas_geradas,
+            'mensagem': f'Aposta inteligente gerada com sucesso! ({len(apostas_geradas)} apostas)'
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao gerar aposta premium (Mega Sena): {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Erro interno: {str(e)}'
+        }), 500
+
 if __name__ == '__main__':
     # Configurações otimizadas para melhor performance
     port = int(os.environ.get('PORT', 5000))

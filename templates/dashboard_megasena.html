@@ -456,14 +456,18 @@
                     .dropdown-content {
                     display: none;
                     position: absolute;
-                    left: 100%;
-                    top: 0;
+                    left: 0;
+                    top: 100%;
+                    margin-top: 8px;
                     background: #2a2a3e;
                     min-width: 200px;
                     box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);
                     border-radius: 8px;
                     z-index: 1000;
                     border: 2px solid rgba(168, 85, 247, 0.6);
+                    transition: all 0.2s ease;
+                    opacity: 0;
+                    visibility: hidden;
                 }
 
     .dropdown-content a {
@@ -490,6 +494,8 @@
 
     .dropdown:hover .dropdown-content {
       display: block;
+      opacity: 1;
+      visibility: visible;
     }
 
     /* Submenu para mobile */

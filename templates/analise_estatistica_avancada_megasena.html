@@ -602,14 +602,18 @@
                     .dropdown-content {
                     display: none;
                     position: absolute;
-                    left: 100%;
-                    top: 0;
+                    left: 0;
+                    top: 100%;
+                    margin-top: 8px;
                     background: #2a2a3e;
                     min-width: 200px;
                     box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);
                     border-radius: 8px;
                     z-index: 1000;
                     border: 2px solid rgba(168, 85, 247, 0.6);
+                    transition: all 0.2s ease;
+                    opacity: 0;
+                    visibility: hidden;
                 }
 
     .dropdown-content a {
@@ -636,6 +640,8 @@
 
     .dropdown:hover .dropdown-content {
       display: block;
+      opacity: 1;
+      visibility: visible;
     }
 
     /* Submenu para mobile */
@@ -1041,9 +1047,7 @@
             <h4 class="text-white text-lg font-semibold mb-3">⚙️ Configuração da Aposta Gerada:</h4>
             <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
                 <label for="qtde-numeros-aposta" class="text-gray-300">Quantos números na aposta?</label>
-                <input type="number" id="qtde-numeros-aposta" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="6" min="6" max="12">
-                <label for="qtde-trevos-aposta" class="text-gray-300">Quantos trevos na aposta?</label>
-                <input type="number" id="qtde-trevos-aposta" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="2" min="2" max="6">
+                <input type="number" id="qtde-numeros-aposta" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="6" min="6" max="15">
             </div>
             <div class="flex items-center">
                 <label for="num-apostas-gerar" class="text-gray-300">Quantas apostas gerar?</label>
@@ -1056,7 +1060,7 @@
         </button>
 
         <div id="resultado-sugestao" class="bg-[#2E303A] p-4 rounded-md mt-6 hidden">
-            <h4 class="text-[#00E38C] text-xl font-semibold mb-3 text-center">🎯 Sua Aposta Sugerida:</h4>
+            <h4 class="text-[#00E38C] text-xl font-semibold mb-3 text-center">🎯 Sua Aposta Sugerida da Mega Sena:</h4>
             <div id="lista-apostas-geradas" class="space-y-4">
             </div>
         </div>
@@ -1545,6 +1549,8 @@
       console.log('Função carregarEstatisticasRapidas() desabilitada na página premium');
     }
 
+
+
     // Abrir modal
     function abrirModal(tipo) {
       // Esconder todos os popups de ajuda primeiro
@@ -1843,7 +1849,10 @@
 
         // Garantir que o gráfico se redimensione quando a janela mudar
         window.addEventListener('resize', () => {
-          Plotly.relayout('grafico-frequencia', { 'autosize': true });
+          const graficoElement = document.getElementById('grafico-frequencia');
+          if (graficoElement) {
+            Plotly.relayout('grafico-frequencia', { 'autosize': true });
+          }
         });
 
         // Aguardar um pouco para garantir que o DOM foi renderizado
@@ -2153,7 +2162,10 @@
 
         // Garantir que o gráfico se redimensione quando a janela mudar
         window.addEventListener('resize', () => {
-          Plotly.relayout('grafico-frequencia', { 'autosize': true });
+          const graficoElement = document.getElementById('grafico-frequencia');
+          if (graficoElement) {
+            Plotly.relayout('grafico-frequencia', { 'autosize': true });
+          }
         });
 
         // Carregar matriz visual com dados reais
@@ -2186,10 +2198,22 @@
           }
         }, 100);
 
-              } catch (error) {
-          container.innerHTML = `<p style="color: red;">Erro ao atualizar dados: ${error.message}</p>`;
-        }
+        // Salvar dados da análise de frequência no localStorage
+        const dadosFrequencia = {
+          janela: janela,
+          numeros_quentes: data.numeros_quentes_frios.numeros_quentes.slice(0, 10).map(n => n[0]),
+          numeros_frios: data.numeros_quentes_frios.numeros_frios.slice(0, 10).map(n => n[0]),
+          frequencia_completa: data.frequencia_completa,
+          timestamp: new Date().toISOString()
+        };
+        
+        armazenarAnalise('frequencia', dadosFrequencia);
+        console.log('✅ Dados de frequência salvos no localStorage');
+
+      } catch (error) {
+        container.innerHTML = `<p style="color: red;">Erro ao atualizar dados: ${error.message}</p>`;
       }
+    }
 
       // Funções para o popup de ajuda
       function abrirPopupAjuda() {
@@ -2991,7 +3015,16 @@
       const selectedQtd = selectElement.value || '500'; // Default para 500 se não houver valor
       const container = document.getElementById('conteudo-modal');
       if (container) {
-        carregarAnaliseAfinidades(container, selectedQtd);
+        carregarAnaliseAfinidades(container, selectedQtd).then(() => {
+          // Salvar dados da análise de afinidades no localStorage
+          const dadosAfinidades = {
+            janela: selectedQtd,
+            timestamp: new Date().toISOString()
+          };
+          
+          armazenarAnalise('afinidades', dadosAfinidades);
+          console.log('✅ Dados de afinidades salvos no localStorage');
+        });
       }
     }
 
@@ -3189,6 +3222,44 @@
         criarGraficoRepeticoes(repeticoes);
         criarGraficoIntervalos(intervalos);
         criarGraficoCiclos(ciclos);
+        
+        // Adicionar seção de sugestões após os gráficos serem criados
+        setTimeout(() => {
+          const containerDiv = container.querySelector('.space-y-6');
+          if (containerDiv) {
+            const sugestoesHtml = `
+              <!-- SUGESTÕES PARA APOSTA PREMIUM -->
+              <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
+                <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
+                <div class="space-y-3">
+                  <div class="flex items-center">
+                    <input type="checkbox" id="sequencia-evitar-consecutivos" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="sequencias" data-pref-name="evitarConsecutivos">
+                    <label for="sequencia-evitar-consecutivos" class="text-white">Evitar Números Consecutivos (ex: 23-24)</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input type="checkbox" id="sequencia-priorizar-atrasados" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="sequencias" data-pref-name="priorizarAtrasados">
+                    <label for="sequencia-priorizar-atrasados" class="text-white">Priorizar Números MUITO Atrasados</label>
+                    <label for="sequencia-min-atraso" class="text-gray-300 text-sm ml-auto mr-2">Mínimo de concursos sem sair:</label>
+                    <input type="number" id="sequencia-min-atraso" class="w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="20" min="1" max="100">
+                  </div>
+                  <div class="flex items-center">
+                    <input type="checkbox" id="sequencia-evitar-sequencias" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="sequencias" data-pref-name="evitarSequencias">
+                    <label for="sequencia-evitar-sequencias" class="text-white">Evitar Sequências Específicas</label>
+                  </div>
+                  <div class="flex items-center">
+                    <input type="checkbox" id="sequencia-evitar-repeticoes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="sequencias" data-pref-name="evitarRepeticoesSeguidas">
+                    <label for="sequencia-evitar-repeticoes" class="text-white">Evitar Números Repetidos do Último Concurso</label>
+                  </div>
+                </div>
+                <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
+                  <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
+                  <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
+                </div>
+              </div>
+            `;
+            containerDiv.insertAdjacentHTML('beforeend', sugestoesHtml);
+          }
+        }, 500);
 
       } catch (error) {
         console.error("Erro ao carregar análise de sequências:", error);
@@ -3201,7 +3272,16 @@
       const selectElement = document.getElementById('janela-analise-sequencias');
       const selectedQtd = selectElement.value;
       const container = document.getElementById('conteudo-modal');
-      carregarAnaliseSequencias(container, selectedQtd);
+      carregarAnaliseSequencias(container, selectedQtd).then(() => {
+        // Salvar dados da análise de sequências no localStorage
+        const dadosSequencias = {
+          janela: selectedQtd,
+          timestamp: new Date().toISOString()
+        };
+        
+        armazenarAnalise('sequencias', dadosSequencias);
+        console.log('✅ Dados de sequências salvos no localStorage');
+      });
     }
 
     // Funções para criar gráficos Plotly das sequências
@@ -3607,7 +3687,16 @@
       // Carregar dados no modal genérico
       const conteudo = document.getElementById('conteudo-modal');
       if (conteudo) {
-        carregarAnaliseSeca(conteudo, selectedQtd);
+        carregarAnaliseSeca(conteudo, selectedQtd).then(() => {
+          // Salvar dados da análise de seca no localStorage
+          const dadosSeca = {
+            janela: selectedQtd,
+            timestamp: new Date().toISOString()
+          };
+          
+          armazenarAnalise('seca', dadosSeca);
+          console.log('✅ Dados de seca salvos no localStorage');
+        });
       }
     }
     
@@ -3914,9 +4003,32 @@
             }
         };
         
+        // SALVAR PREFERÊNCIAS DO PASSO 6 (ESTATÍSTICAS AVANÇADAS) - MEGA SENA
+        window.userPremiumPreferencesMS = window.userPremiumPreferencesMS || {};
+        
+        // Salvar preferências de padrões baseadas na análise de seca
+        window.userPremiumPreferencesMS.padroes = {
+            priorizarAtrasados: true,
+            minAtraso: 20, // Valor padrão para Mega Sena
+            evitarConsecutivos: true,
+            evitarRepeticoesSeguidas: true
+        };
+        
+        // Salvar dados de clusters para uso no modal premium
+        if (clusters && clusters.resumo_clusters) {
+            // Os clusters serão selecionados pelo usuário via checkboxes
+            window.userPremiumPreferencesMS.clusters = [];
+        }
+        
+        // Salvar no localStorage
+        if (typeof savePremiumPreferencesMS === 'function') {
+            savePremiumPreferencesMS();
+        }
+        
         // Debug: verificar se os dados estão sendo armazenados corretamente
         console.log('Dados dos clusters armazenados:', window.analiseResultados.avancada.clusters);
         console.log('Resumo dos clusters:', window.analiseResultados.avancada.clusters?.resumo_clusters);
+        console.log('Preferências salvas:', window.userPremiumPreferencesMS);
         
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
@@ -3983,7 +4095,16 @@
       // Carregar dados no modal genérico
       const conteudo = document.getElementById('conteudo-modal');
       if (conteudo) {
-        carregarAnaliseEstatisticasAvancadas(conteudo, selectedQtd);
+        carregarAnaliseEstatisticasAvancadas(conteudo, selectedQtd).then(() => {
+          // Salvar dados da análise de estatísticas avançadas no localStorage
+          const dadosEstatisticas = {
+            janela: selectedQtd,
+            timestamp: new Date().toISOString()
+          };
+          
+          armazenarAnalise('estatisticas', dadosEstatisticas);
+          console.log('✅ Dados de estatísticas avançadas salvos no localStorage');
+        });
       }
     }
     
@@ -4784,7 +4905,16 @@
       // Carregar dados no modal genérico
       const conteudo = document.getElementById('conteudo-modal');
       if (conteudo) {
-        carregarAnaliseDistribuicao(conteudo, selectedQtd);
+        carregarAnaliseDistribuicao(conteudo, selectedQtd).then(() => {
+          // Salvar dados da análise de distribuição no localStorage
+          const dadosDistribuicao = {
+            janela: selectedQtd,
+            timestamp: new Date().toISOString()
+          };
+          
+          armazenarAnalise('distribuicao', dadosDistribuicao);
+          console.log('✅ Dados de distribuição salvos no localStorage');
+        });
       }
     }
   </script>
@@ -5372,65 +5502,7 @@
   }
   </style>
 
-  <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
-
-  <!-- Script para controlar os menus responsivos -->
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const hamburgerIcon = document.getElementById('hamburgerIcon');
-      const navPanel = document.getElementById('navPanel');
-      const navOverlay = document.getElementById('navOverlay');
-
-      if (hamburgerIcon && navPanel && navOverlay) {
-        hamburgerIcon.addEventListener('click', () => {
-          hamburgerIcon.classList.toggle('open');
-          navPanel.classList.toggle('open');
-          navOverlay.classList.toggle('open');
-          
-          // Previne scroll do body quando menu está aberto
-          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
-        });
-
-        // Controle do submenu mobile
-        const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
-        mobileDropdownToggles.forEach(toggle => {
-          toggle.addEventListener('click', (e) => {
-            e.preventDefault();
-            const dropdown = toggle.nextElementSibling;
-            dropdown.classList.toggle('show');
-          });
-        });
-
-        // Fechar o menu ao clicar em um link (exceto dropdown toggles)
-        navPanel.querySelectorAll('a:not(.mobile-dropdown-toggle)').forEach(link => {
-          link.addEventListener('click', () => {
-            hamburgerIcon.classList.remove('open');
-            navPanel.classList.remove('open');
-            navOverlay.classList.remove('open');
-            document.body.style.overflow = '';
-          });
-        });
-
-        // Fechar o menu ao clicar no overlay
-        navOverlay.addEventListener('click', () => {
-          hamburgerIcon.classList.remove('open');
-          navPanel.classList.remove('open');
-          navOverlay.classList.remove('open');
-          document.body.style.overflow = '';
-        });
-
-        // Fechar o menu com tecla ESC
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
-            hamburgerIcon.classList.remove('open');
-            navPanel.classList.remove('open');
-            navOverlay.classList.remove('open');
-            document.body.style.overflow = '';
-          }
-        });
-      }
-    });
-  </script>
+  <script src="{{ url_for('static', filename='js/graficos_megasena.js') }}"></script>
 
   <!-- Modal para Números do Cluster -->
   <div id="modal-numeros-cluster" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">

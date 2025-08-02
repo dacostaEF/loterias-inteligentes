@@ -1541,6 +1541,8 @@
       console.log('Função carregarEstatisticasRapidas() desabilitada na página premium');
     }
 
+
+
     // Abrir modal
     function abrirModal(tipo) {
       // Esconder todos os popups de ajuda primeiro
@@ -1631,6 +1633,36 @@
       } else {
         // Fechar modal genérico
         document.getElementById('modal').classList.add('hidden');
+        
+        // Salvar preferências do modal que está sendo fechado
+        // Determinar qual modal está sendo fechado baseado no título
+        const tituloModal = document.getElementById('titulo-modal');
+        if (tituloModal) {
+          const titulo = tituloModal.textContent.toLowerCase();
+          let modalPrefix = '';
+          
+          if (titulo.includes('frequência') || titulo.includes('frequencia')) {
+            modalPrefix = 'freq';
+          } else if (titulo.includes('distribuição') || titulo.includes('distribuicao')) {
+            modalPrefix = 'dist';
+          } else if (titulo.includes('afinidades')) {
+            modalPrefix = 'afinidade';
+          } else if (titulo.includes('sequências') || titulo.includes('sequencias') || titulo.includes('padrões') || titulo.includes('padroes')) {
+            modalPrefix = 'padrao';
+          } else if (titulo.includes('seca')) {
+            modalPrefix = 'seca';
+          } else if (titulo.includes('estatísticas') || titulo.includes('estatisticas') || titulo.includes('avançadas') || titulo.includes('avancadas')) {
+            modalPrefix = 'avancada';
+          } else if (titulo.includes('trevos')) {
+            modalPrefix = 'trevo';
+          }
+          
+          // Salvar preferências se identificou o modal
+          if (modalPrefix && typeof salvarPreferenciasDoModal === 'function') {
+            console.log(`💾 Salvando preferências do modal: ${modalPrefix}`);
+            salvarPreferenciasDoModal(modalPrefix);
+          }
+        }
       }
     }
 

@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
     """
-    Gera uma ou mais apostas inteligentes da +Milionária com base nas preferências do usuário
+    Gera uma ou mais apostas inteligentes da Mega Sena com base nas preferências do usuário
     e nos dados de análise estatística.
 
     Args:
@@ -18,21 +18,19 @@ def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
 
     Returns:
         list: Uma lista de dicionários, onde cada dicionário representa uma aposta
-              com 'numeros', 'trevos' e 'valor_estimado'.
+              com 'numeros' e 'valor_estimado'.
     """
     
     num_apostas_gerar = preferencias.get('numApostasGerar', 1)
     qtde_numeros_aposta = preferencias.get('qtdeNumerosAposta', 6)
-    qtde_trevos_aposta = preferencias.get('qtdeTrevosAposta', 2)
 
     todas_apostas_geradas = []
 
     for _ in range(num_apostas_gerar):
         numeros_selecionados = set()
-        trevos_selecionados = set()
 
-        # --- Lógica para seleção dos Números Principais (1-50) ---
-        pool_numeros = list(range(1, 51))
+        # --- Lógica para seleção dos Números Principais (1-60) ---
+        pool_numeros = list(range(1, 61))
         
         # Etapa 1: Aplicação de Pesos/Filtros Iniciais (baseado em preferências)
         # Inicializa pesos iguais para todos os números
@@ -42,27 +40,36 @@ def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
         freq_pref = preferencias.get('frequencia', {})
         if freq_pref.get('priorizarQuentes') and freq_pref.get('qtdeQuentes'):
             periodo = freq_pref.get('considerarPeriodo', 'completa')
-            frequencia_data = analysis_cache.get(f'frequencia_{periodo}', {}).get('frequencia_numeros', {})
-            quentes = sorted(frequencia_data.items(), key=lambda item: item[1], reverse=True)[:freq_pref['qtdeQuentes']]
-            for num, _ in quentes:
-                pesos_numeros[num] *= 2.0  # Dobra o peso para números quentes
+            # Corrigir acesso aos dados de frequência
+            frequencia_cache = analysis_cache.get('frequencia_completa', {})
+            frequencia_data = frequencia_cache.get('analise_frequencia', {}).get('frequencia_absoluta', {}).get('numeros', {})
+            if frequencia_data:
+                quentes = sorted(frequencia_data.items(), key=lambda item: item[1], reverse=True)[:freq_pref['qtdeQuentes']]
+                for num, _ in quentes:
+                    pesos_numeros[num] *= 2.0  # Dobra o peso para números quentes
 
         if freq_pref.get('priorizarFrios') and freq_pref.get('qtdeFrios'):
             periodo = freq_pref.get('considerarPeriodo', 'completa')
-            frequencia_data = analysis_cache.get(f'frequencia_{periodo}', {}).get('frequencia_numeros', {})
-            frios = sorted(frequencia_data.items(), key=lambda item: item[1])[:freq_pref['qtdeFrios']]
-            for num, _ in frios:
-                pesos_numeros[num] *= 2.0  # Dobra o peso para números frios
+            # Corrigir acesso aos dados de frequência
+            frequencia_cache = analysis_cache.get('frequencia_completa', {})
+            frequencia_data = frequencia_cache.get('analise_frequencia', {}).get('frequencia_absoluta', {}).get('numeros', {})
+            if frequencia_data:
+                frios = sorted(frequencia_data.items(), key=lambda item: item[1])[:freq_pref['qtdeFrios']]
+                for num, _ in frios:
+                    pesos_numeros[num] *= 2.0  # Dobra o peso para números frios
         
         # 2. Clusters
         cluster_pref = preferencias.get('clusters', [])
         if cluster_pref:
-            # Assumimos que o cache de 'avancada' contém 'clusters' e 'detalhes_clusters'
-            detalhes_clusters = analysis_cache.get('avancada', {}).get('clusters', {}).get('detalhes_clusters', {})
+            # Usar a estrutura correta da Mega Sena: 'analise_clusters'
+            avancada_cache = analysis_cache.get('avancada', {})
+            analise_clusters = avancada_cache.get('analise_clusters', {})
+            estatisticas_clusters = analise_clusters.get('estatisticas_clusters', {})
             numeros_dos_clusters_selecionados = set()
             for cluster_id in cluster_pref:
-                if cluster_id in detalhes_clusters:
-                    numeros_dos_clusters_selecionados.update(detalhes_clusters[cluster_id]['numeros'])
+                if cluster_id in estatisticas_clusters:
+                    # A Mega Sena usa 'numeros' em vez de 'todos_numeros_do_cluster'
+                    numeros_dos_clusters_selecionados.update(estatisticas_clusters[cluster_id]['numeros'])
             
             if numeros_dos_clusters_selecionados:
                 for num in pool_numeros:
@@ -75,10 +82,12 @@ def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
         padroes_pref = preferencias.get('padroes', {})
         if padroes_pref.get('priorizarAtrasados') and padroes_pref.get('minAtraso'):
             # Obter a 'seca_atual' da análise de padrões
-            seca_atual = analysis_cache.get('padroes_completa', {}).get('seca_atual', {})
-            for num, atraso in seca_atual.items():
-                if atraso >= padroes_pref['minAtraso']:
-                    pesos_numeros[num] *= 2.5 # Aumenta o peso para números muito atrasados
+            padroes_cache = analysis_cache.get('padroes_completa', {})
+            seca_atual = padroes_cache.get('intervalos_de_ausencia', {}).get('numeros_intervalos', {})
+            if seca_atual:
+                for num, atraso in seca_atual.items():
+                    if atraso >= padroes_pref['minAtraso']:
+                        pesos_numeros[num] *= 2.5 # Aumenta o peso para números muito atrasados
 
         # Gerar a aposta principal usando os pesos
         # Convertendo pesos para lista para uso com random.choices
@@ -101,8 +110,9 @@ def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
                     continue # Contém consecutivos, tentar novamente
 
             if padroes_pref.get('evitarRepeticoesSeguidas'):
-                ultimos_numeros_sorteados = analysis_cache.get('padroes_completa', {}).get('ultimos_sorteados', [])
-                if any(num in ultimos_numeros_sorteados for num in temp_numeros_selecionados):
+                padroes_cache = analysis_cache.get('padroes_completa', {})
+                ultimos_numeros_sorteados = padroes_cache.get('repeticoes_entre_concursos', {}).get('ultimos_numeros_sorteados', [])
+                if ultimos_numeros_sorteados and any(num in ultimos_numeros_sorteados for num in temp_numeros_selecionados):
                     continue # Contém números repetidos do último, tentar novamente
 
             # Validação de Distribuição (Pares/Ímpares)
@@ -136,96 +146,36 @@ def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
             # Fallback: gerar aleatoriamente se as preferências forem muito restritivas
             numeros_selecionados = set(random.sample(pool_numeros, qtde_numeros_aposta))
 
-        # --- Lógica para seleção dos Trevos (1-6) ---
-        pool_trevos = list(range(1, 7))
-        pesos_trevos = {trevo: 1.0 for trevo in pool_trevos}
-
-        trevo_pref = preferencias.get('trevos', {})
-        if trevo_pref.get('priorizarQuentesTrevos') and trevo_pref.get('qtdeQuentesTrevos'):
-            trevo_freq_data = analysis_cache.get('trevos_completa', {}).get('frequencia_trevos', {})
-            quentes_trevos = sorted(trevo_freq_data.items(), key=lambda item: item[1], reverse=True)[:trevo_pref['qtdeQuentesTrevos']]
-            for trevo, _ in quentes_trevos:
-                pesos_trevos[trevo] *= 2.0
-
-        if trevo_pref.get('priorizarFriosTrevos') and trevo_pref.get('qtdeFriosTrevos'):
-            trevo_freq_data = analysis_cache.get('trevos_completa', {}).get('frequencia_trevos', {})
-            frios_trevos = sorted(trevo_freq_data.items(), key=lambda item: item[1])[:trevo_pref['qtdeFriosTrevos']]
-            for trevo, _ in frios_trevos:
-                pesos_trevos[trevo] *= 2.0
-
-        # Gerar os trevos usando os pesos
-        trevos_ponderados = [trevo for trevo, peso in pesos_trevos.items()]
-        pesos_dos_trevos = [peso for trevo, peso in pesos_trevos.items()]
-        
-        # Loop de tentativas para trevos (menos complexo)
-        for _ in range(max_tentativas):
-            temp_trevos_selecionados = set(random.choices(trevos_ponderados, weights=pesos_dos_trevos, k=qtde_trevos_aposta))
-            if len(temp_trevos_selecionados) == qtde_trevos_aposta:
-                trevos_selecionados = temp_trevos_selecionados
-                break
-        
-        if not trevos_selecionados:
-            logger.warning("Não foi possível gerar trevos dentro das preferências. Gerando aleatoriamente.")
-            trevos_selecionados = set(random.sample(pool_trevos, qtde_trevos_aposta))
-
-        # Calcular valor estimado da aposta (opcional, pode ser uma função separada)
-        # Exemplo simplificado de cálculo de valor:
-        # Baseado na quantidade de números e trevos
-        valor_aposta_estimado = calcular_valor_aposta(qtde_numeros_aposta, qtde_trevos_aposta)
+        # Calcular valor estimado da aposta (Mega Sena: apenas números)
+        valor_aposta_estimado = calcular_valor_aposta(qtde_numeros_aposta)
         
         todas_apostas_geradas.append({
             'numeros': sorted(list(numeros_selecionados)),
-            'trevos': sorted(list(trevos_selecionados)),
             'valor_estimado': valor_aposta_estimado
         })
 
     return todas_apostas_geradas
 
-def calcular_valor_aposta(qtde_numeros: int, qtde_trevos: int) -> float:
+def calcular_valor_aposta(qtde_numeros: int) -> float:
     """
-    Calcula o valor estimado da aposta baseado na quantidade de números e trevos.
-    Valores baseados na tabela oficial da Mais Milionária.
+    Calcula o valor estimado da aposta baseado na quantidade de números.
+    Valores baseados na tabela oficial da Mega Sena.
     """
-    # Tabela de valores da Mais Milionária (valores aproximados)
+    # Tabela de valores da Mega Sena (valores aproximados)
     tabela_valores = {
-        (6, 2): 6.00,   # 6 números + 2 trevos
-        (6, 3): 18.00,  # 6 números + 3 trevos
-        (6, 4): 36.00,  # 6 números + 4 trevos
-        (6, 5): 60.00,  # 6 números + 5 trevos
-        (6, 6): 90.00,  # 6 números + 6 trevos
-        (7, 2): 21.00,  # 7 números + 2 trevos
-        (7, 3): 63.00,  # 7 números + 3 trevos
-        (7, 4): 126.00, # 7 números + 4 trevos
-        (7, 5): 210.00, # 7 números + 5 trevos
-        (7, 6): 315.00, # 7 números + 6 trevos
-        (8, 2): 56.00,  # 8 números + 2 trevos
-        (8, 3): 168.00, # 8 números + 3 trevos
-        (8, 4): 336.00, # 8 números + 4 trevos
-        (8, 5): 560.00, # 8 números + 5 trevos
-        (8, 6): 840.00, # 8 números + 6 trevos
-        (9, 2): 126.00, # 9 números + 2 trevos
-        (9, 3): 378.00, # 9 números + 3 trevos
-        (9, 4): 756.00, # 9 números + 4 trevos
-        (9, 5): 1260.00,# 9 números + 5 trevos
-        (9, 6): 1890.00,# 9 números + 6 trevos
-        (10, 2): 252.00, # 10 números + 2 trevos
-        (10, 3): 756.00, # 10 números + 3 trevos
-        (10, 4): 1512.00,# 10 números + 4 trevos
-        (10, 5): 2520.00,# 10 números + 5 trevos
-        (10, 6): 3780.00,# 10 números + 6 trevos
-        (11, 2): 462.00, # 11 números + 2 trevos
-        (11, 3): 1386.00,# 11 números + 3 trevos
-        (11, 4): 2772.00,# 11 números + 4 trevos
-        (11, 5): 4620.00,# 11 números + 5 trevos
-        (11, 6): 6930.00,# 11 números + 6 trevos
-        (12, 2): 792.00, # 12 números + 2 trevos
-        (12, 3): 2376.00,# 12 números + 3 trevos
-        (12, 4): 4752.00,# 12 números + 4 trevos
-        (12, 5): 7920.00,# 12 números + 5 trevos
-        (12, 6): 11880.00,# 12 números + 6 trevos
+        6: 5.00,    # 6 números
+        7: 35.00,   # 7 números
+        8: 140.00,  # 8 números
+        9: 420.00,  # 9 números
+        10: 1050.00, # 10 números
+        11: 2310.00, # 11 números
+        12: 4620.00, # 12 números
+        13: 8580.00, # 13 números
+        14: 15015.00, # 14 números
+        15: 25025.00, # 15 números
     }
     
-    return tabela_valores.get((qtde_numeros, qtde_trevos), 0.0)
+    return tabela_valores.get(qtde_numeros, 0.0)
 
 # Função auxiliar para limpar NaN de dicionários aninhados (útil para resultados de análise avançada)
 def limpar_nan_do_dict(d):
@@ -242,10 +192,10 @@ if __name__ == '__main__':
     # Exemplo de como usar a função com um cache simulado para testes
     print("Testando geracao_inteligente.py diretamente...")
     
-    # Simula um cache de análise mínimo
+    # Simula um cache de análise mínimo para Mega Sena
     simulated_cache = {
         'frequencia_completa': {
-            'frequencia_numeros': {1: 100, 2: 95, 3: 90, 4: 85, 5: 80, 6: 10, 7: 15, 8: 20, 9: 25, 10: 30, 48: 70, 49: 65, 50: 60}
+            'frequencia_numeros': {1: 100, 2: 95, 3: 90, 4: 85, 5: 80, 6: 10, 7: 15, 8: 20, 9: 25, 10: 30, 55: 70, 58: 65, 60: 60}
         },
         'frequencia_25': {
             'frequencia_numeros': {1: 20, 2: 18, 3: 15, 4: 5, 5: 3, 6: 2}
@@ -256,18 +206,19 @@ if __name__ == '__main__':
         },
         'avancada': {
             'clusters': {
-                'detalhes_clusters': {
-                    'cluster-0': {'numeros': [1, 2, 3, 4, 5]},
-                    'cluster-1': {'numeros': [45, 46, 47, 48, 49, 50]}
+                'resumo_clusters': {
+                    'cluster_0': {
+                        'todos_numeros_do_cluster': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                    },
+                    'cluster_1': {
+                        'todos_numeros_do_cluster': [51, 52, 53, 54, 55, 56, 57, 58, 59, 60]
+                    }
                 }
             }
-        },
-        'trevos_completa': {
-            'frequencia_trevos': {1: 50, 2: 45, 3: 40, 4: 10, 5: 5, 6: 2}
         }
     }
 
-    # Simula algumas preferências do usuário
+    # Simula algumas preferências do usuário para Mega Sena
     user_prefs_exemplo = {
         'frequencia': {
             'priorizarQuentes': True,
@@ -278,8 +229,8 @@ if __name__ == '__main__':
             'priorizarParesImpares': True,
             'paridadeDesejada': 'equilibrado',
             'priorizarSoma': True,
-            'somaMin': 100,
-            'somaMax': 180
+            'somaMin': 150,
+            'somaMax': 250
         },
         'padroes': {
             'evitarConsecutivos': True,
@@ -287,23 +238,18 @@ if __name__ == '__main__':
             'minAtraso': 30,
             'evitarRepeticoesSeguidas': True
         },
-        'clusters': ['cluster-0'],
-        'trevos': {
-            'priorizarQuentesTrevos': True,
-            'qtdeQuentesTrevos': 2
-        },
+        'clusters': ['cluster_0'],
         'qtdeNumerosAposta': 6,
-        'qtdeTrevosAposta': 2,
         'numApostasGerar': 3
     }
 
     apostas_geradas = gerar_aposta_inteligente(user_prefs_exemplo, simulated_cache)
     print("\nApostas geradas:")
     for i, aposta in enumerate(apostas_geradas):
-        print(f"Aposta {i+1}: Números: {aposta['numeros']}, Trevos: {aposta['trevos']}, Valor: R$ {aposta['valor_estimado']:.2f}")
+        print(f"Aposta {i+1}: Números: {aposta['numeros']}, Valor: R$ {aposta['valor_estimado']:.2f}")
 
     # Teste com preferências vazias (comportamento aleatório)
     print("\nTestando com preferências vazias (deve ser mais aleatório):")
     apostas_aleatorias = gerar_aposta_inteligente({}, simulated_cache)
     for i, aposta in enumerate(apostas_aleatorias):
-        print(f"Aposta {i+1}: Números: {aposta['numeros']}, Trevos: {aposta['trevos']}, Valor: R$ {aposta['valor_estimado']:.2f}") 
+        print(f"Aposta {i+1}: Números: {aposta['numeros']}, Valor: R$ {aposta['valor_estimado']:.2f}") 

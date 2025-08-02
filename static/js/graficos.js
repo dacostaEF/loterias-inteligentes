@@ -382,6 +382,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 userPremiumPreferences.seca[prefName] = value;
             }
             
+            // SALVAR NO LOCALSTORAGE (COMO A MEGA SENA FAZ)
+            const dadosAnalise = {
+                tipo: prefType,
+                nome: prefName,
+                valor: value,
+                periodo: period || 'completa'
+            };
+            armazenarAnalise(prefType, dadosAnalise);
+            
             console.log('🔍 DEBUG - Preferências salvas:', {
                 prefType: prefType,
                 prefName: prefName,
@@ -403,6 +412,16 @@ document.addEventListener('DOMContentLoaded', function() {
             if (prefType === 'frequencia') {
                 userPremiumPreferences.frequencia[prefName] = value;
             }
+            
+            // SALVAR NO LOCALSTORAGE (COMO A MEGA SENA FAZ)
+            const dadosAnalise = {
+                tipo: prefType,
+                nome: prefName,
+                valor: value,
+                periodo: 'completa'
+            };
+            armazenarAnalise(prefType, dadosAnalise);
+            
             savePremiumPreferences();
         }
     });
@@ -1034,6 +1053,33 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// --- FUNÇÕES PARA SALVAR E RECUPERAR ANÁLISES ---
+// =================================================
+
+// Função para armazenar análises no localStorage (Milionária)
+function armazenarAnalise(tipo, dados) {
+    try {
+        const existentes = JSON.parse(localStorage.getItem("analisesSelecionadas_MIL")) || {};
+        existentes[tipo] = dados;
+        localStorage.setItem("analisesSelecionadas_MIL", JSON.stringify(existentes));
+        console.log(`✅ Análise ${tipo} armazenada no localStorage:`, dados);
+    } catch (error) {
+        console.error(`❌ Erro ao armazenar análise ${tipo}:`, error);
+    }
+}
+
+// Função para recuperar análises do localStorage (Milionária)
+function recuperarAnalises() {
+    try {
+        const dados = JSON.parse(localStorage.getItem("analisesSelecionadas_MIL")) || {};
+        console.log("📊 Análises recuperadas do localStorage (Milionária):", dados);
+        return dados;
+    } catch (error) {
+        console.error("❌ Erro ao recuperar análises (Milionária):", error);
+        return {};
+    }
+}
+
 // --- MODAL PREMIUM - FUNÇÕES E EVENT LISTENERS ---
 // ================================================
 
@@ -1052,8 +1098,58 @@ const listaApostasGeradasDiv = document.getElementById('lista-apostas-geradas');
 // Event listeners do modal premium
 if (abrirModalPremiumBtn) {
     abrirModalPremiumBtn.addEventListener('click', () => {
+        console.log("🎯 Botão abrir modal premium clicado (Milionária)!");
         modalPremium.classList.remove('hidden');
         resultadoSugestaoDiv.classList.add('hidden'); // Esconde o resultado ao abrir
+
+        // Recuperar dados das análises do localStorage
+        const analisesRecuperadas = recuperarAnalises();
+        console.log("📊 Análises recuperadas do localStorage (Milionária):", analisesRecuperadas);
+
+        // Atualizar as preferências com os dados das análises
+        if (analisesRecuperadas.frequencia) {
+            userPremiumPreferences.frequencia = {
+                ...userPremiumPreferences.frequencia,
+                ...analisesRecuperadas.frequencia
+            };
+        }
+        if (analisesRecuperadas.distribuicao) {
+            userPremiumPreferences.distribuicao = {
+                ...userPremiumPreferences.distribuicao,
+                ...analisesRecuperadas.distribuicao
+            };
+        }
+        if (analisesRecuperadas.afinidades) {
+            userPremiumPreferences.afinidades = {
+                ...userPremiumPreferences.afinidades,
+                ...analisesRecuperadas.afinidades
+            };
+        }
+        if (analisesRecuperadas.padroes) {
+            userPremiumPreferences.padroes = {
+                ...userPremiumPreferences.padroes,
+                ...analisesRecuperadas.padroes
+            };
+        }
+        if (analisesRecuperadas.seca) {
+            userPremiumPreferences.seca = {
+                ...userPremiumPreferences.seca,
+                ...analisesRecuperadas.seca
+            };
+        }
+        if (analisesRecuperadas.trevos) {
+            userPremiumPreferences.trevos = {
+                ...userPremiumPreferences.trevos,
+                ...analisesRecuperadas.trevos
+            };
+        }
+        if (analisesRecuperadas.estatisticas) {
+            // Não sobrescrever clusters - manter como array
+            console.log("📊 Dados de estatísticas avançadas disponíveis, mas clusters mantidos como array");
+        }
+
+        // Salvar as preferências atualizadas
+        savePremiumPreferences();
 
         // Carregar e exibir as preferências atuais
         renderPremiumPreferencesSummary();
