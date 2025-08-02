@@ -47,6 +47,26 @@
         onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}"></noscript>
   <style>
+    /* Moldura Neon Lilás - Desktop */
+    html::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      box-shadow: inset 0 0 0 4px #B96AFF, 0 0 15px #B96AFF, 0 0 30px #B96AFF;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    /* Moldura Neon Lilás - Mobile (mais fina) */
+    @media (max-width: 768px) {
+      html::before {
+        box-shadow: inset 0 0 0 2px #B96AFF, 0 0 8px #B96AFF, 0 0 15px #B96AFF;
+      }
+    }
+
     body {
       margin: 0;
       padding: 0;
