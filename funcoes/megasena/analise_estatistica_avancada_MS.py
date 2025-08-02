@@ -59,7 +59,7 @@ class AnaliseEstatisticaAvancada:
         """
         self.df = df_milionaria
         self.colunas_bolas = ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']
-        self.colunas_trevos = ['Trevo1', 'Trevo2']
+        # Mega Sena não tem trevos
         self._preparar_dados()
     
     def _preparar_dados(self):
@@ -68,23 +68,19 @@ class AnaliseEstatisticaAvancada:
             logger.error("DataFrame vazio ou None")
             return
         
-        # Limpar e validar dados
-        self.df_limpo = self.df.dropna(subset=self.colunas_bolas + self.colunas_trevos).copy()
+        # Limpar e validar dados (Mega Sena: apenas números, sem trevos)
+        self.df_limpo = self.df.dropna(subset=self.colunas_bolas).copy()
         
         # Converter para numérico
-        for col in self.colunas_bolas + self.colunas_trevos:
+        for col in self.colunas_bolas:
             self.df_limpo[col] = pd.to_numeric(self.df_limpo[col], errors='coerce').astype('Int64')
         
-        # Filtrar dados válidos
+        # Filtrar dados válidos (Mega Sena: apenas números 1-60, sem trevos)
         mask_bolas = self.df_limpo[self.colunas_bolas].notna().all(axis=1) & \
                     (self.df_limpo[self.colunas_bolas] >= 1).all(axis=1) & \
-                    (self.df_limpo[self.colunas_bolas] <= 50).all(axis=1)
+                    (self.df_limpo[self.colunas_bolas] <= 60).all(axis=1)
         
-        mask_trevos = self.df_limpo[self.colunas_trevos].notna().all(axis=1) & \
-                     (self.df_limpo[self.colunas_trevos] >= 1).all(axis=1) & \
-                     (self.df_limpo[self.colunas_trevos] <= 6).all(axis=1)
-        
-        self.df_validos = self.df_limpo[mask_bolas & mask_trevos]
+        self.df_validos = self.df_limpo[mask_bolas]
         
         if self.df_validos.empty:
             logger.error("Nenhum dado válido encontrado após limpeza")
@@ -126,8 +122,8 @@ class AnaliseEstatisticaAvancada:
         # Calcular frequência de cada número
         frequencia_numeros = Counter(todos_numeros)
         
-        # Garantir que todos os números de 1 a 50 tenham uma frequência (mesmo que 0)
-        for numero in range(1, 51):
+        # Garantir que todos os números de 1 a 60 tenham uma frequência (mesmo que 0)
+        for numero in range(1, 61):
             if numero not in frequencia_numeros:
                 frequencia_numeros[numero] = 0
         
@@ -241,11 +237,11 @@ class AnaliseEstatisticaAvancada:
                     'aleatorio_paridade': True
                 }
             }
-        frequencia_esperada = total_sorteios / 50  # 50 números possíveis
+        frequencia_esperada = total_sorteios / 60  # 60 números possíveis
         
         # Preparar dados para chi-quadrado
-        obs = [frequencia_observada.get(i, 0) for i in range(1, 51)]
-        esp = [frequencia_esperada] * 50
+        obs = [frequencia_observada.get(i, 0) for i in range(1, 61)]
+        esp = [frequencia_esperada] * 60
         
         chi2, p_value, dof, expected = chi2_contingency([obs, esp])
         
@@ -334,7 +330,7 @@ class AnaliseEstatisticaAvancada:
         caracteristicas = []
         numeros_analisados = []
         
-        for numero in range(1, 51):
+        for numero in range(1, 61):
             # Características básicas do número
             freq_total = 0
             freq_recente = 0
@@ -388,11 +384,11 @@ class AnaliseEstatisticaAvancada:
         if len(self.df_validos) < n_clusters:
             # Se não há dados suficientes, retornar clusters simples
             return {
-                'clusters': {'cluster_0': list(range(1, 51))},
+                'clusters': {'cluster_0': list(range(1, 61))},
                 'estatisticas_clusters': {
                     'cluster_0': {
-                        'numeros': list(range(1, 51)),
-                        'quantidade': 50,
+                        'numeros': list(range(1, 61)),
+                        'quantidade': 60,
                         'frequencia_media': 0.0,
                         'frequencia_recente_media': 0.0,
                         'ultima_aparicao_media': 0.0,
@@ -638,12 +634,12 @@ class AnaliseEstatisticaAvancada:
         else:
             df_amostra = self.df_validos
         
-        matriz_presenca = np.zeros((len(df_amostra), 50))
+        matriz_presenca = np.zeros((len(df_amostra), 60))
         
         for pos, (idx, row) in enumerate(df_amostra.iterrows()):
             numeros_concurso = [row[col] for col in self.colunas_bolas if pd.notna(row[col])]
             for numero in numeros_concurso:
-                if 1 <= numero <= 50:
+                if 1 <= numero <= 60:
                     matriz_presenca[pos, numero - 1] = 1
         
         # Verificar se há dados suficientes para correlação
@@ -663,13 +659,13 @@ class AnaliseEstatisticaAvancada:
             # Verificar se há dados suficientes na matriz
             soma_por_numero = np.sum(matriz_presenca, axis=0)
             numeros_com_dados = np.sum(soma_por_numero > 0)
-            logger.info(f"📊 Números com dados: {numeros_com_dados}/50")
+            logger.info(f"📊 Números com dados: {numeros_com_dados}/60")
             logger.info(f"📊 Soma total de presenças: {np.sum(soma_por_numero)}")
             
             # Verificar se há variância suficiente para correlação
             variancias = np.var(matriz_presenca, axis=0)
             numeros_com_variancia = np.sum(variancias > 0)
-            logger.info(f"📊 Números com variância > 0: {numeros_com_variancia}/50")
+            logger.info(f"📊 Números com variância > 0: {numeros_com_variancia}/60")
             
             if numeros_com_variancia < 2:
                 logger.warning("⚠️ Variância insuficiente para calcular correlação")
@@ -709,7 +705,7 @@ class AnaliseEstatisticaAvancada:
                 }
             
             # Verificar se a matriz tem o tamanho esperado
-            if matriz_correlacao.shape != (50, 50):
+            if matriz_correlacao.shape != (60, 60):
                 logger.error(f"❌ Matriz de correlação com tamanho inesperado: {matriz_correlacao.shape}")
                 return {
                     'matriz_correlacao': [],
@@ -741,8 +737,8 @@ class AnaliseEstatisticaAvancada:
                 logger.info(f"🔧 Usando estratégia otimizada para {len(self.df_validos)} concursos")
                 # Processar apenas uma amostra dos pares para muitos concursos
                 pares_amostra = []
-                for i in range(0, 50, 2):  # Pular de 2 em 2
-                    for j in range(i + 2, 50, 2):  # Pular de 2 em 2
+                for i in range(0, 60, 2):  # Pular de 2 em 2
+                    for j in range(i + 2, 60, 2):  # Pular de 2 em 2
                         contador_pares += 1
                         if i < matriz_correlacao.shape[0] and j < matriz_correlacao.shape[1]:
                             correlacao = matriz_correlacao[i, j]
@@ -754,8 +750,8 @@ class AnaliseEstatisticaAvancada:
                 logger.info(f"📊 Processados {contador_pares} pares da amostra")
             else:
                 # Processar todos os pares para poucos concursos
-                for i in range(50):
-                    for j in range(i + 1, 50):
+                for i in range(60):
+                    for j in range(i + 1, 60):
                         contador_pares += 1
                         
                         # Log a cada 100 pares para monitorar progresso
@@ -818,7 +814,7 @@ class AnaliseEstatisticaAvancada:
         
         # Calcular correlação média de forma segura
         try:
-            triu_indices = np.triu_indices(50, k=1)
+            triu_indices = np.triu_indices(60, k=1)
             if triu_indices[0].size > 0 and triu_indices[0].max() < matriz_correlacao.shape[0] and triu_indices[1].max() < matriz_correlacao.shape[1]:
                 correlacao_media = float(np.mean(np.abs(matriz_correlacao[triu_indices])))
             else:
@@ -870,8 +866,8 @@ class AnaliseEstatisticaAvancada:
         contagem_numeros = Counter()
         contagem_pares = Counter()
         
-        # Garantir que todos os números de 1 a 50 tenham uma contagem (mesmo que 0)
-        for numero in range(1, 51):
+        # Garantir que todos os números de 1 a 60 tenham uma contagem (mesmo que 0)
+        for numero in range(1, 61):
             contagem_numeros[numero] = 0
         
         for _, row in self.df_validos.iterrows():
@@ -898,11 +894,11 @@ class AnaliseEstatisticaAvancada:
         probabilidades = {}
         
         # Calcular probabilidades condicionais
-        for numero1 in range(1, 51):
+        for numero1 in range(1, 61):
             prob_numero1 = contagem_numeros[numero1] / total_concursos
             condicionais = {}
             
-            for numero2 in range(1, 51):
+            for numero2 in range(1, 61):
                 if numero1 != numero2:
                     # Probabilidade conjunta
                     par = tuple(sorted([numero1, numero2]))
@@ -936,8 +932,8 @@ class AnaliseEstatisticaAvancada:
         dependencias = []
         pares_ja_processados = set()  # Para evitar duplicatas
         
-        for num1 in range(1, 51):
-            for num2 in range(1, 51):
+        for num1 in range(1, 61):
+            for num2 in range(1, 61):
                 if num1 != num2:
                     # Criar chave única para o par (sempre menor primeiro)
                     par_key = tuple(sorted([num1, num2]))
@@ -971,7 +967,7 @@ class AnaliseEstatisticaAvancada:
 
     def calcular_distribuicao_frequencia_numeros(self, df_filtrado):
         """
-        Calcula a frequência de cada número principal (1-50) em um DataFrame filtrado.
+        Calcula a frequência de cada número principal (1-60) em um DataFrame filtrado.
         Retorna uma lista de dicionários com {numero: frequencia}.
         
         Args:
@@ -991,9 +987,9 @@ class AnaliseEstatisticaAvancada:
             # Conta a frequência de cada número
             contagem_numeros = Counter(todos_numeros)
             
-            # Garante que todos os números de 1 a 50 estejam presentes, mesmo com frequência 0
+            # Garante que todos os números de 1 a 60 estejam presentes, mesmo com frequência 0
             distribuicao = []
-            for num in range(1, 51):  # Números de 1 a 50
+            for num in range(1, 61):  # Números de 1 a 60
                 distribuicao.append({
                     'numero': num, 
                     'frequencia': contagem_numeros.get(num, 0)

@@ -1759,7 +1759,7 @@
         const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
         const yFreqAbs = data.frequencia_absoluta_numeros.map(e => e.frequencia);
         const yFreqRelComb = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperadaComb = Array(50).fill(2); // Linha de referência 2%
+        const linhaEsperadaComb = Array(60).fill(2); // Linha de referência 2%
         
         // Detectar se é smartphone para ajustar tamanho da fonte
         const isMobile = window.innerWidth <= 640;
@@ -2065,7 +2065,7 @@
         const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
         const yFreqAbs = data.frequencia_absoluta_numeros.map(e => e.frequencia);
         const yFreqRelComb = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperadaComb = Array(50).fill(2); // Linha de referência 2%
+        const linhaEsperadaComb = Array(60).fill(2); // Linha de referência 2%
         
         // Detectar se é smartphone para ajustar tamanho da fonte
         const isMobile = window.innerWidth <= 640;
@@ -2125,6 +2125,10 @@
             tickangle: 45, // Incline os rótulos em 45 graus
             tickfont: { size: 8 }, // Diminua o tamanho da fonte dos rótulos para que caibam melhor
             // showgrid: false // Remover grade vertical para menos poluição visual se não for essencial
+            range: [0, 61], // Força o range de 1-60
+            tickmode: 'linear',
+            tick0: 1,
+            dtick: 5
           },
           yaxis: { 
             automargin: true,
@@ -3722,7 +3726,7 @@
 
       try {
         // Construir URL com parâmetro de concursos se fornecido
-        let url = '/api/estatisticas_avancadas';
+        let url = '/api/estatisticas_avancadas_MS';
         if (qtdConcursos) {
           url += `?qtd_concursos=${qtdConcursos}`;
         }
@@ -4364,7 +4368,7 @@
       // 2. Aplicar a ordenação
       if (ordenacao === 'frequencia') {
         distribuicaoParaPlotar.sort((a, b) => b.frequencia - a.frequencia); // Do maior para o menor
-      } else { // 'numerica' ou qualquer outro valor, mantém a ordem original (1 a 50)
+      } else { // 'numerica' ou qualquer outro valor, mantém a ordem original (1 a 60)
         distribuicaoParaPlotar.sort((a, b) => a.numero - b.numero);
       }
 
@@ -4437,12 +4441,14 @@
         },
         xaxis: {
           title: { text: 'Número', font: { color: 'white' } },
-          // *** MUDANÇA ESSENCIAL AQUI: DEFINIR O TIPO DO EIXO COMO 'category' ***
-          type: 'category', // Força o Plotly a tratar 'x' como categorias ordenadas
           gridcolor: '#2E303A',
           tickfont: { color: 'white', size: 10 },
           linecolor: '#2E303A',
-          automargin: true // Ajuda a evitar cortes de labels quando há muitos ticks
+          automargin: true, // Ajuda a evitar cortes de labels quando há muitos ticks
+          range: [0, 61], // Força o range de 1-60
+          tickmode: 'linear',
+          tick0: 1,
+          dtick: 5
         },
         yaxis: { 
           title: 'Frequência',
