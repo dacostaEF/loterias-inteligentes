@@ -53,13 +53,13 @@ def testar_carregamento_megasena():
 
 def testar_funcao_carregamento_megasena():
     """Testa a função específica de carregamento da Mega Sena"""
-    print("\n🔍 Testando função de carregamento Mega Sena (limitado a 500)...")
+    print("\n🔍 Testando função de carregamento Mega Sena...")
     
     start_time = time.time()
     
     try:
         from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
-        df = carregar_dados_megasena(limite_concursos=500)
+        df = carregar_dados_megasena()
         print(f"✅ Função executada em {time.time() - start_time:.2f}s")
         print(f"   - Linhas: {len(df)}")
         print(f"   - Colunas: {df.columns.tolist()}")

@@ -479,6 +479,124 @@ def extrair_features_simplificadas(concurso_atual, concurso_anterior):
     
     return features
 
+def calcular_seca_numeros_megasena(df_megasena, qtd_concursos=None):
+    """
+    Calcula o período de "seca" de cada número da Mega Sena (quantos concursos não saiu).
+    
+    Args:
+        df_megasena (pd.DataFrame): DataFrame com os dados dos sorteios da Mega Sena
+        qtd_concursos (int, optional): Quantidade de últimos concursos a analisar.
+                                      Se None, analisa todos os concursos.
+    
+    Returns:
+        dict: Dicionário com informações sobre a seca de cada número
+    """
+    if df_megasena is None or df_megasena.empty:
+        logger.error("DataFrame da Mega Sena está vazio ou None")
+        return {}
+    
+    # Verificar colunas necessárias
+    colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']
+    colunas_faltantes = [col for col in colunas_necessarias if col not in df_megasena.columns]
+    
+    if colunas_faltantes:
+        logger.error(f"Colunas necessárias não encontradas: {colunas_faltantes}")
+        return {}
+    
+    # Filtrar por quantidade de concursos se especificado
+    if qtd_concursos is not None and qtd_concursos > 0:
+        df = df_megasena.tail(qtd_concursos).copy()
+        logger.info(f"Analisando seca da Mega Sena nos últimos {qtd_concursos} concursos")
+    else:
+        df = df_megasena.copy()
+    
+    # Limpar e validar dados
+    df = df.dropna(subset=['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6'])
+    
+    if df.empty:
+        logger.warning("Nenhum dado válido encontrado após limpeza")
+        return {}
+    
+    # Converter para numérico
+    colunas_bolas = ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']
+    for col in colunas_bolas:
+        df[col] = pd.to_numeric(df[col], errors='coerce').astype('Int64')
+    
+    # Filtrar apenas dados válidos (Mega Sena: 1-60)
+    mask_bolas = df[colunas_bolas].notna().all(axis=1) & (df[colunas_bolas] >= 1).all(axis=1) & (df[colunas_bolas] <= 60).all(axis=1)
+    df_validos = df[mask_bolas]
+    
+    if df_validos.empty:
+        logger.warning("Nenhum concurso válido encontrado para análise de seca da Mega Sena")
+        return {}
+    
+    # Ordenar por concurso (mais recente primeiro)
+    df_validos = df_validos.sort_values('Concurso', ascending=False).reset_index(drop=True)
+    
+    # Inicializar dicionário para armazenar a seca de cada número
+    seca_numeros = {}
+    ultima_aparicao = {}
+    
+    # Para cada número de 1 a 60, calcular a seca atual (Mega Sena)
+    for numero in range(1, 61):
+        seca_atual = 0
+        encontrou = False
+        
+        # Procurar a última aparição do número
+        for idx, row in df_validos.iterrows():
+            bolas_concurso = [row[col] for col in colunas_bolas if pd.notna(row[col]) and 1 <= row[col] <= 60]
+            
+            if numero in bolas_concurso:
+                ultima_aparicao[numero] = row['Concurso']
+                encontrou = True
+                break
+            else:
+                seca_atual += 1
+        
+        # Se o número nunca apareceu no período analisado
+        if not encontrou:
+            seca_atual = len(df_validos)
+            ultima_aparicao[numero] = None
+        
+        seca_numeros[numero] = {
+            'seca_atual': seca_atual,
+            'ultima_aparicao': ultima_aparicao[numero],
+            'status': 'em_seca' if seca_atual > 0 else 'saiu_ultimo'
+        }
+    
+    # Calcular estatísticas da seca
+    secas_ordenadas = sorted(seca_numeros.items(), key=lambda x: x[1]['seca_atual'], reverse=True)
+    
+    # Números em maior seca
+    numeros_maior_seca = secas_ordenadas[:10]
+    
+    # Números que saíram recentemente
+    numeros_recentes = [num for num, info in seca_numeros.items() if info['seca_atual'] <= 3]
+    
+    # Estatísticas gerais
+    seca_media = np.mean([info['seca_atual'] for info in seca_numeros.values()])
+    seca_mediana = np.median([info['seca_atual'] for info in seca_numeros.values()])
+    seca_maxima = max([info['seca_atual'] for info in seca_numeros.values()])
+    
+    resultado = {
+        'seca_por_numero': seca_numeros,
+        'numeros_maior_seca': numeros_maior_seca,
+        'numeros_recentes': numeros_recentes,
+        'estatisticas': {
+            'seca_media': seca_media,
+            'seca_mediana': seca_mediana,
+            'seca_maxima': seca_maxima,
+            'total_concursos_analisados': len(df_validos)
+        },
+        'periodo_analisado': {
+            'total_concursos': len(df_megasena),
+            'concursos_analisados': len(df_validos),
+            'qtd_concursos_especificada': qtd_concursos
+        }
+    }
+    
+    return resultado
+
 # Exemplo de uso
 if __name__ == "__main__":
     try:

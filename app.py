@@ -30,6 +30,7 @@ from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise
 
 # As funções de 'calculos.py' e a classe 'AnaliseEstatisticaAvancada' de 'analise_estatistica_avancada.py'
 from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
+from funcoes.megasena.calculos_MS import calcular_seca_numeros_megasena
 from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
 
 # --- Importações para Mega Sena ---
@@ -404,6 +405,42 @@ def get_analise_seca():
 
     except Exception as e:
         print(f"Erro na API de seca: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
+
+
+@app.route('/api/analise_seca_MS', methods=['GET'])
+def get_analise_seca_megasena():
+    """Retorna os dados da análise de seca dos números da Mega Sena."""
+    try:
+        print("🔍 API de seca da Mega Sena chamada!")
+        
+        if df_megasena is None or df_megasena.empty:
+            print("❌ Dados da Mega Sena não carregados")
+            return jsonify({'error': 'Dados da Mega Sena não carregados.'}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        print(f"📈 Análise de Seca Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
+        print(f"📊 DataFrame disponível: {len(df_megasena)} concursos")
+
+        # Executar análise de seca
+        print("⚡ Executando análise de seca da Mega Sena...")
+        resultado = calcular_seca_numeros_megasena(df_megasena, qtd_concursos)
+        
+        print("✅ Análise de seca concluída!")
+        print(f"📊 Resultados obtidos:")
+        print(f"   - Números em seca: {'✅' if resultado.get('seca_por_numero') else '❌'}")
+        print(f"   - Média de seca: {'✅' if resultado.get('estatisticas', {}).get('seca_media') else '❌'}")
+        print(f"   - Máxima seca: {'✅' if resultado.get('estatisticas', {}).get('seca_maxima') else '❌'}")
+
+        # Retornar no formato esperado pelo frontend
+        return jsonify({
+            "numeros_seca": resultado
+        })
+
+    except Exception as e:
+        print(f"❌ Erro na API de seca da Mega Sena: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Erro interno: {str(e)}"}), 500

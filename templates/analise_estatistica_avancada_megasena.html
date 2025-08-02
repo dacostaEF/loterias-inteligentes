@@ -3421,7 +3421,7 @@
       container.innerHTML = `<p class="text-center text-gray-400">🔄 Carregando análise de seca...</p>`;
       
         try {
-          let url = '/api/analise_seca';
+          let url = '/api/analise_seca_MS';
           if (qtdConcursos !== null && qtdConcursos !== '') {
             url += `?qtd_concursos=${qtdConcursos}`;
           }
@@ -3435,9 +3435,8 @@
         }
         
         const numerosSeca = data.numeros_seca;
-        const trevosSeca = data.trevos_seca;
         
-        if (!numerosSeca || !trevosSeca) {
+        if (!numerosSeca) {
           container.innerHTML = `<p class="text-red-500 text-center">Dados de seca incompletos ou não encontrados.</p>`;
           return;
         }
@@ -3451,13 +3450,7 @@
           ? numerosSeca.numeros_recentes.slice(0, 3).join(', ')
           : 'N/A';
         
-        const maiorSecaTrevos = trevosSeca.trevos_maior_seca && trevosSeca.trevos_maior_seca.length > 0
-          ? `${trevosSeca.trevos_maior_seca[0][0]} (${trevosSeca.trevos_maior_seca[0][1].seca_atual} concursos)`
-          : 'N/A';
-        
-        const recentesTrevos = trevosSeca.trevos_recentes && trevosSeca.trevos_recentes.length > 0
-          ? trevosSeca.trevos_recentes.slice(0, 3).join(', ')
-          : 'N/A';
+
         
         // Criar HTML completo para o modal genérico
         container.innerHTML = `
@@ -3498,11 +3491,11 @@
               </button>
             </div>
 
-            <!-- Números e Trevos -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Números da Mega Sena -->
+            <div class="grid grid-cols-1 gap-6">
               <!-- Números -->
               <div class="bg-gray-800 p-4 rounded-lg shadow">
-                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Números Principais (1-50)</h3>
+                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Números da Mega Sena (1-60)</h3>
                 <div class="text-gray-300 mb-4">
                   <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaNumeros}</span></p>
                   <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesNumeros}</span></p>
@@ -3518,30 +3511,14 @@
                 <div id="graficoSecaNumeros" class="w-full h-80 bg-gray-700 rounded"></div>
               </div>
 
-              <!-- Trevos -->
-              <div class="bg-gray-800 p-4 rounded-lg shadow">
-                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Trevos da Sorte (1-6)</h3>
-                <div class="text-gray-300 mb-4">
-                  <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaTrevos}</span></p>
-                  <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesTrevos}</span></p>
-                  <div class="mb-2">
-                    <strong>Estatísticas:</strong>
-                    <ul class="list-disc list-inside ml-4 text-sm">
-                      <li>Média de seca: ${trevosSeca.estatisticas?.seca_media || 'N/A'} concursos</li>
-                      <li>Maior seca: ${trevosSeca.estatisticas?.seca_maxima || 'N/A'} concursos</li>
-                      <li>Menor seca: ${trevosSeca.estatisticas?.seca_mediana || 'N/A'} concursos</li>
-                    </ul>
-                  </div>
-                </div>
-                <div id="graficoSecaTrevos" class="w-full h-80 bg-gray-700 rounded"></div>
-              </div>
+
             </div>
 
             <!-- Interpretação -->
             <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#8B5CF6]">
               <h3 class="text-xl font-semibold text-[#8B5CF6] mb-2">Interpretação dos Gráficos de Seca 📊</h3>
               <ul class="list-disc list-inside text-gray-300 ml-4">
-                <li><strong>Eixo X:</strong> Números (1-50) ou trevos (1-6).</li>
+                <li><strong>Eixo X:</strong> Números da Mega Sena (1-60).</li>
                 <li><strong>Eixo Y:</strong> Concursos em que estão sem sair.</li>
                 <li><strong>Barras altas:</strong> Maior tempo de seca.</li>
                 <li><strong>Barras baixas:</strong> Sorteados recentemente.</li>
@@ -3594,7 +3571,6 @@
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
           plotGraficoSecaNumeros(numerosSeca);
-          plotGraficoSecaTrevos(trevosSeca);
         }, 100);
         
       } catch (error) {
@@ -3649,8 +3625,19 @@
       
       // Converter seca_por_numero em arrays para o gráfico
       const secaPorNumero = numerosSeca.seca_por_numero;
-      const labels = Object.keys(secaPorNumero).map(num => parseInt(num)).sort((a, b) => a - b);
-      const valores = labels.map(num => secaPorNumero[num].seca_atual);
+      
+      // Garantir que todos os números de 1-60 estejam presentes
+      const labels = [];
+      const valores = [];
+      
+      for (let i = 1; i <= 60; i++) {
+        labels.push(i);
+        if (secaPorNumero[i]) {
+          valores.push(secaPorNumero[i].seca_atual);
+        } else {
+          valores.push(0); // Se não encontrado, assume seca 0
+        }
+      }
       
       // Cores baseadas na seca (vermelho para maior seca, verde para menor)
       const cores = valores.map(valor => {
@@ -3689,7 +3676,7 @@
       
       const layout = {
         title: {
-          text: '🌵 Seca dos Números Principais (1-50)',
+          text: '🌵 Seca dos Números da Mega Sena (1-60)',
           font: { size: 18, color: 'white' }
         },
         xaxis: { 
@@ -3698,7 +3685,8 @@
           tickfont: { color: 'white', size: 12 },
           tickmode: 'linear',
           tick0: 1,
-          dtick: 5
+          dtick: 5,
+          range: [0, 61]  // Força o range de 1-60
         },
         yaxis: { 
           title: 'Concursos em Seca',
@@ -3726,88 +3714,7 @@
       });
     }
     
-    // Função para criar gráfico de seca dos trevos
-    function plotGraficoSecaTrevos(trevosSeca) {
-      if (!trevosSeca || !trevosSeca.seca_por_trevo) {
-        console.error('Dados de seca dos trevos não disponíveis');
-        return;
-      }
-      
-      // Converter seca_por_trevo em arrays para o gráfico
-      const secaPorTrevo = trevosSeca.seca_por_trevo;
-      const labels = Object.keys(secaPorTrevo).map(trevo => `🍀 ${trevo}`);
-      const valores = Object.keys(secaPorTrevo).map(trevo => secaPorTrevo[trevo].seca_atual);
-      
-      // Cores baseadas na seca (vermelho para maior seca, verde para menor)
-      const cores = valores.map(valor => {
-        const maxSeca = Math.max(...valores);
-        const minSeca = Math.min(...valores);
-        const normalized = (valor - minSeca) / (maxSeca - minSeca);
-        
-        if (normalized > 0.8) return '#EF4444'; // Vermelho (maior seca)
-        if (normalized > 0.6) return '#F97316'; // Laranja
-        if (normalized > 0.4) return '#EAB308'; // Amarelo
-        if (normalized > 0.2) return '#22C55E'; // Verde claro
-        return '#00E38C'; // Verde (menor seca)
-      });
-      
-      const data = [{
-        x: labels,
-        y: valores,
-        type: 'bar',
-        marker: {
-          color: cores,
-          opacity: 0.9,
-          line: {
-            color: 'white',
-            width: 2
-          }
-        },
-        text: valores.map(val => `${val} concursos`),
-        textposition: 'auto',
-        textfont: {
-          color: 'white',
-          size: 12,
-          weight: 'bold'
-        },
-        hovertemplate: '<b>%{x}</b><br>Em seca há: %{y} concursos<extra></extra>'
-      }];
-      
-      const layout = {
-        title: {
-          text: '🍀 Seca dos Trevos da Sorte (1-6)',
-          font: { size: 18, color: 'white' }
-        },
-        xaxis: { 
-          title: 'Trevo',
-          titlefont: { color: 'white' },
-          tickfont: { color: 'white', size: 14 }
-        },
-        yaxis: { 
-          title: 'Concursos em Seca',
-          titlefont: { color: 'white' },
-          tickfont: { color: 'white' }
-        },
-        plot_bgcolor: '#1a1a1a',
-        paper_bgcolor: '#1a1a1a',
-        font: { color: 'white' },
-        margin: { l: 80, r: 30, t: 80, b: 80, pad: 5 },
-        annotations: [{
-          text: 'Barras vermelhas = maior seca | Barras verdes = menor seca',
-          showarrow: false,
-          xref: 'paper',
-          yref: 'paper',
-          x: 0.5,
-          y: -0.15,
-          font: { color: 'gray', size: 12 }
-        }]
-      };
-      
-      Plotly.newPlot('graficoSecaTrevos', data, layout, { 
-        displayModeBar: false,
-        responsive: true
-      });
-    }
+
 
     // Carregar análise de estatísticas avançadas
     async function carregarAnaliseEstatisticasAvancadas(container, qtdConcursos = null) {
