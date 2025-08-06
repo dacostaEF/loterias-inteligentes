@@ -255,9 +255,9 @@ def analise_distribuicao_megasena(df_megasena, qtd_concursos=None):
         dict: Dicionário com as análises de distribuição.
     """
     
-    print(f"🔍 DEBUG: Iniciando análise de distribuição Mega Sena")
-    print(f"🔍 DEBUG: Tipo de df_megasena: {type(df_megasena)}")
-    print(f"🔍 DEBUG: Colunas disponíveis: {list(df_megasena.columns)}")
+    # print(f"🔍 DEBUG: Iniciando análise de distribuição Mega Sena")  # DEBUG - COMENTADO
+    # print(f"🔍 DEBUG: Tipo de df_megasena: {type(df_megasena)}")  # DEBUG - COMENTADO
+    # print(f"🔍 DEBUG: Colunas disponíveis: {list(df_megasena.columns)}")  # DEBUG - COMENTADO
     
     # Verificar se as colunas necessárias existem
     colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6']
@@ -286,13 +286,13 @@ def analise_distribuicao_megasena(df_megasena, qtd_concursos=None):
         print("⚠️  Aviso: Nenhum sorteio válido encontrado no DataFrame!")
         return {}
     
-    print(f"🔍 DEBUG: Dados convertidos com sucesso. Total de sorteios: {len(dados_sorteios)}")
-    print(f"🔍 DEBUG: Primeiro sorteio: {dados_sorteios[0] if dados_sorteios else 'N/A'}")
+            # print(f"🔍 DEBUG: Dados convertidos com sucesso. Total de sorteios: {len(dados_sorteios)}")  # DEBUG - COMENTADO
+        # print(f"🔍 DEBUG: Primeiro sorteio: {dados_sorteios[0] if dados_sorteios else 'N/A'}")  # DEBUG - COMENTADO
     
     # Executar análise original com parâmetro de quantidade de concursos
     resultado = analise_de_distribuicao(dados_sorteios, qtd_concursos)
-    print(f"🔍 DEBUG: Análise concluída. Tipo do resultado: {type(resultado)}")
-    print(f"🔍 DEBUG: Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+    # print(f"🔍 DEBUG: Análise concluída. Tipo do resultado: {type(resultado)}")  # DEBUG - COMENTADO
+    # print(f"🔍 DEBUG: Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
     
     return resultado
 

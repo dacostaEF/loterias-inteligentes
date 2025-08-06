@@ -681,9 +681,9 @@ def analise_combinacoes_megasena(df_megasena, qtd_concursos=None):
         dict: Resultado da análise de combinações para Mega Sena
     """
     
-    print(f"🔍 DEBUG: Iniciando análise de combinações Mega Sena")
-    print(f"🔍 DEBUG: Tipo de df_megasena: {type(df_megasena)}")
-    print(f"🔍 DEBUG: Colunas disponíveis: {list(df_megasena.columns)}")
+    # print(f"🔍 DEBUG: Iniciando análise de combinações Mega Sena")  # DEBUG - COMENTADO
+    # print(f"🔍 DEBUG: Tipo de df_megasena: {type(df_megasena)}")  # DEBUG - COMENTADO
+    # print(f"🔍 DEBUG: Colunas disponíveis: {list(df_megasena.columns)}")  # DEBUG - COMENTADO
     
     # Verificação de segurança para dados vazios
     if df_megasena is None:
@@ -726,13 +726,13 @@ def analise_combinacoes_megasena(df_megasena, qtd_concursos=None):
         print("⚠️  Aviso: Nenhum sorteio válido encontrado nos dados!")
         return {}
     
-    print(f"🔍 DEBUG: Dados convertidos com sucesso. Total de sorteios: {len(dados_sorteios)}")
-    print(f"🔍 DEBUG: Primeiro sorteio: {dados_sorteios[0] if dados_sorteios else 'N/A'}")
+            # print(f"🔍 DEBUG: Dados convertidos com sucesso. Total de sorteios: {len(dados_sorteios)}")  # DEBUG - COMENTADO
+        # print(f"🔍 DEBUG: Primeiro sorteio: {dados_sorteios[0] if dados_sorteios else 'N/A'}")  # DEBUG - COMENTADO
     
     # Executar análise específica para Mega Sena com parâmetro de quantidade de concursos
     resultado = analise_de_combinacoes_megasena(dados_sorteios, qtd_concursos)
-    print(f"🔍 DEBUG: Análise concluída. Tipo do resultado: {type(resultado)}")
-    print(f"🔍 DEBUG: Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+    # print(f"🔍 DEBUG: Análise concluída. Tipo do resultado: {type(resultado)}")  # DEBUG - COMENTADO
+    # print(f"🔍 DEBUG: Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
     
     return resultado
 

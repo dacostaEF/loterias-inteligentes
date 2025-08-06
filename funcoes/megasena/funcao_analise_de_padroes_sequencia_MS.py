@@ -167,8 +167,8 @@ def analise_padroes_sequencias(dados_sorteios):
         # Tratamento seguro para divisão por zero
         repeticoes_stats['media_repeticoes_numeros'] = np.mean(repeticoes_numeros) if repeticoes_numeros else 0
         
-        print(f"🎯 DEBUG - Repetições - Total de números que repetem: {len(repeticoes_stats['numeros_que_mais_repetem'])}")
-        print(f"🎯 DEBUG - Repetições - Top 10: {dict(repeticoes_stats['numeros_que_mais_repetem'].most_common(10))}")
+        # print(f"🎯 DEBUG - Repetições - Total de números que repetem: {len(repeticoes_stats['numeros_que_mais_repetem'])}")  # DEBUG - COMENTADO
+        # print(f"🎯 DEBUG - Repetições - Top 10: {dict(repeticoes_stats['numeros_que_mais_repetem'].most_common(10))}")  # DEBUG - COMENTADO
         
         return repeticoes_stats
     
@@ -262,10 +262,10 @@ def analise_padroes_sequencias(dados_sorteios):
     intervalos = analisar_intervalos()
     ciclos = analisar_ciclos()
     
-    print(f"🎯 DEBUG - Consecutivos: {len(consecutivos.get('sequencias_encontradas', []))}")
-    print(f"🎯 DEBUG - Repetições: {len(repeticoes.get('numeros_que_mais_repetem', {}))}")
-    print(f"🎯 DEBUG - Intervalos: {len(intervalos.get('numeros_mais_ausentes', []))}")
-    print(f"🎯 DEBUG - Ciclos: {len(ciclos.get('numeros_ciclos_curtos', {}))}")
+            # print(f"🎯 DEBUG - Consecutivos: {len(consecutivos.get('sequencias_encontradas', []))}")  # DEBUG - COMENTADO
+        # print(f"🎯 DEBUG - Repetições: {len(repeticoes.get('numeros_que_mais_repetem', {}))}")  # DEBUG - COMENTADO
+        # print(f"🎯 DEBUG - Intervalos: {len(intervalos.get('numeros_mais_ausentes', []))}")  # DEBUG - COMENTADO
+        # print(f"🎯 DEBUG - Ciclos: {len(ciclos.get('numeros_ciclos_curtos', {}))}")  # DEBUG - COMENTADO
     
     # Organizar resultado final
     resultado = {
@@ -602,8 +602,8 @@ def analise_padroes_sequencias_megasena(df_megasena, qtd_concursos=None):
     # Executar análise original
     resultado = analise_padroes_sequencias(dados_sorteios)
     
-    print(f"🎯 DEBUG - Resultado da análise: {type(resultado)}")
-    print(f"🎯 DEBUG - Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+            # print(f"🎯 DEBUG - Resultado da análise: {type(resultado)}")  # DEBUG - COMENTADO
+        # print(f"🎯 DEBUG - Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
     
     # Remover dados de trevos do resultado para Mega Sena
     if 'repeticoes_entre_concursos' in resultado:
@@ -616,6 +616,6 @@ def analise_padroes_sequencias_megasena(df_megasena, qtd_concursos=None):
         if 'trevos_intervalos' in resultado['intervalos_de_ausencia']:
             del resultado['intervalos_de_ausencia']['trevos_intervalos']
     
-    print(f"🎯 DEBUG - Resultado final: {list(resultado.keys()) if resultado else 'N/A'}")
+            # print(f"🎯 DEBUG - Resultado final: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
     
     return resultado

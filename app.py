@@ -142,20 +142,20 @@ def get_analise_frequencia_nova():
 def get_analise_frequencia_megasena():
     """Nova rota para análise de frequência da Mega Sena com dados reais dos últimos 50 concursos."""
     try:
-        print("🔍 Iniciando API de frequência Mega Sena...")
+        # print("🔍 Iniciando API de frequência Mega Sena...")  # DEBUG - COMENTADO
         
         # Usar a função da Mega Sena
         from funcoes.megasena.funcao_analise_de_frequencia_MS import analisar_frequencia
         
         # Obter parâmetro de quantidade de concursos (padrão: 50)
         qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
-        print(f"🔍 qtd_concursos: {qtd_concursos}")
+        # print(f"🔍 qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
         
         # Executar análise com dados reais da Mega Sena
-        print("🔍 Chamando analisar_frequencia Mega Sena...")
+        # print("🔍 Chamando analisar_frequencia Mega Sena...")  # DEBUG - COMENTADO
         resultado = analisar_frequencia(df_megasena=df_megasena, qtd_concursos=qtd_concursos)
-        print(f"🔍 Resultado tipo: {type(resultado)}")
-        print(f"🔍 Resultado: {resultado}")
+        # print(f"🔍 Resultado tipo: {type(resultado)}")  # DEBUG - COMENTADO
+        # print(f"🔍 Resultado: {resultado}")  # DEBUG - COMENTADO
         
         if not resultado or resultado == {}:
             print("❌ Resultado vazio ou None")
@@ -196,7 +196,7 @@ def get_analise_padroes_sequencias():
 
     # Verificar se há parâmetro de quantidade de concursos
     qtd_concursos = request.args.get('qtd_concursos', type=int)
-    print(f"🎯 Padrões/Sequências - Parâmetro qtd_concursos: {qtd_concursos}")
+    # print(f"🎯 Padrões/Sequências - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
 
     dados_para_analise = df_milionaria.values.tolist()
     resultado = analise_padroes_sequencias_milionaria(dados_para_analise, qtd_concursos)
@@ -210,7 +210,7 @@ def get_analise_de_distribuicao():
 
     # Verificar se há parâmetro de quantidade de concursos
     qtd_concursos = request.args.get('qtd_concursos', type=int)
-    print(f"🎯 Distribuição - Parâmetro qtd_concursos: {qtd_concursos}")
+    # print(f"🎯 Distribuição - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
 
     resultado = analise_distribuicao_milionaria(df_milionaria, qtd_concursos)
     return jsonify(resultado)
@@ -224,13 +224,13 @@ def get_analise_de_distribuicao_megasena():
 
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
-        print(f"🎯 Distribuição Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
-        print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")
-        print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")
+        # print(f"🎯 Distribuição Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
+        # print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")  # DEBUG - COMENTADO
+        # print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")  # DEBUG - COMENTADO
 
         resultado = analise_distribuicao_megasena(df_megasena, qtd_concursos)
-        print(f"🎯 Resultado da análise: {type(resultado)}")
-        print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+        # print(f"🎯 Resultado da análise: {type(resultado)}")  # DEBUG - COMENTADO
+        # print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
         
         return jsonify(resultado)
     except Exception as e:
@@ -248,13 +248,13 @@ def get_analise_de_combinacoes_megasena():
 
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
-        print(f"🎯 Combinações Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
-        print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")
-        print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")
+        # print(f"🎯 Combinações Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
+        # print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")  # DEBUG - COMENTADO
+        # print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")  # DEBUG - COMENTADO
 
         resultado = analise_combinacoes_megasena(df_megasena, qtd_concursos)
-        print(f"🎯 Resultado da análise: {type(resultado)}")
-        print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+        # print(f"🎯 Resultado da análise: {type(resultado)}")  # DEBUG - COMENTADO
+        # print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
         
         return jsonify(resultado)
     except Exception as e:
@@ -272,13 +272,13 @@ def get_analise_padroes_sequencias_megasena():
 
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
-        print(f"🎯 Padrões/Sequências Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
-        print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")
-        print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")
+        # print(f"🎯 Padrões/Sequências Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
+        # print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")  # DEBUG - COMENTADO
+        # print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")  # DEBUG - COMENTADO
 
         resultado = analise_padroes_sequencias_megasena(df_megasena, qtd_concursos)
-        print(f"🎯 Resultado da análise: {type(resultado)}")
-        print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")
+        # print(f"🎯 Resultado da análise: {type(resultado)}")  # DEBUG - COMENTADO
+        # print(f"🎯 Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
         
         return jsonify(resultado)
     except Exception as e:
@@ -362,7 +362,7 @@ def get_analise_trevos_da_sorte():
 
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
-        print(f"🎯 Trevos - Parâmetro qtd_concursos: {qtd_concursos}")
+        # print(f"🎯 Trevos - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
 
         # Note: A função 'analise_trevos_da_sorte' foi ajustada para aceitar o DataFrame diretamente.
         resultado = analise_trevos_da_sorte(df_milionaria, qtd_concursos)
@@ -415,25 +415,25 @@ def get_analise_seca():
 def get_analise_seca_megasena():
     """Retorna os dados da análise de seca dos números da Mega Sena."""
     try:
-        print("🔍 API de seca da Mega Sena chamada!")
+        # print("🔍 API de seca da Mega Sena chamada!")  # DEBUG - COMENTADO
         
         if df_megasena is None or df_megasena.empty:
-            print("❌ Dados da Mega Sena não carregados")
+            # print("❌ Dados da Mega Sena não carregados")  # DEBUG - COMENTADO
             return jsonify({'error': 'Dados da Mega Sena não carregados.'}), 500
 
         qtd_concursos = request.args.get('qtd_concursos', type=int)
-        print(f"📈 Análise de Seca Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
-        print(f"📊 DataFrame disponível: {len(df_megasena)} concursos")
+        # print(f"📈 Análise de Seca Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
+        # print(f"📊 DataFrame disponível: {len(df_megasena)} concursos")  # DEBUG - COMENTADO
 
         # Executar análise de seca
-        print("⚡ Executando análise de seca da Mega Sena...")
+        # print("⚡ Executando análise de seca da Mega Sena...")  # DEBUG - COMENTADO
         resultado = calcular_seca_numeros_megasena(df_megasena, qtd_concursos)
         
-        print("✅ Análise de seca concluída!")
-        print(f"📊 Resultados obtidos:")
-        print(f"   - Números em seca: {'✅' if resultado.get('seca_por_numero') else '❌'}")
-        print(f"   - Média de seca: {'✅' if resultado.get('estatisticas', {}).get('seca_media') else '❌'}")
-        print(f"   - Máxima seca: {'✅' if resultado.get('estatisticas', {}).get('seca_maxima') else '❌'}")
+        # print("✅ Análise de seca concluída!")  # DEBUG - COMENTADO
+        # print(f"📊 Resultados obtidos:")  # DEBUG - COMENTADO
+        # print(f"   - Números em seca: {'✅' if resultado.get('seca_por_numero') else '❌'}")  # DEBUG - COMENTADO
+        # print(f"   - Média de seca: {'✅' if resultado.get('estatisticas', {}).get('seca_media') else '❌'}")  # DEBUG - COMENTADO
+        # print(f"   - Máxima seca: {'✅' if resultado.get('estatisticas', {}).get('seca_maxima') else '❌'}")  # DEBUG - COMENTADO
 
         # Retornar no formato esperado pelo frontend
         return jsonify({
@@ -451,7 +451,7 @@ def get_analise_seca_megasena():
 def get_estatisticas_avancadas():
     """Retorna os dados das estatísticas avançadas."""
     try:
-        print("🔍 Iniciando requisição para /api/estatisticas_avancadas")
+        # print("🔍 Iniciando requisição para /api/estatisticas_avancadas")  # DEBUG - COMENTADO
         
         if df_milionaria is None or df_milionaria.empty:
             print("❌ Dados da +Milionária não carregados")
@@ -537,7 +537,7 @@ def get_estatisticas_avancadas():
 def get_estatisticas_avancadas_megasena():
     """Retorna os dados das estatísticas avançadas da Mega Sena."""
     try:
-        print("🔍 Iniciando requisição para /api/estatisticas_avancadas_MS")
+        # print("🔍 Iniciando requisição para /api/estatisticas_avancadas_MS")  # DEBUG - COMENTADO
         
         if df_megasena is None or df_megasena.empty:
             print("❌ Dados da Mega Sena não carregados")
@@ -727,6 +727,28 @@ def aposta_inteligente_premium_megasena():
     """Renderiza a página de Aposta Inteligente Premium da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
 
+# --- Rotas da Quina ---
+@app.route('/dashboard_quina')
+def dashboard_quina():
+    """Renderiza a página principal do dashboard da Quina."""
+    return render_template('dashboard_quina.html')
+
+@app.route('/aposta_inteligente_premium_quina')
+def aposta_inteligente_premium_quina():
+    """Renderiza a página de Aposta Inteligente Premium da Quina."""
+    return render_template('analise_estatistica_avancada_quina.html')
+
+# --- Rotas da Lotofácil ---
+@app.route('/dashboard_lotofacil')
+def dashboard_lotofacil():
+    """Renderiza a página principal do dashboard da Lotofácil."""
+    return render_template('dashboard_lotofacil.html')
+
+@app.route('/aposta_inteligente_premium_lotofacil')
+def aposta_inteligente_premium_lotofacil():
+    """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
+    return render_template('analise_estatistica_avancada_lotofacil.html')
+
 @app.route('/aposta_inteligente_premium')
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
@@ -744,7 +766,7 @@ def gerar_aposta_premium():
         # O frontend envia o objeto userPremiumPreferences completo
         preferencias_ml = data  # Usar diretamente o objeto enviado
         
-        print(f"📊 Preferências recebidas: {preferencias_ml}")
+        # print(f"📊 Preferências recebidas: {preferencias_ml}")  # DEBUG - COMENTADO
         
         # Carregar dados de análise para o cache
         analysis_cache = {}
@@ -756,7 +778,7 @@ def gerar_aposta_premium():
                 dados_freq = analisar_frequencia(qtd_concursos=50)  # Últimos 50 concursos
                 analysis_cache['frequencia_completa'] = dados_freq
                 analysis_cache['frequencia_25'] = analisar_frequencia(qtd_concursos=25)  # Últimos 25 concursos
-                print("✅ Dados de frequência carregados (50 e 25 concursos)")
+                # print("✅ Dados de frequência carregados (50 e 25 concursos)")  # DEBUG - COMENTADO
             except Exception as e:
                 print(f"⚠️ Erro ao carregar frequência: {e}")
         
@@ -766,7 +788,7 @@ def gerar_aposta_premium():
                 from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
                 dados_padroes = analise_padroes_sequencias_milionaria()
                 analysis_cache['padroes_completa'] = dados_padroes
-                print("✅ Dados de padrões carregados")
+                # print("✅ Dados de padrões carregados")  # DEBUG - COMENTADO
             except Exception as e:
                 print(f"⚠️ Erro ao carregar padrões: {e}")
         
@@ -776,7 +798,7 @@ def gerar_aposta_premium():
                 from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
                 dados_trevos = analise_trevos_da_sorte()
                 analysis_cache['trevos_completa'] = dados_trevos
-                print("✅ Dados de trevos carregados")
+                # print("✅ Dados de trevos carregados")  # DEBUG - COMENTADO
             except Exception as e:
                 print(f"⚠️ Erro ao carregar trevos: {e}")
         
@@ -790,12 +812,12 @@ def gerar_aposta_premium():
             except Exception as e:
                 print(f"⚠️ Erro ao carregar dados avançados: {e}")
         
-        print(f"📊 Cache de análise preparado: {list(analysis_cache.keys())}")
+        # print(f"📊 Cache de análise preparado: {list(analysis_cache.keys())}")  # DEBUG - COMENTADO
         
         # Gerar apostas usando Machine Learning
         apostas_geradas = gerar_aposta_inteligente(preferencias_ml, analysis_cache)
         
-        print(f"🎯 Apostas geradas: {len(apostas_geradas)}")
+        # print(f"🎯 Apostas geradas: {len(apostas_geradas)}")  # DEBUG - COMENTADO
         
         return jsonify({
             'success': True,
@@ -824,7 +846,7 @@ def gerar_aposta_premium_megasena():
         # O frontend envia o objeto userPremiumPreferencesMS completo
         preferencias_ml = data  # Usar diretamente o objeto enviado
         
-        print(f"📊 Preferências recebidas (Mega Sena): {preferencias_ml}")
+        # print(f"📊 Preferências recebidas (Mega Sena): {preferencias_ml}")  # DEBUG - COMENTADO
         
         # Carregar dados da Mega Sena
         df_megasena = carregar_dados_megasena_app()
@@ -835,7 +857,7 @@ def gerar_aposta_premium_megasena():
                 'error': 'Dados da Mega Sena não disponíveis'
             }), 500
         
-        print(f"📊 Dados da Mega Sena carregados: {len(df_megasena)} concursos")
+        # print(f"📊 Dados da Mega Sena carregados: {len(df_megasena)} concursos")  # DEBUG - COMENTADO
         
         # Preparar cache de análise baseado nas preferências
         analysis_cache = {}
@@ -846,7 +868,7 @@ def gerar_aposta_premium_megasena():
                 from funcoes.megasena.funcao_analise_de_frequencia_MS import analise_frequencia_megasena_completa
                 dados_freq = analise_frequencia_megasena_completa(df_megasena)
                 analysis_cache['frequencia_completa'] = dados_freq
-                print("✅ Dados de frequência carregados")
+                # print("✅ Dados de frequência carregados")  # DEBUG - COMENTADO
             except Exception as e:
                 print(f"⚠️ Erro ao carregar frequência: {e}")
         
@@ -856,7 +878,7 @@ def gerar_aposta_premium_megasena():
                 from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribuicao_megasena
                 dados_dist = analise_distribuicao_megasena(df_megasena)
                 analysis_cache['distribuicao_completa'] = dados_dist
-                print("✅ Dados de distribuição carregados")
+                # print("✅ Dados de distribuição carregados")  # DEBUG - COMENTADO
             except Exception as e:
                 print(f"⚠️ Erro ao carregar distribuição: {e}")
         
@@ -866,7 +888,7 @@ def gerar_aposta_premium_megasena():
                 from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
                 dados_padroes = analise_padroes_sequencias_megasena(df_megasena)
                 analysis_cache['padroes_completa'] = dados_padroes
-                print("✅ Dados de padrões carregados")
+                # print("✅ Dados de padrões carregados")  # DEBUG - COMENTADO
             except Exception as e:
                 print(f"⚠️ Erro ao carregar padrões: {e}")
         
@@ -881,12 +903,12 @@ def gerar_aposta_premium_megasena():
             except Exception as e:
                 print(f"⚠️ Erro ao carregar dados avançados: {e}")
         
-        print(f"📊 Cache de análise preparado: {list(analysis_cache.keys())}")
+        # print(f"📊 Cache de análise preparado: {list(analysis_cache.keys())}")  # DEBUG - COMENTADO
         
         # Gerar apostas usando Machine Learning
         apostas_geradas = gerar_aposta_inteligente(preferencias_ml, analysis_cache)
         
-        print(f"🎯 Apostas geradas (Mega Sena): {len(apostas_geradas)}")
+        # print(f"🎯 Apostas geradas (Mega Sena): {len(apostas_geradas)}")  # DEBUG - COMENTADO
         
         return jsonify({
             'success': True,

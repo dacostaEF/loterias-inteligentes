@@ -71,7 +71,7 @@ def analise_frequencia(dados_sorteios, qtd_concursos=None):
         
         # Pegar os últimos N concursos (mais recentes primeiro)
         historico_por_concurso = historico_por_concurso[-qtd_concursos:]
-        print(f"📊 Analisando os últimos {qtd_concursos} concursos...")
+        # print(f"📊 Analisando os últimos {qtd_concursos} concursos...")  # DEBUG - COMENTADO
     
     # Extrair números do período selecionado
     for sorteio in historico_por_concurso:
