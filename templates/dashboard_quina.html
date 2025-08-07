@@ -1029,7 +1029,7 @@
 
       <div class="mb-8">
         <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (5-15)</label>
-        <input type="range" id="sliderNumeros" min="5" max="15" value="8" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
+                        <input type="range" id="sliderNumeros" min="5" max="20" value="8" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
         <span id="valorNumeros" class="block text-center text-lg font-bold mt-2 text-[#00E38C]">8</span>
       </div>
 
@@ -1114,12 +1114,12 @@
     const tourSteps = [
       {
         target: '#numeros-container',
-        content: '🎯 <strong>Grid de Números Principais (1-60)</strong><br><br>Esta é a área mais importante! Você pode optar por clicar e selecionar seus números ou usar o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 6 a 15 números principais. Os números selecionados ficarão destacados em verde.',
+        content: '🎯 <strong>Grid de Números Principais (1-80)</strong><br><br>Esta é a área mais importante! Você pode optar por clicar e selecionar seus números ou usar o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 5 a 15 números principais. Os números selecionados ficarão destacados em verde.',
         position: 'center'
       },
       {
         target: '#numeros-container',
-        content: '🎯 <strong>Seleção de Números</strong><br><br>Selecione seus números ou use o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 6 a 15 números para jogar.',
+        content: '🎯 <strong>Seleção de Números</strong><br><br>Selecione seus números ou use o botão "Gerar Palpite da Sorte" para gerar de forma automática, de 5 a 15 números para jogar.',
         position: 'bottom-right'
       },
       {
@@ -2428,7 +2428,7 @@
       }];
 
       const layout = {
-        title: 'Distribuição da Soma dos 6 Números Principais',
+        title: 'Distribuição da Soma dos 5 Números Principais',
         xaxis: { title: 'Soma dos Números', automargin: true },
         yaxis: { title: 'Frequência', automargin: true },
         plot_bgcolor: '#1a1d25',
@@ -2530,7 +2530,7 @@
       }];
 
       const layout = {
-        title: 'Distribuição da Amplitude dos 6 Números Principais',
+        title: 'Distribuição da Amplitude dos 5 Números Principais',
         xaxis: { title: 'Amplitude (Maior - Menor Número)', automargin: true },
         yaxis: { title: 'Frequência', automargin: true },
         plot_bgcolor: '#1a1d25',
@@ -4956,7 +4956,7 @@
 
       <h3>➕ Soma dos Números Principais</h3>
       <p>
-        O que mostra: Um histograma da frequência da soma total dos 6 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
+        O que mostra: Um histograma da frequência da soma total dos 5 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
         <strong>✔ Útil para:</strong> Escolher combinações com somas que estejam dentro da faixa de valores mais comuns historicamente.<br>
         <strong💡 Dica:</strong> Evite somas muito altas ou muito baixas, que são estatisticamente menos frequentes.
       </p>
