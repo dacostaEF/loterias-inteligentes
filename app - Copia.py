@@ -48,9 +48,6 @@ df_milionaria = None # Variável global para armazenar o DataFrame
 # Variável global para armazenar o DataFrame da Mega Sena
 df_megasena = None
 
-# Variável global para armazenar o DataFrame da Quina
-df_quina = None
-
 def carregar_dados_milionaria():
     """Carrega os dados da +Milionária do arquivo Excel."""
     global df_milionaria
@@ -85,24 +82,10 @@ def carregar_dados_megasena_app():
             df_megasena = pd.DataFrame() # Retorna DataFrame vazio em caso de erro
     return df_megasena
 
-def carregar_dados_quina_app():
-    """Carrega os dados da Quina do arquivo Excel."""
-    global df_quina
-    if df_quina is None:
-        try:
-            from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
-            df_quina = carregar_dados_quina(limite_concursos=500)  # Limitar aos últimos 500 concursos para melhor sensibilidade estatística
-            print(f"Dados da Quina carregados. Total de concursos: {len(df_quina)}")
-        except Exception as e:
-            print(f"Erro ao carregar dados da Quina: {e}")
-            df_quina = pd.DataFrame() # Retorna DataFrame vazio em caso de erro
-    return df_quina
-
 # Carrega os dados na inicialização do aplicativo
 with app.app_context():
     carregar_dados_milionaria()
     carregar_dados_megasena_app()
-    carregar_dados_quina_app()
 
 @app.route('/')
 def landing_page():
@@ -255,180 +238,6 @@ def get_analise_de_distribuicao_megasena():
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Erro interno: {str(e)}"}), 500
-
-# --- Rotas de API da Quina ---
-@app.route('/api/analise-frequencia-quina')
-def get_analise_frequencia_quina():
-    """Nova rota para análise de frequência da Quina com dados reais dos últimos 50 concursos."""
-    try:
-        # Usar a função da Quina
-        from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_quina
-        
-        # Obter parâmetro de quantidade de concursos (padrão: 50)
-        qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
-        
-        # Executar análise com dados reais da Quina
-        resultado = analise_frequencia_quina(df_quina=df_quina, qtd_concursos=qtd_concursos)
-        
-        if not resultado or resultado == {}:
-            print("❌ Resultado vazio ou None")
-            return jsonify({'error': 'Erro ao carregar dados de frequência da Quina.'}), 500
-
-        # Preparar dados dos concursos individuais para a matriz visual
-        concursos_para_matriz = []
-        if 'periodo_analisado' in resultado and 'concursos_do_periodo' in resultado['periodo_analisado']:
-            # Converter dados do DataFrame para formato da matriz
-            # Se qtd_concursos for None (todos os concursos), limitar a 500 para evitar loop
-            limite_efetivo = qtd_concursos if qtd_concursos else 500
-            df_filtrado = df_quina.tail(limite_efetivo)
-            for _, row in df_filtrado.iterrows():
-                if not pd.isna(row['Concurso']):
-                    concursos_para_matriz.append({
-                        'concurso': int(row['Concurso']),
-                        'numeros': [int(row['Bola1']), int(row['Bola2']), int(row['Bola3']), 
-                                   int(row['Bola4']), int(row['Bola5'])]
-                    })
-
-        return jsonify({
-            'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
-            'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
-            'numeros_quentes_frios': resultado['numeros_quentes_frios'],
-            'analise_temporal': resultado['analise_temporal'],
-            'periodo_analisado': resultado['periodo_analisado'],
-            'concursos_para_matriz': concursos_para_matriz  # Dados para a matriz visual
-        })
-    except Exception as e:
-        print(f"❌ Erro na API de frequência Quina: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/analise_de_distribuicao-quina', methods=['GET'])
-def get_analise_de_distribuicao_quina():
-    """Retorna os dados da análise de distribuição da Quina."""
-    try:
-        if df_quina.empty:
-            return jsonify({"error": "Dados da Quina não carregados."}), 500
-
-        # Verificar se há parâmetro de quantidade de concursos
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
-
-        resultado = analise_de_distribuicao_quina(df_quina, qtd_concursos)
-        
-        return jsonify(resultado)
-    except Exception as e:
-        print(f"❌ Erro na API de distribuição Quina: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/analise_de_combinacoes-quina', methods=['GET'])
-def get_analise_de_combinacoes_quina():
-    """Retorna os dados da análise de combinações da Quina."""
-    try:
-        if df_quina.empty:
-            return jsonify({"error": "Dados da Quina não carregados."}), 500
-
-        # Verificar se há parâmetro de quantidade de concursos
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
-
-        resultado = analise_de_combinacoes_quina(df_quina, qtd_concursos)
-        
-        return jsonify(resultado)
-    except Exception as e:
-        print(f"❌ Erro na API de combinações Quina: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/analise_padroes_sequencias-quina', methods=['GET'])
-def get_analise_padroes_sequencias_quina():
-    """Retorna os dados da análise de padrões e sequências da Quina."""
-    try:
-        if df_quina.empty:
-            return jsonify({"error": "Dados da Quina não carregados."}), 500
-
-        # Verificar se há parâmetro de quantidade de concursos
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
-
-        resultado = analise_padroes_sequencias_quina(df_quina, qtd_concursos)
-        
-        return jsonify(resultado)
-    except Exception as e:
-        print(f"❌ Erro na API de padrões Quina: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/estatisticas_avancadas_quina', methods=['GET'])
-def get_estatisticas_avancadas_quina():
-    """Retorna os dados das estatísticas avançadas da Quina."""
-    try:
-        if df_quina.empty:
-            return jsonify({"error": "Dados da Quina não carregados."}), 500
-
-        # Verificar se há parâmetro de quantidade de concursos
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
-
-        resultado = realizar_analise_estatistica_avancada_quina(df_quina, qtd_concursos)
-        
-        return jsonify(resultado)
-    except Exception as e:
-        print(f"❌ Erro na API de estatísticas avançadas Quina: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/gerar_aposta_premium_quina', methods=['POST'])
-def gerar_aposta_premium_quina():
-    """Gera aposta inteligente da Quina usando Machine Learning."""
-    try:
-        from funcoes.quina.geracao_inteligente_quina import gerar_aposta_inteligente_quina
-        
-        # Obter dados do request
-        data = request.get_json()
-        
-        # O frontend envia o objeto userPremiumPreferences completo
-        preferencias_ml = data  # Usar diretamente o objeto enviado
-        
-        # Carregar dados de análise para o cache
-        analysis_cache = {}
-        
-        # Carregar dados de frequência se necessário
-        if any(key in preferencias_ml for key in ['frequencia']):
-            try:
-                from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_quina
-                dados_freq = analise_frequencia_quina(qtd_concursos=50)  # Últimos 50 concursos
-                analysis_cache['frequencia_completa'] = dados_freq
-                analysis_cache['frequencia_25'] = analise_frequencia_quina(qtd_concursos=25)  # Últimos 25 concursos
-            except Exception as e:
-                print(f"⚠️ Erro ao carregar frequência: {e}")
-        
-        # Carregar dados de padrões se necessário
-        if any(key in preferencias_ml for key in ['padroes']):
-            try:
-                from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analise_padroes_sequencias_quina
-                dados_padroes = analise_padroes_sequencias_quina()
-                analysis_cache['padroes_completa'] = dados_padroes
-            except Exception as e:
-                print(f"⚠️ Erro ao carregar padrões: {e}")
-        
-        # Carregar dados avançados se necessário
-        if any(key in preferencias_ml for key in ['clusters']):
-            try:
-                from funcoes.quina.analise_estatistica_avancada_quina import realizar_analise_estatistica_avancada_quina
-                dados_avancados = realizar_analise_estatistica_avancada_quina()
-                analysis_cache['avancada'] = dados_avancados
-            except Exception as e:
-                print(f"⚠️ Erro ao carregar dados avançados: {e}")
-        
-        # Gerar aposta inteligente
-        resultado = gerar_aposta_inteligente_quina(preferencias_ml, analysis_cache)
-        
-        return jsonify(resultado)
-    except Exception as e:
-        print(f"❌ Erro na API de geração premium Quina: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise_de_combinacoes-MS', methods=['GET'])
 def get_analise_de_combinacoes_megasena():
