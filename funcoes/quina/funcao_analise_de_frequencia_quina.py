@@ -70,8 +70,9 @@ def analise_frequencia_quina(dados_sorteios, qtd_concursos=None):
             qtd_concursos = len(historico_por_concurso)
         
         # Pegar os últimos N concursos (mais recentes primeiro)
+        # IMPORTANTE: Garantir que estamos pegando exatamente os últimos N concursos
         historico_por_concurso = historico_por_concurso[-qtd_concursos:]
-        # print(f"📊 Analisando os últimos {qtd_concursos} concursos...")  # DEBUG - COMENTADO
+        print(f"📊 Analisando os últimos {len(historico_por_concurso)} concursos (de {qtd_concursos} solicitados)...")
     
     # Extrair números do período selecionado
     for sorteio in historico_por_concurso:
@@ -356,6 +357,7 @@ def analise_frequencia_quina_completa(df_quina, qtd_concursos=None, periodo_temp
         print(f"📊 Analisando frequência da Quina nos últimos {qtd_concursos} concursos")
     else:
         df = df_quina.copy()
+        print(f"📊 Analisando frequência da Quina em todos os {len(df)} concursos disponíveis")
     
     # Limpar e validar dados
     df = df.dropna(subset=['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5'])
@@ -447,8 +449,16 @@ def analisar_frequencia_quina(df_quina=None, qtd_concursos=50):
             from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
             df_quina = carregar_dados_quina()
         
-        # Executar análise completa
-        resultado_completo = analise_frequencia_quina_completa(df_quina, qtd_concursos=qtd_concursos)
+        # CORREÇÃO: Filtrar os dados ANTES de passar para a análise
+        if qtd_concursos is not None and qtd_concursos > 0:
+            # Pegar exatamente os últimos N concursos do DataFrame
+            df_filtrado = df_quina.tail(qtd_concursos).copy()
+            print(f"🔧 Filtrando para os últimos {qtd_concursos} concursos (de {len(df_quina)} disponíveis)")
+        else:
+            df_filtrado = df_quina.copy()
+        
+        # Executar análise completa com dados já filtrados
+        resultado_completo = analise_frequencia_quina_completa(df_filtrado, qtd_concursos=None)
         
         if not resultado_completo or 'analise_frequencia' not in resultado_completo:
             print("⚠️  Erro: Não foi possível obter dados de frequência da Quina")

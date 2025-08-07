@@ -152,8 +152,9 @@ def analise_de_distribuicao_quina(dados_sorteios, qtd_concursos=None):
             soma_stats['numeros_principais']['max'] = max(somas_numeros)
             soma_stats['numeros_principais']['media'] = np.mean(somas_numeros)
             soma_stats['numeros_principais']['moda'] = Counter(somas_numeros).most_common(1)[0][0]
+            soma_stats['numeros_principais']['somas'] = somas_numeros  # Lista de todas as somas para o gráfico
         else:
-            soma_stats['numeros_principais'] = {'min': 0, 'max': 0, 'media': 0, 'moda': 0}
+            soma_stats['numeros_principais'] = {'min': 0, 'max': 0, 'media': 0, 'moda': 0, 'somas': []}
         
         return soma_stats
 
@@ -173,10 +174,11 @@ def analise_de_distribuicao_quina(dados_sorteios, qtd_concursos=None):
                 'min': min(amplitudes),
                 'max': max(amplitudes),
                 'media': np.mean(amplitudes),
-                'moda': Counter(amplitudes).most_common(1)[0][0]
+                'moda': Counter(amplitudes).most_common(1)[0][0],
+                'amplitudes': amplitudes  # Lista de todas as amplitudes para o gráfico
             }
         else:
-            return {'min': 0, 'max': 0, 'media': 0, 'moda': 0}
+            return {'min': 0, 'max': 0, 'media': 0, 'moda': 0, 'amplitudes': []}
 
     # Executar todas as análises
     paridade = analisar_paridade()
@@ -255,6 +257,46 @@ def analise_distribuicao_quina_completa(df_quina, qtd_concursos=None):
     # print(f"🔍 DEBUG: Chaves do resultado: {list(resultado.keys()) if resultado else 'N/A'}")  # DEBUG - COMENTADO
     
     return resultado
+
+def analisar_distribuicao_quina(df_quina=None, qtd_concursos=50):
+    """
+    Função wrapper para análise de distribuição dos últimos N concursos da Quina
+    Retorna dados formatados para uso na API
+    
+    Args:
+        df_quina (pd.DataFrame, optional): DataFrame com dados da Quina. 
+                                             Se None, tenta carregar automaticamente.
+        qtd_concursos (int): Quantidade de últimos concursos a analisar (padrão: 50)
+    
+    Returns:
+        dict: Dados formatados para a API
+    """
+    try:
+        # Se não foi passado DataFrame, tentar carregar
+        if df_quina is None:
+            from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
+            df_quina = carregar_dados_quina()
+        
+        # CORREÇÃO: Filtrar os dados ANTES de passar para a análise
+        if qtd_concursos is not None and qtd_concursos > 0:
+            # Pegar exatamente os últimos N concursos do DataFrame
+            df_filtrado = df_quina.tail(qtd_concursos).copy()
+            print(f"🔧 Filtrando para os últimos {qtd_concursos} concursos (de {len(df_quina)} disponíveis)")
+        else:
+            df_filtrado = df_quina.copy()
+        
+        # Executar análise completa com dados já filtrados
+        resultado = analise_distribuicao_quina_completa(df_filtrado, qtd_concursos=None)
+        
+        if not resultado:
+            print("⚠️  Erro: Não foi possível obter dados de distribuição da Quina")
+            return {}
+        
+        return resultado
+        
+    except Exception as e:
+        print(f"❌ Erro ao analisar distribuição da Quina: {e}")
+        return {}
 
 def exibir_analise_distribuicao_detalhada_quina(resultado):
     """

@@ -39,7 +39,7 @@ from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_me
 from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar_aposta_personalizada
 
 # --- Importações para Quina ---
-from funcoes.quina.funcao_analise_de_distribuicao_quina import analise_de_distribuicao_quina
+from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribuicao_quina
 from funcoes.quina.funcao_analise_de_combinacoes_quina import analise_de_combinacoes_quina
 
 
@@ -322,7 +322,7 @@ def get_analise_de_distribuicao_quina():
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
 
-        resultado = analise_de_distribuicao_quina(df_quina, qtd_concursos)
+        resultado = analisar_distribuicao_quina(df_quina, qtd_concursos)
         
         return jsonify(resultado)
     except Exception as e:

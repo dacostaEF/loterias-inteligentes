@@ -2417,7 +2417,7 @@
                   <input type="checkbox" id="dist-priorizar-pares-impares" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="distribuicao" data-pref-name="priorizarParesImpares">
                   <label for="dist-priorizar-pares-impares" class="text-white">Priorizar Paridade (Pares/Ímpares)</label>
                   <select id="dist-paridade-desejada" class="select-premium-pref ml-auto bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="distribuicao" data-pref-name="paridadeDesejada">
-                    <option value="equilibrado">Equilibrada (3 pares/3 ímpares)</option>
+                    <option value="equilibrado">Equilibrada (2 pares/3 ímpares ou 3 pares/2 ímpares)</option>
                     <option value="mais_pares">Mais Pares</option>
                     <option value="mais_impares">Mais Ímpares</option>
                   </select>
@@ -2428,9 +2428,9 @@
                 </div>
                 <div class="flex items-center ml-auto">
                   <label for="dist-soma-min" class="text-gray-300 text-sm mr-2">Soma Min:</label>
-                  <input type="number" id="dist-soma-min" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="100" min="21" max="285">
+                  <input type="number" id="dist-soma-min" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="100" min="15" max="390">
                   <label for="dist-soma-max" class="text-gray-300 text-sm ml-4 mr-2">Soma Max:</label>
-                  <input type="number" id="dist-soma-max" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="200" min="21" max="285">
+                  <input type="number" id="dist-soma-max" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="200" min="15" max="390">
                 </div>
               </div>
               <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
@@ -2474,10 +2474,10 @@
         type: 'bar',
         marker: {
           color: labels.map(label => {
-            // Cores baseadas nas combinações P/I
-            if (label.includes('6P')) return '#4CAF50'; // Mais pares
+            // Cores baseadas nas combinações P/I para Quina (5 números)
+            if (label.includes('5P')) return '#4CAF50'; // Mais pares
             if (label.includes('0P')) return '#F44336'; // Mais ímpares
-            if (label.includes('3P-3I')) return '#2196F3'; // Equilíbrio
+            if (label.includes('2P-3I') || label.includes('3P-2I')) return '#2196F3'; // Equilíbrio
             return '#9C27B0'; // Outros
           })
         }
@@ -2523,7 +2523,7 @@
       }];
 
       const layout = {
-        title: 'Distribuição da Soma dos 6 Números Principais',
+        title: 'Distribuição da Soma dos 5 Números Principais',
         xaxis: { title: 'Soma dos Números', automargin: true },
         yaxis: { title: 'Frequência', automargin: true },
         plot_bgcolor: '#1a1d25',
@@ -2576,7 +2576,7 @@
       }];
 
       const layout = {
-        title: 'Distribuição da Amplitude dos 6 Números Principais',
+        title: 'Distribuição da Amplitude dos 5 Números Principais',
         xaxis: { title: 'Amplitude (Maior - Menor Número)', automargin: true },
         yaxis: { title: 'Frequência', automargin: true },
         plot_bgcolor: '#1a1d25',
@@ -4807,18 +4807,26 @@
     const btnGerarNoModal = document.getElementById('btnGerarNoModal');
     const sliderNumeros = document.getElementById('sliderNumeros');
     const valorNumeros = document.getElementById('valorNumeros');
-    const sliderTrevos = document.getElementById('sliderTrevos');
-    const valorTrevos = document.getElementById('valorTrevos');
+    
+    // CORREÇÃO: A Quina não tem trevos, então não tenta acessar esses elementos
+    // const sliderTrevos = document.getElementById('sliderTrevos');
+    // const valorTrevos = document.getElementById('valorTrevos');
 
     // Atualiza os valores exibidos pelos sliders
-    sliderNumeros.oninput = () => {
-      valorNumeros.textContent = sliderNumeros.value;
-      atualizarCorSlider(sliderNumeros);
-    };
-    sliderTrevos.oninput = () => {
-      valorTrevos.textContent = sliderTrevos.value;
-      atualizarCorSlider(sliderTrevos);
-    };
+    if (sliderNumeros && valorNumeros) {
+        sliderNumeros.oninput = () => {
+            valorNumeros.textContent = sliderNumeros.value;
+            atualizarCorSlider(sliderNumeros);
+        };
+    }
+    
+    // CORREÇÃO: Removido código dos trevos para a Quina
+    // if (sliderTrevos && valorTrevos) {
+    //     sliderTrevos.oninput = () => {
+    //         valorTrevos.textContent = sliderTrevos.value;
+    //         atualizarCorSlider(sliderTrevos);
+    //     };
+    // }
 
     // Função para atualizar a cor da barra do slider dinamicamente
     function atualizarCorSlider(slider) {
@@ -5047,41 +5055,36 @@
     <div class="modal-content">
       <span class="close" onclick="fecharPopupAjudaDistribuicao()">×</span>
       <h2>🧠 Entendendo a Análise de Distribuição</h2>
-      <p>Esta análise revela a "forma" como os números e trevos se comportam, mostrando padrões estatísticos, desequilíbrios, aglomerados e dispersão. Compreender esses padrões pode guiar suas escolhas com mais estratégia.</p>
+      <p>Esta análise revela a "forma" como os números da Quina se comportam, mostrando padrões estatísticos, desequilíbrios, aglomerados e dispersão. Compreender esses padrões pode guiar suas escolhas com mais estratégia.</p>
 
       <h3>📊 Paridade (Pares vs Ímpares)</h3>
       <p>
-        O que mostra: A frequência de sorteios com diferentes combinações de números pares e ímpares para os números principais e trevos. (Ex: 3 Pares-3 Ímpares, 4 Pares-2 Ímpares, etc.).<br>
+        O que mostra: A frequência de sorteios com diferentes combinações de números pares e ímpares nos 5 números principais da Quina. (Ex: 3 Pares-2 Ímpares, 2 Pares-3 Ímpares, etc.).<br>
         <strong>✔ Útil para:</strong> Equilibrar sua aposta e identificar padrões comuns ou combinações historicamente raras.<br>
-        <strong💡 Dica:</strong> A maioria dos sorteios tem 3 números pares e 3 números ímpares.
+        <strong💡 Dica:</strong> A maioria dos sorteios da Quina tem entre 2 e 3 números pares.
       </p>
 
       <h3>🔢 Distribuição por Faixas Numéricas</h3>
       <p>
-        O que mostra: Quantas vezes os números sorteados caem em diferentes faixas numéricas (1-10, 11-20, etc.). Também exibe a média e a moda de ocorrências por faixa.<br>
-        <strong>✔ Útil para:</strong> Observar se algumas faixas são historicamente mais sorteadas do que outras.<br>
+        O que mostra: Quantas vezes os números sorteados caem em diferentes faixas numéricas (1-10, 11-20, 21-30, etc. até 71-80). Também exibe a média e a moda de ocorrências por faixa.<br>
+        <strong>✔ Útil para:</strong> Observar se algumas faixas da Quina (1-80) são historicamente mais sorteadas do que outras.<br>
         <strong💡 Dica:</strong> Ajuda a balancear sua aposta para incluir números de faixas mais ativas ou, se preferir, de faixas menos exploradas.
       </p>
 
       <h3>➕ Soma dos Números Principais</h3>
       <p>
-        O que mostra: Um histograma da frequência da soma total dos 6 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
+        O que mostra: Um histograma da frequência da soma total dos 5 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
         <strong>✔ Útil para:</strong> Escolher combinações com somas que estejam dentro da faixa de valores mais comuns historicamente.<br>
         <strong💡 Dica:</strong> Evite somas muito altas ou muito baixas, que são estatisticamente menos frequentes.
       </p>
 
-      <h3>🍀 Soma dos Trevos da Sorte</h3>
-      <p>
-        O que mostra: Um histograma da distribuição das somas dos 2 trevos da sorte. Exibe o mínimo, máximo, média e a(s) moda(s) das somas dos trevos.<br>
-        <strong>✔ Útil para:</strong> Escolher trevos que somem valores que ocorrem com mais frequência nos sorteios.<br>
-        <strong💡 Dica:</strong> Trevos com soma entre 3 e 7 são historicamente mais comuns.
-      </p>
+
 
       <h3>↔️ Amplitude dos Números Principais</h3>
       <p>
-        O que mostra: Um histograma da frequência da diferença entre o maior e o menor número sorteado em cada concurso. (Ex: Números 1 e 50 = amplitude 49).<br>
+        O que mostra: Um histograma da frequência da diferença entre o maior e o menor número sorteado em cada concurso da Quina. (Ex: Números 5 e 75 = amplitude 70).<br>
         <strong>✔ Útil para:</strong> Avaliar a "dispersão" dos números sorteados e evitar apostar em números muito próximos ou muito distantes entre si.<br>
-        <strong💡 Dica:</strong> Amplitudes entre 30 e 45 são as mais frequentes historicamente.
+        <strong💡 Dica:</strong> Na Quina, amplitudes entre 40 e 70 são as mais frequentes historicamente.
       </p>
 
       <h3>🎯 Como Usar na Prática</h3>
@@ -5093,7 +5096,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strongImportante:</strong> A Loteria é um jogo de azar. Estas análises estatísticas não garantem acertos, mas ajudam você a criar apostas mais equilibradas e estatisticamente mais prováveis, baseadas em dados históricos reais.
+        <strongImportante:</strong> A Loteria é um jogo de probabilidades onde a sorte é protagonista. Estas análises estatísticas não garantem acertos, mas ajudam você a criar apostas mais equilibradas e estatisticamente mais prováveis, baseadas em dados históricos reais.
       </p>
     </div>
   </div>
@@ -5146,7 +5149,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises de afinidade não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+        <strong⚠️ Importante:</strong> A Loteria é um jogo de probabilidades onde a sorte é protagonista. Estas análises de afinidade não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
       </p>
     </div>
   </div>
@@ -5206,7 +5209,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong>⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises de sequências não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+        <strong>⚠️ Importante:</strong> A Loteria é um jogo de probabilidades onde a sorte é protagonista. Estas análises de sequências não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
       </p>
     </div>
   </div>
@@ -5248,7 +5251,7 @@
         <strongAtrasados:</strong> Apostar nos números em maior seca, baseado na teoria de que estão "devendo" sair.<br>
         <strongRecentes:</strong> Apostar nos que saíram há pouco, seguindo a tendência de "momentum".<br>
         <strongMisto:</strong> Combinar ambas as estratégias para diversificar sua aposta.<br>
-        <strongAleatoriedade:</strong> Lembre-se: não há garantias! A loteria é um jogo de azar.
+        <strongAleatoriedade:</strong> Lembre-se: não há garantias! A loteria é um jogo de probabilidades onde a sorte é protagonista.
       </p>
 
       <h3>🎯 Como Usar na Prática</h3>
@@ -5268,7 +5271,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strongImportante:</strong> Esta é uma análise estatística histórica que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
+        <strongImportante:</strong> Esta é uma análise estatística histórica que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de probabilidades onde a sorte é protagonista.
       </p>
     </div>
   </div>
@@ -5361,7 +5364,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strongImportante:</strong> Esta é uma análise estatística avançada que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
+        <strongImportante:</strong> Esta é uma análise estatística avançada que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de probabilidades onde a sorte é protagonista.
       </p>
     </div>
   </div>
