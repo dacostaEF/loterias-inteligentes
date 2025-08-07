@@ -164,8 +164,11 @@ def analise_frequencia_quina(dados_sorteios, qtd_concursos=None):
     resultado = {
         'periodo_analisado': {
             'total_concursos': total_concursos,
-            'qtd_concursos_especificada': qtd_concursos
+            'qtd_concursos_especificada': qtd_concursos,
+            'concursos_do_periodo': [s['concurso'] for s in historico_por_concurso]
         },
+        # Anexar os últimos concursos com os números sorteados para exibir no grid
+        'ultimos_concursos': historico_por_concurso[-25:],  # os últimos 25 concursos (mais recentes no final)
         'frequencia_absoluta': {
             'numeros': freq_absoluta_numeros
         },

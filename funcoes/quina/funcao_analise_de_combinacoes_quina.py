@@ -254,15 +254,15 @@ def analise_combinacoes_quina_completa(df_quina, qtd_concursos=None):
         # Se for DataFrame, verificar se está vazio
     if hasattr(df_quina, 'empty') and df_quina.empty:
         print("⚠️  Aviso: DataFrame da Quina está vazio!")
-            return {}
+        return {}
         
         # Verificar se as colunas necessárias existem
     colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']
     colunas_faltantes = [col for col in colunas_necessarias if col not in df_quina.columns]
         
-        if colunas_faltantes:
-            print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
-            return {}
+    if colunas_faltantes:
+        print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
+        return {}
         
         # Converter DataFrame para formato esperado pela função original
         dados_sorteios = []

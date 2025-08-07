@@ -38,6 +38,10 @@ from funcoes.megasena.analise_estatistica_avancada_MS import AnaliseEstatisticaA
 from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
 from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar_aposta_personalizada
 
+# --- Importações para Quina ---
+from funcoes.quina.funcao_analise_de_distribuicao_quina import analise_de_distribuicao_quina
+from funcoes.quina.funcao_analise_de_combinacoes_quina import analise_de_combinacoes_quina
+
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
 
@@ -276,18 +280,24 @@ def get_analise_frequencia_quina():
 
         # Preparar dados dos concursos individuais para a matriz visual
         concursos_para_matriz = []
-        if 'periodo_analisado' in resultado and 'concursos_do_periodo' in resultado['periodo_analisado']:
-            # Converter dados do DataFrame para formato da matriz
-            # Se qtd_concursos for None (todos os concursos), limitar a 500 para evitar loop
-            limite_efetivo = qtd_concursos if qtd_concursos else 500
-            df_filtrado = df_quina.tail(limite_efetivo)
-            for _, row in df_filtrado.iterrows():
-                if not pd.isna(row['Concurso']):
-                    concursos_para_matriz.append({
-                        'concurso': int(row['Concurso']),
-                        'numeros': [int(row['Bola1']), int(row['Bola2']), int(row['Bola3']), 
-                                   int(row['Bola4']), int(row['Bola5'])]
-                    })
+        # Converter dados do DataFrame para formato da matriz
+        # Se qtd_concursos for None (todos os concursos), limitar a 500 para evitar loop
+        limite_efetivo = qtd_concursos if qtd_concursos else 500
+        print(f"🔍 Debug: qtd_concursos={qtd_concursos}, limite_efetivo={limite_efetivo}")
+        print(f"🔍 Debug: Shape do df_quina={df_quina.shape}")
+        
+        df_filtrado = df_quina.tail(limite_efetivo)
+        print(f"🔍 Debug: Shape do df_filtrado={df_filtrado.shape}")
+        
+        for _, row in df_filtrado.iterrows():
+            if not pd.isna(row['Concurso']):
+                concursos_para_matriz.append({
+                    'concurso': int(row['Concurso']),
+                    'numeros': [int(row['Bola1']), int(row['Bola2']), int(row['Bola3']), 
+                               int(row['Bola4']), int(row['Bola5'])]
+                })
+        
+        print(f"🔍 Debug: Total de concursos para matriz={len(concursos_para_matriz)}")
 
         return jsonify({
             'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
@@ -295,7 +305,8 @@ def get_analise_frequencia_quina():
             'numeros_quentes_frios': resultado['numeros_quentes_frios'],
             'analise_temporal': resultado['analise_temporal'],
             'periodo_analisado': resultado['periodo_analisado'],
-            'concursos_para_matriz': concursos_para_matriz  # Dados para a matriz visual
+            'concursos_para_matriz': concursos_para_matriz,  # Dados para a matriz visual
+            'ultimos_concursos': resultado.get('ultimos_concursos', [])  # Dados para o grid
         })
     except Exception as e:
         print(f"❌ Erro na API de frequência Quina: {e}")
@@ -1184,6 +1195,40 @@ def gerar_aposta_premium_megasena():
         
     except Exception as e:
         print(f"❌ Erro ao gerar aposta premium (Mega Sena): {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Erro interno: {str(e)}'
+        }), 500
+
+@app.route('/api/analise_seca_quina', methods=['GET'])
+def get_analise_seca_quina():
+    """Retorna análise de seca (números que não saem há muito tempo) para a Quina."""
+    try:
+        qtd_concursos = request.args.get('qtd_concursos', 50, type=int)
+        
+        if df_quina is None or df_quina.empty:
+            return jsonify({
+                'success': False,
+                'error': 'Dados da Quina não carregados'
+            }), 500
+        
+        # Usar os dados limitados aos últimos concursos
+        dados_limitados = df_quina.head(qtd_concursos)
+        
+        # Calcular seca dos números
+        from funcoes.quina.calculos_quina import calcular_seca_numeros_quina
+        numeros_seca = calcular_seca_numeros_quina(dados_limitados)
+        
+        return jsonify({
+            'success': True,
+            'numeros_seca': numeros_seca,
+            'qtd_concursos_analisados': len(dados_limitados)
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro na análise de seca da Quina: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({
