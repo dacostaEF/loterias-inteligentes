@@ -1,18 +1,18 @@
 import random
 
-# Tabela de preços das apostas da Quina
+# Tabela de preços das apostas da Quina (valores atualizados)
 TABELA_PRECOS = {
-    5: {"apostas": 1, "valor": 2.50},
-    6: {"apostas": 6, "valor": 15.00},
-    7: {"apostas": 21, "valor": 52.50},
-    8: {"apostas": 56, "valor": 140.00},
-    9: {"apostas": 126, "valor": 315.00},
-    10: {"apostas": 252, "valor": 630.00},
-    11: {"apostas": 462, "valor": 1155.00},
-    12: {"apostas": 792, "valor": 1980.00},
-    13: {"apostas": 1287, "valor": 3217.50},
-    14: {"apostas": 2002, "valor": 5005.00},
-    15: {"apostas": 3003, "valor": 7507.50}
+    5: {"apostas": 1, "valor": 3.00},
+    6: {"apostas": 6, "valor": 18.00},
+    7: {"apostas": 21, "valor": 63.00},
+    8: {"apostas": 56, "valor": 168.00},
+    9: {"apostas": 126, "valor": 378.00},
+    10: {"apostas": 252, "valor": 756.00},
+    11: {"apostas": 462, "valor": 1386.00},
+    12: {"apostas": 792, "valor": 2376.00},
+    13: {"apostas": 1287, "valor": 3861.00},
+    14: {"apostas": 2002, "valor": 6006.00},
+    15: {"apostas": 3003, "valor": 9009.00}
 }
 
 def gerar_aposta_personalizada_quina(qtde_num):

@@ -262,13 +262,13 @@ def get_analise_frequencia_quina():
     """Nova rota para análise de frequência da Quina com dados reais dos últimos 50 concursos."""
     try:
         # Usar a função da Quina
-        from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_quina
+        from funcoes.quina.funcao_analise_de_frequencia_quina import analisar_frequencia_quina
         
         # Obter parâmetro de quantidade de concursos (padrão: 50)
         qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
         
         # Executar análise com dados reais da Quina
-        resultado = analise_frequencia_quina(df_quina=df_quina, qtd_concursos=qtd_concursos)
+        resultado = analisar_frequencia_quina(df_quina=df_quina, qtd_concursos=qtd_concursos)
         
         if not resultado or resultado == {}:
             print("❌ Resultado vazio ou None")
@@ -395,10 +395,10 @@ def gerar_aposta_premium_quina():
         # Carregar dados de frequência se necessário
         if any(key in preferencias_ml for key in ['frequencia']):
             try:
-                from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_quina
-                dados_freq = analise_frequencia_quina(qtd_concursos=50)  # Últimos 50 concursos
+                from funcoes.quina.funcao_analise_de_frequencia_quina import analisar_frequencia_quina
+                dados_freq = analisar_frequencia_quina(qtd_concursos=50)  # Últimos 50 concursos
                 analysis_cache['frequencia_completa'] = dados_freq
-                analysis_cache['frequencia_25'] = analise_frequencia_quina(qtd_concursos=25)  # Últimos 25 concursos
+                analysis_cache['frequencia_25'] = analisar_frequencia_quina(qtd_concursos=25)  # Últimos 25 concursos
             except Exception as e:
                 print(f"⚠️ Erro ao carregar frequência: {e}")
         
@@ -813,6 +813,28 @@ def gerar_numeros_aleatorios():
         
     except Exception as e:
         logger.error(f"Erro ao gerar números aleatórios: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
+@app.route('/api/gerar-numeros-aleatorios-quina', methods=['GET'])
+def gerar_numeros_aleatorios_quina():
+    """Gera números aleatórios para Quina (5 números de 1-80)."""
+    try:
+        import random
+        
+        # Gerar 5 números únicos entre 1 e 80 (Quina)
+        numeros = sorted(random.sample(range(1, 81), 5))
+        
+        return jsonify({
+            "success": True,
+            "numeros": numeros,
+            "mensagem": "Números da Quina gerados com sucesso!"
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro ao gerar números aleatórios da Quina: {e}")
         return jsonify({
             "success": False,
             "error": "Erro interno do servidor"

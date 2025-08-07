@@ -99,12 +99,33 @@ def analise_frequencia_quina(dados_sorteios, qtd_concursos=None):
         else:
             freq_relativa_numeros[num] = 0
     
-    # 3. NÚMEROS QUENTES E FRIOS
-    # Top 10 números mais sorteados
-    numeros_quentes = dict(sorted(freq_absoluta_numeros.items(), key=lambda x: x[1], reverse=True)[:10])
+    # 3. NÚMEROS QUENTES, FRIOS E SECOS
+    # Ordenar por frequência
+    numeros_ordenados = sorted(freq_absoluta_numeros.items(), key=lambda x: x[1], reverse=True)
     
-    # Top 10 números menos sorteados
-    numeros_frios = dict(sorted(freq_absoluta_numeros.items(), key=lambda x: x[1])[:10])
+    # Top 10 mais e menos sorteados
+    numeros_quentes = numeros_ordenados[:10]
+    numeros_frios = numeros_ordenados[-10:]
+    
+    # 4. NÚMEROS SECOS (não saíram há mais tempo)
+    # Calcular há quantos concursos cada número não sai
+    numeros_secos = {}
+    for num in range(1, 81):  # Quina: 1-80
+        ultima_aparicao = 0
+        for i, sorteio in enumerate(historico_por_concurso):
+            if num in sorteio['numeros']:
+                ultima_aparicao = i + 1  # +1 porque i começa em 0
+        
+        # Se o número nunca saiu, considerar como o máximo de concursos
+        if ultima_aparicao == 0:
+            numeros_secos[num] = total_sorteios
+        else:
+            # Calcular quantos concursos se passaram desde a última aparição
+            numeros_secos[num] = total_sorteios - ultima_aparicao
+    
+    # Ordenar números secos (maior tempo sem sair primeiro)
+    numeros_secos_ordenados = sorted(numeros_secos.items(), key=lambda x: x[1], reverse=True)
+    numeros_secos_top10 = numeros_secos_ordenados[:10]
     
     # 4. ANÁLISE TEMPORAL
     def calcular_freq_periodo(inicio_idx):
@@ -153,7 +174,9 @@ def analise_frequencia_quina(dados_sorteios, qtd_concursos=None):
         },
         'numeros_quentes_frios': {
             'numeros_quentes': numeros_quentes,
-            'numeros_frios': numeros_frios
+            'numeros_frios': numeros_frios,
+            'numeros_secos': numeros_secos_top10,
+            'diferenca_max_min_numeros': numeros_quentes[0][1] - numeros_frios[0][1] if numeros_quentes and numeros_frios else 0
         },
         'analise_temporal': [
             {
@@ -409,7 +432,7 @@ def analisar_frequencia_quina(df_quina=None, qtd_concursos=50):
     
     Args:
         df_quina (pd.DataFrame, optional): DataFrame com dados da Quina. 
-                                           Se None, tenta carregar automaticamente.
+                                             Se None, tenta carregar automaticamente.
         qtd_concursos (int): Quantidade de últimos concursos a analisar (padrão: 50)
     
     Returns:

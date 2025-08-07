@@ -113,7 +113,7 @@ def analise_padroes_sequencias_quina(dados_sorteios):
                     consecutivos_stats['sequencias_encontradas'].append(seq)
         
         return consecutivos_stats
-
+    
     # 2. REPETIÇÕES ENTRE CONCURSOS
     def analisar_repeticoes():
         repeticoes_stats = {
@@ -138,16 +138,16 @@ def analise_padroes_sequencias_quina(dados_sorteios):
                     'numeros_repetidos': list(repeticoes),
                     'quantidade_repetidos': len(repeticoes)
                 })
-                
-                # Contar números que mais repetem
+            
+            # Contar números que mais repetem
                 for num in repeticoes:
-                    repeticoes_stats['numeros_que_mais_repetem'][num] += 1
-                
+                repeticoes_stats['numeros_que_mais_repetem'][num] += 1
+            
                 # Verificar se não houve repetição
                 if len(repeticoes) == 0:
                     repeticoes_stats['concursos_sem_repeticao'] += 1
                     sequencia_atual_sem_repeticao += 1
-                else:
+            else:
                     if sequencia_atual_sem_repeticao > repeticoes_stats['maior_sequencia_sem_repeticao']:
                         repeticoes_stats['maior_sequencia_sem_repeticao'] = sequencia_atual_sem_repeticao
                     sequencia_atual_sem_repeticao = 0
@@ -160,7 +160,7 @@ def analise_padroes_sequencias_quina(dados_sorteios):
             repeticoes_stats['media_repeticoes'] = total_repeticoes / len(repeticoes_stats['por_concurso'])
         
         return repeticoes_stats
-
+    
     # 3. INTERVALOS DE AUSÊNCIA
     def analisar_intervalos():
         intervalos_stats = {
@@ -222,7 +222,7 @@ def analise_padroes_sequencias_quina(dados_sorteios):
             intervalos_stats['intervalo_medio_geral'] = sum(intervalos_totais) / len(intervalos_totais)
         
         return intervalos_stats
-
+    
     # 4. CICLOS DE RETORNO
     def analisar_ciclos():
         ciclos_stats = {
@@ -283,13 +283,13 @@ def analise_padroes_sequencias_quina(dados_sorteios):
             ciclos_stats['ciclo_medio_geral'] = sum(ciclos_totais) / len(ciclos_totais)
         
         return ciclos_stats
-
+    
     # Executar todas as análises
     consecutivos = analisar_consecutivos()
     repeticoes = analisar_repeticoes()
     intervalos = analisar_intervalos()
     ciclos = analisar_ciclos()
-
+    
     # Organizar resultado final
     resultado = {
         'numeros_consecutivos': consecutivos,
@@ -301,7 +301,7 @@ def analise_padroes_sequencias_quina(dados_sorteios):
             'concursos_analisados': [s['concurso'] for s in historico_sorteios]
         }
     }
-
+    
     return resultado
 
 def exibir_analise_padroes_sequencias_quina(resultado):
@@ -417,12 +417,12 @@ def analise_padroes_sequencias_quina_completa(df_quina, qtd_concursos=None):
         # Validar range de números (1-80 para Quina)
         numeros_validos = [row[col] for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']]
         if all(1 <= n <= 80 for n in numeros_validos):
-            sorteio = [
-                row['Concurso'],
-                row['Bola1'], row['Bola2'], row['Bola3'], 
+        sorteio = [
+            row['Concurso'],
+            row['Bola1'], row['Bola2'], row['Bola3'], 
                 row['Bola4'], row['Bola5']
-            ]
-            dados_sorteios.append(sorteio)
+        ]
+        dados_sorteios.append(sorteio)
     
     # Verificação final antes de executar análise
     if not dados_sorteios:
@@ -447,7 +447,7 @@ def analise_padroes_sequencias_quina_completa(df_quina, qtd_concursos=None):
     
     # Executar análise original
     resultado = analise_padroes_sequencias_quina(dados_sorteios)
-    
+
     return resultado
 
 def exibir_analise_padroes_sequencias_detalhada_quina(resultado):

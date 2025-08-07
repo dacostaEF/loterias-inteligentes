@@ -101,7 +101,7 @@ class AnaliseEstatisticaAvancadaQuina:
         frequencias = {}
         for num in range(1, 81):
             count = 0
-            for _, row in self.df_validos.iterrows():
+        for _, row in self.df_validos.iterrows():
                 if num in row[self.colunas_bolas].values:
                     count += 1
             frequencias[num] = count
@@ -170,13 +170,13 @@ class AnaliseEstatisticaAvancadaQuina:
         # Em 5 números, esperamos em média 2.5 pares
         aleatorio_paridade = abs(media_pares - 2.5) < 0.5
         
-        return {
-            'teste_chi_quadrado': {
+            return {
+                'teste_chi_quadrado': {
                 'chi2': chi2_stat,
                 'p_value': p_value,
                 'interpretacao': interpretacao
-            },
-            'teste_paridade': {
+                },
+                'teste_paridade': {
                 'media_pares': media_pares,
                 'aleatorio_paridade': aleatorio_paridade
             }
@@ -273,7 +273,7 @@ class AnaliseEstatisticaAvancadaQuina:
             )
             
             estatisticas_clusters[f'cluster_{i+1}'] = {
-                'numeros': numeros_cluster,
+                    'numeros': numeros_cluster,
                 'quantidade': len(numeros_cluster),
                 'tipo': tipo,
                 'frequencia_media': freq_media,
@@ -283,7 +283,7 @@ class AnaliseEstatisticaAvancadaQuina:
                 'score_atraso': score_atraso,
                 'volatilidade': volatilidade,
                 'tendencia': tendencia
-            }
+                }
         
         return {
             'estatisticas_clusters': estatisticas_clusters,
@@ -308,7 +308,7 @@ class AnaliseEstatisticaAvancadaQuina:
             return "Ciclo Curto"
         elif intervalo_medio > 20:
             return "Ciclo Longo"
-        else:
+            else:
             return "Regular"
     
     def analise_correlacao_numeros(self):
@@ -349,7 +349,7 @@ class AnaliseEstatisticaAvancadaQuina:
         # Calcular correlação média
         correlacao_media = np.mean([corr for _, _, corr, _ in correlacoes])
         
-        return {
+                return {
             'correlacoes_positivas': correlacoes_positivas[:20],
             'correlacoes_negativas': correlacoes_negativas[:20],
             'correlacao_media': correlacao_media,
@@ -404,7 +404,7 @@ class AnaliseEstatisticaAvancadaQuina:
             'dependencias_fracas': dependencias_fracas[:20],
             'todas_dependencias': dependencias[:50]
         }
-    
+
     def calcular_distribuicao_frequencia_numeros(self, df_filtrado):
         """
         Calcula a distribuição de frequência dos números
@@ -415,7 +415,7 @@ class AnaliseEstatisticaAvancadaQuina:
         Returns:
             dict: Distribuição de frequência
         """
-        if df_filtrado is None or df_filtrado.empty:
+            if df_filtrado is None or df_filtrado.empty:
             return {}
         
         # Calcular frequência de cada número

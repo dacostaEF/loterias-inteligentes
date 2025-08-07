@@ -171,19 +171,19 @@ def calcular_valor_aposta_quina(qtde_numeros: int) -> float:
     Calcula o valor estimado da aposta baseado na quantidade de números.
     Valores baseados na tabela oficial da Quina.
     """
-    # Tabela de valores da Quina (valores aproximados)
+    # Tabela de valores da Quina (valores atualizados)
     tabela_valores = {
-        5: 2.50,     # 5 números
-        6: 15.00,    # 6 números
-        7: 52.50,    # 7 números
-        8: 157.50,   # 8 números
-        9: 420.00,   # 9 números
-        10: 1050.00, # 10 números
-        11: 2310.00, # 11 números
-        12: 4620.00, # 12 números
-        13: 8580.00, # 13 números
-        14: 15015.00, # 14 números
-        15: 25025.00, # 15 números
+        5: 3.00,     # 5 números
+        6: 18.00,    # 6 números
+        7: 63.00,    # 7 números
+        8: 168.00,   # 8 números
+        9: 378.00,   # 9 números
+        10: 756.00,  # 10 números
+        11: 1386.00, # 11 números
+        12: 2376.00, # 12 números
+        13: 3861.00, # 13 números
+        14: 6006.00, # 14 números
+        15: 9009.00, # 15 números
     }
     
     return tabela_valores.get(qtde_numeros, 0.0)

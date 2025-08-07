@@ -469,27 +469,35 @@
       background: rgba(0, 227, 140, 0.2) !important;
     }
 
-    /* Estilos para submenu dropdown */
+    /* Estilos para submenu dropdown - MELHORADO */
     .dropdown {
       position: relative;
     }
 
-                    .dropdown-content {
-                    display: none;
-                    position: absolute;
-                    left: 0;
-                    top: 100%;
-                    margin-top: 8px;
-                    background: #2a2a3e;
-                    min-width: 200px;
-                    box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);
-                    border-radius: 8px;
-                    z-index: 1000;
-                    border: 2px solid rgba(168, 85, 247, 0.6);
-                    transition: all 0.2s ease;
-                    opacity: 0;
-                    visibility: hidden;
-                }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      margin-top: 8px;
+      background: #2a2a3e;
+      min-width: 200px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);
+      border-radius: 8px;
+      z-index: 1000;
+      border: 2px solid rgba(168, 85, 247, 0.6);
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+    }
+
+    .dropdown-content.show {
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
 
     .dropdown-content a {
       color: #e2e8f0;
@@ -513,10 +521,17 @@
       border-left-color: #00E38C !important;
     }
 
+    /* Hover melhorado com delay */
     .dropdown:hover .dropdown-content {
       display: block;
       opacity: 1;
       visibility: visible;
+      transform: translateY(0);
+    }
+
+    /* Delay para fechar o dropdown */
+    .dropdown {
+      transition: all 0.2s ease;
     }
 
     /* Submenu para mobile */
@@ -1450,17 +1465,17 @@
       if (qtdeNum >= 5) {
         // Tabela de preços simplificada para Quina
         const tabelaPrecos = {
-          "5": {apostas: 1, valor: 2.50},
-          "6": {apostas: 6, valor: 15.00},
-          "7": {apostas: 21, valor: 52.50},
-          "8": {apostas: 56, valor: 140.00},
-          "9": {apostas: 126, valor: 315.00},
-          "10": {apostas: 252, valor: 630.00},
-          "11": {apostas: 462, valor: 1155.00},
-          "12": {apostas: 792, valor: 1980.00},
-          "13": {apostas: 1287, valor: 3217.50},
-          "14": {apostas: 2002, valor: 5005.00},
-          "15": {apostas: 3003, valor: 7507.50}
+          "5": {apostas: 1, valor: 3.00},
+          "6": {apostas: 6, valor: 18.00},
+          "7": {apostas: 21, valor: 63.00},
+          "8": {apostas: 56, valor: 168.00},
+          "9": {apostas: 126, valor: 378.00},
+          "10": {apostas: 252, valor: 756.00},
+          "11": {apostas: 462, valor: 1386.00},
+          "12": {apostas: 792, valor: 2376.00},
+          "13": {apostas: 1287, valor: 3861.00},
+          "14": {apostas: 2002, valor: 6006.00},
+          "15": {apostas: 3003, valor: 9009.00}
         };
         
         const infoAposta = tabelaPrecos[qtdeNum];
@@ -4684,8 +4699,8 @@
         botao.innerHTML = '🍀 Gerando Palpite...';
         botao.disabled = true;
         
-        // Chamar API para gerar números aleatórios
-        const response = await fetch('/api/gerar-numeros-aleatorios');
+        // Chamar API para gerar números aleatórios da Quina
+        const response = await fetch('/api/gerar-numeros-aleatorios-quina');
         const dados = await response.json();
         
         if (dados.success) {
@@ -4700,11 +4715,6 @@
               selecionarNumero(numero, elemento);
             }
           });
-          
-          // Selecionar trevos (corrigido para usar a nova estrutura)
-
-          
-
           
           // Mostrar sucesso
           mostrarMensagem('🍀 Palpite da Sorte gerado com sucesso!', 'success');
@@ -5505,6 +5515,39 @@
   <!-- Script para controlar os menus responsivos -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // MELHORIA DOS DROPDOWNS DESKTOP
+      const dropdowns = document.querySelectorAll('.dropdown');
+      let timeoutId;
+
+      dropdowns.forEach(dropdown => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        
+        // Mostrar dropdown no hover
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+          dropdownContent.classList.add('show');
+        });
+        
+        // Esconder dropdown com delay
+        dropdown.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300); // 300ms de delay
+        });
+        
+        // Manter dropdown aberto se o mouse estiver sobre ele
+        dropdownContent.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+        });
+        
+        // Fechar dropdown quando sair do conteúdo
+        dropdownContent.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300);
+        });
+      });
+
       const hamburgerIcon = document.getElementById('hamburgerIcon');
       const navPanel = document.getElementById('navPanel');
       const navOverlay = document.getElementById('navOverlay');
@@ -5574,4 +5617,3 @@
     </div>
   </div>
 </body>
-</html> 

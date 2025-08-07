@@ -469,27 +469,35 @@
       background: rgba(0, 227, 140, 0.2) !important;
     }
 
-    /* Estilos para submenu dropdown */
+        /* Estilos para submenu dropdown - MELHORADO */
     .dropdown {
       position: relative;
     }
 
-                    .dropdown-content {
-                    display: none;
-                    position: absolute;
-                    left: 0;
-                    top: 100%;
-                    margin-top: 8px;
-                    background: #2a2a3e;
-                    min-width: 200px;
-                    box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);
-                    border-radius: 8px;
-                    z-index: 1000;
-                    border: 2px solid rgba(168, 85, 247, 0.6);
-                    transition: all 0.2s ease;
-                    opacity: 0;
-                    visibility: hidden;
-                }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      margin-top: 8px;
+      background: #2a2a3e;
+      min-width: 200px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);
+      border-radius: 8px;
+      z-index: 1000;
+      border: 2px solid rgba(168, 85, 247, 0.6);
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+    }
+
+    .dropdown-content.show {
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
 
     .dropdown-content a {
       color: #e2e8f0;
@@ -513,10 +521,17 @@
       border-left-color: #00E38C !important;
     }
 
+    /* Hover melhorado com delay */
     .dropdown:hover .dropdown-content {
       display: block;
       opacity: 1;
       visibility: visible;
+      transform: translateY(0);
+    }
+
+    /* Delay para fechar o dropdown */
+    .dropdown {
+      transition: all 0.2s ease;
     }
 
     /* Submenu para mobile */
@@ -5504,6 +5519,39 @@
   <!-- Script para controlar os menus responsivos -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // MELHORIA DOS DROPDOWNS DESKTOP
+      const dropdowns = document.querySelectorAll('.dropdown');
+      let timeoutId;
+
+      dropdowns.forEach(dropdown => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        
+        // Mostrar dropdown no hover
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+          dropdownContent.classList.add('show');
+        });
+        
+        // Esconder dropdown com delay
+        dropdown.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300); // 300ms de delay
+        });
+        
+        // Manter dropdown aberto se o mouse estiver sobre ele
+        dropdownContent.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+        });
+        
+        // Fechar dropdown quando sair do conteúdo
+        dropdownContent.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300);
+        });
+      });
+
       const hamburgerIcon = document.getElementById('hamburgerIcon');
       const navPanel = document.getElementById('navPanel');
       const navOverlay = document.getElementById('navOverlay');
@@ -5573,4 +5621,3 @@
     </div>
   </div>
 </body>
-</html> 

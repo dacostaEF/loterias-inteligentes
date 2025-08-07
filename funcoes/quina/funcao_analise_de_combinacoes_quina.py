@@ -89,13 +89,13 @@ def analise_de_combinacoes_quina(dados_sorteios, qtd_concursos=None):
                 combinacoes_stats['duplas'][tuple(sorted(dupla))] += 1
             
             # Ternas de números principais
-            for terna in combinations(numeros, 3):
-                combinacoes_stats['ternas'][tuple(sorted(terna))] += 1
-            
+                for terna in combinations(numeros, 3):
+                    combinacoes_stats['ternas'][tuple(sorted(terna))] += 1
+
             # Quadras de números principais
-            for quadra in combinations(numeros, 4):
-                combinacoes_stats['quadras'][tuple(sorted(quadra))] += 1
-        
+                for quadra in combinations(numeros, 4):
+                    combinacoes_stats['quadras'][tuple(sorted(quadra))] += 1
+            
         return combinacoes_stats
 
     # 2. Afinidade: Números que mais aparecem juntos
@@ -172,7 +172,7 @@ def analise_de_combinacoes_quina(dados_sorteios, qtd_concursos=None):
             'razoes_mais_comuns': Counter(),
             'tamanhos_sequencias': Counter()
         }
-
+        
         for _, row in df_sorteios_pd.iterrows():
             numeros = row['numeros_principais_ordenados']
             
@@ -251,27 +251,27 @@ def analise_combinacoes_quina_completa(df_quina, qtd_concursos=None):
         print("⚠️  Aviso: Dados da Quina são None!")
         return {}
     
-    # Se for DataFrame, verificar se está vazio
+        # Se for DataFrame, verificar se está vazio
     if hasattr(df_quina, 'empty') and df_quina.empty:
         print("⚠️  Aviso: DataFrame da Quina está vazio!")
-        return {}
-    
-    # Verificar se as colunas necessárias existem
+            return {}
+        
+        # Verificar se as colunas necessárias existem
     colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']
     colunas_faltantes = [col for col in colunas_necessarias if col not in df_quina.columns]
-    
-    if colunas_faltantes:
-        print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
-        return {}
-    
-    # Converter DataFrame para formato esperado pela função original
-    dados_sorteios = []
-    
+        
+        if colunas_faltantes:
+            print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
+            return {}
+        
+        # Converter DataFrame para formato esperado pela função original
+        dados_sorteios = []
+        
     for _, row in df_quina.iterrows():
         # Verificar se os dados são válidos (apenas números 1-80)
         if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']):
-            continue  # Pular linhas com dados inválidos
-        
+                continue  # Pular linhas com dados inválidos
+            
         # Validar range de números (1-80 para Quina)
         numeros_validos = [row[col] for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']]
         if all(1 <= n <= 80 for n in numeros_validos):
