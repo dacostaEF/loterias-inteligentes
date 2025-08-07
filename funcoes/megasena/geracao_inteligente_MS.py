@@ -159,20 +159,25 @@ def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
 def calcular_valor_aposta(qtde_numeros: int) -> float:
     """
     Calcula o valor estimado da aposta baseado na quantidade de números.
-    Valores baseados na tabela oficial da Mega Sena.
+    Valores baseados na tabela oficial da Mega Sena (atualizada 2024).
     """
-    # Tabela de valores da Mega Sena (valores aproximados)
+    # Tabela de valores da Mega Sena (valores atualizados 2024)
     tabela_valores = {
-        6: 5.00,    # 6 números
-        7: 35.00,   # 7 números
-        8: 140.00,  # 8 números
-        9: 420.00,  # 9 números
-        10: 1050.00, # 10 números
-        11: 2310.00, # 11 números
-        12: 4620.00, # 12 números
-        13: 8580.00, # 13 números
-        14: 15015.00, # 14 números
-        15: 25025.00, # 15 números
+        6: 6.00,      # 6 números
+        7: 42.00,     # 7 números
+        8: 168.00,    # 8 números
+        9: 504.00,    # 9 números
+        10: 1260.00,  # 10 números
+        11: 2772.00,  # 11 números
+        12: 5544.00,  # 12 números
+        13: 10296.00, # 13 números
+        14: 18018.00, # 14 números
+        15: 30030.00, # 15 números
+        16: 48048.00, # 16 números
+        17: 74256.00, # 17 números
+        18: 111384.00, # 18 números
+        19: 162792.00, # 19 números
+        20: 232560.00  # 20 números
     }
     
     return tabela_valores.get(qtde_numeros, 0.0)

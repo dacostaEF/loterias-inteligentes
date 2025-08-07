@@ -1,17 +1,22 @@
 import random
 
-# Tabela de preços das apostas da Mega Sena
+# Tabela de preços das apostas da Mega Sena (valores atualizados 2024)
 TABELA_PRECOS = {
-    6: {"apostas": 1, "valor": 5.00},
-    7: {"apostas": 7, "valor": 35.00},
-    8: {"apostas": 28, "valor": 140.00},
-    9: {"apostas": 84, "valor": 420.00},
-    10: {"apostas": 210, "valor": 1050.00},
-    11: {"apostas": 462, "valor": 2310.00},
-    12: {"apostas": 924, "valor": 4620.00},
-    13: {"apostas": 1716, "valor": 8580.00},
-    14: {"apostas": 3003, "valor": 15015.00},
-    15: {"apostas": 5005, "valor": 25025.00}
+    6: {"apostas": 1, "valor": 6.00},
+    7: {"apostas": 7, "valor": 42.00},
+    8: {"apostas": 28, "valor": 168.00},
+    9: {"apostas": 84, "valor": 504.00},
+    10: {"apostas": 210, "valor": 1260.00},
+    11: {"apostas": 462, "valor": 2772.00},
+    12: {"apostas": 924, "valor": 5544.00},
+    13: {"apostas": 1716, "valor": 10296.00},
+    14: {"apostas": 3003, "valor": 18018.00},
+    15: {"apostas": 5005, "valor": 30030.00},
+    16: {"apostas": 8008, "valor": 48048.00},
+    17: {"apostas": 12376, "valor": 74256.00},
+    18: {"apostas": 18564, "valor": 111384.00},
+    19: {"apostas": 27132, "valor": 162792.00},
+    20: {"apostas": 38760, "valor": 232560.00}
 }
 
 def gerar_aposta_personalizada(qtde_num):
@@ -19,15 +24,15 @@ def gerar_aposta_personalizada(qtde_num):
     Gera uma aposta personalizada da Mega Sena com base na quantidade de números escolhidos
     
     Args:
-        qtde_num (int): Quantidade de números principais (6 a 15)
+        qtde_num (int): Quantidade de números principais (6 a 20)
     
     Returns:
         tuple: (numeros, valor_aposta, qtde_apostas)
     """
     
     # Validação dos parâmetros
-    if qtde_num < 6 or qtde_num > 15:
-        raise ValueError("Quantidade de números deve estar entre 6 e 15")
+    if qtde_num < 6 or qtde_num > 20:
+        raise ValueError("Quantidade de números deve estar entre 6 e 20")
     
     # Verificar se a quantidade existe na tabela
     if qtde_num not in TABELA_PRECOS:
@@ -103,7 +108,7 @@ if __name__ == "__main__":
                 continue
             
             # Solicitar quantidade de números
-            qtde_num = int(input("Quantos números? (6-15): "))
+            qtde_num = int(input("Quantos números? (6-20): "))
             
             # Gerar e exibir aposta
             gerar_e_exibir_personalizada(qtde_num)

@@ -1028,8 +1028,8 @@
       <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Configurar Aposta Aleatória</h3>
 
       <div class="mb-8">
-        <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (6-15)</label>
-        <input type="range" id="sliderNumeros" min="6" max="15" value="8" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
+        <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (6-20)</label>
+        <input type="range" id="sliderNumeros" min="6" max="20" value="8" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
         <span id="valorNumeros" class="block text-center text-lg font-bold mt-2 text-[#00E38C]">8</span>
       </div>
 
@@ -1301,42 +1301,40 @@
       }, 10000);
     }
 
-    // Dados simulados (serão substituídos pelos dados reais)
-    const dadosMilionaria = {
+    // Dados simulados para Mega Sena (serão substituídos pelos dados reais)
+    const dadosMegaSena = {
       frequencia: {
         numeros: {
-          quentes: [21, 41, 50, 23, 44, 16, 35, 42, 47, 48],
-          frios: [49, 43, 45, 46, 40, 39, 38, 37, 36, 34]
-        },
-        trevos: {
-          frequentes: [2, 4, 1, 6, 3, 5]
+          quentes: [10, 23, 27, 33, 41, 53, 58, 60, 44, 51],
+          frios: [1, 2, 3, 4, 5, 6, 7, 8, 9, 11]
         }
       },
       distribuicao: {
-        pares: 3.04,
-        impares: 2.96,
+        pares: 3.2,
+        impares: 2.8,
         faixas: {
           "1-10": 0.8,
-          "11-20": 1.2,
-          "21-30": 1.1,
-          "31-40": 1.3,
-          "41-50": 1.6
+          "11-20": 1.1,
+          "21-30": 1.2,
+          "31-40": 1.0,
+          "41-50": 1.3,
+          "51-60": 0.6
         }
       },
       afinidades: {
         positivas: [
-          { num1: 21, num2: 22, correlacao: 0.182 },
-          { num1: 17, num2: 46, correlacao: 0.173 },
-          { num1: 4, num2: 38, correlacao: 0.155 }
+          { num1: 10, num2: 23, correlacao: 0.182 },
+          { num1: 27, num2: 33, correlacao: 0.173 },
+          { num1: 41, num2: 53, correlacao: 0.155 }
         ],
         negativas: [
-          { num1: 24, num2: 25, correlacao: -0.159 },
-          { num1: 20, num2: 41, correlacao: -0.155 }
+          { num1: 1, num2: 2, correlacao: -0.159 },
+          { num1: 3, num2: 4, correlacao: -0.155 }
         ]
       },
       seca: {
-        maior: [49, 43, 45, 46, 40],
-        recentes: [21, 41, 50, 23, 44]
+        maior: [1, 2, 3, 4, 5],
+        recentes: [10, 23, 27, 33, 41]
       }
     };
 
@@ -1379,11 +1377,11 @@
 
 
 
-    // Selecionar número (manual - limite de 15)
+    // Selecionar número (manual - limite de 20)
     function selecionarNumero(numero, elemento) {
       // Verificar se já atingiu o limite antes de qualquer ação
-      if (numerosSelecionados.length >= 15 && !numerosSelecionados.includes(numero)) {
-        alert('Você já selecionou 15 números! Limite máximo para seleção manual.');
+      if (numerosSelecionados.length >= 20 && !numerosSelecionados.includes(numero)) {
+        alert('Você já selecionou 20 números! Limite máximo para seleção manual.');
         // Garantir que o elemento NÃO seja marcado visualmente
         elemento.classList.remove('selecionado');
         // Forçar remoção de qualquer estado temporário
@@ -1463,18 +1461,23 @@
       
       // Só calcular se tiver seleção mínima (6 números)
       if (qtdeNum >= 6) {
-        // Tabela de preços simplificada para Mega Sena (sem trevos)
+        // Tabela de preços simplificada para Mega Sena (valores atualizados 2024)
         const tabelaPrecos = {
-          "6": {apostas: 1, valor: 5.00},
-          "7": {apostas: 7, valor: 35.00},
-          "8": {apostas: 28, valor: 140.00},
-          "9": {apostas: 84, valor: 420.00},
-          "10": {apostas: 210, valor: 1050.00},
-          "11": {apostas: 462, valor: 2310.00},
-          "12": {apostas: 924, valor: 4620.00},
-          "13": {apostas: 1716, valor: 8580.00},
-          "14": {apostas: 3003, valor: 15015.00},
-          "15": {apostas: 5005, valor: 25025.00}
+          "6": {apostas: 1, valor: 6.00},
+          "7": {apostas: 7, valor: 42.00},
+          "8": {apostas: 28, valor: 168.00},
+          "9": {apostas: 84, valor: 504.00},
+          "10": {apostas: 210, valor: 1260.00},
+          "11": {apostas: 462, valor: 2772.00},
+          "12": {apostas: 924, valor: 5544.00},
+          "13": {apostas: 1716, valor: 10296.00},
+          "14": {apostas: 3003, valor: 18018.00},
+          "15": {apostas: 5005, valor: 30030.00},
+          "16": {apostas: 8008, valor: 48048.00},
+          "17": {apostas: 12376, valor: 74256.00},
+          "18": {apostas: 18564, valor: 111384.00},
+          "19": {apostas: 27132, valor: 162792.00},
+          "20": {apostas: 38760, valor: 232560.00}
         };
         
         const infoAposta = tabelaPrecos[qtdeNum];
@@ -4698,8 +4701,8 @@
         botao.innerHTML = '🍀 Gerando Palpite...';
         botao.disabled = true;
         
-        // Chamar API para gerar números aleatórios
-        const response = await fetch('/api/gerar-numeros-aleatorios');
+        // Chamar API para gerar números aleatórios da Mega Sena
+        const response = await fetch('/api/gerar-numeros-aleatorios-megasena');
         const dados = await response.json();
         
         if (dados.success) {
@@ -4714,11 +4717,6 @@
               selecionarNumero(numero, elemento);
             }
           });
-          
-          // Selecionar trevos (corrigido para usar a nova estrutura)
-
-          
-
           
           // Mostrar sucesso
           mostrarMensagem('🍀 Palpite da Sorte gerado com sucesso!', 'success');

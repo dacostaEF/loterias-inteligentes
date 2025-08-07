@@ -818,6 +818,28 @@ def gerar_numeros_aleatorios():
             "error": "Erro interno do servidor"
         }), 500
 
+@app.route('/api/gerar-numeros-aleatorios-megasena', methods=['GET'])
+def gerar_numeros_aleatorios_megasena():
+    """Gera números aleatórios para Mega Sena (6 números de 1-60)."""
+    try:
+        import random
+        
+        # Gerar 6 números únicos entre 1 e 60 (Mega Sena)
+        numeros = sorted(random.sample(range(1, 61), 6))
+        
+        return jsonify({
+            "success": True,
+            "numeros": numeros,
+            "mensagem": "Números da Mega Sena gerados com sucesso!"
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro ao gerar números aleatórios da Mega Sena: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
 @app.route('/api/gerar-numeros-aleatorios-quina', methods=['GET'])
 def gerar_numeros_aleatorios_quina():
     """Gera números aleatórios para Quina (5 números de 1-80)."""
