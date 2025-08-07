@@ -96,21 +96,21 @@ if __name__ == '__main__':
         df_milionaria = carregar_dados_milionaria()
         matriz_numeros, matriz_trevos, concursos_nums, concursos_trevos = converter_para_matrizes_binarias_milionaria(df_milionaria)
         
-        print("\n--- Carregamento de Dados Mais Milionária ---")
-        print(f"Número de concursos carregados: {len(df_milionaria)}")
-        print(f"Formato da matriz de números: {matriz_numeros.shape}")
-        print(f"Formato da matriz de trevos: {matriz_trevos.shape}")
-        
+        # print("\n--- Carregamento de Dados Mais Milionária ---")  # DEBUG - COMENTADO
+        # print(f"Número de concursos carregados: {len(df_milionaria)}")  # DEBUG - COMENTADO
+        # print(f"Formato da matriz de números: {matriz_numeros.shape}")  # DEBUG - COMENTADO
+        # print(f"Formato da matriz de trevos: {matriz_trevos.shape}")  # DEBUG - COMENTADO
+        # 
         # Exemplo: mostrar o primeiro e o último concurso em matriz binária
-        print("\nPrimeiro concurso (Números):")
-        print(matriz_numeros[0])
-        print("\nÚltimo concurso (Números):")
-        print(matriz_numeros[-1])
-        
-        print("\nPrimeiro concurso (Trevos):")
-        print(matriz_trevos[0])
-        print("\nÚltimo concurso (Trevos):")
-        print(matriz_trevos[-1])
+        # print("\nPrimeiro concurso (Números):")  # DEBUG - COMENTADO
+        # print(matriz_numeros[0])  # DEBUG - COMENTADO
+        # print("\nÚltimo concurso (Números):")  # DEBUG - COMENTADO
+        # print(matriz_numeros[-1])  # DEBUG - COMENTADO
+        # 
+        # print("\nPrimeiro concurso (Trevos):")  # DEBUG - COMENTADO
+        # print(matriz_trevos[0])  # DEBUG - COMENTADO
+        # print("\nÚltimo concurso (Trevos):")  # DEBUG - COMENTADO
+        # print(matriz_trevos[-1])  # DEBUG - COMENTADO
 
     except FileNotFoundError as e:
         print(e)

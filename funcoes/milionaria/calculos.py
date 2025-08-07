@@ -361,79 +361,79 @@ def exibir_analise_seca(resultado_seca, tipo='numeros'):
         tipo (str): 'numeros' ou 'trevos'
     """
     if not resultado_seca:
-        print(f"❌ Nenhum resultado de análise de seca de {tipo} disponível")
+        # print(f"❌ Nenhum resultado de análise de seca de {tipo} disponível")  # DEBUG - COMENTADO
         return
     
     # Informações do período analisado
-    if 'periodo_analisado' in resultado_seca:
-        periodo = resultado_seca['periodo_analisado']
-        print(f"\n🌵 PERÍODO ANALISADO PARA SECA DE {tipo.upper()}:")
-        print(f"   Total de concursos disponíveis: {periodo['total_concursos']}")
-        print(f"   Concursos analisados: {periodo['concursos_analisados']}")
-        if periodo['qtd_concursos_especificada']:
-            print(f"   Análise dos últimos: {periodo['qtd_concursos_especificada']} concursos")
-        print("-" * 50)
+    # if 'periodo_analisado' in resultado_seca:
+    #     periodo = resultado_seca['periodo_analisado']
+    #     print(f"\n🌵 PERÍODO ANALISADO PARA SECA DE {tipo.upper()}:")  # DEBUG - COMENTADO
+    #     print(f"   Total de concursos disponíveis: {periodo['total_concursos']}")  # DEBUG - COMENTADO
+    #     print(f"   Concursos analisados: {periodo['concursos_analisados']}")  # DEBUG - COMENTADO
+    #     if periodo['qtd_concursos_especificada']:
+    #         print(f"   Análise dos últimos: {periodo['qtd_concursos_especificada']} concursos")  # DEBUG - COMENTADO
+    #     print("-" * 50)  # DEBUG - COMENTADO
     
-    print(f"\n" + "="*80)
-    print(f"🌵 ANÁLISE DE SECA DOS {tipo.upper()}")
-    print("="*80)
+    # print(f"\n" + "="*80)  # DEBUG - COMENTADO
+    # print(f"🌵 ANÁLISE DE SECA DOS {tipo.upper()}")  # DEBUG - COMENTADO
+    # print("="*80)  # DEBUG - COMENTADO
     
     # Estatísticas gerais
-    if 'estatisticas' in resultado_seca:
-        stats = resultado_seca['estatisticas']
-        print(f"\n📊 ESTATÍSTICAS GERAIS:")
-        print(f"   Seca média: {stats['seca_media']:.1f} concursos")
-        print(f"   Seca mediana: {stats['seca_mediana']:.1f} concursos")
-        print(f"   Seca máxima: {stats['seca_maxima']} concursos")
-        print(f"   Concursos analisados: {stats['total_concursos_analisados']}")
+    # if 'estatisticas' in resultado_seca:
+    #     stats = resultado_seca['estatisticas']
+    #     print(f"\n📊 ESTATÍSTICAS GERAIS:")  # DEBUG - COMENTADO
+    #     print(f"   Seca média: {stats['seca_media']:.1f} concursos")  # DEBUG - COMENTADO
+    #     print(f"   Seca mediana: {stats['seca_mediana']:.1f} concursos")  # DEBUG - COMENTADO
+    #     print(f"   Seca máxima: {stats['seca_maxima']} concursos")  # DEBUG - COMENTADO
+    #     print(f"   Concursos analisados: {stats['total_concursos_analisados']}")  # DEBUG - COMENTADO
     
     # Maior seca
-    if tipo == 'numeros' and 'numeros_maior_seca' in resultado_seca:
-        print(f"\n🔥 {tipo.upper()} EM MAIOR SECA:")
-        for numero, info in resultado_seca['numeros_maior_seca']:
-            ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
-            print(f"   {tipo.capitalize()} {numero}: {info['seca_atual']} concursos sem sair (última: {ultima})")
+    # if tipo == 'numeros' and 'numeros_maior_seca' in resultado_seca:
+    #     print(f"\n🔥 {tipo.upper()} EM MAIOR SECA:")  # DEBUG - COMENTADO
+    #     for numero, info in resultado_seca['numeros_maior_seca']:
+    #         ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
+    #         print(f"   {tipo.capitalize()} {numero}: {info['seca_atual']} concursos sem sair (última: {ultima})")  # DEBUG - COMENTADO
     
-    elif tipo == 'trevos' and 'trevos_maior_seca' in resultado_seca:
-        print(f"\n🔥 {tipo.upper()} EM MAIOR SECA:")
-        for trevo, info in resultado_seca['trevos_maior_seca']:
-            ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
-            print(f"   Trevo {trevo}: {info['seca_atual']} concursos sem sair (última: {ultima})")
+    # elif tipo == 'trevos' and 'trevos_maior_seca' in resultado_seca:
+    #     print(f"\n🔥 {tipo.upper()} EM MAIOR SECA:")  # DEBUG - COMENTADO
+    #     for trevo, info in resultado_seca['trevos_maior_seca']:
+    #         ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
+    #         print(f"   Trevo {trevo}: {info['seca_atual']} concursos sem sair (última: {ultima})")  # DEBUG - COMENTADO
     
     # Recentes
-    if tipo == 'numeros' and 'numeros_recentes' in resultado_seca:
-        print(f"\n✅ {tipo.upper()} QUE SAÍRAM RECENTEMENTE (últimos 3 concursos):")
-        if resultado_seca['numeros_recentes']:
-            for numero in resultado_seca['numeros_recentes']:
-                info = resultado_seca['seca_por_numero'][numero]
-                print(f"   {tipo.capitalize()} {numero}: saiu há {info['seca_atual']} concursos")
-        else:
-            print(f"   Nenhum {tipo} saiu nos últimos 3 concursos")
+    # if tipo == 'numeros' and 'numeros_recentes' in resultado_seca:
+    #     print(f"\n✅ {tipo.upper()} QUE SAÍRAM RECENTEMENTE (últimos 3 concursos):")  # DEBUG - COMENTADO
+    #     if resultado_seca['numeros_recentes']:
+    #         for numero in resultado_seca['numeros_recentes']:
+    #             info = resultado_seca['seca_por_numero'][numero]
+    #             print(f"   {tipo.capitalize()} {numero}: saiu há {info['seca_atual']} concursos")  # DEBUG - COMENTADO
+    #     else:
+    #         print(f"   Nenhum {tipo} saiu nos últimos 3 concursos")  # DEBUG - COMENTADO
     
-    elif tipo == 'trevos' and 'trevos_recentes' in resultado_seca:
-        print(f"\n✅ {tipo.upper()} QUE SAÍRAM RECENTEMENTE (últimos 2 concursos):")
-        if resultado_seca['trevos_recentes']:
-            for trevo in resultado_seca['trevos_recentes']:
-                info = resultado_seca['seca_por_trevo'][trevo]
-                print(f"   Trevo {trevo}: saiu há {info['seca_atual']} concursos")
-        else:
-            print(f"   Nenhum {tipo} saiu nos últimos 2 concursos")
+    # elif tipo == 'trevos' and 'trevos_recentes' in resultado_seca:
+    #     print(f"\n✅ {tipo.upper()} QUE SAÍRAM RECENTEMENTE (últimos 2 concursos):")  # DEBUG - COMENTADO
+    #     if resultado_seca['trevos_recentes']:
+    #         for trevo in resultado_seca['trevos_recentes']:
+    #             info = resultado_seca['seca_por_trevo'][trevo]
+    #             print(f"   Trevo {trevo}: saiu há {info['seca_atual']} concursos")  # DEBUG - COMENTADO
+    #     else:
+    #         print(f"   Nenhum {tipo} saiu nos últimos 2 concursos")  # DEBUG - COMENTADO
     
     # Lista completa de seca
-    print(f"\n📋 LISTA COMPLETA DE SECA DOS {tipo.upper()}:")
-    if tipo == 'numeros':
-        seca_items = sorted(resultado_seca['seca_por_numero'].items(), key=lambda x: x[1]['seca_atual'], reverse=True)
-        for numero, info in seca_items:
-            ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
-            status_emoji = "🔥" if info['seca_atual'] > 10 else "⚠️" if info['seca_atual'] > 5 else "✅"
-            print(f"   {status_emoji} {tipo.capitalize()} {numero:2d}: {info['seca_atual']:2d} concursos sem sair (última: {ultima})")
+    # print(f"\n📋 LISTA COMPLETA DE SECA DOS {tipo.upper()}:")  # DEBUG - COMENTADO
+    # if tipo == 'numeros':
+    #     seca_items = sorted(resultado_seca['seca_por_numero'].items(), key=lambda x: x[1]['seca_atual'], reverse=True)
+    #     for numero, info in seca_items:
+    #         ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
+    #         status_emoji = "🔥" if info['seca_atual'] > 10 else "⚠️" if info['seca_atual'] > 5 else "✅"
+    #         print(f"   {status_emoji} {tipo.capitalize()} {numero:2d}: {info['seca_atual']:2d} concursos sem sair (última: {ultima})")  # DEBUG - COMENTADO
     
-    elif tipo == 'trevos':
-        seca_items = sorted(resultado_seca['seca_por_trevo'].items(), key=lambda x: x[1]['seca_atual'], reverse=True)
-        for trevo, info in seca_items:
-            ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
-            status_emoji = "🔥" if info['seca_atual'] > 5 else "⚠️" if info['seca_atual'] > 3 else "✅"
-            print(f"   {status_emoji} Trevo {trevo}: {info['seca_atual']:2d} concursos sem sair (última: {ultima})")
+    # elif tipo == 'trevos':
+    #     seca_items = sorted(resultado_seca['seca_por_trevo'].items(), key=lambda x: x[1]['seca_atual'], reverse=True)
+    #     for trevo, info in seca_items:
+    #         ultima = info['ultima_aparicao'] if info['ultima_aparicao'] else 'Nunca'
+    #         status_emoji = "🔥" if info['seca_atual'] > 5 else "⚠️" if info['seca_atual'] > 3 else "✅"
+    #         print(f"   {status_emoji} Trevo {trevo}: {info['seca_atual']:2d} concursos sem sair (última: {ultima})")  # DEBUG - COMENTADO
 
 def extrair_features_simplificadas(concurso_atual, concurso_anterior):
     """
@@ -480,62 +480,62 @@ def extrair_features_simplificadas(concurso_atual, concurso_anterior):
     return features
 
 # Exemplo de uso
-if __name__ == "__main__":
-    try:
-        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
-        
-        print("🌵 ANÁLISE DE SECA DA +MILIONÁRIA")
-        print("="*80)
-        
-        df_milionaria = carregar_dados_milionaria()
-        
-        if df_milionaria is not None and not df_milionaria.empty:
-            # Análise de seca dos números
-            print("\n" + "="*80)
-            print("🌵 ANÁLISE DE SECA DOS NÚMEROS (TODOS OS CONCURSOS)")
-            print("="*80)
-            resultado_seca_numeros = calcular_seca_numeros(df_milionaria)
-            exibir_analise_seca(resultado_seca_numeros, 'numeros')
-            
-            print("\n" + "="*80)
-            print("🌵 ANÁLISE DE SECA DOS NÚMEROS (ÚLTIMOS 50 CONCURSOS)")
-            print("="*80)
-            resultado_seca_numeros_50 = calcular_seca_numeros(df_milionaria, qtd_concursos=50)
-            exibir_analise_seca(resultado_seca_numeros_50, 'numeros')
-            
-            # Análise de seca dos trevos
-            print("\n" + "="*80)
-            print("🌵 ANÁLISE DE SECA DOS TREVOS (TODOS OS CONCURSOS)")
-            print("="*80)
-            resultado_seca_trevos = calcular_seca_trevos(df_milionaria)
-            exibir_analise_seca(resultado_seca_trevos, 'trevos')
-            
-            print("\n" + "="*80)
-            print("🌵 ANÁLISE DE SECA DOS TREVOS (ÚLTIMOS 50 CONCURSOS)")
-            print("="*80)
-            resultado_seca_trevos_50 = calcular_seca_trevos(df_milionaria, qtd_concursos=50)
-            exibir_analise_seca(resultado_seca_trevos_50, 'trevos')
-            
-        else:
-            print("❌ Não foi possível carregar os dados da Milionária")
-            
-    except ImportError:
-        print("⚠️  Módulo de carregamento não encontrado. Usando dados de exemplo...")
-        
-        # Dados de exemplo para teste
-        dados_exemplo = [
-            [1, 1, 3, 7, 15, 23, 44, 2, 4],
-            [2, 13, 16, 35, 41, 42, 47, 2, 6],
-            [3, 1, 9, 17, 30, 31, 44, 1, 4],
-            [4, 6, 23, 25, 33, 34, 47, 1, 2],
-            [5, 6, 16, 21, 24, 26, 45, 2, 5]
-        ]
-        df_exemplo = pd.DataFrame(dados_exemplo, columns=['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2'])
-        
-        print("🌵 ANÁLISE DE SECA (DADOS DE EXEMPLO)")
-        print("="*80)
-        resultado_seca_exemplo = calcular_seca_numeros(df_exemplo)
-        exibir_analise_seca(resultado_seca_exemplo, 'numeros')
-        
-        resultado_seca_trevos_exemplo = calcular_seca_trevos(df_exemplo)
-        exibir_analise_seca(resultado_seca_trevos_exemplo, 'trevos') 
+# if __name__ == "__main__":  # DEBUG - COMENTADO
+#     try:  # DEBUG - COMENTADO
+#         from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria  # DEBUG - COMENTADO
+#         
+#         print("🌵 ANÁLISE DE SECA DA +MILIONÁRIA")  # DEBUG - COMENTADO
+#         print("="*80)  # DEBUG - COMENTADO
+#         
+#         df_milionaria = carregar_dados_milionaria()  # DEBUG - COMENTADO
+#         
+#         if df_milionaria is not None and not df_milionaria.empty:  # DEBUG - COMENTADO
+#             # Análise de seca dos números  # DEBUG - COMENTADO
+#             print("\n" + "="*80)  # DEBUG - COMENTADO
+#             print("🌵 ANÁLISE DE SECA DOS NÚMEROS (TODOS OS CONCURSOS)")  # DEBUG - COMENTADO
+#             print("="*80)  # DEBUG - COMENTADO
+#             resultado_seca_numeros = calcular_seca_numeros(df_milionaria)  # DEBUG - COMENTADO
+#             exibir_analise_seca(resultado_seca_numeros, 'numeros')  # DEBUG - COMENTADO
+#             
+#             print("\n" + "="*80)  # DEBUG - COMENTADO
+#             print("🌵 ANÁLISE DE SECA DOS NÚMEROS (ÚLTIMOS 50 CONCURSOS)")  # DEBUG - COMENTADO
+#             print("="*80)  # DEBUG - COMENTADO
+#             resultado_seca_numeros_50 = calcular_seca_numeros(df_milionaria, qtd_concursos=50)  # DEBUG - COMENTADO
+#             exibir_analise_seca(resultado_seca_numeros_50, 'numeros')  # DEBUG - COMENTADO
+#             
+#             # Análise de seca dos trevos  # DEBUG - COMENTADO
+#             print("\n" + "="*80)  # DEBUG - COMENTADO
+#             print("🌵 ANÁLISE DE SECA DOS TREVOS (TODOS OS CONCURSOS)")  # DEBUG - COMENTADO
+#             print("="*80)  # DEBUG - COMENTADO
+#             resultado_seca_trevos = calcular_seca_trevos(df_milionaria)  # DEBUG - COMENTADO
+#             exibir_analise_seca(resultado_seca_trevos, 'trevos')  # DEBUG - COMENTADO
+#             
+#             print("\n" + "="*80)  # DEBUG - COMENTADO
+#             print("🌵 ANÁLISE DE SECA DOS TREVOS (ÚLTIMOS 50 CONCURSOS)")  # DEBUG - COMENTADO
+#             print("="*80)  # DEBUG - COMENTADO
+#             resultado_seca_trevos_50 = calcular_seca_trevos(df_milionaria, qtd_concursos=50)  # DEBUG - COMENTADO
+#             exibir_analise_seca(resultado_seca_trevos_50, 'trevos')  # DEBUG - COMENTADO
+#             
+#         else:  # DEBUG - COMENTADO
+#             print("❌ Não foi possível carregar os dados da Milionária")  # DEBUG - COMENTADO
+#             
+#     except ImportError:  # DEBUG - COMENTADO
+#         print("⚠️  Módulo de carregamento não encontrado. Usando dados de exemplo...")  # DEBUG - COMENTADO
+#         
+#         # Dados de exemplo para teste  # DEBUG - COMENTADO
+#         dados_exemplo = [  # DEBUG - COMENTADO
+#             [1, 1, 3, 7, 15, 23, 44, 2, 4],  # DEBUG - COMENTADO
+#             [2, 13, 16, 35, 41, 42, 47, 2, 6],  # DEBUG - COMENTADO
+#             [3, 1, 9, 17, 30, 31, 44, 1, 4],  # DEBUG - COMENTADO
+#             [4, 6, 23, 25, 33, 34, 47, 1, 2],  # DEBUG - COMENTADO
+#             [5, 6, 16, 21, 24, 26, 45, 2, 5]  # DEBUG - COMENTADO
+#         ]  # DEBUG - COMENTADO
+#         df_exemplo = pd.DataFrame(dados_exemplo, columns=['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2'])  # DEBUG - COMENTADO
+#         
+#         print("🌵 ANÁLISE DE SECA (DADOS DE EXEMPLO)")  # DEBUG - COMENTADO
+#         print("="*80)  # DEBUG - COMENTADO
+#         resultado_seca_exemplo = calcular_seca_numeros(df_exemplo)  # DEBUG - COMENTADO
+#         exibir_analise_seca(resultado_seca_exemplo, 'numeros')  # DEBUG - COMENTADO
+#         
+#         resultado_seca_trevos_exemplo = calcular_seca_trevos(df_exemplo)  # DEBUG - COMENTADO
+#         exibir_analise_seca(resultado_seca_trevos_exemplo, 'trevos')  # DEBUG - COMENTADO 

@@ -827,11 +827,11 @@ function renderClusterCheckboxes() {
     opcoesClustersDiv.innerHTML = '<p class="col-span-2 text-gray-300 text-center">Carregando...</p>';
 
     // Debug: verificar a estrutura dos dados
-    console.log('=== DEBUG RENDER CLUSTER CHECKBOXES ===');
-    console.log('window.analiseResultados:', window.analiseResultados);
-    console.log('window.analiseResultados?.avancada:', window.analiseResultados?.avancada);
-    console.log('window.analiseResultados?.avancada?.clusters:', window.analiseResultados?.avancada?.clusters);
-    console.log('window.analiseResultados?.avancada?.clusters?.resumo_clusters:', window.analiseResultados?.avancada?.clusters?.resumo_clusters);
+    // console.log('=== DEBUG RENDER CLUSTER CHECKBOXES ===');  // DEBUG - COMENTADO
+    // console.log('window.analiseResultados:', window.analiseResultados);  // DEBUG - COMENTADO
+    // console.log('window.analiseResultados?.avancada:', window.analiseResultados?.avancada);  // DEBUG - COMENTADO
+    // console.log('window.analiseResultados?.avancada?.clusters:', window.analiseResultados?.avancada?.clusters);  // DEBUG - COMENTADO
+    // console.log('window.analiseResultados?.avancada?.clusters?.resumo_clusters:', window.analiseResultados?.avancada?.clusters?.resumo_clusters);  // DEBUG - COMENTADO
 
     // Use window.analiseResultados.avancada.clusters.resumo_clusters que deve ser carregado
     if (window.analiseResultados && window.analiseResultados.avancada && window.analiseResultados.avancada.clusters && window.analiseResultados.avancada.clusters.resumo_clusters) {

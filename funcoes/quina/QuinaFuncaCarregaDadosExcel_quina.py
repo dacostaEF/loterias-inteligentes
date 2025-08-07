@@ -90,15 +90,15 @@ if __name__ == '__main__':
         df_quina = carregar_dados_quina(limite_concursos=500)
         matriz_numeros, concursos_nums = converter_para_matrizes_binarias_quina(df_quina)
         
-        print("\n--- Carregamento de Dados Quina ---")
-        print(f"Número de concursos carregados: {len(df_quina)}")
-        print(f"Formato da matriz de números: {matriz_numeros.shape}")
-        
+        # print("\n--- Carregamento de Dados Quina ---")  # DEBUG - COMENTADO
+        # print(f"Número de concursos carregados: {len(df_quina)}")  # DEBUG - COMENTADO
+        # print(f"Formato da matriz de números: {matriz_numeros.shape}")  # DEBUG - COMENTADO
+        # 
         # Exemplo: mostrar o primeiro e o último concurso em matriz binária
-        print("\nPrimeiro concurso (Números):")
-        print(matriz_numeros[0])
-        print("\nÚltimo concurso (Números):")
-        print(matriz_numeros[-1])
+        # print("\nPrimeiro concurso (Números):")  # DEBUG - COMENTADO
+        # print(matriz_numeros[0])  # DEBUG - COMENTADO
+        # print("\nÚltimo concurso (Números):")  # DEBUG - COMENTADO
+        # print(matriz_numeros[-1])  # DEBUG - COMENTADO
 
     except FileNotFoundError as e:
         print(e)

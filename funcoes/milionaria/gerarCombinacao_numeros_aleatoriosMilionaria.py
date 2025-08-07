@@ -99,17 +99,17 @@ def exibir_opcoes_disponiveis():
     """
     Exibe todas as opções de apostas disponíveis
     """
-    print("=" * 60)
-    print("🎲 OPÇÕES DE APOSTAS DISPONÍVEIS 🎲")
-    print("=" * 60)
-    print(f"{'Números':<8} {'Trevos':<8} {'Apostas':<10} {'Valor':<15}")
-    print("-" * 60)
-    
-    for (nums, trevos), info in sorted(TABELA_PRECOS.items()):
-        valor_formatado = f"R$ {info['valor']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-        print(f"{nums:<8} {trevos:<8} {info['apostas']:<10} {valor_formatado:<15}")
-    
-    print("=" * 60)
+    # print("=" * 60)  # DEBUG - COMENTADO
+    # print("🎲 OPÇÕES DE APOSTAS DISPONÍVEIS 🎲")  # DEBUG - COMENTADO
+    # print("=" * 60)  # DEBUG - COMENTADO
+    # print(f"{'Números':<8} {'Trevos':<8} {'Apostas':<10} {'Valor':<15}")  # DEBUG - COMENTADO
+    # print("-" * 60)  # DEBUG - COMENTADO
+    # 
+    # for (nums, trevos), info in sorted(TABELA_PRECOS.items()):
+    #     valor_formatado = f"R$ {info['valor']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    #     print(f"{nums:<8} {trevos:<8} {info['apostas']:<10} {valor_formatado:<15}")  # DEBUG - COMENTADO
+    # 
+    # print("=" * 60)  # DEBUG - COMENTADO
 
 def gerar_e_exibir_personalizada(qtde_num, qtde_trevo):
     """

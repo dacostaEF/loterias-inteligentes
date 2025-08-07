@@ -52,17 +52,17 @@ def exibir_opcoes_disponiveis():
     """
     Exibe todas as opções de apostas disponíveis da Mega Sena
     """
-    print("=" * 50)
-    print("🎲 OPÇÕES DE APOSTAS MEGA SENA 🎲")
-    print("=" * 50)
-    print(f"{'Números':<8} {'Apostas':<10} {'Valor':<15}")
-    print("-" * 50)
-    
-    for nums, info in sorted(TABELA_PRECOS.items()):
-        valor_formatado = f"R$ {info['valor']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-        print(f"{nums:<8} {info['apostas']:<10} {valor_formatado:<15}")
-    
-    print("=" * 50)
+    # print("=" * 50)  # DEBUG - COMENTADO
+    # print("🎲 OPÇÕES DE APOSTAS MEGA SENA 🎲")  # DEBUG - COMENTADO
+    # print("=" * 50)  # DEBUG - COMENTADO
+    # print(f"{'Números':<8} {'Apostas':<10} {'Valor':<15}")  # DEBUG - COMENTADO
+    # print("-" * 50)  # DEBUG - COMENTADO
+    # 
+    # for nums, info in sorted(TABELA_PRECOS.items()):
+    #     valor_formatado = f"R$ {info['valor']:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+    #     print(f"{nums:<8} {info['apostas']:<10} {valor_formatado:<15}")  # DEBUG - COMENTADO
+    # 
+    # print("=" * 50)  # DEBUG - COMENTADO
 
 def gerar_e_exibir_personalizada(qtde_num):
     """
@@ -71,15 +71,15 @@ def gerar_e_exibir_personalizada(qtde_num):
     try:
         numeros, valor, qtde_apostas = gerar_aposta_personalizada(qtde_num)
         
-        print("=" * 50)
-        print("🎲 APOSTA MEGA SENA GERADA 🎲")
-        print("=" * 50)
-        print(f"Configuração: {qtde_num} números")
-        print(f"Números: {numeros}")
-        print(f"Quantidade de apostas: {qtde_apostas}")
-        valor_formatado = f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
-        print(f"Valor da aposta: {valor_formatado}")
-        print("=" * 50)
+        # print("=" * 50)  # DEBUG - COMENTADO
+        # print("🎲 APOSTA MEGA SENA GERADA 🎲")  # DEBUG - COMENTADO
+        # print("=" * 50)  # DEBUG - COMENTADO
+        # print(f"Configuração: {qtde_num} números")  # DEBUG - COMENTADO
+        # print(f"Números: {numeros}")  # DEBUG - COMENTADO
+        # print(f"Quantidade de apostas: {qtde_apostas}")  # DEBUG - COMENTADO
+        # valor_formatado = f"R$ {valor:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
+        # print(f"Valor da aposta: {valor_formatado}")  # DEBUG - COMENTADO
+        # print("=" * 50)  # DEBUG - COMENTADO
         
         return numeros, valor, qtde_apostas
         

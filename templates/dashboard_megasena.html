@@ -2570,16 +2570,16 @@
           url += `?qtd_concursos=${qtdConcursos}`;
         }
 
-        console.log("=== REQUISIÇÃO AFINIDADES ===");
-        console.log("URL:", url);
-        console.log("qtdConcursos:", qtdConcursos);
+        // console.log("=== REQUISIÇÃO AFINIDADES ===");  // DEBUG - COMENTADO
+        // console.log("URL:", url);  // DEBUG - COMENTADO
+        // console.log("qtdConcursos:", qtdConcursos);  // DEBUG - COMENTADO
 
         const response = await fetch(url);
         const data = await response.json();
 
-        console.log("=== DADOS RECEBIDOS DO BACKEND ===");
-        console.log("Data completo:", data);
-        console.log("Afinidade entre números:", data.afinidade_entre_numeros);
+        // console.log("=== DADOS RECEBIDOS DO BACKEND ===");  // DEBUG - COMENTADO
+        // console.log("Data completo:", data);  // DEBUG - COMENTADO
+        // console.log("Afinidade entre números:", data.afinidade_entre_numeros);  // DEBUG - COMENTADO
 
         if (data.error) {
           container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
@@ -2590,12 +2590,12 @@
         const periodoInfo = data.periodo_analisado;
         
         // Debug específico da tabela
-        console.log("=== DEBUG TABELA DETALHADA ===");
-        console.log("Período solicitado:", qtdConcursos);
-        console.log("Período analisado:", periodoInfo);
-        console.log("Pares com maior afinidade:", afinidades.pares_com_maior_afinidade);
-        console.log("Primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5));
-        console.log("Frequências dos primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5).map(p => p[1]));
+        // console.log("=== DEBUG TABELA DETALHADA ===");  // DEBUG - COMENTADO
+        // console.log("Período solicitado:", qtdConcursos);  // DEBUG - COMENTADO
+        // console.log("Período analisado:", periodoInfo);  // DEBUG - COMENTADO
+        // console.log("Pares com maior afinidade:", afinidades.pares_com_maior_afinidade);  // DEBUG - COMENTADO
+        // console.log("Primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5));  // DEBUG - COMENTADO
+        // console.log("Frequências dos primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5).map(p => p[1]));  // DEBUG - COMENTADO
         
         // Verificar se os dados estão no formato correto
         if (!afinidades || !afinidades.pares_com_maior_afinidade || !afinidades.numeros_com_maior_afinidade_geral) {

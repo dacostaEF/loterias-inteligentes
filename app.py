@@ -123,23 +123,23 @@ def dashboard():
 def get_analise_frequencia_nova():
     """Nova rota para análise de frequência com dados reais dos últimos 50 concursos."""
     try:
-        print("🔍 Iniciando API de frequência...")
+        # print("🔍 Iniciando API de frequência...")  # DEBUG - COMENTADO
         
         # Usar a nova função que carrega dados reais
         from funcoes.milionaria.funcao_analise_de_frequencia import analisar_frequencia
         
         # Obter parâmetro de quantidade de concursos (padrão: 50)
         qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
-        print(f"🔍 qtd_concursos: {qtd_concursos}")
+        # print(f"🔍 qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
         
         # Executar análise com dados reais
-        print("🔍 Chamando analisar_frequencia...")
+        # print("🔍 Chamando analisar_frequencia...")  # DEBUG - COMENTADO
         resultado = analisar_frequencia(df_milionaria=df_milionaria, qtd_concursos=qtd_concursos)
-        print(f"🔍 Resultado tipo: {type(resultado)}")
-        print(f"🔍 Resultado: {resultado}")
+        # print(f"🔍 Resultado tipo: {type(resultado)}")  # DEBUG - COMENTADO
+        # print(f"🔍 Resultado: {resultado}")  # DEBUG - COMENTADO
         
         if not resultado or resultado == {}:
-            print("❌ Resultado vazio ou None")
+            # print("❌ Resultado vazio ou None")  # DEBUG - COMENTADO
             return jsonify({'error': 'Erro ao carregar dados de frequência.'}), 500
 
         return jsonify({
@@ -494,7 +494,7 @@ def get_analise_de_combinacoes():
         if isinstance(df_milionaria, list) and len(df_milionaria) == 0:
             return jsonify({"error": "Lista de dados da +Milionária está vazia."}), 500
 
-        print(f"Tipo de df_milionaria: {type(df_milionaria)}")
+        # print(f"Tipo de df_milionaria: {type(df_milionaria)}")  # DEBUG - COMENTADO
         
         # Converter para lista se necessário
         if hasattr(df_milionaria, 'values'):
@@ -502,36 +502,36 @@ def get_analise_de_combinacoes():
         else:
             dados_para_analise = df_milionaria
             
-        print(f"Dados para análise: {len(dados_para_analise)} linhas")
+        # print(f"Dados para análise: {len(dados_para_analise)} linhas")  # DEBUG - COMENTADO
         
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos')
         if qtd_concursos:
             qtd_concursos = int(qtd_concursos)
-            print(f"🎯 Parâmetro qtd_concursos recebido: {qtd_concursos}")
-        else:
-            print(f"🎯 Nenhum parâmetro qtd_concursos recebido")
+            # print(f"🎯 Parâmetro qtd_concursos recebido: {qtd_concursos}")  # DEBUG - COMENTADO
+        # else:
+        #     print(f"🎯 Nenhum parâmetro qtd_concursos recebido")  # DEBUG - COMENTADO
         
         resultado = analise_combinacoes_milionaria(dados_para_analise, qtd_concursos)
-        print(f"Resultado obtido: {type(resultado)}")
+        # print(f"Resultado obtido: {type(resultado)}")  # DEBUG - COMENTADO
         
         # Debug detalhado do resultado
-        if resultado and 'afinidade_entre_numeros' in resultado:
-            afinidades = resultado['afinidade_entre_numeros']
-            print(f"=== DEBUG AFINIDADES BACKEND ===")
-            print(f"Tipo de afinidades: {type(afinidades)}")
-            print(f"Chaves em afinidades: {list(afinidades.keys())}")
-            
-            if 'pares_com_maior_afinidade' in afinidades:
-                pares = afinidades['pares_com_maior_afinidade']
-                print(f"Tipo de pares_com_maior_afinidade: {type(pares)}")
-                print(f"É lista? {isinstance(pares, list)}")
-                print(f"Tamanho: {len(pares) if isinstance(pares, list) else 'N/A'}")
-                
-                if isinstance(pares, list) and len(pares) > 0:
-                    print(f"Primeiro par: {pares[0]}")
-                    print(f"Tipo do primeiro par: {type(pares[0])}")
-                    print(f"Estrutura do primeiro par: {pares[0]}")
+        # if resultado and 'afinidade_entre_numeros' in resultado:
+        #     afinidades = resultado['afinidade_entre_numeros']
+        #     print(f"=== DEBUG AFINIDADES BACKEND ===")  # DEBUG - COMENTADO
+        #     print(f"Tipo de afinidades: {type(afinidades)}")  # DEBUG - COMENTADO
+        #     print(f"Chaves em afinidades: {list(afinidades.keys())}")  # DEBUG - COMENTADO
+        #     
+        #     if 'pares_com_maior_afinidade' in afinidades:
+        #         pares = afinidades['pares_com_maior_afinidade']
+        #         print(f"Tipo de pares_com_maior_afinidade: {type(pares)}")  # DEBUG - COMENTADO
+        #         print(f"É lista? {isinstance(pares, list)}")  # DEBUG - COMENTADO
+        #         print(f"Tamanho: {len(pares) if isinstance(pares, list) else 'N/A'}")  # DEBUG - COMENTADO
+        #         
+        #         if isinstance(pares, list) and len(pares) > 0:
+        #             print(f"Primeiro par: {pares[0]}")  # DEBUG - COMENTADO
+        #             print(f"Tipo do primeiro par: {type(pares[0])}")  # DEBUG - COMENTADO
+        #             print(f"Estrutura do primeiro par: {pares[0]}")  # DEBUG - COMENTADO
         
         if not resultado:
             return jsonify({"error": "Erro ao processar análise de combinações."}), 500
@@ -649,53 +649,53 @@ def get_estatisticas_avancadas():
             return jsonify({'error': 'Dados da +Milionária não carregados.'}), 500
 
         qtd_concursos = request.args.get('qtd_concursos', type=int)
-        print(f"📈 Estatísticas Avançadas - Parâmetro qtd_concursos: {qtd_concursos}")
-        print(f"📊 DataFrame disponível: {len(df_milionaria)} concursos")
+        # print(f"📈 Estatísticas Avançadas - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
+        # print(f"📊 DataFrame disponível: {len(df_milionaria)} concursos")  # DEBUG - COMENTADO
 
         # Criar instância da classe de análise
-        print("🔧 Criando instância da AnaliseEstatisticaAvancada...")
+        # print("🔧 Criando instância da AnaliseEstatisticaAvancada...")  # DEBUG - COMENTADO
         analise = AnaliseEstatisticaAvancada(df_milionaria)
         
         # Executar análise completa
-        print("⚡ Executando análise completa...")
+        # print("⚡ Executando análise completa...")  # DEBUG - COMENTADO
         resultado = analise.executar_analise_completa(qtd_concursos)
         
-        print("✅ Análise concluída! Verificando resultados...")
+        # print("✅ Análise concluída! Verificando resultados...")  # DEBUG - COMENTADO
         
         # Log detalhado dos resultados
-        if resultado:
-            print(f"📊 Resultados obtidos:")
-            print(f"   - Desvio padrão: {'✅' if resultado.get('desvio_padrao_distribuicao') else '❌'}")
-            print(f"   - Teste aleatoriedade: {'✅' if resultado.get('teste_aleatoriedade') else '❌'}")
-            print(f"   - Análise clusters: {'✅' if resultado.get('analise_clusters') else '❌'}")
-            print(f"   - Correlação números: {'✅' if resultado.get('analise_correlacao_numeros') else '❌'}")
-            print(f"   - Probabilidades condicionais: {'✅' if resultado.get('probabilidades_condicionais') else '❌'}")
-            print(f"   - Distribuição números: {'✅' if resultado.get('distribuicao_numeros') else '❌'}")
-            
-                    # Log específico para correlação
-        if resultado.get('analise_correlacao_numeros'):
-            correlacao = resultado['analise_correlacao_numeros']
-            print(f"🔍 Dados de correlação enviados ao frontend:")
-            print(f"   - Correlações positivas: {len(correlacao.get('correlacoes_positivas', []))}")
-            print(f"   - Correlações negativas: {len(correlacao.get('correlacoes_negativas', []))}")
-            print(f"   - Correlação média: {correlacao.get('correlacao_media', 0.0):.4f}")
-            if correlacao.get('correlacoes_positivas'):
-                print(f"   - Amostra positivas: {correlacao['correlacoes_positivas'][:3]}")
-            if correlacao.get('correlacoes_negativas'):
-                print(f"   - Amostra negativas: {correlacao['correlacoes_negativas'][:3]}")
-            
-            # Verificar se os dados são serializáveis para JSON
-            try:
-                import json
-                json_test = json.dumps(correlacao)
-                print(f"✅ Dados de correlação são serializáveis para JSON")
-            except Exception as json_error:
-                print(f"❌ Erro ao serializar dados de correlação: {json_error}")
-        else:
-            print("❌ Dados de correlação não encontrados no resultado!")
-        
-        if not resultado:
-            print("❌ Nenhum resultado obtido!")
+        # if resultado:
+        #     print(f"📊 Resultados obtidos:")  # DEBUG - COMENTADO
+        #     print(f"   - Desvio padrão: {'✅' if resultado.get('desvio_padrao_distribuicao') else '❌'}")  # DEBUG - COMENTADO
+        #     print(f"   - Teste aleatoriedade: {'✅' if resultado.get('teste_aleatoriedade') else '❌'}")  # DEBUG - COMENTADO
+        #     print(f"   - Análise clusters: {'✅' if resultado.get('analise_clusters') else '❌'}")  # DEBUG - COMENTADO
+        #     print(f"   - Correlação números: {'✅' if resultado.get('analise_correlacao_numeros') else '❌'}")  # DEBUG - COMENTADO
+        #     print(f"   - Probabilidades condicionais: {'✅' if resultado.get('probabilidades_condicionais') else '❌'}")  # DEBUG - COMENTADO
+        #     print(f"   - Distribuição números: {'✅' if resultado.get('distribuicao_numeros') else '❌'}")  # DEBUG - COMENTADO
+        #     
+        #             # Log específico para correlação
+        # if resultado.get('analise_correlacao_numeros'):
+        #     correlacao = resultado['analise_correlacao_numeros']
+        #     print(f"🔍 Dados de correlação enviados ao frontend:")  # DEBUG - COMENTADO
+        #     print(f"   - Correlações positivas: {len(correlacao.get('correlacoes_positivas', []))}")  # DEBUG - COMENTADO
+        #     print(f"   - Correlações negativas: {len(correlacao.get('correlacoes_negativas', []))}")  # DEBUG - COMENTADO
+        #     print(f"   - Correlação média: {correlacao.get('correlacao_media', 0.0):.4f}")  # DEBUG - COMENTADO
+        #     if correlacao.get('correlacoes_positivas'):
+        #         print(f"   - Amostra positivas: {correlacao['correlacoes_positivas'][:3]}")  # DEBUG - COMENTADO
+        #     if correlacao.get('correlacoes_negativas'):
+        #         print(f"   - Amostra negativas: {correlacao['correlacoes_negativas'][:3]}")  # DEBUG - COMENTADO
+        #     
+        #     # Verificar se os dados são serializáveis para JSON
+        #     try:
+        #         import json
+        #         json_test = json.dumps(correlacao)
+        #         print(f"✅ Dados de correlação são serializáveis para JSON")  # DEBUG - COMENTADO
+        #     except Exception as json_error:
+        #         print(f"❌ Erro ao serializar dados de correlação: {json_error}")  # DEBUG - COMENTADO
+        # else:
+        #     print("❌ Dados de correlação não encontrados no resultado!")  # DEBUG - COMENTADO
+        # 
+        # if not resultado:
+        #     print("❌ Nenhum resultado obtido!")  # DEBUG - COMENTADO
 
         # Verificar se há valores NaN ou infinitos antes de retornar
         def limpar_valores_problematicos(obj):
