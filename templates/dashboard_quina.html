@@ -1630,7 +1630,7 @@
       container.innerHTML = "🔄 Carregando análise de frequência...";
 
       try {
-        const response = await fetch('/api/analise-frequencia');
+        const response = await fetch('/api/analise-frequencia-quina');
         const data = await response.json();
 
         if (data.error) {
@@ -1915,7 +1915,7 @@
       container.innerHTML = "🔄 Atualizando análise...";
 
       try {
-        const url = janela ? `/api/analise-frequencia?qtd_concursos=${janela}` : '/api/analise-frequencia';
+        const url = janela ? `/api/analise-frequencia-quina?qtd_concursos=${janela}` : '/api/analise-frequencia-quina';
         const response = await fetch(url);
         const data = await response.json();
 
@@ -2165,7 +2165,7 @@
 
       try {
         console.log("Iniciando fetch para /api/analise_de_distribuicao...");
-        const url = qtdConcursos ? `/api/analise_de_distribuicao?qtd_concursos=${qtdConcursos}` : '/api/analise_de_distribuicao';
+        const url = qtdConcursos ? `/api/analise_de_distribuicao-quina?qtd_concursos=${qtdConcursos}` : '/api/analise_de_distribuicao-quina';
         const response = await fetch(url);
         console.log("Response status:", response.status);
         
@@ -2563,7 +2563,7 @@
       container.innerHTML = "🔄 Carregando análise de afinidades...";
 
       try {
-        let url = '/api/analise_de_combinacoes';
+        let url = '/api/analise_de_combinacoes-quina';
         if (qtdConcursos !== null && qtdConcursos !== '') {
           url += `?qtd_concursos=${qtdConcursos}`;
         }
@@ -4824,7 +4824,7 @@
       try {
         mostrarMensagem('🎲 Gerando sua aposta...', 'info');
         
-        const response = await fetch('/api/gerar-aposta-megasena', {
+        const response = await fetch('/api/gerar-aposta-quina', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
