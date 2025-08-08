@@ -40,7 +40,9 @@ from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar
 
 # --- Importações para Quina ---
 from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribuicao_quina
-from funcoes.quina.funcao_analise_de_combinacoes_quina import analise_de_combinacoes_quina
+from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
+from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analisar_padroes_sequencias_quina
+from funcoes.quina.analise_estatistica_avancada_quina import realizar_analise_estatistica_avancada_quina
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -341,7 +343,7 @@ def get_analise_de_combinacoes_quina():
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
 
-        resultado = analise_de_combinacoes_quina(df_quina, qtd_concursos)
+        resultado = analisar_combinacoes_quina(df_quina, qtd_concursos)
         
         return jsonify(resultado)
     except Exception as e:
@@ -360,7 +362,7 @@ def get_analise_padroes_sequencias_quina():
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
 
-        resultado = analise_padroes_sequencias_quina(df_quina, qtd_concursos)
+        resultado = analisar_padroes_sequencias_quina(df_quina, qtd_concursos)
         
         return jsonify(resultado)
     except Exception as e:
@@ -1215,7 +1217,7 @@ def get_analise_seca_quina():
             }), 500
         
         # Usar os dados limitados aos últimos concursos
-        dados_limitados = df_quina.head(qtd_concursos)
+        dados_limitados = df_quina.tail(qtd_concursos)
         
         # Calcular seca dos números
         from funcoes.quina.calculos_quina import calcular_seca_numeros_quina

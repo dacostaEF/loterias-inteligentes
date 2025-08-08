@@ -82,7 +82,8 @@ def analise_de_combinacoes_quina(dados_sorteios, qtd_concursos=None):
         }
 
         for _, row in df_sorteios_pd.iterrows():
-            numeros = tuple(row['numeros_principais_ordenados'])
+            numeros_lista = row['numeros_principais_ordenados']
+            numeros = tuple(numeros_lista) if isinstance(numeros_lista, list) else numeros_lista
 
             # Duplas de números principais
             for dupla in combinations(numeros, 2):
@@ -106,7 +107,8 @@ def analise_de_combinacoes_quina(dados_sorteios, qtd_concursos=None):
         }
 
         for _, row in df_sorteios_pd.iterrows():
-            numeros = row['numeros_principais_ordenados']
+            numeros_lista = row['numeros_principais_ordenados']
+            numeros = list(numeros_lista) if isinstance(numeros_lista, (list, tuple)) else numeros_lista
             
             # Contar pares de números
             for i, num1 in enumerate(numeros):
@@ -211,7 +213,48 @@ def analise_de_combinacoes_quina(dados_sorteios, qtd_concursos=None):
     padroes_geometricos = analisar_padroes_geometricos()
     sequencias_aritmeticas = analisar_sequencias_aritmeticas()
 
-    # Organizar resultado final
+    # Converter tuplas para listas para ser JSON serializável
+    def converter_tuplas_para_listas(dados):
+        """Converte tuplas em chaves de Counter para strings serializáveis"""
+        if isinstance(dados, Counter):
+            resultado = {}
+            for k, v in dados.items():
+                if isinstance(k, tuple):
+                    # Converter tupla para string representativa
+                    chave_str = f"[{','.join(map(str, k))}]"
+                elif isinstance(k, list):
+                    # Converter lista para string representativa
+                    chave_str = f"[{','.join(map(str, k))}]"
+                else:
+                    chave_str = str(k)
+                resultado[chave_str] = v
+            return resultado
+        elif isinstance(dados, defaultdict):
+            resultado = {}
+            for k, v in dados.items():
+                if isinstance(v, Counter):
+                    resultado[k] = converter_tuplas_para_listas(v)
+                else:
+                    resultado[k] = v
+            return resultado
+        elif isinstance(dados, dict):
+            return {k: converter_tuplas_para_listas(v) for k, v in dados.items()}
+        else:
+            return dados
+
+    # Aplicar conversão nos dados que contêm tuplas
+    combinacoes_convertidas = {
+        'duplas': converter_tuplas_para_listas(combinacoes_frequentes['duplas']),
+        'ternas': converter_tuplas_para_listas(combinacoes_frequentes['ternas']),
+        'quadras': converter_tuplas_para_listas(combinacoes_frequentes['quadras'])
+    }
+    
+    afinidade_convertida = {
+        'pares_mais_frequentes': converter_tuplas_para_listas(afinidade['pares_mais_frequentes']),
+        'numeros_mais_compatíveis': converter_tuplas_para_listas(afinidade['numeros_mais_compatíveis'])
+    }
+
+    # Organizar resultado final - ESTRUTURA COMPATÍVEL COM FRONTEND
     resultado = {
         'periodo_analisado': {
             'total_concursos_disponiveis': len(dados_sorteios),
@@ -219,8 +262,12 @@ def analise_de_combinacoes_quina(dados_sorteios, qtd_concursos=None):
             'qtd_concursos_solicitada': qtd_concursos,
             'concursos_do_periodo': df_sorteios_pd['concurso'].tolist()
         },
-        'combinacoes_frequentes': combinacoes_frequentes,
-        'afinidade': afinidade,
+        'combinacoes_frequentes': combinacoes_convertidas,
+        # CORREÇÃO: Ajustar estrutura para corresponder ao que o frontend espera
+        'afinidade_entre_numeros': {
+            'pares_com_maior_afinidade': list(afinidade['pares_mais_frequentes'].most_common(20)),
+            'numeros_com_maior_afinidade_geral': sorted([(num, sum(compat.values())) for num, compat in afinidade['numeros_mais_compatíveis'].items()], key=lambda x: x[1], reverse=True)[:20]
+        },
         'padroes_geometricos': padroes_geometricos,
         'sequencias_aritmeticas': sequencias_aritmeticas
     }
@@ -264,13 +311,13 @@ def analise_combinacoes_quina_completa(df_quina, qtd_concursos=None):
         print(f"⚠️  Aviso: Colunas faltantes no DataFrame: {colunas_faltantes}")
         return {}
         
-        # Converter DataFrame para formato esperado pela função original
-        dados_sorteios = []
+    # Converter DataFrame para formato esperado pela função original
+    dados_sorteios = []
         
     for _, row in df_quina.iterrows():
         # Verificar se os dados são válidos (apenas números 1-80)
         if pd.isna(row['Concurso']) or any(pd.isna(row[col]) for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']):
-                continue  # Pular linhas com dados inválidos
+            continue  # Pular linhas com dados inválidos
             
         # Validar range de números (1-80 para Quina)
         numeros_validos = [row[col] for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']]
@@ -403,6 +450,73 @@ def exibir_analise_combinacoes_detalhada_quina(resultado):
             print(f"  {i}. {seq_info['sequencia']} (razão: {seq_info['razao']}, tamanho: {seq_info['tamanho']})")
     else:
         print("📊 Nenhuma sequência aritmética encontrada no período analisado.")
+
+def analisar_combinacoes_quina(df_quina=None, qtd_concursos=50):
+    """
+    Função wrapper para análise de combinações dos últimos N concursos da Quina
+    Retorna dados formatados para uso na API
+    
+    Args:
+        df_quina (pd.DataFrame, optional): DataFrame com dados da Quina. 
+                                             Se None, tenta carregar automaticamente.
+        qtd_concursos (int): Quantidade de últimos concursos a analisar (padrão: 50)
+    
+    Returns:
+        dict: Dados formatados para a API
+    """
+    try:
+        # Se não foi passado DataFrame, tentar carregar
+        if df_quina is None:
+            from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
+            df_quina = carregar_dados_quina()
+        
+        # CORREÇÃO: Filtrar os dados ANTES de passar para a análise
+        if qtd_concursos is not None and qtd_concursos > 0:
+            # Pegar exatamente os últimos N concursos do DataFrame
+            df_filtrado = df_quina.tail(qtd_concursos).copy()
+            print(f"🔧 Filtrando para os últimos {qtd_concursos} concursos (de {len(df_quina)} disponíveis)")
+        else:
+            df_filtrado = df_quina.copy()
+        
+        # Verificar colunas necessárias
+        colunas_necessarias = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']
+        colunas_faltantes = [col for col in colunas_necessarias if col not in df_filtrado.columns]
+        
+        if colunas_faltantes:
+            print(f"❌ Colunas necessárias não encontradas: {colunas_faltantes}")
+            return {}
+        
+        # Converter DataFrame para formato de lista esperado pela função principal
+        dados_sorteios = []
+        for _, row in df_filtrado.iterrows():
+            if pd.notna(row['Concurso']):
+                sorteio = [
+                    row['Concurso'],
+                    row['Bola1'], row['Bola2'], row['Bola3'], 
+                    row['Bola4'], row['Bola5']
+                ]
+                # Verificar se todos os números são válidos
+                if all(pd.notna(num) and 1 <= num <= 80 for num in sorteio[1:]):
+                    dados_sorteios.append(sorteio)
+        
+        if not dados_sorteios:
+            print("⚠️  Erro: Nenhum sorteio válido encontrado após conversão")
+            return {}
+        
+        # Executar análise com dados já filtrados (qtd_concursos=None para evitar filtragem dupla)
+        resultado = analise_de_combinacoes_quina(dados_sorteios, qtd_concursos=None)
+        
+        if not resultado:
+            print("⚠️  Erro: Não foi possível obter dados de combinações da Quina")
+            return {}
+        
+        return resultado
+        
+    except Exception as e:
+        print(f"❌ Erro ao analisar combinações da Quina: {e}")
+        import traceback
+        traceback.print_exc()
+        return {'erro': f'Erro interno: {str(e)}'}
 
 # Exemplo de uso com dados da Quina
 if __name__ == "__main__":

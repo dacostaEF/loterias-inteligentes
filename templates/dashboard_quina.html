@@ -2712,7 +2712,7 @@
                   <span class="text-gray-300">Média afinidade</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <div class="w-4 h-1 bg-[#FF6B6B]"></div>
+                  <div class="w-4 h-1 bg-[#00E38C]"></div>
                   <span class="text-gray-300">Alta afinidade</span>
                 </div>
               </div>
@@ -2924,7 +2924,7 @@
             
             // Cor baseada na intensidade da afinidade
             const intensity = (edge.value - minFreq) / freqRange;
-            const color = intensity > 0.7 ? '#FF6B6B' : intensity > 0.4 ? '#FFA500' : '#8B5CF6';
+            const color = intensity > 0.7 ? '#00E38C' : intensity > 0.4 ? '#FFA500' : '#8B5CF6';
             edgeColors.push(color);
             
             console.log(`Par ${edge.from}-${edge.to}: Frequência=${edge.value}, Espessura=${normalizedWidth.toFixed(2)}, Cor=${color}`);

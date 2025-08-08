@@ -101,7 +101,7 @@ class AnaliseEstatisticaAvancadaQuina:
         frequencias = {}
         for num in range(1, 81):
             count = 0
-        for _, row in self.df_validos.iterrows():
+            for _, row in self.df_validos.iterrows():
                 if num in row[self.colunas_bolas].values:
                     count += 1
             frequencias[num] = count
@@ -170,12 +170,12 @@ class AnaliseEstatisticaAvancadaQuina:
         # Em 5 números, esperamos em média 2.5 pares
         aleatorio_paridade = abs(media_pares - 2.5) < 0.5
         
-            return {
-                'teste_chi_quadrado': {
+        return {
+            'teste_chi_quadrado': {
                 'chi2': chi2_stat,
                 'p_value': p_value,
                 'interpretacao': interpretacao
-                },
+            },
                 'teste_paridade': {
                 'media_pares': media_pares,
                 'aleatorio_paridade': aleatorio_paridade
@@ -308,7 +308,7 @@ class AnaliseEstatisticaAvancadaQuina:
             return "Ciclo Curto"
         elif intervalo_medio > 20:
             return "Ciclo Longo"
-            else:
+        else:
             return "Regular"
     
     def analise_correlacao_numeros(self):
@@ -349,7 +349,7 @@ class AnaliseEstatisticaAvancadaQuina:
         # Calcular correlação média
         correlacao_media = np.mean([corr for _, _, corr, _ in correlacoes])
         
-                return {
+        return {
             'correlacoes_positivas': correlacoes_positivas[:20],
             'correlacoes_negativas': correlacoes_negativas[:20],
             'correlacao_media': correlacao_media,
@@ -415,7 +415,7 @@ class AnaliseEstatisticaAvancadaQuina:
         Returns:
             dict: Distribuição de frequência
         """
-            if df_filtrado is None or df_filtrado.empty:
+        if df_filtrado is None or df_filtrado.empty:
             return {}
         
         # Calcular frequência de cada número
@@ -574,6 +574,57 @@ def exibir_analise_estatistica_avancada_quina(resultados):
         print("   💪 Dependências mais fortes:")
         for num1, num2, dep in resultados['probabilidades_condicionais']['dependencias_fortes'][:10]:
             print(f"      {num1} → {num2}: {dep:.2f}x mais provável")
+
+def realizar_analise_estatistica_avancada_quina(df_quina=None, qtd_concursos=50):
+    """
+    Função wrapper para análise estatística avançada da Quina.
+    Esta função padroniza o carregamento de dados e filtragem antes de chamar
+    a função principal de análise.
+    
+    Args:
+        df_quina (pd.DataFrame, optional): DataFrame com dados da Quina
+        qtd_concursos (int): Quantidade de últimos concursos a analisar (padrão: 50)
+    
+    Returns:
+        dict: Resultado da análise estatística avançada
+    """
+    try:
+        from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
+        
+        # Carregar dados se não fornecidos
+        if df_quina is None:
+            print("🔄 Carregando dados da Quina...")
+            df_quina = carregar_dados_quina()
+            
+        if df_quina is None or df_quina.empty:
+            print("❌ Erro: Não foi possível carregar os dados da Quina")
+            return {'erro': 'Dados da Quina não disponíveis'}
+        
+        # Filtrar para os últimos N concursos se especificado
+        if qtd_concursos is not None and qtd_concursos > 0:
+            df_filtrado = df_quina.tail(qtd_concursos).copy()
+            print(f"🔧 Filtrando para os últimos {qtd_concursos} concursos (de {len(df_quina)} disponíveis)")
+        else:
+            df_filtrado = df_quina.copy()
+        
+        # Criar instância da análise
+        analise = AnaliseEstatisticaAvancadaQuina(df_filtrado)
+        
+        # Executar análise completa
+        resultado_completo = analise.executar_analise_completa()
+        
+        if not resultado_completo:
+            print("❌ Erro: Análise retornou resultado vazio")
+            return {'erro': 'Análise não produziu resultados'}
+        
+        print(f"✅ Análise estatística avançada da Quina concluída com sucesso!")
+        return resultado_completo
+        
+    except Exception as e:
+        print(f"❌ Erro na análise estatística avançada da Quina: {e}")
+        import traceback
+        traceback.print_exc()
+        return {'erro': f'Erro interno: {str(e)}'}
 
 # Exemplo de uso
 if __name__ == "__main__":

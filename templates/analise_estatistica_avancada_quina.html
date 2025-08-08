@@ -2759,7 +2759,7 @@
                   <span class="text-gray-300">Média afinidade</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <div class="w-4 h-1 bg-[#FF6B6B]"></div>
+                  <div class="w-4 h-1 bg-[#00E38C]"></div>
                   <span class="text-gray-300">Alta afinidade</span>
                 </div>
               </div>
@@ -2856,26 +2856,40 @@
         }
 
         // Criar gráfico de afinidade geral por número
-        const numerosLabels = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[0]);
-        const numerosValues = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[1]);
-
-        Plotly.newPlot('grafico-afinidade-geral', [{
-          x: numerosLabels,
-          y: numerosValues,
-          type: 'bar',
-          marker: { color: '#8B5CF6' }
-        }], {
-          title: 'Afinidade Geral por Número',
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          xaxis: { automargin: true },
-          yaxis: { automargin: true },
-          showlegend: false,
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
-        }, { displayModeBar: false });
+        console.log("=== DEBUG GRÁFICO AFINIDADE GERAL ===");
+        console.log("Dados de afinidade geral:", afinidades.numeros_com_maior_afinidade_geral);
+        console.log("Tipo:", typeof afinidades.numeros_com_maior_afinidade_geral);
+        console.log("É array?", Array.isArray(afinidades.numeros_com_maior_afinidade_geral));
+        console.log("Tamanho:", afinidades.numeros_com_maior_afinidade_geral ? afinidades.numeros_com_maior_afinidade_geral.length : 'undefined');
+        
+        if (afinidades.numeros_com_maior_afinidade_geral && afinidades.numeros_com_maior_afinidade_geral.length > 0) {
+          const numerosLabels = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[0]);
+          const numerosValues = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[1]);
+          
+          console.log("Labels processados:", numerosLabels);
+          console.log("Values processados:", numerosValues);
+          
+          Plotly.newPlot('grafico-afinidade-geral', [{
+            x: numerosLabels,
+            y: numerosValues,
+            type: 'bar',
+            marker: { color: '#8B5CF6' }
+          }], {
+            title: 'Afinidade Geral por Número',
+            paper_bgcolor: '#1a1a1a',
+            plot_bgcolor: '#1a1a1a',
+            font: { color: 'white' },
+            xaxis: { automargin: true },
+            yaxis: { automargin: true },
+            showlegend: false,
+            autosize: true,
+            responsive: true,
+            margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
+          }, { displayModeBar: false });
+        } else {
+          console.error("Dados de afinidade geral não encontrados ou vazios");
+          document.getElementById('grafico-afinidade-geral').innerHTML = '<p style="color: red; text-align: center;">Erro: Dados de afinidade geral não encontrados</p>';
+        }
 
         // Criar gráfico de rede de afinidade
         console.log("=== CRIANDO GRÁFICO DE REDE ===");
@@ -2946,6 +2960,7 @@
         console.log("Frequência máxima:", maxFreq);
         console.log("Frequência mínima:", minFreq);
         console.log("Range de frequências:", freqRange);
+        console.log("Primeiros 5 pares com frequências:", edges.slice(0, 5).map(e => `${e.from}-${e.to}: ${e.value}`));
         
         edges.forEach(edge => {
           const fromNode = nodes.find(n => n.id === edge.from);
@@ -2971,7 +2986,7 @@
             
             // Cor baseada na intensidade da afinidade
             const intensity = (edge.value - minFreq) / freqRange;
-            const color = intensity > 0.7 ? '#FF6B6B' : intensity > 0.4 ? '#FFA500' : '#8B5CF6';
+            const color = intensity > 0.7 ? '#00E38C' : intensity > 0.4 ? '#FFA500' : '#8B5CF6';
             edgeColors.push(color);
             
             console.log(`Par ${edge.from}-${edge.to}: Frequência=${edge.value}, Espessura=${normalizedWidth.toFixed(2)}, Cor=${color}`);

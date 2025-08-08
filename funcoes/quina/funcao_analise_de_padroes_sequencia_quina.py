@@ -140,17 +140,17 @@ def analise_padroes_sequencias_quina(dados_sorteios):
                 })
             
             # Contar números que mais repetem
-                for num in repeticoes:
+            for num in repeticoes:
                 repeticoes_stats['numeros_que_mais_repetem'][num] += 1
             
-                # Verificar se não houve repetição
-                if len(repeticoes) == 0:
-                    repeticoes_stats['concursos_sem_repeticao'] += 1
-                    sequencia_atual_sem_repeticao += 1
+            # Verificar se não houve repetição
+            if len(repeticoes) == 0:
+                repeticoes_stats['concursos_sem_repeticao'] += 1
+                sequencia_atual_sem_repeticao += 1
             else:
-                    if sequencia_atual_sem_repeticao > repeticoes_stats['maior_sequencia_sem_repeticao']:
-                        repeticoes_stats['maior_sequencia_sem_repeticao'] = sequencia_atual_sem_repeticao
-                    sequencia_atual_sem_repeticao = 0
+                if sequencia_atual_sem_repeticao > repeticoes_stats['maior_sequencia_sem_repeticao']:
+                    repeticoes_stats['maior_sequencia_sem_repeticao'] = sequencia_atual_sem_repeticao
+                sequencia_atual_sem_repeticao = 0
             
             numeros_anteriores = numeros_atuais
         
@@ -417,12 +417,12 @@ def analise_padroes_sequencias_quina_completa(df_quina, qtd_concursos=None):
         # Validar range de números (1-80 para Quina)
         numeros_validos = [row[col] for col in ['Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5']]
         if all(1 <= n <= 80 for n in numeros_validos):
-        sorteio = [
-            row['Concurso'],
-            row['Bola1'], row['Bola2'], row['Bola3'], 
+            sorteio = [
+                row['Concurso'],
+                row['Bola1'], row['Bola2'], row['Bola3'], 
                 row['Bola4'], row['Bola5']
-        ]
-        dados_sorteios.append(sorteio)
+            ]
+            dados_sorteios.append(sorteio)
     
     # Verificação final antes de executar análise
     if not dados_sorteios:
@@ -449,6 +449,54 @@ def analise_padroes_sequencias_quina_completa(df_quina, qtd_concursos=None):
     resultado = analise_padroes_sequencias_quina(dados_sorteios)
 
     return resultado
+
+def analisar_padroes_sequencias_quina(df_quina=None, qtd_concursos=50):
+    """
+    Função wrapper para análise de padrões e sequências da Quina.
+    Esta função padroniza o carregamento de dados e filtragem antes de chamar
+    a função principal de análise.
+    
+    Args:
+        df_quina (pd.DataFrame, optional): DataFrame com dados da Quina
+        qtd_concursos (int): Quantidade de últimos concursos a analisar (padrão: 50)
+    
+    Returns:
+        dict: Resultado da análise de padrões
+    """
+    try:
+        from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
+        
+        # Carregar dados se não fornecidos
+        if df_quina is None:
+            print("🔄 Carregando dados da Quina...")
+            df_quina = carregar_dados_quina()
+            
+        if df_quina is None or df_quina.empty:
+            print("❌ Erro: Não foi possível carregar os dados da Quina")
+            return {'erro': 'Dados da Quina não disponíveis'}
+        
+        # Filtrar para os últimos N concursos se especificado
+        if qtd_concursos is not None and qtd_concursos > 0:
+            df_filtrado = df_quina.tail(qtd_concursos).copy()
+            print(f"🔧 Filtrando para os últimos {qtd_concursos} concursos (de {len(df_quina)} disponíveis)")
+        else:
+            df_filtrado = df_quina.copy()
+        
+        # Chamar a função completa que já faz a conversão necessária
+        resultado_completo = analise_padroes_sequencias_quina_completa(df_filtrado, qtd_concursos=None)
+        
+        if not resultado_completo:
+            print("❌ Erro: Análise retornou resultado vazio")
+            return {'erro': 'Análise não produziu resultados'}
+        
+        print(f"✅ Análise de padrões da Quina concluída com sucesso!")
+        return resultado_completo
+        
+    except Exception as e:
+        print(f"❌ Erro na análise de padrões da Quina: {e}")
+        import traceback
+        traceback.print_exc()
+        return {'erro': f'Erro interno: {str(e)}'}
 
 def exibir_analise_padroes_sequencias_detalhada_quina(resultado):
     """
