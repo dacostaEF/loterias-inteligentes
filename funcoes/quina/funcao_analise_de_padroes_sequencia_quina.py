@@ -129,6 +129,7 @@ def analise_padroes_sequencias_quina(dados_sorteios):
         
         for i, sorteio in enumerate(historico_sorteios):
             numeros_atuais = set(sorteio['numeros'])
+            repeticoes = set()  # Inicializar repeticoes
             
             # Verificar repetições com sorteio anterior
             if i > 0:
@@ -138,19 +139,19 @@ def analise_padroes_sequencias_quina(dados_sorteios):
                     'numeros_repetidos': list(repeticoes),
                     'quantidade_repetidos': len(repeticoes)
                 })
-            
-            # Contar números que mais repetem
-            for num in repeticoes:
-                repeticoes_stats['numeros_que_mais_repetem'][num] += 1
-            
-            # Verificar se não houve repetição
-            if len(repeticoes) == 0:
-                repeticoes_stats['concursos_sem_repeticao'] += 1
-                sequencia_atual_sem_repeticao += 1
-            else:
-                if sequencia_atual_sem_repeticao > repeticoes_stats['maior_sequencia_sem_repeticao']:
-                    repeticoes_stats['maior_sequencia_sem_repeticao'] = sequencia_atual_sem_repeticao
-                sequencia_atual_sem_repeticao = 0
+                
+                # Contar números que mais repetem
+                for num in repeticoes:
+                    repeticoes_stats['numeros_que_mais_repetem'][num] += 1
+                
+                # Verificar se não houve repetição
+                if len(repeticoes) == 0:
+                    repeticoes_stats['concursos_sem_repeticao'] += 1
+                    sequencia_atual_sem_repeticao += 1
+                else:
+                    if sequencia_atual_sem_repeticao > repeticoes_stats['maior_sequencia_sem_repeticao']:
+                        repeticoes_stats['maior_sequencia_sem_repeticao'] = sequencia_atual_sem_repeticao
+                    sequencia_atual_sem_repeticao = 0
             
             numeros_anteriores = numeros_atuais
         
@@ -289,6 +290,13 @@ def analise_padroes_sequencias_quina(dados_sorteios):
     repeticoes = analisar_repeticoes()
     intervalos = analisar_intervalos()
     ciclos = analisar_ciclos()
+    
+    # Converter Counter para dict para serialização JSON
+    if 'numeros_que_mais_repetem' in repeticoes:
+        repeticoes['numeros_que_mais_repetem'] = dict(repeticoes['numeros_que_mais_repetem'])
+    
+    if 'tipos_consecutivos' in consecutivos:
+        consecutivos['tipos_consecutivos'] = dict(consecutivos['tipos_consecutivos'])
     
     # Organizar resultado final
     resultado = {

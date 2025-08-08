@@ -58,12 +58,12 @@ def analise_padroes_sequencias(dados_sorteios):
     # Processar dados
     historico_sorteios = []
     for sorteio in dados_sorteios:
-        if len(sorteio) >= 9:
+        if len(sorteio) >= 7:  # Concurso + 6 números
             historico_sorteios.append({
                 'concurso': sorteio[0],
                 'numeros': sorted(sorteio[1:7]),  # Números ordenados para análise
                 'numeros_originais': sorteio[1:7],  # Ordem original do sorteio
-                'trevos': sorteio[7:9]
+                'trevos': []  # Mega Sena não tem trevos
             })
     
     # Verificação adicional após processamento
