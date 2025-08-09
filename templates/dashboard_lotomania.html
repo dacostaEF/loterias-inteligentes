@@ -173,10 +173,10 @@
     }
 
     .dropdown-content.show {
-      display: block;
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: translateY(0) !important;
     }
 
     .dropdown-content a {
@@ -207,6 +207,11 @@
       opacity: 1;
       visibility: visible;
       transform: translateY(0);
+    }
+
+    /* Delay para fechar o dropdown */
+    .dropdown {
+      transition: all 0.2s ease;
     }
 
     /* Estilos para Breadcrumbs */
@@ -570,9 +575,11 @@
       </div>
       <div class="dropdown">
         <a href="#" class="dropdown-toggle active"><i class="fa fa-circle"></i> Lotomania ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_lotomania" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-        </div>
+                 <div class="dropdown-content">
+           <a href="/dashboard_lotomania" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+           <a href="/estatisticas_lotomania"><i class="fa fa-chart-bar"></i> Estatísticas</a>
+           <a href="/analise_estatistica_avancada_lotomania"><i class="fa fa-chart-line"></i> Análise Estatística</a>
+         </div>
       </div>
       <div class="dropdown">
         <a href="#" class="dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
@@ -629,9 +636,11 @@
       </li>
       <li>
         <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-circle"></i> Lotomania ▼</a>
-        <div class="mobile-dropdown">
-          <a href="/dashboard_lotomania" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-        </div>
+                 <div class="mobile-dropdown">
+           <a href="/dashboard_lotomania" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+           <a href="/estatisticas_lotomania"><i class="fa fa-chart-bar"></i> Estatísticas</a>
+           <a href="/analise_estatistica_avancada_lotomania"><i class="fa fa-chart-line"></i> Análise Estatística</a>
+         </div>
       </li>
       <li>
         <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
@@ -725,19 +734,40 @@
   <!-- Seção de Estatísticas Rápidas -->
   <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">🔥 Números Quentes</h3>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">🔥 Números Quentes</h3>
+        <button onclick="destacarNumeros('quentes')" class="text-white hover:text-green-300 transition-colors" title="Destacar no grid">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
       <div class="text-sm text-gray-300" id="numeros-quentes">
         Carregando...
       </div>
     </div>
     <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">❄️ Números Frios</h3>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">❄️ Números Frios</h3>
+        <button onclick="destacarNumeros('frios')" class="text-white hover:text-blue-300 transition-colors" title="Destacar no grid">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
       <div class="text-sm text-gray-300" id="numeros-frios">
         Carregando...
       </div>
     </div>
     <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">🌵 Números Secos</h3>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">🌵 Números Secos</h3>
+        <button onclick="destacarNumeros('secos')" class="text-white hover:text-orange-300 transition-colors" title="Destacar no grid">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
       <div class="text-sm text-gray-300" id="numeros-secos">
         Carregando...
       </div>
@@ -932,43 +962,123 @@
       }
     }
 
+    // Variáveis para armazenar os números estatísticos
+    let numerosQuentes = [];
+    let numerosFrios = [];
+    let numerosSecos = [];
+
+
+
+    // Função para destacar números no grid
+    function destacarNumeros(tipo) {
+      // Limpar cores anteriores
+      document.querySelectorAll('.numero').forEach(el => {
+        el.style.backgroundColor = '#2E303A';
+        el.style.color = '#FFFFFF';
+      });
+      
+      // Definir cores baseado no tipo
+      let cor;
+      let corTexto;
+      if (tipo === 'quentes') {
+        cor = '#556B2F';
+        corTexto = 'white';
+      } else if (tipo === 'frios') {
+        cor = '#87CEEB';
+        corTexto = '#2C3E50';
+      } else if (tipo === 'secos') {
+        cor = '#FF8C00';
+        corTexto = 'white';
+      }
+      
+      // Pegar números do container
+      const container = document.getElementById(`numeros-${tipo}`);
+      const spans = container.querySelectorAll('span');
+      
+      // Destacar cada número no grid
+      spans.forEach(span => {
+        const numero = span.textContent;
+        const numeroFormatado = numero.padStart(2, '0');
+        const elementos = document.querySelectorAll('.numero');
+        elementos.forEach(el => {
+          if (el.textContent === numeroFormatado) {
+            el.style.setProperty('background-color', cor, 'important');
+            el.style.setProperty('color', corTexto, 'important');
+          }
+        });
+      });
+    }
+
+    // Função para mostrar mensagens
+    function mostrarMensagem(texto) {
+      // Criar ou atualizar mensagem de destaque
+      let mensagemEl = document.getElementById('mensagem-destaque');
+      if (!mensagemEl) {
+        mensagemEl = document.createElement('div');
+        mensagemEl.id = 'mensagem-destaque';
+        mensagemEl.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        document.body.appendChild(mensagemEl);
+      }
+      mensagemEl.textContent = texto;
+      
+      // Remover mensagem após 3 segundos
+      setTimeout(() => {
+        if (mensagemEl) {
+          mensagemEl.remove();
+        }
+      }, 3000);
+    }
+
     // Carregar estatísticas rápidas
     async function carregarEstatisticasRapidas() {
       try {
         const response = await fetch('/api/analise-frequencia-lotomania');
-        if (!response.ok) {
-          throw new Error('Erro ao carregar dados de frequência');
-        }
+        const data = await response.json();
         
-        const dados = await response.json();
-        
-        if (dados && dados.numeros_quentes_frios) {
-          // Números quentes (top 10)
-          const numerosQuentes = dados.numeros_quentes_frios.numeros_quentes || [];
+        if (data && data.numeros_quentes_frios) {
+          // Armazenar nas variáveis globais para uso no destaque
+          numerosQuentes = data.numeros_quentes_frios.numeros_quentes || [];
+          numerosFrios = data.numeros_quentes_frios.numeros_frios || [];
+          numerosSecos = data.numeros_quentes_frios.numeros_secos || [];
+          
+          console.log('Dados carregados:', { numerosQuentes, numerosFrios, numerosSecos });
+
+          // Números quentes (top 20)
           document.getElementById('numeros-quentes').innerHTML = 
-            numerosQuentes.slice(0, 10)
+            numerosQuentes.slice(0, 20)
               .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
 
-          // Números frios (top 10)
-          const numerosFrios = dados.numeros_quentes_frios.numeros_frios || [];
+          // Números frios (top 20)
           document.getElementById('numeros-frios').innerHTML = 
-            numerosFrios.slice(0, 10)
+            numerosFrios.slice(0, 20)
               .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
 
-          // Números secos (top 10)
-          const numerosSecos = dados.numeros_quentes_frios.numeros_secos || [];
+          // Números secos (top 20)
           document.getElementById('numeros-secos').innerHTML = 
-            numerosSecos.slice(0, 10)
+            numerosSecos.slice(0, 20)
               .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
         }
       } catch (error) {
-        console.error('Erro ao carregar dados de frequência:', error);
-        document.getElementById('numeros-quentes').innerHTML = '<span class="text-red-500">Erro ao carregar</span>';
-        document.getElementById('numeros-frios').innerHTML = '<span class="text-red-500">Erro ao carregar</span>';
-        document.getElementById('numeros-secos').innerHTML = '<span class="text-red-500">Erro ao carregar</span>';
+        console.error('Erro ao carregar estatísticas:', error);
+        // Fallback para dados simulados
+        numerosQuentes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 00, 12, 22, 32, 42, 52, 62, 72, 82, 92, 02].map(n => [n, 0]);
+        numerosFrios = [1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 01, 13, 23, 33, 43, 53, 63, 73, 83, 93].map(n => [n, 0]);
+        numerosSecos = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 05, 17, 27, 37, 47, 57, 67, 77, 87, 97].map(n => [n, 0]);
+        
+        document.getElementById('numeros-quentes').innerHTML = numerosQuentes.map(n => 
+          `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+        ).join('');
+        
+        document.getElementById('numeros-frios').innerHTML = numerosFrios.map(n => 
+          `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+        ).join('');
+        
+        document.getElementById('numeros-secos').innerHTML = numerosSecos.map(n => 
+          `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+        ).join('');
       }
     }
 
@@ -992,6 +1102,38 @@
 
          // Event listeners
      document.addEventListener('DOMContentLoaded', function() {
+      // MELHORIA DOS DROPDOWNS DESKTOP
+      const dropdowns = document.querySelectorAll('.dropdown');
+      let timeoutId;
+
+      dropdowns.forEach(dropdown => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        
+        // Mostrar dropdown no hover
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+          dropdownContent.classList.add('show');
+        });
+        
+        // Esconder dropdown com delay
+        dropdown.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300); // 300ms de delay
+        });
+        
+        // Manter dropdown aberto se o mouse estiver sobre ele
+        dropdownContent.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+        });
+        
+        // Fechar dropdown quando sair do conteúdo
+        dropdownContent.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300);
+        });
+      });
 
       // Botões do modal
       const btnCancelar = document.getElementById('btnCancelarModal');
@@ -1001,41 +1143,65 @@
         btnCancelar.addEventListener('click', fecharModal);
       }
       
-             if (btnGerar) {
-         btnGerar.addEventListener('click', function() {
-           gerarApostaLotomania();
-           fecharModal();
-         });
-       }
-
-      // Menu mobile functionality
-      document.getElementById('hamburgerIcon').addEventListener('click', function() {
-        document.getElementById('navPanel').classList.toggle('active');
-        document.getElementById('navOverlay').classList.toggle('active');
-      });
-
-      document.getElementById('navOverlay').addEventListener('click', function() {
-        document.getElementById('navPanel').classList.remove('active');
-        document.getElementById('navOverlay').classList.remove('active');
-      });
-
-      // Dropdown functionality
-      document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          const dropdown = this.nextElementSibling;
-          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      if (btnGerar) {
+        btnGerar.addEventListener('click', function() {
+          gerarApostaLotomania();
+          fecharModal();
         });
-      });
+      }
 
-      // Mobile dropdown functionality
-      document.querySelectorAll('.mobile-dropdown-toggle').forEach(toggle => {
-        toggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          const dropdown = this.nextElementSibling;
-          dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+
+      if (hamburgerIcon && navPanel && navOverlay) {
+        hamburgerIcon.addEventListener('click', () => {
+          hamburgerIcon.classList.toggle('open');
+          navPanel.classList.toggle('open');
+          navOverlay.classList.toggle('open');
+          
+          // Previne scroll do body quando menu está aberto
+          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
         });
-      });
+
+        // Controle do submenu mobile
+        const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+        mobileDropdownToggles.forEach(toggle => {
+          toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const dropdown = toggle.nextElementSibling;
+            dropdown.classList.toggle('show');
+          });
+        });
+
+        // Fechar o menu ao clicar em um link (exceto dropdown toggles)
+        navPanel.querySelectorAll('a:not(.mobile-dropdown-toggle)').forEach(link => {
+          link.addEventListener('click', () => {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Fechar o menu ao clicar no overlay
+        navOverlay.addEventListener('click', () => {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        });
+
+        // Fechar o menu com tecla ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        });
+      }
     });
 
          // Gerar aposta da Lotomania via API
@@ -1129,5 +1295,19 @@
         });
      }
   </script>
+
+  <style>
+    /* Remover fundo dos botões de seta */
+    button[onclick*="destacarNumeros"] {
+      background: none !important;
+      border: none !important;
+      padding: 4px !important;
+      border-radius: 50% !important;
+    }
+    
+    button[onclick*="destacarNumeros"]:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  </style>
 </body>
 </html>

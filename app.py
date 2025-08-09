@@ -110,6 +110,7 @@ from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaA
 
 # --- Importações para Lotomania ---
 from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
+from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_frequencia_lotomania
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -382,45 +383,23 @@ def get_analise_frequencia_quina():
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise-frequencia-lotomania')
-def get_analise_frequencia_lotomania():
-    """API básica para análise de frequência da Lotomania (dados simulados)."""
+def analise_frequencia_lotomania_api():
+    """API para análise de frequência da Lotomania"""
     try:
-        import random
+        # Carregar dados da Lotomania
+        df_lotomania = pd.read_excel('LoteriasExcel/Lotomania_edt.xlsx')
         
-        # Dados simulados para Lotomania (1-100)
-        numeros_quentes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-        numeros_frios = [1, 11, 21, 31, 41, 51, 61, 71, 81, 91]
-        numeros_secos = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
+        # Executar análise de frequência (últimos 300 concursos)
+        resultado = analisar_frequencia_lotomania(df_lotomania, qtd_concursos=300)
         
-        # Gerar dados de frequência simulados
-        frequencia_absoluta = {i: random.randint(5, 25) for i in range(1, 101)}
-        frequencia_relativa = {i: round(random.uniform(1.0, 3.0), 2) for i in range(1, 101)}
-        
-        # Simular concursos recentes
-        concursos_recentes = []
-        for i in range(10):
-            numeros_sorteio = sorted(random.sample(range(1, 101), 20))
-            concursos_recentes.append({
-                'concurso': 1000 - i,
-                'numeros': numeros_sorteio
-            })
-
-        return jsonify({
-            'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(frequencia_absoluta.items())],
-            'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(frequencia_relativa.items())],
-            'numeros_quentes_frios': {
-                'numeros_quentes': [[n, random.randint(20, 30)] for n in numeros_quentes],
-                'numeros_frios': [[n, random.randint(1, 10)] for n in numeros_frios],
-                'numeros_secos': [[n, random.randint(0, 5)] for n in numeros_secos]
-            },
-            'analise_temporal': concursos_recentes,
-            'periodo_analisado': 'Últimos 50 concursos (dados simulados)',
-            'concursos_para_matriz': concursos_recentes,
-            'ultimos_concursos': concursos_recentes
-        })
+        if resultado:
+            return jsonify(resultado)
+        else:
+            return jsonify({"error": "Não foi possível analisar os dados da Lotomania"}), 500
+            
     except Exception as e:
-        print(f"❌ Erro na API de frequência Lotomania: {e}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(f"Erro ao analisar frequência da Lotomania: {e}")
+        return jsonify({"error": "Erro interno do servidor"}), 500
 
 @app.route('/api/analise_de_distribuicao-quina', methods=['GET'])
 def get_analise_de_distribuicao_quina():
@@ -1464,6 +1443,16 @@ def get_analise_seca_quina():
             'success': False,
             'error': f'Erro interno: {str(e)}'
         }), 500
+
+@app.route('/analise_estatistica_avancada_lotomania')
+def analise_estatistica_avancada_lotomania():
+    """Página de análise estatística avançada da Lotomania"""
+    return render_template('analise_estatistica_avancada_lotomania.html')
+
+@app.route('/estatisticas_lotomania')
+def estatisticas_lotomania():
+    """Página de estatísticas completas da Lotomania"""
+    return render_template('estatisticas_lotomania.html')
 
 if __name__ == '__main__':
     # Configurações otimizadas para melhor performance

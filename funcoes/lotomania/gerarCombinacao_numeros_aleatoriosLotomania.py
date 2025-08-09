@@ -111,3 +111,4 @@ if __name__ == "__main__":
 # Para usar em outros programas:
 # from nome_do_arquivo import gerar_aposta_personalizada_lotomania
 # numeros, valor, qtde_apostas = gerar_aposta_personalizada_lotomania()
+
