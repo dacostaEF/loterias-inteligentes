@@ -4,6 +4,65 @@
 from flask import Flask, render_template, jsonify, request
 import pandas as pd
 import os
+import math
+import numpy as np
+from datetime import datetime, date
+import json
+
+def _to_native(x):
+    """Converte tipos NumPy/Pandas para tipos nativos Python"""
+    # Tipos NumPy → nativos
+    if isinstance(x, (np.integer,)):
+        return int(x)
+    if isinstance(x, (np.floating,)):
+        return float(x) if not (np.isnan(x) or np.isinf(x)) else 0.0
+    if isinstance(x, (np.bool_,)):
+        return bool(x)
+    if isinstance(x, (np.generic,)):  # fallback para outros np.* genéricos
+        try:
+            return x.item()
+        except Exception:
+            return str(x)
+
+    # Tipos Pandas problemáticos
+    if x is pd.NA:
+        return None
+    if isinstance(x, (pd.Timestamp, pd.Timedelta)):
+        return str(x)
+
+    # Datetimes/dates
+    if isinstance(x, (datetime, date)):
+        return x.isoformat()
+
+    # Floats nativos com NaN/Inf
+    if isinstance(x, float) and (math.isnan(x) or math.isinf(x)):
+        return 0.0
+
+    return x
+
+def limpar_valores_problematicos(obj):
+    """Sanitiza valores para serialização JSON"""
+    # dict
+    if isinstance(obj, dict):
+        return {str(k): limpar_valores_problematicos(v) for k, v in obj.items()}
+
+    # listas/tuplas/conjuntos
+    if isinstance(obj, (list, tuple, set)):
+        return [limpar_valores_problematicos(v) for v in obj]
+
+    # arrays NumPy → lista nativa
+    if isinstance(obj, np.ndarray):
+        return [limpar_valores_problematicos(v) for v in obj.tolist()]
+
+    # Series/DataFrame como último recurso (se aparecerem)
+    if isinstance(obj, pd.Series):
+        return limpar_valores_problematicos(obj.tolist())
+    if isinstance(obj, pd.DataFrame):
+        return limpar_valores_problematicos(obj.to_dict(orient="records"))
+
+    # atômicos
+    obj2 = _to_native(obj)
+    return obj2
 
 # --- Importações das suas funções de análise, conforme a nova estrutura ---
 # Certifique-se de que esses arquivos Python (.py) estejam no mesmo diretório
@@ -42,7 +101,7 @@ from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar
 from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribuicao_quina
 from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
 from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analisar_padroes_sequencias_quina
-from funcoes.quina.analise_estatistica_avancada_quina import realizar_analise_estatistica_avancada_quina
+from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaAvancadaQuina
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -375,20 +434,71 @@ def get_analise_padroes_sequencias_quina():
 def get_estatisticas_avancadas_quina():
     """Retorna os dados das estatísticas avançadas da Quina."""
     try:
-        if df_quina.empty:
-            return jsonify({"error": "Dados da Quina não carregados."}), 500
-
-        # Verificar se há parâmetro de quantidade de concursos
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
-
-        resultado = realizar_analise_estatistica_avancada_quina(df_quina, qtd_concursos)
+        # print("🔍 Iniciando requisição para /api/estatisticas_avancadas_quina")  # DEBUG - COMENTADO
         
-        return jsonify(resultado)
+        if df_quina is None or df_quina.empty:
+            print("❌ Dados da Quina não carregados")
+            return jsonify({'error': 'Dados da Quina não carregados.'}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=25)
+        print(f"📈 Estatísticas Avançadas Quina - Parâmetro qtd_concursos: {qtd_concursos}")
+        print(f"📊 DataFrame disponível: {len(df_quina)} concursos")
+
+        # Criar instância da classe de análise da Quina
+        print("🔧 Criando instância da AnaliseEstatisticaAvancadaQuina...")
+        analise = AnaliseEstatisticaAvancadaQuina(df_quina)
+        
+        # Executar análise completa
+        print("⚡ Executando análise completa da Quina...")
+        resultado = analise.executar_analise_completa(qtd_concursos)
+        
+        print("✅ Análise da Quina concluída! Verificando resultados...")
+        
+        # Log detalhado dos resultados
+        if resultado:
+            print(f"📊 Resultados obtidos:")
+            print(f"   - Desvio padrão: {'✅' if resultado.get('desvio_padrao_distribuicao') else '❌'}")
+            print(f"   - Teste aleatoriedade: {'✅' if resultado.get('teste_aleatoriedade') else '❌'}")
+            print(f"   - Análise clusters: {'✅' if resultado.get('analise_clusters') else '❌'}")
+            print(f"   - Correlação números: {'✅' if resultado.get('analise_correlacao_numeros') else '❌'}")
+            print(f"   - Probabilidades condicionais: {'✅' if resultado.get('probabilidades_condicionais') else '❌'}")
+            print(f"   - Distribuição números: {'✅' if resultado.get('distribuicao_numeros') else '❌'}")
+        else:
+            print("❌ Nenhum resultado obtido!")
+
+        # Limpar valores problemáticos usando função global
+        resultado_limpo = limpar_valores_problematicos(resultado)
+        print("✅ Dados limpos de valores problemáticos")
+
+        # Debug: testar serialização JSON
+        try:
+            json.dumps(resultado_limpo)  # teste seco
+            print("✅ Serialização JSON bem-sucedida")
+            
+            # Debug específico para distribuição de números
+            if 'distribuicao_numeros' in resultado_limpo:
+                dist_numeros = resultado_limpo['distribuicao_numeros']
+                print(f"🔍 Distribuição de números:")
+                print(f"   - Tipo: {type(dist_numeros)}")
+                print(f"   - É lista? {isinstance(dist_numeros, list)}")
+                print(f"   - Tamanho: {len(dist_numeros) if isinstance(dist_numeros, list) else 'N/A'}")
+                if isinstance(dist_numeros, list) and len(dist_numeros) > 0:
+                    print(f"   - Primeiro item: {dist_numeros[0]}")
+                    print(f"   - Último item: {dist_numeros[-1]}")
+            else:
+                print("❌ 'distribuicao_numeros' não encontrada no resultado")
+                
+        except TypeError as e:
+            print(f"🔎 JSON falhou com: {e}")
+            # opcional: localizar tipos estranhos
+
+        return jsonify(resultado_limpo)
+
     except Exception as e:
-        print(f"❌ Erro na API de estatísticas avançadas Quina: {e}")
+        print(f"❌ Erro na API de estatísticas avançadas da Quina: {e}")
         import traceback
         traceback.print_exc()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": f"Erro interno: {str(e)}"}), 500
 
 @app.route('/api/gerar_aposta_premium_quina', methods=['POST'])
 def gerar_aposta_premium_quina():
@@ -427,8 +537,8 @@ def gerar_aposta_premium_quina():
         # Carregar dados avançados se necessário
         if any(key in preferencias_ml for key in ['clusters']):
             try:
-                from funcoes.quina.analise_estatistica_avancada_quina import realizar_analise_estatistica_avancada_quina
-                dados_avancados = realizar_analise_estatistica_avancada_quina()
+                analise = AnaliseEstatisticaAvancadaQuina(df_quina)
+                dados_avancados = analise.executar_analise_completa()
                 analysis_cache['avancada'] = dados_avancados
             except Exception as e:
                 print(f"⚠️ Erro ao carregar dados avançados: {e}")
@@ -661,7 +771,7 @@ def get_estatisticas_avancadas():
             print("❌ Dados da +Milionária não carregados")
             return jsonify({'error': 'Dados da +Milionária não carregados.'}), 500
 
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=25)
         # print(f"📈 Estatísticas Avançadas - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
         # print(f"📊 DataFrame disponível: {len(df_milionaria)} concursos")  # DEBUG - COMENTADO
 
@@ -710,23 +820,17 @@ def get_estatisticas_avancadas():
         # if not resultado:
         #     print("❌ Nenhum resultado obtido!")  # DEBUG - COMENTADO
 
-        # Verificar se há valores NaN ou infinitos antes de retornar
-        def limpar_valores_problematicos(obj):
-            if isinstance(obj, dict):
-                return {k: limpar_valores_problematicos(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [limpar_valores_problematicos(v) for v in obj]
-            elif isinstance(obj, float):
-                import numpy as np
-                if np.isnan(obj) or np.isinf(obj):
-                    return 0.0
-                return obj
-            else:
-                return obj
-        
-        # Limpar valores problemáticos
+        # Limpar valores problemáticos usando função global
         resultado_limpo = limpar_valores_problematicos(resultado)
         print("✅ Dados limpos de valores problemáticos")
+
+        # Debug: testar serialização JSON
+        try:
+            json.dumps(resultado_limpo)  # teste seco
+            print("✅ Serialização JSON bem-sucedida")
+        except TypeError as e:
+            print(f"🔎 JSON falhou com: {e}")
+            # opcional: localizar tipos estranhos
 
         return jsonify(resultado_limpo)
 
@@ -747,7 +851,7 @@ def get_estatisticas_avancadas_megasena():
             print("❌ Dados da Mega Sena não carregados")
             return jsonify({'error': 'Dados da Mega Sena não carregados.'}), 500
 
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=25)
         print(f"📈 Estatísticas Avançadas Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")
         print(f"📊 DataFrame disponível: {len(df_megasena)} concursos")
 
@@ -773,23 +877,17 @@ def get_estatisticas_avancadas_megasena():
         else:
             print("❌ Nenhum resultado obtido!")
 
-        # Verificar se há valores NaN ou infinitos antes de retornar
-        def limpar_valores_problematicos(obj):
-            if isinstance(obj, dict):
-                return {k: limpar_valores_problematicos(v) for k, v in obj.items()}
-            elif isinstance(obj, list):
-                return [limpar_valores_problematicos(v) for v in obj]
-            elif isinstance(obj, float):
-                import numpy as np
-                if np.isnan(obj) or np.isinf(obj):
-                    return 0.0
-                return obj
-            else:
-                return obj
-        
-        # Limpar valores problemáticos
+        # Limpar valores problemáticos usando função global
         resultado_limpo = limpar_valores_problematicos(resultado)
         print("✅ Dados limpos de valores problemáticos")
+
+        # Debug: testar serialização JSON
+        try:
+            json.dumps(resultado_limpo)  # teste seco
+            print("✅ Serialização JSON bem-sucedida")
+        except TypeError as e:
+            print(f"🔎 JSON falhou com: {e}")
+            # opcional: localizar tipos estranhos
 
         return jsonify(resultado_limpo)
 

@@ -3918,6 +3918,7 @@
 
     // Carregar análise de estatísticas avançadas
     async function carregarAnaliseEstatisticasAvancadas(container, qtdConcursos = null) {
+      console.log('🚀 Iniciando carregamento de estatísticas avançadas...');
       container.innerHTML = "🔄 Carregando análise de estatísticas avançadas...";
 
       try {
@@ -3926,9 +3927,17 @@
         if (qtdConcursos) {
           url += `?qtd_concursos=${qtdConcursos}`;
         }
+        
+        console.log('📡 Fazendo requisição para:', url);
 
         const response = await fetch(url);
+        console.log('📥 Resposta recebida:', response.status, response.statusText);
+        
         const data = await response.json();
+        console.log('📊 Dados recebidos:', data);
+        console.log('🔍 Distribuição de números:', data.distribuicao_numeros);
+        console.log('🔍 Tipo da distribuição:', typeof data.distribuicao_numeros);
+        console.log('🔍 É lista?', Array.isArray(data.distribuicao_numeros));
 
         if (data.error) {
           container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
@@ -4907,9 +4916,10 @@
       if (sliderNumeros) {
         atualizarCorSlider(sliderNumeros);
       }
-      if (sliderTrevos) {
-        atualizarCorSlider(sliderTrevos);
-      }
+      // CORREÇÃO: A Quina não tem trevos, então não tenta acessar sliderTrevos
+      // if (sliderTrevos) {
+      //   atualizarCorSlider(sliderTrevos);
+      // }
     });
 
     // Abrir o modal
@@ -4925,7 +4935,8 @@
     // Gerar aposta ao clicar no botão dentro do modal
     btnGerarNoModal.addEventListener('click', () => {
       const qtdeNum = parseInt(sliderNumeros.value);
-      const qtdeTrevos = parseInt(sliderTrevos.value);
+      // CORREÇÃO: A Quina não tem trevos, então usa 0 como padrão
+      const qtdeTrevos = 0; // parseInt(sliderTrevos.value);
       gerarApostaAleatoria(qtdeNum, qtdeTrevos);
       modalConfiguracao.classList.add('hidden'); // Fecha o modal após gerar
     });
@@ -4934,19 +4945,14 @@
       try {
         mostrarMensagem('🎲 Gerando sua aposta...', 'info');
         
-        // Para compatibilidade com o backend, dividimos os trevos em 2 grupos
-        const qtdeTrevo1 = Math.ceil(qtdeTrevos / 2);
-        const qtdeTrevo2 = Math.floor(qtdeTrevos / 2);
-        
-        const response = await fetch('/api/gerar-aposta-milionaria', {
+        // CORREÇÃO: A Quina não tem trevos, então usa a API da Quina
+        const response = await fetch('/api/gerar-aposta-aleatoria-quina', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            qtde_num: qtdeNum,
-            qtde_trevo1: qtdeTrevo1,
-            qtde_trevo2: qtdeTrevo2
+            qtde_num: qtdeNum
           })
         });
 
@@ -4960,74 +4966,24 @@
         // Limpar seleções anteriores
         limparSelecaoSilenciosa();
         
-        // Atualizar limite de trevos baseado no modal
-        const limiteTrevos = qtdeTrevos;
-        
+        // CORREÇÃO: A Quina não tem trevos, então só seleciona números
         // Selecionar números aleatórios automaticamente
-        data.numeros.forEach(numero => {
-          const elementos = document.querySelectorAll('#numeros-container .numero');
-          const elemento = Array.from(elementos).find(el => el.textContent.trim() === numero.toString().padStart(2, '0'));
-          if (elemento) {
-            selecionarNumeroAutomatico(numero, elemento);
-          }
-        });
-        
-        // Selecionar múltiplos números para Trevos (corrigido para usar a nova estrutura)
-        const trevoElementos = document.querySelectorAll('#trevos-container .trevo-icon-container');
-        
-        // Função para selecionar trevo sem validação de limite (para geração automática)
-        function selecionarTrevoAutomatico(trevo, elemento) {
-          if (!trevosSelecionados.includes(trevo)) {
-            trevosSelecionados.push(trevo);
-            elemento.classList.add('selecionado');
-          }
-          atualizarTrevosSelecionados();
-        }
-        
-        // Selecionar múltiplos números para Trevo 1
-        if (Array.isArray(data.trevo1)) {
-          data.trevo1.forEach(trevo => {
-            const trevoElemento = Array.from(trevoElementos).find(el => 
-              el.querySelector('.trevo-number').textContent.trim() === trevo.toString()
-            );
-            if (trevoElemento) {
-              selecionarTrevoAutomatico(trevo, trevoElemento);
+        if (data.numeros && Array.isArray(data.numeros)) {
+          data.numeros.forEach(numero => {
+            const elementos = document.querySelectorAll('#numeros-container .numero');
+            const elemento = Array.from(elementos).find(el => el.textContent.trim() === numero.toString().padStart(2, '0'));
+            if (elemento) {
+              selecionarNumeroAutomatico(numero, elemento);
             }
           });
-        } else {
-          // Fallback para compatibilidade (trevo único)
-          const trevoElemento = Array.from(trevoElementos).find(el => 
-            el.querySelector('.trevo-number').textContent.trim() === data.trevo1.toString()
-          );
-          if (trevoElemento) {
-            selecionarTrevoAutomatico(data.trevo1, trevoElemento);
-          }
         }
         
-        // Selecionar múltiplos números para Trevo 2
-        if (Array.isArray(data.trevo2)) {
-          data.trevo2.forEach(trevo => {
-            const trevoElemento = Array.from(trevoElementos).find(el => 
-              el.querySelector('.trevo-number').textContent.trim() === trevo.toString()
-            );
-            if (trevoElemento) {
-              selecionarTrevoAutomatico(trevo, trevoElemento);
-            }
-          });
-        } else {
-          // Fallback para compatibilidade (trevo único)
-          const trevoElemento = Array.from(trevoElementos).find(el => 
-            el.querySelector('.trevo-number').textContent.trim() === data.trevo2.toString()
-          );
-          if (trevoElemento) {
-            selecionarTrevoAutomatico(data.trevo2, trevoElemento);
-          }
+        // Atualizar valor da aposta (sem trevos)
+        if (data.valor && data.qtde_apostas) {
+          atualizarValorAposta(data.valor, data.qtde_apostas, qtdeNum, 0, 0);
         }
         
-        // Atualizar valor da aposta
-        atualizarValorAposta(data.valor, data.qtde_apostas, qtdeNum, qtdeTrevos, qtdeTrevos);
-        
-        mostrarMensagem(`✅ Aposta gerada com sucesso! ${data.qtde_apostas} combinações`, 'success');
+        mostrarMensagem(`✅ Aposta gerada com sucesso! ${data.qtde_apostas || 1} combinações`, 'success');
 
       } catch (error) {
         console.error("Erro ao gerar aposta:", error);

@@ -344,3 +344,6 @@ Este manual oferece uma abordagem **científica e sistemática** para análise d
 
 **Lembre-se:** O objetivo é **maximizar probabilidades**, não garantir vitórias. Use com sabedoria e responsabilidade! 🍀
 
+
+
+
