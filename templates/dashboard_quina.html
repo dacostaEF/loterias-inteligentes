@@ -1063,19 +1063,40 @@
   <!-- Seção de Estatísticas Rápidas -->
   <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">🔥 Números Quentes</h3>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">🔥 Números Quentes</h3>
+        <button onclick="destacarNumeros('quentes')" class="text-white hover:text-green-300 transition-colors" title="Destacar no grid">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
       <div class="text-sm text-gray-300" id="numeros-quentes">
         Carregando...
       </div>
     </div>
     <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">❄️ Números Frios</h3>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">❄️ Números Frios</h3>
+        <button onclick="destacarNumeros('frios')" class="text-white hover:text-blue-300 transition-colors" title="Destacar no grid">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
       <div class="text-sm text-gray-300" id="numeros-frios">
         Carregando...
       </div>
     </div>
     <div class="stat-card p-6 rounded-2xl">
-      <h3 class="text-lg font-semibold mb-2">🌵 Números Secos</h3>
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">🌵 Números Secos</h3>
+        <button onclick="destacarNumeros('secos')" class="text-white hover:text-orange-300 transition-colors" title="Destacar no grid">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
       <div class="text-sm text-gray-300" id="numeros-secos">
         Carregando...
       </div>
@@ -1563,6 +1584,46 @@
         // Se não tiver seleção mínima, limpar valor
         atualizarValorAposta(null, null, null);
       }
+    }
+
+    // Função para destacar números no grid
+    function destacarNumeros(tipo) {
+      // Limpar cores anteriores
+      document.querySelectorAll('.numero').forEach(el => {
+        el.style.setProperty('background-color', '#2E303A', 'important');
+        el.style.setProperty('color', '#FFFFFF', 'important');
+      });
+      
+      // Definir cores baseado no tipo
+      let cor;
+      let corTexto;
+      if (tipo === 'quentes') {
+        cor = '#556B2F';
+        corTexto = 'white';
+      } else if (tipo === 'frios') {
+        cor = '#87CEEB';
+        corTexto = '#2C3E50';
+      } else if (tipo === 'secos') {
+        cor = '#FF8C00';
+        corTexto = 'white';
+      }
+      
+      // Pegar números do container
+      const container = document.getElementById(`numeros-${tipo}`);
+      const spans = container.querySelectorAll('span');
+      
+      // Destacar cada número no grid
+      spans.forEach(span => {
+        const numero = span.textContent;
+        const numeroFormatado = numero.padStart(2, '0');
+        const elementos = document.querySelectorAll('.numero');
+        elementos.forEach(el => {
+          if (el.textContent === numeroFormatado) {
+            el.style.setProperty('background-color', cor, 'important');
+            el.style.setProperty('color', corTexto, 'important');
+          }
+        });
+      });
     }
 
     // Carregar estatísticas rápidas
@@ -5675,6 +5736,20 @@
       }
     });
   </script>
+
+  <style>
+    /* Remover fundo dos botões de seta */
+    button[onclick*="destacarNumeros"] {
+      background: none !important;
+      border: none !important;
+      padding: 4px !important;
+      border-radius: 50% !important;
+    }
+    
+    button[onclick*="destacarNumeros"]:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  </style>
 
   <!-- Modal para Números do Cluster -->
   <div id="modal-numeros-cluster" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
