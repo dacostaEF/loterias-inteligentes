@@ -9,13 +9,13 @@ import os
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def carregar_dados_quina(arquivo_excel: str = 'LoteriasExcel/Quina_edt.xlsx', limite_concursos: int = 500) -> pd.DataFrame:
+def carregar_dados_quina(arquivo_excel: str = 'LoteriasExcel/Quina_edt.xlsx', limite_concursos: int = 300) -> pd.DataFrame:
     """
     Carrega os dados históricos da Quina, limitando aos últimos N concursos.
 
     Args:
         arquivo_excel (str): O nome do arquivo Excel com os dados da Quina.
-        limite_concursos (int): Quantidade de últimos concursos a carregar (padrão: 500).
+        limite_concursos (int): Quantidade de últimos concursos a carregar (padrão: 300).
 
     Returns:
         pd.DataFrame: DataFrame contendo os dados dos concursos, com números
@@ -87,7 +87,7 @@ def converter_para_matrizes_binarias_quina(df: pd.DataFrame) -> tuple[np.ndarray
 # Exemplo de uso
 if __name__ == '__main__':
     try:
-        df_quina = carregar_dados_quina(limite_concursos=500)
+        df_quina = carregar_dados_quina(limite_concursos=300)
         matriz_numeros, concursos_nums = converter_para_matrizes_binarias_quina(df_quina)
         
         # print("\n--- Carregamento de Dados Quina ---")  # DEBUG - COMENTADO

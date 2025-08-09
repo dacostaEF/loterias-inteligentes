@@ -89,6 +89,34 @@ def gerar_aposta_inteligente(preferencias: dict, analysis_cache: dict) -> list:
                     if atraso >= padroes_pref['minAtraso']:
                         pesos_numeros[num] *= 2.5 # Aumenta o peso para números muito atrasados
 
+        # 4. Afinidades (Combinacoes)
+        afinidades_pref = preferencias.get('afinidades', {})
+        if afinidades_pref.get('priorizarParesFortes') and afinidades_pref.get('qtdePares'):
+            afinidades_cache = analysis_cache.get('afinidades_completa', {})
+            afinidade_data = afinidades_cache.get('afinidade_entre_numeros', {})
+            pares_mais_frequentes = afinidade_data.get('pares_com_maior_afinidade', [])
+            
+            if pares_mais_frequentes:
+                numeros_com_afinidade = set()
+                for par, _ in pares_mais_frequentes[:afinidades_pref['qtdePares']]:
+                    if isinstance(par, (list, tuple)) and len(par) == 2:
+                        numeros_com_afinidade.add(par[0])
+                        numeros_com_afinidade.add(par[1])
+                
+                for num in pool_numeros:
+                    if num in numeros_com_afinidade:
+                        pesos_numeros[num] *= 2.0 # Dobra o peso para números com afinidade
+
+        # 5. Distribuição (Paridade e Soma)
+        distrib_pref = preferencias.get('distribuicao', {})
+        if distrib_pref.get('priorizarParesImpares'):
+            # A distribuição será verificada durante a geração da aposta
+            pass  # Será aplicada na validação posterior
+
+        if distrib_pref.get('priorizarSoma'):
+            # A soma será verificada durante a geração da aposta
+            pass  # Será aplicada na validação posterior
+
         # Gerar a aposta principal usando os pesos
         # Convertendo pesos para lista para uso com random.choices
         numeros_ponderados = [num for num, peso in pesos_numeros.items()]

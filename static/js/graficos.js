@@ -1402,8 +1402,41 @@ if (gerarSugestaoBtn) {
         console.log("🔢 qtdeNumerosAposta:", preferenciasParaML.qtdeNumerosAposta);
         console.log("🍀 qtdeTrevosAposta:", preferenciasParaML.qtdeTrevosAposta);
 
+        // Função para detectar qual loteria está sendo usada
+        function detectarLoteria() {
+            const titulo = document.title;
+            const pathname = window.location.pathname;
+            
+            if (titulo.includes('Quina') || pathname.includes('quina')) {
+                return 'quina';
+            } else if (titulo.includes('Mega') || pathname.includes('megasena')) {
+                return 'megasena';
+            } else {
+                return 'milionaria'; // Padrão
+            }
+        }
+
+        const loteria = detectarLoteria();
+        console.log("🎯 Loteria detectada:", loteria);
+
+        // Determinar a API correta baseada na loteria
+        let apiEndpoint;
+        switch (loteria) {
+            case 'quina':
+                apiEndpoint = '/api/gerar_aposta_premium_quina';
+                break;
+            case 'megasena':
+                apiEndpoint = '/api/gerar_aposta_premium_megasena';
+                break;
+            default:
+                apiEndpoint = '/api/gerar_aposta_premium'; // +Milionária
+                break;
+        }
+
+        console.log("🔗 API endpoint:", apiEndpoint);
+
         try {
-            const response = await fetch('/api/gerar_aposta_premium', {
+            const response = await fetch(apiEndpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(preferenciasParaML)
@@ -1420,13 +1453,16 @@ if (gerarSugestaoBtn) {
             if (data.success && data.apostas && data.apostas.length > 0) {
                 let apostasHtml = '';
                 data.apostas.forEach((aposta, index) => {
+                    // Determinar se é +Milionária (tem trevos) ou outras loterias (só números)
+                    const temTrevos = aposta.trevos && aposta.trevos.length > 0;
+                    
                     apostasHtml += `
                         <div class="bg-[#1A1D25] p-3 rounded-md text-center border border-[#00E38C]">
                             <h5 class="text-white font-semibold mb-2">Aposta #${index + 1}</h5>
                             <div class="flex flex-wrap justify-center items-center gap-2 text-lg font-bold mb-2">
                                 ${aposta.numeros.map(num => `<span class="bg-[#00E38C] text-black px-3 py-1 rounded-full">${String(num).padStart(2, '0')}</span>`).join('')}
-                                <span class="text-gray-300 text-base">+ Trevos:</span>
-                                ${aposta.trevos.map(trevo => `<span class="bg-[#8B5CF6] text-white px-3 py-1 rounded-full">${String(trevo).padStart(2, '0')}</span>`).join('')}
+                                ${temTrevos ? `<span class="text-gray-300 text-base">+ Trevos:</span>
+                                ${aposta.trevos.map(trevo => `<span class="bg-[#8B5CF6] text-white px-3 py-1 rounded-full">${String(trevo).padStart(2, '0')}</span>`).join('')}` : ''}
                             </div>
                             <p class="text-gray-300 text-sm">Valor Estimado: R$ ${aposta.valor_estimado ? aposta.valor_estimado.toFixed(2).replace('.', ',') : 'N/A'}</p>
                         </div>

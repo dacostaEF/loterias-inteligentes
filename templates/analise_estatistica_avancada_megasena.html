@@ -1730,7 +1730,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="500">Últimos 500 concursos</option>
+                    <option value="350">Últimos 350 concursos</option>
                     <option value="25">Últimos 25 concursos</option>
                     <option value="50">Últimos 50 concursos</option>
                     <option value="100">Últimos 100 concursos</option>
@@ -1792,7 +1792,7 @@
                 <div class="flex items-center">
                   <label for="freq-periodo" class="text-white">Considerar período:</label>
                   <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
-                    <option value="500">Últimos 500 Concursos</option>
+                    <option value="350">Últimos 350 Concursos</option>
                     <option value="25">Últimos 25 Concursos</option>
                     <option value="50">Últimos 50 Concursos</option>
                   </select>
@@ -2040,7 +2040,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="500" ${janela === '' || janela === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
+                    <option value="350" ${janela === '' || janela === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
                     <option value="25" ${janela === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${janela === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${janela === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -2104,7 +2104,7 @@
                 <div class="flex items-center">
                   <label for="freq-periodo" class="text-white">Considerar período:</label>
                   <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
-                    <option value="500">Últimos 500 Concursos</option>
+                    <option value="350">Últimos 350 Concursos</option>
                     <option value="25">Últimos 25 Concursos</option>
                     <option value="50">Últimos 50 Concursos</option>
                   </select>
@@ -2342,7 +2342,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectDistribuicaoPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateDistribuicaoModal()">
-                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
+                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
                     <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
@@ -2352,7 +2352,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="distribuicaoPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 500 concursos.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 350 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaDistribuicao()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
@@ -2660,7 +2660,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-afinidades" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateAfinidadeModal()">
-                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
+                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -3124,7 +3124,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-sequencias" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSequenciasModal()">
-                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
+                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -3644,7 +3644,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectSecaPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSecaModal()">
-                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
+                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -3653,7 +3653,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="secaPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 500 concursos.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 350 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaSeca()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
@@ -3930,7 +3930,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectEstatisticasAvancadasPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateEstatisticasAvancadasModal()">
-                    <option value="500" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '500' ? 'selected' : ''}>Últimos 500 concursos</option>
+                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
                     <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
@@ -3940,7 +3940,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="estatisticasAvancadasPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 500 concursos.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 350 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaEstatisticasAvancadas()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
@@ -4081,6 +4081,10 @@
         // Armazenar dados da distribuição globalmente para os controles de ordenação
         window.ultimaDistribuicaoNumeros = data.distribuicao_numeros;
         window.ultimoPeriodoEstatisticas = qtdConcursos;
+        console.log('🔍 Dados armazenados globalmente:', {
+          distribuicao: window.ultimaDistribuicaoNumeros,
+          periodo: window.ultimoPeriodoEstatisticas
+        });
         
         // Armazenar dados dos clusters globalmente para as preferências premium
         window.analiseResultados = {
@@ -4174,7 +4178,7 @@
         if (selectedQtd) {
           periodoDisplay.textContent = `Análise dos últimos ${selectedQtd} concursos.`;
         } else {
-          periodoDisplay.textContent = 'Análise dos últimos 500 concursos.';
+          periodoDisplay.textContent = 'Análise dos últimos 350 concursos.';
         }
       }
       
@@ -4575,12 +4579,23 @@
       // 2. Aplicar a ordenação
       if (ordenacao === 'frequencia') {
         distribuicaoParaPlotar.sort((a, b) => b.frequencia - a.frequencia); // Do maior para o menor
+        console.log('🔍 Ordenação por frequência aplicada. Primeiros 5 números:', distribuicaoParaPlotar.slice(0, 5).map(item => `${item.numero}:${item.frequencia}`));
       } else { // 'numerica' ou qualquer outro valor, mantém a ordem original (1 a 60)
         distribuicaoParaPlotar.sort((a, b) => a.numero - b.numero);
+        console.log('🔍 Ordenação numérica aplicada. Primeiros 5 números:', distribuicaoParaPlotar.slice(0, 5).map(item => `${item.numero}:${item.frequencia}`));
       }
 
       const numeros = distribuicaoParaPlotar.map(item => item.numero);
       const frequencias = distribuicaoParaPlotar.map(item => item.frequencia);
+      
+      // Para ordenação por frequência, converter números para string para forçar eixo categórico
+      const numerosParaEixo = ordenacao === 'frequencia' 
+        ? numeros.map(num => num.toString()) 
+        : numeros;
+      
+      console.log('🔍 Tipo de ordenação:', ordenacao);
+      console.log('🔍 Primeiros 5 números para eixo X:', numerosParaEixo.slice(0, 5));
+      console.log('🔍 Tipo do eixo X:', ordenacao === 'frequencia' ? 'category' : 'linear');
 
       // Calcular estatísticas para exibir
       const total = frequencias.reduce((a, b) => a + b, 0);
@@ -4604,7 +4619,7 @@
       titulo += ordenacao === 'frequencia' ? '<br>- Ordenado por Frequência' : '<br>- Ordem Numérica';
 
       const data = [{
-        x: numeros,
+        x: numerosParaEixo,
         y: frequencias,
         type: 'bar',
         marker: {
@@ -4648,14 +4663,11 @@
         },
         xaxis: {
           title: { text: 'Número', font: { color: 'white' } },
+          type: ordenacao === 'frequencia' ? 'category' : 'linear', // Força categoria apenas quando ordenado por frequência
           gridcolor: '#2E303A',
           tickfont: { color: 'white', size: 10 },
           linecolor: '#2E303A',
-          automargin: true, // Ajuda a evitar cortes de labels quando há muitos ticks
-          range: [0, 61], // Força o range de 1-60
-          tickmode: 'linear',
-          tick0: 1,
-          dtick: 5
+          automargin: true
         },
         yaxis: { 
           title: 'Frequência',
@@ -4704,11 +4716,15 @@
         const btnFrequencia = document.getElementById('btn-ordenar-frequencia');
 
         btnNumerica.addEventListener('click', () => {
+          console.log('🔍 Botão "Ordem Numérica" clicado!');
           plotGraficoEstatisticasDistribuicao(window.ultimaDistribuicaoNumeros, 'numerica', window.ultimoPeriodoEstatisticas);
           atualizarBotoesOrdenacao('numerica');
         });
 
         btnFrequencia.addEventListener('click', () => {
+          console.log('🔍 Botão "Por Frequência" clicado!');
+          console.log('🔍 Dados disponíveis:', window.ultimaDistribuicaoNumeros);
+          console.log('🔍 Período:', window.ultimoPeriodoEstatisticas);
           plotGraficoEstatisticasDistribuicao(window.ultimaDistribuicaoNumeros, 'frequencia', window.ultimoPeriodoEstatisticas);
           atualizarBotoesOrdenacao('frequencia');
         });
@@ -5266,7 +5282,7 @@
       <h3>🎯 Janela de Análise Temporal</h3>
       <p>
         Use o seletor de período para analisar diferentes janelas de tempo:<br>
-        <strong>Últimos 500 concursos:</strong> Análise completa do histórico disponível.<br>
+        <strong>Últimos 350 concursos:</strong> Análise completa do histórico disponível.<br>
         <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
         <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
       </p>
@@ -5365,7 +5381,7 @@
       <h3>🎯 Janela de Análise Temporal</h3>
       <p>
         Use o seletor de período para analisar diferentes janelas de tempo:<br>
-        <strong>Últimos 500 concursos:</strong> Análise completa do histórico disponível.<br>
+        <strong>Últimos 350 concursos:</strong> Análise completa do histórico disponível.<br>
         <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
         <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
       </p>

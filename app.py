@@ -143,7 +143,7 @@ def carregar_dados_megasena_app():
     global df_megasena
     if df_megasena is None:
         try:
-            df_megasena = carregar_dados_megasena(limite_concursos=500)  # Limitar aos últimos 500 concursos para melhor sensibilidade estatística
+            df_megasena = carregar_dados_megasena(limite_concursos=350)  # Limitar aos últimos 350 concursos para melhor sensibilidade estatística
             print(f"Dados da Mega Sena carregados. Total de concursos: {len(df_megasena)}")
         except Exception as e:
             print(f"Erro ao carregar dados da Mega Sena: {e}")
@@ -156,7 +156,7 @@ def carregar_dados_quina_app():
     if df_quina is None:
         try:
             from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
-            df_quina = carregar_dados_quina(limite_concursos=500)  # Limitar aos últimos 500 concursos para melhor sensibilidade estatística
+            df_quina = carregar_dados_quina(limite_concursos=300)  # Limitar aos últimos 300 concursos para melhor sensibilidade estatística
             print(f"Dados da Quina carregados. Total de concursos: {len(df_quina)}")
         except Exception as e:
             print(f"Erro ao carregar dados da Quina: {e}")
@@ -247,8 +247,8 @@ def get_analise_frequencia_megasena():
         concursos_para_matriz = []
         if 'periodo_analisado' in resultado and 'concursos_do_periodo' in resultado['periodo_analisado']:
             # Converter dados do DataFrame para formato da matriz
-            # Se qtd_concursos for None (todos os concursos), limitar a 500 para evitar loop
-            limite_efetivo = qtd_concursos if qtd_concursos else 500
+            # Se qtd_concursos for None (todos os concursos), limitar a 300 para evitar loop
+            limite_efetivo = qtd_concursos if qtd_concursos else 300
             df_filtrado = df_megasena.tail(limite_efetivo)
             for _, row in df_filtrado.iterrows():
                 if not pd.isna(row['Concurso']):
@@ -342,8 +342,8 @@ def get_analise_frequencia_quina():
         # Preparar dados dos concursos individuais para a matriz visual
         concursos_para_matriz = []
         # Converter dados do DataFrame para formato da matriz
-        # Se qtd_concursos for None (todos os concursos), limitar a 500 para evitar loop
-        limite_efetivo = qtd_concursos if qtd_concursos else 500
+        # Se qtd_concursos for None (todos os concursos), limitar a 350 para evitar loop
+        limite_efetivo = qtd_concursos if qtd_concursos else 350
         print(f"🔍 Debug: qtd_concursos={qtd_concursos}, limite_efetivo={limite_efetivo}")
         print(f"🔍 Debug: Shape do df_quina={df_quina.shape}")
         
@@ -533,6 +533,24 @@ def gerar_aposta_premium_quina():
                 analysis_cache['padroes_completa'] = dados_padroes
             except Exception as e:
                 print(f"⚠️ Erro ao carregar padrões: {e}")
+        
+        # Carregar dados de afinidades (combinacoes) se necessário
+        if any(key in preferencias_ml for key in ['afinidades']):
+            try:
+                from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
+                dados_afinidades = analisar_combinacoes_quina(df_quina, qtd_concursos=50)  # Últimos 50 concursos
+                analysis_cache['afinidades_completa'] = dados_afinidades
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar afinidades: {e}")
+        
+        # Carregar dados de distribuição se necessário
+        if any(key in preferencias_ml for key in ['distribuicao']):
+            try:
+                from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribuicao_quina
+                dados_distribuicao = analisar_distribuicao_quina(df_quina, qtd_concursos=50)  # Últimos 50 concursos
+                analysis_cache['distribuicao_completa'] = dados_distribuicao
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar distribuição: {e}")
         
         # Carregar dados avançados se necessário
         if any(key in preferencias_ml for key in ['clusters']):
@@ -1268,6 +1286,16 @@ def gerar_aposta_premium_megasena():
                 # print("✅ Dados de padrões carregados")  # DEBUG - COMENTADO
             except Exception as e:
                 print(f"⚠️ Erro ao carregar padrões: {e}")
+        
+        # Carregar dados de afinidades (combinacoes) se necessário
+        if any(key in preferencias_ml for key in ['afinidades']):
+            try:
+                from funcoes.megasena.funcao_analise_de_combinacoes_MS import analise_combinacoes_megasena
+                dados_afinidades = analise_combinacoes_megasena(df_megasena, qtd_concursos=50)  # Últimos 50 concursos
+                analysis_cache['afinidades_completa'] = dados_afinidades
+                # print("✅ Dados de afinidades carregados")  # DEBUG - COMENTADO
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar afinidades: {e}")
         
         # Carregar dados avançados se necessário
         if any(key in preferencias_ml for key in ['clusters']):

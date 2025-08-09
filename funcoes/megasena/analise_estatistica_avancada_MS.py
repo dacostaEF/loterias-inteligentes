@@ -626,7 +626,7 @@ class AnaliseEstatisticaAvancada:
         
         # Criar matriz de presença (concurso x número)
         # Para muitos concursos, usar apenas uma amostra para evitar problemas de memória
-        max_concursos_para_correlacao = 500  # Limitar a 500 concursos para correlação
+        max_concursos_para_correlacao = 350  # Limitar a 350 concursos para correlação
         
         if len(self.df_validos) > max_concursos_para_correlacao:
             logger.info(f"🔧 Limitando análise de correlação a {max_concursos_para_correlacao} concursos (de {len(self.df_validos)})")
