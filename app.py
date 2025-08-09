@@ -8,6 +8,11 @@ import math
 import numpy as np
 from datetime import datetime, date
 import json
+import logging
+
+# Configuração do logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def _to_native(x):
     """Converte tipos NumPy/Pandas para tipos nativos Python"""
@@ -102,6 +107,9 @@ from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribu
 from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
 from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analisar_padroes_sequencias_quina
 from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaAvancadaQuina
+
+# --- Importações para Lotomania ---
+from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -371,6 +379,47 @@ def get_analise_frequencia_quina():
         })
     except Exception as e:
         print(f"❌ Erro na API de frequência Quina: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/analise-frequencia-lotomania')
+def get_analise_frequencia_lotomania():
+    """API básica para análise de frequência da Lotomania (dados simulados)."""
+    try:
+        import random
+        
+        # Dados simulados para Lotomania (1-100)
+        numeros_quentes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        numeros_frios = [1, 11, 21, 31, 41, 51, 61, 71, 81, 91]
+        numeros_secos = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95]
+        
+        # Gerar dados de frequência simulados
+        frequencia_absoluta = {i: random.randint(5, 25) for i in range(1, 101)}
+        frequencia_relativa = {i: round(random.uniform(1.0, 3.0), 2) for i in range(1, 101)}
+        
+        # Simular concursos recentes
+        concursos_recentes = []
+        for i in range(10):
+            numeros_sorteio = sorted(random.sample(range(1, 101), 20))
+            concursos_recentes.append({
+                'concurso': 1000 - i,
+                'numeros': numeros_sorteio
+            })
+
+        return jsonify({
+            'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(frequencia_absoluta.items())],
+            'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(frequencia_relativa.items())],
+            'numeros_quentes_frios': {
+                'numeros_quentes': [[n, random.randint(20, 30)] for n in numeros_quentes],
+                'numeros_frios': [[n, random.randint(1, 10)] for n in numeros_frios],
+                'numeros_secos': [[n, random.randint(0, 5)] for n in numeros_secos]
+            },
+            'analise_temporal': concursos_recentes,
+            'periodo_analisado': 'Últimos 50 concursos (dados simulados)',
+            'concursos_para_matriz': concursos_recentes,
+            'ultimos_concursos': concursos_recentes
+        })
+    except Exception as e:
+        print(f"❌ Erro na API de frequência Lotomania: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise_de_distribuicao-quina', methods=['GET'])
@@ -991,6 +1040,30 @@ def gerar_numeros_aleatorios_quina():
             "error": "Erro interno do servidor"
         }), 500
 
+@app.route('/api/gerar-numeros-aleatorios-lotomania', methods=['GET'])
+def gerar_numeros_aleatorios_lotomania():
+    """Gera números aleatórios para Lotomania (15-20 números de 1-100)."""
+    try:
+        import random
+        
+        # Gerar entre 15 e 20 números únicos entre 1 e 100 (Lotomania)
+        qtde_numeros = random.randint(15, 20)
+        numeros = sorted(random.sample(range(1, 101), qtde_numeros))
+        
+        return jsonify({
+            "success": True,
+            "numeros": numeros,
+            "qtde_numeros": qtde_numeros,
+            "mensagem": f"Números da Lotomania gerados com sucesso! ({qtde_numeros} números)"
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro ao gerar números aleatórios da Lotomania: {e}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
 @app.route('/api/gerar-aposta-milionaria', methods=['POST'])
 def gerar_aposta_milionaria_api():
     """Gera aposta personalizada para +Milionária com quantidade configurável."""
@@ -1088,6 +1161,28 @@ def gerar_aposta_quina_api():
         logger.error(f"Erro inesperado ao gerar aposta Quina: {e}")
         return jsonify({'error': 'Erro interno do servidor ao gerar aposta.'}), 500
 
+@app.route('/api/gerar-aposta-lotomania', methods=['POST'])
+def gerar_aposta_lotomania_api():
+    """Gera aposta personalizada para Lotomania (50 números fixos)."""
+    try:
+        # Chama a função principal de geração de aposta (sempre 50 números)
+        numeros, valor, qtde_apostas = gerar_aposta_personalizada_lotomania()
+
+        return jsonify({
+            'success': True,
+            'numeros': numeros,
+            'valor': valor,
+            'qtde_apostas': qtde_apostas,
+            'mensagem': 'Aposta da Lotomania gerada com sucesso! (50 números fixos)'
+        })
+
+    except ValueError as e:
+        logger.error(f"Erro de validação ao gerar aposta Lotomania: {e}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Erro inesperado ao gerar aposta Lotomania: {e}")
+        return jsonify({'error': 'Erro interno do servidor ao gerar aposta.'}), 500
+
 @app.route('/api/bolao_interesse', methods=['POST'])
 def bolao_interesse():
     data = request.json
@@ -1143,6 +1238,12 @@ def dashboard_lotofacil():
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html')
+
+# --- Rotas da Lotomania ---
+@app.route('/dashboard_lotomania')
+def dashboard_lotomania():
+    """Renderiza a página principal do dashboard da Lotomania."""
+    return render_template('dashboard_lotomania.html')
 
 @app.route('/aposta_inteligente_premium')
 def aposta_inteligente_premium():
