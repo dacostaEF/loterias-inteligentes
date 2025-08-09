@@ -812,6 +812,62 @@
         padding-top: 1rem !important;
       }
     }
+
+    /* Auto-ajuste centralizado da imagem da Quina */
+    .quina-logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      position: relative;
+    }
+    
+    .quina-logo {
+      max-width: 240px;
+      min-width: 96px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      margin-left: 15px !important;
+      margin-bottom: -8px;
+      transition: all 0.3s ease;
+      vertical-align: bottom;
+      transform: translateX(15px);
+    }
+    
+    /* Responsividade total para mobile e tablet */
+    @media (max-width: 640px) {
+      .quina-logo {
+        max-width: 144px;
+        min-width: 72px;
+        height: 58px;
+      }
+    }
+    
+    @media (min-width: 641px) and (max-width: 768px) {
+      .quina-logo {
+        max-width: 180px;
+        min-width: 84px;
+        height: 77px;
+      }
+    }
+    
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .quina-logo {
+        max-width: 216px;
+        min-width: 96px;
+        height: 96px;
+      }
+    }
+    
+    @media (min-width: 1025px) {
+      .quina-logo {
+        max-width: 240px;
+        min-width: 120px;
+        height: 115px;
+      }
+    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
@@ -925,15 +981,15 @@
   <!-- Header -->
   <header class="flex justify-between items-center mb-8">
     <!-- Título deslocado para a direita -->
-    <div class="flex-1 text-center">
-      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2" style="margin-left: 20%;">
-        Quina
+    <div class="flex-1 text-center quina-logo-container">
+      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex justify-center items-center">
+        <img src="/static/img/Quina.png" alt="Quina" class="quina-logo">
       </h1>
     </div>
     
     <!-- Logo no lado direito -->
     <div class="flex justify-end items-center">
-      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-width-[120px] sm:max-w-[150px] md:max-w-[180px]">
     </div>
   </header>
 
