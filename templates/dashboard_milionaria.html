@@ -1079,11 +1079,18 @@
     <div class="stat-card p-6 rounded-2xl">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">🔥 Números Quentes</h3>
-        <button onclick="destacarNumeros('quentes')" class="text-white hover:text-green-300 transition-colors" title="Destacar no grid">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </button>
+        <div class="flex space-x-2">
+          <button onclick="destacarNumeros('quentes')" class="text-white hover:text-green-300 transition-colors" title="Destacar no grid">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <button onclick="limparDestaques()" class="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors" title="Limpar destaques">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="text-sm text-gray-300" id="numeros-quentes">
         Carregando...
@@ -1092,11 +1099,18 @@
     <div class="stat-card p-6 rounded-2xl">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">❄️ Números Frios</h3>
-        <button onclick="destacarNumeros('frios')" class="text-white hover:text-blue-300 transition-colors" title="Destacar no grid">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-          </svg>
-        </button>
+        <div class="flex space-x-2">
+          <button onclick="destacarNumeros('frios')" class="text-white hover:text-blue-300 transition-colors" title="Destacar no grid">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <button onclick="limparDestaques()" class="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors" title="Limpar destaques">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
       </div>
       <div class="text-sm text-gray-300" id="numeros-frios">
         Carregando...
@@ -1536,6 +1550,9 @@
       if (!numerosSelecionados.includes(numero)) {
         numerosSelecionados.push(numero);
         elemento.classList.add('selecionado');
+        // Manter a cor verde sólida para números selecionados
+        elemento.style.setProperty('background-color', '#00E38C', 'important');
+        elemento.style.setProperty('color', '#000000', 'important');
       }
       atualizarNumerosSelecionados();
     }
@@ -1734,6 +1751,34 @@
               el.style.setProperty('color', corTexto, 'important');
             }
           });
+        }
+      });
+    }
+
+    // Função para limpar todos os destaques
+    function limparDestaques() {
+      document.querySelectorAll('.numero').forEach(el => {
+        // Se o número está selecionado, manter a cor verde
+        if (el.classList.contains('selecionado')) {
+          el.style.setProperty('background-color', '#00E38C', 'important');
+          el.style.setProperty('color', '#000000', 'important');
+        } else {
+          // Se não está selecionado, restaurar cor original
+          el.style.setProperty('background-color', '#2E303A', 'important');
+          el.style.setProperty('color', '#FFFFFF', 'important');
+        }
+      });
+      
+      // Limpar trevos também
+      document.querySelectorAll('.trevo').forEach(el => {
+        // Se o trevo está selecionado, manter a cor roxa
+        if (el.classList.contains('selecionado')) {
+          el.style.setProperty('background-color', '#8B5CF6', 'important');
+          el.style.setProperty('color', '#FFFFFF', 'important');
+        } else {
+          // Se não está selecionado, restaurar cor original
+          el.style.setProperty('background-color', '#2E303A', 'important');
+          el.style.setProperty('color', '#FFFFFF', 'important');
         }
       });
     }
@@ -4991,6 +5036,9 @@
             if (!trevosSelecionados.includes(trevo)) {
               trevosSelecionados.push(trevo);
               elemento.classList.add('selecionado');
+              // Manter a cor roxa sólida para trevos selecionados
+              elemento.style.setProperty('background-color', '#8B5CF6', 'important');
+              elemento.style.setProperty('color', '#FFFFFF', 'important');
             }
             atualizarTrevosSelecionados();
           }
@@ -5182,6 +5230,9 @@
           if (!trevosSelecionados.includes(trevo)) {
             trevosSelecionados.push(trevo);
             elemento.classList.add('selecionado');
+            // Manter a cor roxa sólida para trevos selecionados
+            elemento.style.setProperty('background-color', '#8B5CF6', 'important');
+            elemento.style.setProperty('color', '#FFFFFF', 'important');
           }
           atualizarTrevosSelecionados();
         }

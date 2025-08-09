@@ -98,6 +98,8 @@ from funcoes.megasena.calculos_MS import calcular_seca_numeros_megasena
 from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
 from funcoes.megasena.analise_estatistica_avancada_MS import AnaliseEstatisticaAvancada as AnaliseEstatisticaAvancadaMS
 
+
+
 # --- Importações para Mega Sena ---
 from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
 from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar_aposta_personalizada
@@ -1453,6 +1455,8 @@ def analise_estatistica_avancada_lotomania():
 def estatisticas_lotomania():
     """Página de estatísticas completas da Lotomania"""
     return render_template('estatisticas_lotomania.html')
+
+
 
 if __name__ == '__main__':
     # Configurações otimizadas para melhor performance
