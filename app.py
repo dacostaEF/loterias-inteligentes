@@ -1319,15 +1319,7 @@ def get_analise_seca_quina():
             'error': f'Erro interno: {str(e)}'
         }), 500
 
-@app.route('/analise_estatistica_avancada_lotomania')
-def analise_estatistica_avancada_lotomania():
-    """Página de análise estatística avançada da Lotomania"""
-    return render_template('analise_estatistica_avancada_lotomania.html')
 
-@app.route('/estatisticas_lotomania')
-def estatisticas_lotomania():
-    """Página de estatísticas completas da Lotomania"""
-    return render_template('estatisticas_lotomania.html')
 
 
 
