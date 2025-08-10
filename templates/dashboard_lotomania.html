@@ -1157,7 +1157,12 @@
     // Limpar seleção
     function limparSelecao() {
       numerosSelecionados = [];
-      document.querySelectorAll('.numero').forEach(el => el.classList.remove('selecionado'));
+      document.querySelectorAll('.numero').forEach(el => {
+        el.classList.remove('selecionado');
+        // Restaurar cor original dos números
+        el.style.setProperty('background-color', '#2E303A', 'important');
+        el.style.setProperty('color', '#FFFFFF', 'important');
+      });
       atualizarNumerosSelecionados();
       calcularEAtualizarValorAposta();
     }
