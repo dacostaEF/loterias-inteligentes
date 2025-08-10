@@ -14,60 +14,8 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def _to_native(x):
-    """Converte tipos NumPy/Pandas para tipos nativos Python"""
-    # Tipos NumPy → nativos
-    if isinstance(x, (np.integer,)):
-        return int(x)
-    if isinstance(x, (np.floating,)):
-        return float(x) if not (np.isnan(x) or np.isinf(x)) else 0.0
-    if isinstance(x, (np.bool_,)):
-        return bool(x)
-    if isinstance(x, (np.generic,)):  # fallback para outros np.* genéricos
-        try:
-            return x.item()
-        except Exception:
-            return str(x)
-
-    # Tipos Pandas problemáticos
-    if x is pd.NA:
-        return None
-    if isinstance(x, (pd.Timestamp, pd.Timedelta)):
-        return str(x)
-
-    # Datetimes/dates
-    if isinstance(x, (datetime, date)):
-        return x.isoformat()
-
-    # Floats nativos com NaN/Inf
-    if isinstance(x, float) and (math.isnan(x) or math.isinf(x)):
-        return 0.0
-
-    return x
-
-def limpar_valores_problematicos(obj):
-    """Sanitiza valores para serialização JSON"""
-    # dict
-    if isinstance(obj, dict):
-        return {str(k): limpar_valores_problematicos(v) for k, v in obj.items()}
-
-    # listas/tuplas/conjuntos
-    if isinstance(obj, (list, tuple, set)):
-        return [limpar_valores_problematicos(v) for v in obj]
-
-    # arrays NumPy → lista nativa
-    if isinstance(obj, np.ndarray):
-        return [limpar_valores_problematicos(v) for v in obj.tolist()]
-
-    # Series/DataFrame como último recurso (se aparecerem)
-    if isinstance(obj, pd.Series):
-        return limpar_valores_problematicos(obj.tolist())
-    if isinstance(obj, pd.DataFrame):
-        return limpar_valores_problematicos(obj.to_dict(orient="records"))
-
-    # atômicos
-    obj2 = _to_native(obj)
-    return obj2
+# Funções utilitárias movidas para utils/data_helpers.py
+from utils.data_helpers import _to_native, limpar_valores_problematicos
 
 # --- Importações das suas funções de análise, conforme a nova estrutura ---
 # Certifique-se de que esses arquivos Python (.py) estejam no mesmo diretório
@@ -117,68 +65,19 @@ from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_fr
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
 
-# Caminho para o arquivo Excel
-EXCEL_FILE = 'LoteriasExcel/Milionária_edt.xlsx'
-df_milionaria = None # Variável global para armazenar o DataFrame
+# Funções de carregamento movidas para services/data_loader.py
+from services.data_loader import carregar_dados_milionaria, carregar_dados_megasena_app, carregar_dados_quina_app
 
-# Variável global para armazenar o DataFrame da Mega Sena
+# Variáveis globais para armazenar os DataFrames
+df_milionaria = None
 df_megasena = None
-
-# Variável global para armazenar o DataFrame da Quina
 df_quina = None
-
-def carregar_dados_milionaria():
-    """Carrega os dados da +Milionária do arquivo Excel."""
-    global df_milionaria
-    if df_milionaria is None:
-        if os.path.exists(EXCEL_FILE):
-            try:
-                df = pd.read_excel(EXCEL_FILE)
-                # Renomeia as colunas para o padrão esperado pelas funções de análise
-                df.columns = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
-                # Converte os números para tipos numéricos, forçando erros para NaN e depois Int64
-                for col in ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']:
-                    df[col] = pd.to_numeric(df[col], errors='coerce').astype('Int64')
-                df_milionaria = df.dropna().reset_index(drop=True) # Remove linhas com NaN após conversão
-                print(f"Dados da +Milionária carregados. Total de concursos: {len(df_milionaria)}")
-            except Exception as e:
-                print(f"Erro ao carregar o arquivo Excel: {e}")
-                df_milionaria = pd.DataFrame() # Retorna DataFrame vazio em caso de erro
-        else:
-            print(f"Arquivo Excel não encontrado: {EXCEL_FILE}")
-            df_milionaria = pd.DataFrame() # Retorna DataFrame vazio se o arquivo não existir
-    return df_milionaria
-
-def carregar_dados_megasena_app():
-    """Carrega os dados da Mega Sena do arquivo Excel."""
-    global df_megasena
-    if df_megasena is None:
-        try:
-            df_megasena = carregar_dados_megasena(limite_concursos=350)  # Limitar aos últimos 350 concursos para melhor sensibilidade estatística
-            print(f"Dados da Mega Sena carregados. Total de concursos: {len(df_megasena)}")
-        except Exception as e:
-            print(f"Erro ao carregar dados da Mega Sena: {e}")
-            df_megasena = pd.DataFrame() # Retorna DataFrame vazio em caso de erro
-    return df_megasena
-
-def carregar_dados_quina_app():
-    """Carrega os dados da Quina do arquivo Excel."""
-    global df_quina
-    if df_quina is None:
-        try:
-            from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
-            df_quina = carregar_dados_quina(limite_concursos=300)  # Limitar aos últimos 300 concursos para melhor sensibilidade estatística
-            print(f"Dados da Quina carregados. Total de concursos: {len(df_quina)}")
-        except Exception as e:
-            print(f"Erro ao carregar dados da Quina: {e}")
-            df_quina = pd.DataFrame() # Retorna DataFrame vazio em caso de erro
-    return df_quina
 
 # Carrega os dados na inicialização do aplicativo
 with app.app_context():
-    carregar_dados_milionaria()
-    carregar_dados_megasena_app()
-    carregar_dados_quina_app()
+    df_milionaria = carregar_dados_milionaria()
+    df_megasena = carregar_dados_megasena_app()
+    df_quina = carregar_dados_quina_app()
 
 @app.route('/')
 def landing_page():
@@ -947,29 +846,23 @@ def get_estatisticas_avancadas_megasena():
 
 
 # --- Rota para manifestação de interesse em bolões (sem persistência para este exemplo) ---
+# Funções de geração de números movidas para services/geradores/numeros_aleatorios.py
+from services.geradores.numeros_aleatorios import (
+    gerar_numeros_aleatorios,
+    gerar_numeros_aleatorios_megasena,
+    gerar_numeros_aleatorios_quina,
+    gerar_numeros_aleatorios_lotomania
+)
+
 @app.route('/api/gerar-numeros-aleatorios', methods=['GET'])
 def gerar_numeros_aleatorios():
     """Gera números aleatórios para +Milionária (6 números + 2 trevos)."""
     try:
-        import random
-        
-        # Gerar 6 números únicos entre 1 e 50
-        numeros = sorted(random.sample(range(1, 51), 6))
-        
-        # Gerar 2 trevos únicos entre 1 e 6
-        trevo1 = random.randint(1, 6)
-        trevo2 = random.randint(1, 6)
-        while trevo2 == trevo1:  # Garantir que sejam diferentes
-            trevo2 = random.randint(1, 6)
-        
-        return jsonify({
-            "success": True,
-            "numeros": numeros,
-            "trevo1": trevo1,
-            "trevo2": trevo2,
-            "mensagem": "Números gerados com sucesso!"
-        })
-        
+        resultado = gerar_numeros_aleatorios()
+        if resultado["success"]:
+            return jsonify(resultado)
+        else:
+            return jsonify(resultado), 500
     except Exception as e:
         logger.error(f"Erro ao gerar números aleatórios: {e}")
         return jsonify({
@@ -981,17 +874,11 @@ def gerar_numeros_aleatorios():
 def gerar_numeros_aleatorios_megasena():
     """Gera números aleatórios para Mega Sena (6 números de 1-60)."""
     try:
-        import random
-        
-        # Gerar 6 números únicos entre 1 e 60 (Mega Sena)
-        numeros = sorted(random.sample(range(1, 61), 6))
-        
-        return jsonify({
-            "success": True,
-            "numeros": numeros,
-            "mensagem": "Números da Mega Sena gerados com sucesso!"
-        })
-        
+        resultado = gerar_numeros_aleatorios_megasena()
+        if resultado["success"]:
+            return jsonify(resultado)
+        else:
+            return jsonify(resultado), 500
     except Exception as e:
         logger.error(f"Erro ao gerar números aleatórios da Mega Sena: {e}")
         return jsonify({
@@ -1003,17 +890,11 @@ def gerar_numeros_aleatorios_megasena():
 def gerar_numeros_aleatorios_quina():
     """Gera números aleatórios para Quina (5 números de 1-80)."""
     try:
-        import random
-        
-        # Gerar 5 números únicos entre 1 e 80 (Quina)
-        numeros = sorted(random.sample(range(1, 81), 5))
-        
-        return jsonify({
-            "success": True,
-            "numeros": numeros,
-            "mensagem": "Números da Quina gerados com sucesso!"
-        })
-        
+        resultado = gerar_numeros_aleatorios_quina()
+        if resultado["success"]:
+            return jsonify(resultado)
+        else:
+            return jsonify(resultado), 500
     except Exception as e:
         logger.error(f"Erro ao gerar números aleatórios da Quina: {e}")
         return jsonify({
@@ -1025,140 +906,11 @@ def gerar_numeros_aleatorios_quina():
 def gerar_numeros_aleatorios_lotomania():
     """Gera números aleatórios para Lotomania com controle de qualidade de distribuição par/ímpar e repetição do último concurso."""
     try:
-        import random
-        import pandas as pd
-        
-        # Carregar dados da Lotomania
-        try:
-            df_lotomania = pd.read_excel('LoteriasExcel/Lotomania_edt.xlsx')
-            # Pegar o último concurso (assumindo que está ordenado por concurso)
-            ultimo_concurso = df_lotomania.iloc[-1]
-            numeros_ultimo_concurso = []
-            
-            # Extrair os 20 números do último concurso
-            for i in range(1, 21):  # Colunas de 1 a 20
-                coluna = f'Dezena_{i:02d}'
-                if coluna in ultimo_concurso:
-                    numero = ultimo_concurso[coluna]
-                    if pd.notna(numero) and numero != 0:
-                        numeros_ultimo_concurso.append(int(numero))
-            
-            # Se não conseguiu extrair números, usar lista vazia
-            if not numeros_ultimo_concurso:
-                numeros_ultimo_concurso = []
-                
-        except Exception as e:
-            logger.warning(f"Não foi possível carregar dados da Lotomania: {e}")
-            numeros_ultimo_concurso = []
-        
-        # Gerar sempre 20 números (como na loteria real)
-        qtde_numeros = 20
-        max_tentativas = 200  # Aumentar tentativas para encontrar solução balanceada
-        
-        for tentativa in range(max_tentativas):
-            # Gerar 20 números únicos entre 1 e 100
-            numeros = sorted(random.sample(range(1, 101), qtde_numeros))
-            
-            # Contar pares e ímpares
-            pares = len([n for n in numeros if n % 2 == 0])
-            impares = qtde_numeros - pares
-            
-            # Verificar se está dentro da margem aceitável (±4)
-            if 21 <= pares <= 29:
-                # Verificar repetição do último concurso
-                numeros_repetidos = [n for n in numeros if n in numeros_ultimo_concurso]
-                qtde_repetidos = len(numeros_repetidos)
-                
-                # Máximo 6 números repetidos do último concurso
-                if qtde_repetidos <= 6:
-                    return jsonify({
-                        "success": True,
-                        "numeros": numeros,
-                        "qtde_numeros": qtde_numeros,
-                        "distribuicao": {
-                            "pares": pares,
-                            "impares": impares,
-                            "balanceamento": "BALANCEADO" if pares == 25 else "ACEITÁVEL"
-                        },
-                        "controle_repeticao": {
-                            "numeros_repetidos": numeros_repetidos,
-                            "qtde_repetidos": qtde_repetidos,
-                            "numeros_novos": qtde_numeros - qtde_repetidos,
-                            "status": "DIVERSIFICADO" if qtde_repetidos <= 4 else "ACEITÁVEL"
-                        },
-                        "mensagem": f"Números da Lotomania gerados com sucesso! ({qtde_numeros} números) - Pares: {pares}, Ímpares: {impares}, Repetidos: {qtde_repetidos}"
-                    })
-        
-        # Se não conseguiu balancear após max_tentativas, retorna o melhor resultado
-        melhor_resultado = None
-        melhor_score = float('inf')
-        
-        for _ in range(100):  # Última tentativa com mais amostras
-            numeros = sorted(random.sample(range(1, 101), qtde_numeros))
-            pares = len([n for n in numeros if n % 2 == 0])
-            
-            # Calcular score baseado no balanceamento par/ímpar e repetição
-            score_balanceamento = abs(pares - 25)
-            numeros_repetidos = [n for n in numeros if n in numeros_ultimo_concurso]
-            qtde_repetidos = len(numeros_repetidos)
-            score_repeticao = max(0, qtde_repetidos - 6) * 10  # Penalizar repetições excessivas
-            
-            score_total = score_balanceamento + score_repeticao
-            
-            if score_total < melhor_score:
-                melhor_score = score_total
-                melhor_resultado = {
-                    'numeros': numeros,
-                    'pares': pares,
-                    'impares': qtde_numeros - pares,
-                    'repetidos': numeros_repetidos,
-                    'qtde_repetidos': qtde_repetidos
-                }
-        
-        if melhor_resultado:
-            return jsonify({
-                "success": True,
-                "numeros": melhor_resultado['numeros'],
-                "qtde_numeros": qtde_numeros,
-                "distribuicao": {
-                    "pares": melhor_resultado['pares'],
-                    "impares": melhor_resultado['impares'],
-                    "balanceamento": "MELHOR DISPONÍVEL"
-                },
-                "controle_repeticao": {
-                    "numeros_repetidos": melhor_resultado['repetidos'],
-                    "qtde_repetidos": melhor_resultado['qtde_repetidos'],
-                    "numeros_novos": qtde_numeros - melhor_resultado['qtde_repetidos'],
-                    "status": "MELHOR DISPONÍVEL"
-                },
-                "mensagem": f"Números da Lotomania gerados! ({qtde_numeros} números) - Pares: {melhor_resultado['pares']}, Ímpares: {melhor_resultado['impares']}, Repetidos: {melhor_resultado['qtde_repetidos']} (melhor distribuição encontrada)"
-            })
-        
-        # Fallback final
-        numeros_fallback = sorted(random.sample(range(1, 101), qtde_numeros))
-        pares_fallback = len([n for n in numeros_fallback if n % 2 == 0])
-        impares_fallback = qtde_numeros - pares_fallback
-        numeros_repetidos_fallback = [n for n in numeros_fallback if n in numeros_ultimo_concurso]
-        qtde_repetidos_fallback = len(numeros_repetidos_fallback)
-        
-        return jsonify({
-            "success": True,
-            "numeros": numeros_fallback,
-            "qtde_numeros": qtde_numeros,
-            "distribuicao": {
-                "pares": pares_fallback,
-                "impares": impares_fallback,
-                "balanceamento": "FALLBACK"
-            },
-            "controle_repeticao": {
-                "numeros_repetidos": numeros_repetidos_fallback,
-                "qtde_repetidos": qtde_repetidos_fallback,
-                "numeros_novos": qtde_numeros - qtde_repetidos_fallback,
-                "status": "FALLBACK"
-            },
-            "mensagem": f"Números da Lotomania gerados (fallback)! ({qtde_numeros} números) - Pares: {pares_fallback}, Ímpares: {impares_fallback}, Repetidos: {qtde_repetidos_fallback}"
-        })
-        
+        resultado = gerar_numeros_aleatorios_lotomania()
+        if resultado["success"]:
+            return jsonify(resultado)
+        else:
+            return jsonify(resultado), 500
     except Exception as e:
         logger.error(f"Erro ao gerar números aleatórios da Lotomania: {e}")
         return jsonify({
