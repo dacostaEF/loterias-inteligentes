@@ -1,182 +1,1326 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotofácil | Dashboard Inteligente</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Meta tags para colorir a status bar dos dispositivos móveis -->
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="msapplication-navbutton-color" content="#7C3AED">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  
+  <title>Lotofácil | Dashboard Inteligente</title>
+  
+  <!-- Favicons otimizados para todos os dispositivos -->
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="16x16">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="48x48">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="192x192">
+  <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="512x512">
+  
+  <!-- Apple Touch Icons para iOS -->
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="180x180">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="152x152">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="144x144">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="120x120">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="114x114">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="76x76">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="72x72">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="60x60">
+  <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="57x57">
+  
+  <!-- Android Chrome Icons -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/img/Favicon_LI.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/static/img/Favicon_LI.png">
+  
+  <!-- Windows Tiles -->
+  <meta name="msapplication-TileColor" content="#7C3AED">
+  <meta name="msapplication-TileImage" content="/static/img/Favicon_LI.png">
+  <meta name="msapplication-config" content="none">
+  
+  <!-- Manifest para PWA -->
+  <link rel="manifest" href="/static/manifest.json">
+
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      important: false,
+      corePlugins: {
+        preflight: false,
+      },
+      theme: {
+        extend: {
+          colors: {
+            'primary': '#00E38C',
+            'secondary': '#8B5CF6',
+            'background': '#000000',
+            'card': '#1A1D25',
+            'surface': '#2E303A',
+          }
+        }
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+
+  <style>
+    /* Moldura Neon Lilás - Desktop */
+    html::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      box-shadow: inset 0 0 0 4px #B96AFF, 0 0 15px #B96AFF, 0 0 30px #B96AFF;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    /* Moldura Neon Lilás - Mobile (mais fina) */
+    @media (max-width: 768px) {
+      html::before {
+        box-shadow: inset 0 0 0 2px #B96AFF, 0 0 8px #B96AFF, 0 0 15px #B96AFF;
+      }
+    }
+
+    /* Estilos para os menus responsivos */
+    /* Menu Desktop */
+    .desktop-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .desktop-nav .logo {
+      max-width: 150px;
+      height: auto;
+    }
+
+    .desktop-nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .desktop-nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .desktop-nav-links a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Estilo para destacar a página atual */
+    .desktop-nav-links a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border: 1px solid rgba(0, 227, 140, 0.3) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .desktop-nav-links a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
+    /* Estilos para submenu dropdown */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 100%;
+      margin-top: 8px;
+      background: #2a2a3e;
+      min-width: 200px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);
+      border-radius: 8px;
+      z-index: 1000;
+      border: 2px solid rgba(168, 85, 247, 0.6);
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+    }
+
+    .dropdown-content.show {
+      display: block !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: translateY(0) !important;
+    }
+
+    .dropdown-content a {
+      color: #e2e8f0;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-left: 3px solid transparent;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .dropdown-content a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      border-left-color: #A855F7;
+    }
+
+    .dropdown-content a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+    }
+
+    /* Hover melhorado com delay */
+    .dropdown:hover .dropdown-content {
+      display: block;
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    /* Delay para fechar o dropdown */
+    .dropdown {
+      transition: all 0.2s ease;
+    }
+
+    /* Estilos para Breadcrumbs */
+    .breadcrumbs-container {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(0, 227, 140, 0.05) 100%);
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      padding: 8px 0;
+      margin-bottom: 20px;
+    }
+    
+    .breadcrumbs {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    .breadcrumb-list {
+      display: flex;
+      align-items: center;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: 0.9rem;
+    }
+    
+    .breadcrumb-item {
+      display: flex;
+      align-items: center;
+      color: #94a3b8;
+    }
+    
+    .breadcrumb-item:not(:last-child)::after {
+      content: "›";
+      margin: 0 8px;
+      color: #64748b;
+      font-weight: bold;
+    }
+    
+    .breadcrumb-link {
+      color: #cbd5e1;
+      text-decoration: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .breadcrumb-item:not(.active) .breadcrumb-link:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+    }
+    
+    .breadcrumb-item.active .breadcrumb-link {
+      color: #00E38C;
+      font-weight: 600;
+    }
+
+    /* Esconder menu desktop em mobile */
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+    }
+
+    /* Mostrar menu desktop em telas maiores */
+    @media (min-width: 769px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    /* Estilos para o menu hambúrguer */
+    .hamburger-menu {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 1000;
+      display: none;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .hamburger-icon {
+      width: 30px;
+      height: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .hamburger-icon span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: #A855F7;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-icon.open span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger-icon.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-icon.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* Sidebar deslizante */
+    .nav-panel {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+      display: flex;
+      flex-direction: column;
+      transition: left 0.3s ease-in-out;
+      z-index: 999;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+      border-right: 1px solid rgba(168, 85, 247, 0.2);
+    }
+
+    .nav-panel.open {
+      left: 0;
+    }
+
+    /* Header do sidebar */
+    .nav-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      text-align: center;
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .nav-logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .nav-header h3 {
+      color: #A855F7;
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .nav-panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .nav-panel li {
+      margin: 0;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+    }
+
+    .nav-panel a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 20px 25px;
+      display: block;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-panel a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+      border-left-color: #A855F7;
+    }
+
+    /* Estilo para destacar a página atual no menu mobile */
+    .nav-panel a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .nav-panel a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
+    /* Overlay para escurecer o fundo */
+    .nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 998;
+    }
+
+    .nav-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Mostrar menu hambúrguer em mobile */
+    @media (max-width: 768px) {
+      .hamburger-menu {
+        display: block;
+      }
+    }
+
+    /* Ajuste do padding do body para o menu desktop */
+    body {
+      padding-top: 80px !important;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding-top: 1rem !important;
+      }
+    }
+
+    /* Auto-ajuste centralizado da imagem da Lotofácil */
+    .lotofacil-logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      position: relative;
+    }
+    
+    .lotofacil-logo {
+      max-width: 240px;
+      min-width: 96px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      margin-left: 15px !important;
+      margin-bottom: -8px;
+      transition: all 0.3s ease;
+      vertical-align: bottom;
+      transform: translateX(15px);
+    }
+    
+    /* Responsividade total para mobile e tablet */
+    @media (max-width: 640px) {
+      .lotofacil-logo {
+        max-width: 144px;
+        min-width: 72px;
+        height: 58px;
+      }
+    }
+    
+    @media (min-width: 641px) and (max-width: 768px) {
+      .lotofacil-logo {
+        max-width: 180px;
+        min-width: 84px;
+        height: 77px;
+      }
+    }
+    
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .lotofacil-logo {
+        max-width: 216px;
+        min-width: 96px;
+        height: 96px;
+      }
+    }
+    
+    @media (min-width: 1025px) {
+      .lotofacil-logo {
+        max-width: 240px;
+        min-width: 120px;
+        height: 115px;
+      }
+    }
+
+    /* Estilos para os números */
+    .numero {
+      background: #2E303A;
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .numero:hover {
+      background: #00E38C;
+      color: #000000;
+      transform: scale(1.05);
+      box-shadow: 0 0 8px rgba(0, 227, 140, 0.5);
+    }
+
+    .numero.selecionado {
+      background: #00E38C;
+      color: #000000;
+      font-weight: bold;
+      box-shadow: 0 0 8px rgba(0, 227, 140, 0.5);
+    }
+
+    /* Grid responsivo para 25 números da Lotofácil */
+    .grid-numeros {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid-numeros {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .grid-numeros {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 0.2rem;
+      }
+    }
+  </style>
 </head>
-<body>
-    <!-- Menu Desktop -->
-    <nav class="desktop-nav">
-        <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="logo">
-        <div class="desktop-nav-links">
-            <a href="/"><i class="fa fa-home"></i> Início</a>
-            <div class="dropdown">
-                <a href="#" class="dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
-                <div class="dropdown-content">
-                    <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                    <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
-                <div class="dropdown-content">
-                    <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                    <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
-                <div class="dropdown-content">
-                    <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                    <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a href="#" class="dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
-                <div class="dropdown-content">
-                    <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                </div>
-            </div>
-            <div class="dropdown">
-                <a href="#" class="dropdown-toggle active"><i class="fa fa-dice"></i> Lotofácil ▼</a>
-                <div class="dropdown-content">
-                    <a href="/dashboard_lotofacil" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                    <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                </div>
-            </div>
-            <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
-            <a href="#"><i class="fa fa-phone"></i> Contato</a>
+<body class="p-4 sm:p-6">
+  <!-- Menu Desktop -->
+  <nav class="desktop-nav">
+    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
+    <div class="desktop-nav-links">
+      <a href="/"><i class="fa fa-home"></i> Início</a>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
         </div>
+      </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle active"><i class="fa fa-dice"></i> Lotofácil ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_lotofacil" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </div>
+      <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
+      <a href="#"><i class="fa fa-phone"></i> Contato</a>
+    </div>
+  </nav>
+
+  <!-- Menu Mobile (Hambúrguer) -->
+  <div class="hamburger-menu">
+    <div class="hamburger-icon" id="hamburgerIcon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- Overlay para escurecer o fundo -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
+  <!-- Sidebar deslizante -->
+  <nav class="nav-panel" id="navPanel">
+    <div class="nav-header">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="nav-logo">
+      <h3>Menu</h3>
+    </div>
+    <ul>
+      <li><a href="/"><i class="fa fa-home"></i> Início</a></li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-dice"></i> Lotofácil ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_lotofacil" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
+      <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+    </ul>
+  </nav>
+
+  <!-- Breadcrumbs -->
+  <div class="breadcrumbs-container">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <ol class="breadcrumb-list">
+        <li class="breadcrumb-item">
+          <a href="#" class="breadcrumb-link">🎲 Lotofácil</a>
+        </li>
+        <li class="breadcrumb-item active">
+          <span class="breadcrumb-link">🎯 Palpite da Sorte</span>
+        </li>
+      </ol>
     </nav>
+  </div>
 
-    <!-- Breadcrumbs -->
-    <div class="breadcrumbs-container">
-        <nav class="breadcrumbs" aria-label="Breadcrumb">
-            <ol class="breadcrumb-list">
-                <li class="breadcrumb-item">
-                    <a href="/" class="breadcrumb-link">🏠 Início</a>
-                </li>
-                <li class="breadcrumb-item active">
-                    <a href="#" class="breadcrumb-link">🎲 Lotofácil</a>
-                </li>
-            </ol>
-        </nav>
+  <!-- Header -->
+  <header class="flex justify-between items-center">
+    <!-- Título deslocado para a direita -->
+    <div class="flex-1 text-center lotofacil-logo-container">
+      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex justify-center items-center">
+        <img src="/static/img/Lotofacil.png" alt="Lotofácil" class="lotofacil-logo">
+      </h1>
+    </div>
+    
+    <!-- Logo no lado direito -->
+    <div class="flex justify-end items-center">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-width-[120px] sm:max-w-[150px] md:max-w-[180px]">
+    </div>
+  </header>
+
+  <!-- Informação dos sorteios -->
+  <div class="text-center mb-4" style="margin-left: -15px;">
+    <p class="text-orange-500 font-semibold text-lg mb-0">Sorteios: Segundas, Quartas e Sexta-feiras</p>
+  </div>
+
+  <!-- Cartão de jogo -->
+  <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8 flex flex-col">
+    <h2 class="text-xl font-semibold mb-4">🎯 Selecione 15 números entre 01 e 25</h2>
+    <div class="grid-numeros mb-6" id="numeros-container">
+      <!-- Números serão gerados dinamicamente -->
     </div>
 
-    <div class="main-container">
-        <div class="hamburger-menu">
-            <div class="hamburger-icon" id="hamburgerIcon">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+    <!-- Números selecionados -->
+    <div class="mt-6 p-4 bg-[#2E303A] rounded-xl">
+      <div class="grid grid-cols-2 gap-6">
+        <!-- Coluna 1: Números principais -->
+        <div>
+          <h4 class="text-sm font-semibold mb-2">Números Selecionados:</h4>
+          <div class="flex gap-2 flex-wrap" id="numeros-selecionados">
+            <span class="text-gray-400">Nenhum número selecionado</span>
+          </div>
         </div>
-
-        <!-- Overlay para escurecer o fundo -->
-        <div class="nav-overlay" id="navOverlay"></div>
-
-        <nav class="nav-panel" id="navPanel">
-            <div class="nav-header">
-                <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="nav-logo">
-                <h3>Menu</h3>
-            </div>
-            <ul>
-                <li><a href="/"><i class="fa fa-home"></i> Início</a></li>
-                <li>
-                    <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
-                    <div class="mobile-dropdown">
-                        <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                        <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                    </div>
-                </li>
-                <li>
-                    <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
-                    <div class="mobile-dropdown">
-                        <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                        <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                    </div>
-                </li>
-                <li>
-                    <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
-                    <div class="mobile-dropdown">
-                        <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                        <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                    </div>
-                </li>
-                <li>
-                    <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
-                    <div class="mobile-dropdown">
-                        <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                    </div>
-                </li>
-                <li>
-                    <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-dice"></i> Lotofácil ▼</a>
-                    <div class="mobile-dropdown">
-                        <a href="/dashboard_lotofacil" class="active"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                        <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-                    </div>
-                </li>
-                <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-                <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
-            </ul>
-        </nav>
-
-        <!-- Conteúdo principal -->
-        <div class="content">
-            <div class="header-section">
-                <a href="#" class="breadcrumb-link">🎲 Lotofácil</a>
-                <h1>Lotofácil</h1>
-                <p>Análise estatística avançada para a Lotofácil</p>
-            </div>
-
-            <!-- Container específico para o Gerador de Números Lotofácil -->
-            <div class="generator-container">
-                <h3 class="text-lg font-semibold mb-4 text-center">🎲 Gerador de Números Lotofácil</h3>
-                <p class="text-center mb-6">Em desenvolvimento - Em breve você poderá gerar números inteligentes para a Lotofácil!</p>
-                
-                <div class="coming-soon">
-                    <i class="fa fa-tools fa-3x"></i>
-                    <h4>Funcionalidade em Desenvolvimento</h4>
-                    <p>Estamos trabalhando para trazer análises estatísticas avançadas para a Lotofácil.</p>
-                </div>
-            </div>
+        
+        <!-- Coluna 2: Valor da aposta -->
+        <div class="flex flex-col justify-center items-center">
+          <div id="valor-aposta-container" class="text-center">
+            <div class="text-gray-400 text-sm">Aguardando sua seleção de números para calcular o valor</div>
+          </div>
         </div>
+      </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
-    <script>
-        // Menu mobile functionality
-        document.getElementById('hamburgerIcon').addEventListener('click', function() {
-            document.getElementById('navPanel').classList.toggle('active');
-            document.getElementById('navOverlay').classList.toggle('active');
+    <!-- Container específico para o Gerador de Números Lotofácil -->
+    <div class="gerador-container mt-6 p-6 bg-[#1A1D25] rounded-xl shadow-md">
+      <h3 class="text-lg font-semibold mb-4 text-center">🎲 Gerador de Números Lotofácil</h3>
+      
+      <div class="botoes-mobile-ajustados">
+        <button class="bg-[#00E38C] text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="abrirModalConfiguracao()">
+          🍀 Gerar Palpite da Sorte
+        </button>
+      
+        <button class="bg-red-600 text-black font-bold px-6 py-3 rounded-xl hover:opacity-80 transition-all text-sm" onclick="limparSelecao()">
+          🗑️ Limpar Tudo<br><small>&nbsp;</small>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção de Estatísticas Rápidas -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="stat-card p-6 rounded-2xl">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">🔥 Números Quentes</h3>
+        <div class="flex space-x-2">
+          <button onclick="destacarNumeros('quentes')" class="text-white hover:text-green-300 transition-colors" title="Destacar no grid">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <button onclick="limparDestaques()" class="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors" title="Limpar destaques">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="text-sm text-gray-300" id="numeros-quentes">
+        Carregando...
+      </div>
+    </div>
+    <div class="stat-card p-6 rounded-2xl">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">❄️ Números Frios</h3>
+        <div class="flex space-x-2">
+          <button onclick="destacarNumeros('frios')" class="text-white hover:text-blue-300 transition-colors" title="Destacar no grid">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <button onclick="limparDestaques()" class="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors" title="Limpar destaques">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="text-sm text-gray-300" id="numeros-frios">
+        Carregando...
+      </div>
+    </div>
+    <div class="stat-card p-6 rounded-2xl">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="text-lg font-semibold">🌵 Números Secos</h3>
+        <div class="flex space-x-2">
+          <button onclick="destacarNumeros('secos')" class="text-white hover:text-orange-300 transition-colors" title="Destacar no grid">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          <button onclick="limparDestaques()" class="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors" title="Limpar destaques">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="text-sm text-gray-300" id="numeros-secos">
+        Carregando...
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de Configuração de Aposta -->
+  <div id="modalConfiguracao" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+    <div class="modal-content p-8 rounded-2xl shadow-xl w-96 text-white">
+      <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Gerar Aposta Lotofácil</h3>
+
+      <div class="mb-8 text-center">
+        <div class="bg-[#00E38C] text-black p-4 rounded-xl mb-4">
+          <h4 class="font-bold text-lg">15 Números Fixos</h4>
+          <p class="text-sm">Valor: R$ 3,00</p>
+        </div>
+        <p class="text-gray-300 text-sm">
+          A Lotofácil utiliza 15 números fixos por aposta, com valor único de R$ 3,00.
+        </p>
+      </div>
+
+      <div class="flex justify-end space-x-4">
+        <button id="btnCancelarModal" class="bg-gray-600 text-white px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">Cancelar</button>
+        <button id="btnGerarNoModal" class="bg-[#00E38C] text-black px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">Gerar Aposta</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Variáveis globais
+    let numerosSelecionados = [];
+
+    // Inicialização
+    function inicializarAplicacao() {
+      gerarNumeros();
+      carregarEstatisticasRapidas();
+    }
+
+    // Aguarda tanto DOM quanto estilos carregados
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', inicializarAplicacao);
+    } else {
+      window.addEventListener('load', inicializarAplicacao);
+    }
+
+    // Gerar números de 1 a 25 para a Lotofácil
+    function gerarNumeros() {
+      const container = document.getElementById('numeros-container');
+      container.innerHTML = '';
+      
+      for (let i = 1; i <= 25; i++) {
+        const div = document.createElement('div');
+        div.className = 'numero p-3 rounded-xl text-center font-semibold';
+        div.textContent = i.toString().padStart(2, '0');
+        div.onclick = () => selecionarNumero(i, div);
+        container.appendChild(div);
+      }
+    }
+
+    // Selecionar número (manual - limite de 15 para Lotofácil)
+    function selecionarNumero(numero, elemento) {
+      if (numerosSelecionados.includes(numero)) {
+        // Deselecionar número
+        numerosSelecionados = numerosSelecionados.filter(n => n !== numero);
+        elemento.classList.remove('selecionado');
+      } else {
+        // Verificar limite de 15 números
+        if (numerosSelecionados.length >= 15) {
+          alert('Você já selecionou 15 números! Limite máximo para a Lotofácil.');
+          elemento.classList.remove('selecionado');
+          elemento.blur();
+          elemento.style.pointerEvents = 'none';
+          setTimeout(() => {
+            elemento.style.pointerEvents = 'auto';
+          }, 100);
+          return;
+        }
+        // Selecionar número
+        numerosSelecionados.push(numero);
+        elemento.classList.add('selecionado');
+      }
+      atualizarNumerosSelecionados();
+      calcularEAtualizarValorAposta();
+    }
+
+    // Selecionar número automaticamente (sem limite - para Lotofácil)
+    function selecionarNumeroAutomatico(numero, elemento) {
+      if (numerosSelecionados.includes(numero)) {
+        numerosSelecionados = numerosSelecionados.filter(n => n !== numero);
+        elemento.classList.remove('selecionado');
+        // Restaurar cor original se não estiver destacado
+        elemento.style.setProperty('background-color', '#2E303A', 'important');
+        elemento.style.setProperty('color', '#FFFFFF', 'important');
+      } else {
+        numerosSelecionados.push(numero);
+        elemento.classList.add('selecionado');
+        // Manter a cor verde sólida para números selecionados
+        elemento.style.setProperty('background-color', '#00E38C', 'important');
+        elemento.style.setProperty('color', '#000000', 'important');
+      }
+      atualizarNumerosSelecionados();
+      calcularEAtualizarValorAposta();
+    }
+
+    // Atualizar display dos números selecionados
+    function atualizarNumerosSelecionados() {
+      const container = document.getElementById('numeros-selecionados');
+      if (numerosSelecionados.length === 0) {
+        container.innerHTML = '<span class="text-gray-400">Nenhum número selecionado</span>';
+      } else {
+        container.innerHTML = numerosSelecionados
+          .sort((a, b) => a - b)
+          .map(n => `<span class="bg-[#00E38C] text-black px-2 py-1 rounded font-semibold">${n.toString().padStart(2, '0')}</span>`)
+          .join('');
+      }
+    }
+
+    // Atualizar display do valor da aposta
+    function atualizarValorAposta(valor, qtdeApostas, qtdeNum) {
+      const container = document.getElementById('valor-aposta-container');
+      if (valor && qtdeApostas) {
+        const valorFormatado = new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        }).format(valor);
+        
+        container.innerHTML = `
+          <div class="bg-[#00E38C] text-black p-3 rounded-xl font-bold text-lg mb-2">
+            ${valorFormatado}
+          </div>
+          <div class="text-sm text-gray-300 mb-1">
+            <strong>${qtdeApostas}</strong> combinações
+          </div>
+          <div class="text-xs text-gray-400">
+            ${qtdeNum} números
+          </div>
+        `;
+      } else if (qtdeNum && qtdeNum > 0) {
+        // Mostrar quantidade de números selecionados
+        if (qtdeNum >= 15) {
+          container.innerHTML = `
+            <div class="bg-gray-600 text-white p-3 rounded-xl font-bold text-lg mb-2">
+              ${qtdeNum} números
+            </div>
+            <div class="text-sm text-gray-300 mb-1">
+              Selecione 15 números para aposta válida
+            </div>
+            <div class="text-xs text-gray-400">
+              Valor: R$ 3,00
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <div class="bg-orange-600 text-white p-3 rounded-xl font-bold text-lg mb-2">
+              ${qtdeNum} números
+            </div>
+            <div class="text-sm text-gray-300 mb-1">
+              Mínimo 15 números para Lotofácil
+            </div>
+            <div class="text-xs text-gray-400">
+              Valor: R$ 3,00 (15 números)
+            </div>
+          `;
+        }
+      } else {
+        container.innerHTML = '<div class="text-gray-400 text-sm">Selecione números para apostar</div>';
+      }
+    }
+
+    // Calcular e atualizar valor da aposta baseado nas seleções
+    function calcularEAtualizarValorAposta() {
+      const qtdeNum = numerosSelecionados.length;
+      
+      if (qtdeNum === 15) {
+        // Lotofácil: 15 números fixos = R$ 3,00
+        atualizarValorAposta(3.00, 1, qtdeNum);
+      } else if (qtdeNum >= 15 && qtdeNum < 25) {
+        // Para Lotofácil, qualquer quantidade entre 15-24 é válida
+        // Mostrar apenas a quantidade de números selecionados
+        atualizarValorAposta(null, null, qtdeNum);
+      } else if (qtdeNum > 0 && qtdeNum < 15) {
+        // Mostrar quantidade de números selecionados (mínimo 15)
+        atualizarValorAposta(null, null, qtdeNum);
+      } else {
+        atualizarValorAposta(null, null, null);
+      }
+    }
+
+    // Variáveis para armazenar os números estatísticos
+    let numerosQuentes = [];
+    let numerosFrios = [];
+    let numerosSecos = [];
+
+    // Função para destacar números no grid
+    function destacarNumeros(tipo) {
+      // Limpar cores anteriores
+      document.querySelectorAll('.numero').forEach(el => {
+        el.style.backgroundColor = '#2E303A';
+        el.style.color = '#FFFFFF';
+      });
+      
+      // Definir cores baseado no tipo
+      let cor;
+      let corTexto;
+      if (tipo === 'quentes') {
+        cor = '#556B2F';
+        corTexto = 'white';
+      } else if (tipo === 'frios') {
+        cor = '#87CEEB';
+        corTexto = '#2C3E50';
+      } else if (tipo === 'secos') {
+        cor = '#FF8C00';
+        corTexto = 'white';
+      }
+      
+      // Pegar números do container
+      const container = document.getElementById(`numeros-${tipo}`);
+      const spans = container.querySelectorAll('span');
+      
+      // Destacar cada número no grid
+      spans.forEach(span => {
+        const numero = span.textContent;
+        const numeroFormatado = numero.padStart(2, '0');
+        const elementos = document.querySelectorAll('.numero');
+        elementos.forEach(el => {
+          if (el.textContent === numeroFormatado) {
+            el.style.setProperty('background-color', cor, 'important');
+            el.style.setProperty('color', corTexto, 'important');
+          }
+        });
+      });
+    }
+
+    // Função para limpar todos os destaques
+    function limparDestaques() {
+      document.querySelectorAll('.numero').forEach(el => {
+        // Se o número está selecionado, manter a cor verde
+        if (el.classList.contains('selecionado')) {
+          el.style.setProperty('background-color', '#00E38C', 'important');
+          el.style.setProperty('color', '#000000', 'important');
+        } else {
+          // Se não está selecionado, restaurar cor original
+          el.style.setProperty('background-color', '#2E303A', 'important');
+          el.style.setProperty('color', '#FFFFFF', 'important');
+        }
+      });
+    }
+
+    // Função para mostrar mensagens
+    function mostrarMensagem(texto) {
+      // Criar ou atualizar mensagem de destaque
+      let mensagemEl = document.getElementById('mensagem-destaque');
+      if (!mensagemEl) {
+        mensagemEl = document.createElement('div');
+        mensagemEl.id = 'mensagem-destaque';
+        mensagemEl.className = 'fixed top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+        document.body.appendChild(mensagemEl);
+      }
+      mensagemEl.textContent = texto;
+      
+      // Remover mensagem após 3 segundos
+      setTimeout(() => {
+        if (mensagemEl) {
+          mensagemEl.remove();
+        }
+      }, 3000);
+    }
+
+    // Carregar estatísticas rápidas
+    async function carregarEstatisticasRapidas() {
+      try {
+        const response = await fetch('/api/analise-frequencia-lotofacil');
+        const data = await response.json();
+        
+        if (data && data.numeros_quentes_frios) {
+          // Armazenar nas variáveis globais para uso no destaque
+          numerosQuentes = data.numeros_quentes_frios.numeros_quentes || [];
+          numerosFrios = data.numeros_quentes_frios.numeros_frios || [];
+          numerosSecos = data.numeros_quentes_frios.numeros_secos || [];
+          
+          console.log('Dados carregados:', { numerosQuentes, numerosFrios, numerosSecos });
+
+          // Números quentes (top 20)
+          document.getElementById('numeros-quentes').innerHTML = 
+            numerosQuentes.slice(0, 20)
+              .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
+              .join('');
+
+          // Números frios (top 20)
+          document.getElementById('numeros-frios').innerHTML = 
+            numerosFrios.slice(0, 20)
+              .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
+              .join('');
+
+          // Números secos (top 20)
+          document.getElementById('numeros-secos').innerHTML = 
+            numerosSecos.slice(0, 20)
+              .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
+              .join('');
+        }
+      } catch (error) {
+        console.error('Erro ao carregar estatísticas:', error);
+        // Fallback para dados simulados
+        numerosQuentes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map(n => [n, 0]);
+        numerosFrios = [21, 22, 23, 24, 25, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(n => [n, 0]);
+        numerosSecos = [5, 10, 15, 20, 25, 1, 6, 11, 16, 21, 2, 7, 12, 17, 22, 3, 8, 13, 18, 23].map(n => [n, 0]);
+        
+        document.getElementById('numeros-quentes').innerHTML = numerosQuentes.map(n => 
+          `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+        ).join('');
+        
+        document.getElementById('numeros-frios').innerHTML = numerosFrios.map(n => 
+          `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+        ).join('');
+        
+        document.getElementById('numeros-secos').innerHTML = numerosSecos.map(n => 
+          `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+        ).join('');
+      }
+    }
+
+    // Abrir modal de configuração
+    function abrirModalConfiguracao() {
+      document.getElementById('modalConfiguracao').classList.remove('hidden');
+    }
+
+    // Fechar modal
+    function fecharModal() {
+      document.getElementById('modalConfiguracao').classList.add('hidden');
+    }
+
+    // Limpar seleção
+    function limparSelecao() {
+      numerosSelecionados = [];
+      document.querySelectorAll('.numero').forEach(el => {
+        el.classList.remove('selecionado');
+        // Restaurar cor original dos números
+        el.style.setProperty('background-color', '#2E303A', 'important');
+        el.style.setProperty('color', '#FFFFFF', 'important');
+      });
+      atualizarNumerosSelecionados();
+      calcularEAtualizarValorAposta();
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      // MELHORIA DOS DROPDOWNS DESKTOP
+      const dropdowns = document.querySelectorAll('.dropdown');
+      let timeoutId;
+
+      dropdowns.forEach(dropdown => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        
+        // Mostrar dropdown no hover
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+          dropdownContent.classList.add('show');
+        });
+        
+        // Esconder dropdown com delay
+        dropdown.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300); // 300ms de delay
+        });
+        
+        // Manter dropdown aberto se o mouse estiver sobre ele
+        dropdownContent.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+        });
+        
+        // Fechar dropdown quando sair do conteúdo
+        dropdownContent.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300);
+        });
+      });
+
+      // Botões do modal
+      const btnCancelar = document.getElementById('btnCancelarModal');
+      const btnGerar = document.getElementById('btnGerarNoModal');
+      
+      if (btnCancelar) {
+        btnCancelar.addEventListener('click', fecharModal);
+      }
+      
+      if (btnGerar) {
+        btnGerar.addEventListener('click', function() {
+          gerarApostaLotofacil();
+          fecharModal();
+        });
+      }
+
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+
+      if (hamburgerIcon && navPanel && navOverlay) {
+        hamburgerIcon.addEventListener('click', () => {
+          hamburgerIcon.classList.toggle('open');
+          navPanel.classList.toggle('open');
+          navOverlay.classList.toggle('open');
+          
+          // Previne scroll do body quando menu está aberto
+          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
         });
 
-        document.getElementById('navOverlay').addEventListener('click', function() {
-            document.getElementById('navPanel').classList.remove('active');
-            document.getElementById('navOverlay').classList.remove('active');
+        // Controle do submenu mobile
+        const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+        mobileDropdownToggles.forEach(toggle => {
+          toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const dropdown = toggle.nextElementSibling;
+            dropdown.classList.toggle('show');
+          });
         });
 
-        // Dropdown functionality
-        document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                const dropdown = this.nextElementSibling;
-                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        // Fechar o menu ao clicar em um link (exceto dropdown toggles)
+        navPanel.querySelectorAll('a:not(.mobile-dropdown-toggle)').forEach(link => {
+          link.addEventListener('click', () => {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Fechar o menu ao clicar no overlay
+        navOverlay.addEventListener('click', () => {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        });
+
+        // Fechar o menu com tecla ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+    });
+
+    // Gerar aposta da Lotofácil via API
+    async function gerarApostaLotofacil() {
+      try {
+        // Limpar seleção atual
+        limparSelecao();
+        
+        // Chamar API da Lotofácil
+        const response = await fetch('/api/gerar-aposta-lotofacil', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({})
+        });
+        
+        if (!response.ok) {
+          throw new Error('Erro ao gerar aposta');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.numeros) {
+          // Pequeno delay para garantir que o DOM esteja pronto
+          setTimeout(() => {
+            // Selecionar os números no grid (sem limite para seleção automática)
+            data.numeros.forEach(numero => {
+              // Buscar o elemento pelo texto do número
+              const elementos = document.querySelectorAll('.numero');
+              
+              const numeroFormatado = numero.toString().padStart(2, '0');
+              const elemento = Array.from(elementos).find(el => el.textContent.trim() === numeroFormatado);
+              if (elemento) {
+                selecionarNumeroAutomatico(numero, elemento);
+              }
             });
-        });
+          }, 100);
+        } else {
+          throw new Error(data.error || 'Erro desconhecido');
+        }
+        
+      } catch (error) {
+        console.error('Erro ao gerar aposta:', error);
+        alert('Erro ao gerar aposta. Tente novamente.');
+      }
+    }
 
-        // Mobile dropdown functionality
-        document.querySelectorAll('.mobile-dropdown-toggle').forEach(toggle => {
-            toggle.addEventListener('click', function(e) {
-                e.preventDefault();
-                const dropdown = this.nextElementSibling;
-                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-            });
-        });
-    </script>
+    // Gerar aposta aleatória (mantida para compatibilidade)
+    function gerarApostaAleatoria(qtdeNumeros) {
+      // Limpar seleção atual
+      limparSelecao();
+      
+      // Gerar números aleatórios únicos
+      const numerosDisponiveis = Array.from({length: 25}, (_, i) => i + 1);
+      const numerosSorteados = [];
+      
+      for (let i = 0; i < qtdeNumeros; i++) {
+        const indiceAleatorio = Math.floor(Math.random() * numerosDisponiveis.length);
+        const numeroSorteado = numerosDisponiveis.splice(indiceAleatorio, 1)[0];
+        numerosSorteados.push(numeroSorteado);
+      }
+      
+      // Selecionar os números no grid
+      numerosSorteados.forEach(numero => {
+        // Buscar o elemento pelo texto do número
+        const elementos = document.querySelectorAll('.numero');
+        
+        const numeroFormatado = numero.toString().padStart(2, '0');
+        const elemento = Array.from(elementos).find(el => el.textContent.trim() === numeroFormatado);
+        if (elemento) {
+          selecionarNumero(numero, elemento);
+        }
+      });
+    }
+  </script>
+
+  <style>
+    /* Remover fundo dos botões de seta */
+    button[onclick*="destacarNumeros"] {
+      background: none !important;
+      border: none !important;
+      padding: 4px !important;
+      border-radius: 50% !important;
+    }
+    
+    button[onclick*="destacarNumeros"]:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  </style>
 </body>
-</html> 
+</html>

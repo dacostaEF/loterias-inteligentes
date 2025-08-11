@@ -62,6 +62,11 @@ from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaA
 from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
 from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_frequencia_lotomania
 
+# --- Importações para Lotofácil ---
+from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil, obter_ultimos_concursos_lotofacil
+from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import analisar_frequencia_lotofacil, obter_estatisticas_rapidas_lotofacil
+from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosLotofacil import gerar_aposta_personalizada_lotofacil, gerar_aposta_aleatoria_lotofacil
+
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
 
@@ -72,12 +77,14 @@ from services.data_loader import carregar_dados_milionaria, carregar_dados_megas
 df_milionaria = None
 df_megasena = None
 df_quina = None
+df_lotofacil = None
 
 # Carrega os dados na inicialização do aplicativo
 with app.app_context():
     df_milionaria = carregar_dados_milionaria()
     df_megasena = carregar_dados_megasena_app()
     df_quina = carregar_dados_quina_app()
+    df_lotofacil = carregar_dados_lotofacil()
 
 @app.route('/')
 def landing_page():
@@ -300,6 +307,22 @@ def analise_frequencia_lotomania_api():
             
     except Exception as e:
         logger.error(f"Erro ao analisar frequência da Lotomania: {e}")
+        return jsonify({"error": "Erro interno do servidor"}), 500
+
+@app.route('/api/analise-frequencia-lotofacil')
+def analise_frequencia_lotofacil_api():
+    """API para análise de frequência da Lotofácil"""
+    try:
+        # Executar análise de frequência da Lotofácil
+        resultado = obter_estatisticas_rapidas_lotofacil()
+        
+        if resultado:
+            return jsonify(resultado)
+        else:
+            return jsonify({"error": "Não foi possível analisar os dados da Lotofácil"}), 500
+            
+    except Exception as e:
+        logger.error(f"Erro ao analisar frequência da Lotofácil: {e}")
         return jsonify({"error": "Erro interno do servidor"}), 500
 
 @app.route('/api/analise_de_distribuicao-quina', methods=['GET'])
@@ -1035,6 +1058,32 @@ def gerar_aposta_lotomania_api():
         return jsonify({'error': str(e)}), 400
     except Exception as e:
         logger.error(f"Erro inesperado ao gerar aposta Lotomania: {e}")
+        return jsonify({'error': 'Erro interno do servidor ao gerar aposta.'}), 500
+
+@app.route('/api/gerar-aposta-lotofacil', methods=['POST'])
+def gerar_aposta_lotofacil_api():
+    """Gera aposta personalizada para Lotofácil (15 números fixos)."""
+    try:
+        # Chama a função principal de geração de aposta (sempre 15 números)
+        numeros = gerar_aposta_personalizada_lotofacil()
+        
+        # Valor fixo da Lotofácil: R$ 3,00
+        valor = 3.00
+        qtde_apostas = 1
+
+        return jsonify({
+            'success': True,
+            'numeros': numeros,
+            'valor': valor,
+            'qtde_apostas': qtde_apostas,
+            'mensagem': 'Aposta da Lotofácil gerada com sucesso! (15 números fixos)'
+        })
+
+    except ValueError as e:
+        logger.error(f"Erro de validação ao gerar aposta Lotofácil: {e}")
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        logger.error(f"Erro inesperado ao gerar aposta Lotofácil: {e}")
         return jsonify({'error': 'Erro interno do servidor ao gerar aposta.'}), 500
 
 @app.route('/api/bolao_interesse', methods=['POST'])
