@@ -1062,13 +1062,63 @@ def gerar_aposta_lotomania_api():
 
 @app.route('/api/gerar-aposta-lotofacil', methods=['POST'])
 def gerar_aposta_lotofacil_api():
-    """Gera aposta personalizada para Lotofácil (15 números fixos)."""
+    """Gera aposta personalizada para Lotofácil (15-20 números) com controle de qualidade."""
     try:
-        # Chama a função principal de geração de aposta (sempre 15 números)
-        numeros = gerar_aposta_personalizada_lotofacil()
+        # Obter dados da requisição
+        data = request.get_json()
+        quantidade = data.get('quantidade', 15) if data else 15
+        preferencias = data.get('preferencias', {}) if data else {}
         
-        # Valor fixo da Lotofácil: R$ 3,00
-        valor = 3.00
+        # Validar quantidade (15-20 números)
+        if quantidade < 15 or quantidade > 20:
+            return jsonify({'error': 'Quantidade deve ser entre 15 e 20 números'}), 400
+        
+        # Preparar preferências para controle de qualidade
+        if preferencias:
+            # Mapear preferências do frontend para o backend
+            preferencias_backend = {
+                'incluir_quentes': True,
+                'incluir_frios': True,
+                'incluir_secos': True,
+                'balancear_par_impar': True,
+                'controlar_repetidos': True,
+                'qtd_quentes': 6,
+                'qtd_frios': 4,
+                'qtd_secos': 2,
+                'qtd_aleatorios': 3
+            }
+            
+            # Aplicar preferências de repetidos se fornecidas
+            if 'repetidos_min' in preferencias:
+                preferencias_backend['repetidos_min'] = preferencias['repetidos_min']
+            if 'repetidos_max' in preferencias:
+                preferencias_backend['repetidos_max'] = preferencias['repetidos_max']
+            
+            # Ajustar faixas baseado no modo conservador
+            if preferencias.get('modo_conservador', False):
+                if quantidade == 15:
+                    preferencias_backend['repetidos_conservador_min'] = 6
+                    preferencias_backend['repetidos_conservador_max'] = 12
+                else:
+                    preferencias_backend['repetidos_conservador_min'] = 10
+                    preferencias_backend['repetidos_conservador_max'] = 14
+        else:
+            preferencias_backend = None
+        
+        # Chama a função principal de geração de aposta com quantidade e preferências
+        numeros = gerar_aposta_personalizada_lotofacil(quantidade, preferencias_backend)
+        
+        # Tabela de valores da Lotofácil
+        valores_lotofacil = {
+            15: 3.50,
+            16: 56.00,
+            17: 476.00,
+            18: 2856.00,
+            19: 13566.00,
+            20: 54264.00
+        }
+        
+        valor = valores_lotofacil[quantidade]
         qtde_apostas = 1
 
         return jsonify({
@@ -1076,7 +1126,8 @@ def gerar_aposta_lotofacil_api():
             'numeros': numeros,
             'valor': valor,
             'qtde_apostas': qtde_apostas,
-            'mensagem': 'Aposta da Lotofácil gerada com sucesso! (15 números fixos)'
+            'quantidade': quantidade,
+            'mensagem': f'Aposta da Lotofácil gerada com sucesso! ({quantidade} números)'
         })
 
     except ValueError as e:

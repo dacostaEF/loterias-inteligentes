@@ -18,7 +18,7 @@ def carregar_dados_lotofacil():
     """
     try:
         # Caminho para o arquivo Excel da Lotofácil
-        caminho_arquivo = "LoteriasExcel/Lotofácil_edt.xlsx"
+        caminho_arquivo = "LoteriasExcel/Lotofacil_edt.xlsx"
         
         # Verifica se o arquivo existe
         if not os.path.exists(caminho_arquivo):

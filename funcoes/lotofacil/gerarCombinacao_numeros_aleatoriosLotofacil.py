@@ -5,40 +5,163 @@ import random
 import numpy as np
 import logging
 from collections import Counter
+import pandas as pd # Added for controlling_qualidade_repetidos_lotofacil
 
 # Configuração do logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def gerar_aposta_personalizada_lotofacil(preferencias=None):
+def controlar_qualidade_repetidos_lotofacil(numeros_gerados, quantidade, preferencias=None):
+    """
+    Controla a qualidade dos números repetidos em relação ao último concurso.
+    
+    Args:
+        numeros_gerados (list): Lista de números gerados
+        quantidade (int): Quantidade de números na aposta (15-20)
+        preferencias (dict): Preferências de controle de repetidos
+        
+    Returns:
+        list: Lista de números com qualidade controlada
+    """
+    try:
+        # Preferências padrão para controle de repetidos
+        if preferencias is None:
+            preferencias = {}
+        
+        # Obtém o último concurso para comparação
+        from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import obter_ultimos_concursos_lotofacil
+        
+        df_ultimo = obter_ultimos_concursos_lotofacil(1)
+        if df_ultimo.empty:
+            logger.warning("Não foi possível obter o último concurso para controle de repetidos")
+            return numeros_gerados
+        
+        # Números do último concurso
+        ultimo_concurso = []
+        for i in range(1, 16):  # Bola1 até Bola15
+            coluna = f'Bola{i}'
+            if coluna in df_ultimo.columns:
+                valor = df_ultimo.iloc[0][coluna]
+                if pd.notna(valor) and valor > 0:
+                    ultimo_concurso.append(int(valor))
+        
+        if not ultimo_concurso:
+            logger.warning("Último concurso não possui números válidos")
+            return numeros_gerados
+        
+        # Calcula repetidos atuais
+        repetidos_atuais = len(set(numeros_gerados) & set(ultimo_concurso))
+        
+        # Define faixas baseadas na quantidade de números
+        if quantidade == 15:
+            # Para 15 números: faixa ideal 7-11, conservadora 6-12
+            faixa_min = preferencias.get('repetidos_min', 7)
+            faixa_max = preferencias.get('repetidos_max', 11)
+            faixa_conservadora_min = preferencias.get('repetidos_conservador_min', 6)
+            faixa_conservadora_max = preferencias.get('repetidos_conservador_max', 12)
+        else:
+            # Para 16-20 números: faixa ideal 11-13, conservadora 10-14
+            faixa_min = preferencias.get('repetidos_min', 11)
+            faixa_max = preferencias.get('repetidos_max', 13)
+            faixa_conservadora_min = preferencias.get('repetidos_conservador_min', 10)
+            faixa_conservadora_max = preferencias.get('repetidos_conservador_max', 14)
+        
+        # Verifica se está na faixa ideal
+        if faixa_min <= repetidos_atuais <= faixa_max:
+            logger.info(f"✅ Repetidos ({repetidos_atuais}) está na faixa ideal ({faixa_min}-{faixa_max})")
+            return numeros_gerados
+        
+        # Verifica se está na faixa conservadora
+        if faixa_conservadora_min <= repetidos_atuais <= faixa_conservadora_max:
+            logger.info(f"⚠️ Repetidos ({repetidos_atuais}) está na faixa conservadora ({faixa_conservadora_min}-{faixa_conservadora_max})")
+            return numeros_gerados
+        
+        # Se não está nas faixas, tenta ajustar
+        logger.info(f"🔄 Ajustando repetidos: {repetidos_atuais} → alvo: {faixa_min}-{faixa_max}")
+        
+        tentativas_maximas = 50
+        tentativas = 0
+        
+        while tentativas < tentativas_maximas:
+            tentativas += 1
+            
+            # Gera nova combinação
+            numeros_novos = gerar_aposta_personalizada_lotofacil(quantidade, preferencias)
+            
+            # Calcula novos repetidos
+            novos_repetidos = len(set(numeros_novos) & set(ultimo_concurso))
+            
+            # Verifica se está na faixa desejada
+            if faixa_min <= novos_repetidos <= faixa_max:
+                logger.info(f"✅ Ajuste bem-sucedido: {novos_repetidos} repetidos em {tentativas} tentativas")
+                return numeros_novos
+            
+            # Se está na faixa conservadora, aceita após algumas tentativas
+            if tentativas > 20 and faixa_conservadora_min <= novos_repetidos <= faixa_conservadora_max:
+                logger.info(f"⚠️ Ajuste conservador aceito: {novos_repetidos} repetidos em {tentativas} tentativas")
+                return numeros_novos
+        
+        # Se não conseguiu ajustar, retorna o melhor resultado encontrado
+        logger.warning(f"⚠️ Não foi possível ajustar repetidos após {tentativas_maximas} tentativas. Mantendo original.")
+        return numeros_gerados
+        
+    except Exception as e:
+        logger.error(f"Erro no controle de qualidade de repetidos: {str(e)}")
+        return numeros_gerados
+
+def gerar_aposta_personalizada_lotofacil(quantidade=15, preferencias=None):
     """
     Gera uma aposta personalizada da Lotofácil baseada em critérios inteligentes.
     
     Args:
+        quantidade (int): Quantidade de números para a aposta (15-20)
         preferencias (dict): Dicionário com preferências de geração
         
     Returns:
-        list: Lista com 15 números para a aposta
+        list: Lista com a quantidade especificada de números para a aposta
     """
     try:
         # Preferências padrão se não fornecidas
         if preferencias is None:
-            preferencias = {
-                'incluir_quentes': True,
-                'incluir_frios': True,
-                'incluir_secos': True,
-                'balancear_par_impar': True,
-                'evitar_repetidos': True,
-                'qtd_quentes': 6,
-                'qtd_frios': 4,
-                'qtd_secos': 2,
-                'qtd_aleatorios': 3
-            }
+            preferencias = {}
+        
+        # Preferências padrão para controle de repetidos
+        preferencias_padrao = {
+            'incluir_quentes': True,
+            'incluir_frios': True,
+            'incluir_secos': True,
+            'balancear_par_impar': True,
+            'controlar_repetidos': True,
+            'qtd_quentes': 6,
+            'qtd_frios': 4,
+            'qtd_secos': 2,
+            'qtd_aleatorios': 3,
+            # Controle de repetidos para 15 números
+            'repetidos_min': 7,
+            'repetidos_max': 11,
+            'repetidos_conservador_min': 6,
+            'repetidos_conservador_max': 12
+        }
+        
+        # Para 16-20 números, ajusta as faixas de repetidos
+        if quantidade > 15:
+            preferencias_padrao.update({
+                'repetidos_min': 11,
+                'repetidos_max': 13,
+                'repetidos_conservador_min': 10,
+                'repetidos_conservador_max': 14
+            })
+        
+        # Mescla preferências fornecidas com padrões
+        for key, value in preferencias.items():
+            preferencias_padrao[key] = value
+        
+        preferencias = preferencias_padrao
         
         logger.info("Gerando aposta personalizada da Lotofácil...")
         
         # Obtém estatísticas da Lotofácil
-        from .funcao_analise_de_frequencia_lotofacil import obter_estatisticas_rapidas_lotofacil
+        from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import obter_estatisticas_rapidas_lotofacil
         
         stats = obter_estatisticas_rapidas_lotofacil()
         
@@ -74,9 +197,9 @@ def gerar_aposta_personalizada_lotofacil(preferencias=None):
                 numeros_selecionados.extend(numeros_secos_escolhidos)
                 logger.info(f"Adicionados {qtd_secos} números secos: {numeros_secos_escolhidos}")
         
-        # 4. Adiciona números aleatórios para completar 15
+        # 4. Adiciona números aleatórios para completar a quantidade desejada
         numeros_disponiveis = [n for n in range(1, 26) if n not in numeros_selecionados]
-        qtd_restante = 15 - len(numeros_selecionados)
+        qtd_restante = quantidade - len(numeros_selecionados)
         
         if qtd_restante > 0 and numeros_disponiveis:
             numeros_aleatorios = random.sample(numeros_disponiveis, qtd_restante)
@@ -87,19 +210,25 @@ def gerar_aposta_personalizada_lotofacil(preferencias=None):
         if preferencias.get('balancear_par_impar', True):
             numeros_selecionados = balancear_par_impar_lotofacil(numeros_selecionados)
         
-        # 6. Ordena os números
+        # 6. Controle de qualidade para repetidos
+        if preferencias.get('controlar_repetidos', True):
+            numeros_selecionados = controlar_qualidade_repetidos_lotofacil(
+                numeros_selecionados, quantidade, preferencias
+            )
+        
+        # 7. Ordena os números
         numeros_selecionados.sort()
         
-        # Verifica se temos exatamente 15 números
-        if len(numeros_selecionados) != 15:
+        # Verifica se temos exatamente a quantidade desejada
+        if len(numeros_selecionados) != quantidade:
             logger.warning(f"Quantidade incorreta de números: {len(numeros_selecionados)}")
-            # Completa ou remove números para ter exatamente 15
-            while len(numeros_selecionados) < 15:
+            # Completa ou remove números para ter exatamente a quantidade desejada
+            while len(numeros_selecionados) < quantidade:
                 numero_adicional = random.randint(1, 25)
                 if numero_adicional not in numeros_selecionados:
                     numeros_selecionados.append(numero_adicional)
             
-            while len(numeros_selecionados) > 15:
+            while len(numeros_selecionados) > quantidade:
                 numeros_selecionados.pop()
             
             numeros_selecionados.sort()
@@ -110,7 +239,7 @@ def gerar_aposta_personalizada_lotofacil(preferencias=None):
     except Exception as e:
         logger.error(f"Erro ao gerar aposta personalizada da Lotofácil: {str(e)}")
         # Retorna aposta aleatória em caso de erro
-        return sorted(random.sample(range(1, 26), 15))
+        return sorted(random.sample(range(1, 26), quantidade))
 
 def balancear_par_impar_lotofacil(numeros):
     """
@@ -170,21 +299,24 @@ def balancear_par_impar_lotofacil(numeros):
         logger.error(f"Erro ao balancear par/ímpar: {str(e)}")
         return numeros
 
-def gerar_aposta_aleatoria_lotofacil():
+def gerar_aposta_aleatoria_lotofacil(quantidade=15):
     """
     Gera uma aposta completamente aleatória da Lotofácil.
     
+    Args:
+        quantidade (int): Quantidade de números para a aposta (15-20)
+        
     Returns:
-        list: Lista com 15 números aleatórios
+        list: Lista com a quantidade especificada de números aleatórios
     """
     try:
-        numeros = sorted(random.sample(range(1, 26), 15))
+        numeros = sorted(random.sample(range(1, 26), quantidade))
         logger.info(f"Aposta aleatória gerada: {numeros}")
         return numeros
         
     except Exception as e:
         logger.error(f"Erro ao gerar aposta aleatória: {str(e)}")
-        return list(range(1, 16))  # Fallback: números 1-15
+        return list(range(1, quantidade + 1))  # Fallback: números sequenciais
 
 if __name__ == "__main__":
     # Teste das funções

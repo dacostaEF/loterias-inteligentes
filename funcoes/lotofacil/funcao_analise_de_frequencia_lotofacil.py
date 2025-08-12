@@ -21,7 +21,10 @@ def analisar_frequencia_lotofacil(qtd_concursos=50):
         dict: Dicionário com números quentes, frios e secos
     """
     try:
-        from .LotofacilFuncaCarregaDadosExcel import obter_ultimos_concursos_lotofacil
+        import sys
+        import os
+        sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+        from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import obter_ultimos_concursos_lotofacil
         
         # Obtém os últimos concursos
         df = obter_ultimos_concursos_lotofacil(qtd_concursos)

@@ -538,6 +538,43 @@
       }
     }
 
+    /* Estilos para o slider */
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 5px;
+      background: #4B5563;
+      outline: none;
+      opacity: 0.7;
+      transition: opacity .2s;
+    }
+
+    .slider:hover {
+      opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #00E38C;
+      cursor: pointer;
+      box-shadow: 0 0 8px rgba(0, 227, 140, 0.5);
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #00E38C;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 0 8px rgba(0, 227, 140, 0.5);
+    }
+
     @media (max-width: 480px) {
       .grid-numeros {
         grid-template-columns: repeat(5, 1fr);
@@ -686,7 +723,7 @@
 
   <!-- Cartão de jogo -->
   <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8 flex flex-col">
-    <h2 class="text-xl font-semibold mb-4">🎯 Selecione 15 números entre 01 e 25</h2>
+            <h2 class="text-xl font-semibold mb-4">🎯 Selecione de 15 a 20 números entre 01 e 25</h2>
     <div class="grid-numeros mb-6" id="numeros-container">
       <!-- Números serão gerados dinamicamente -->
     </div>
@@ -793,17 +830,103 @@
 
   <!-- Modal de Configuração de Aposta -->
   <div id="modalConfiguracao" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
-    <div class="modal-content p-8 rounded-2xl shadow-xl w-96 text-white">
+    <div class="modal-content p-8 rounded-2xl shadow-xl w-[500px] text-white">
       <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Gerar Aposta Lotofácil</h3>
 
-      <div class="mb-8 text-center">
-        <div class="bg-[#00E38C] text-black p-4 rounded-xl mb-4">
-          <h4 class="font-bold text-lg">15 Números Fixos</h4>
-          <p class="text-sm">Valor: R$ 3,00</p>
+      <!-- Configuração de Quantidade de Números -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium mb-2 text-gray-300">Quantidade de Números:</label>
+        <div class="flex items-center space-x-4">
+          <input type="range" id="sliderQuantidade" min="15" max="20" value="15" class="flex-1 h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider">
+          <span id="valorQuantidade" class="text-[#00E38C] font-bold text-lg">15</span>
         </div>
-        <p class="text-gray-300 text-sm">
-          A Lotofácil utiliza 15 números fixos por aposta, com valor único de R$ 3,00.
-        </p>
+        <div class="text-xs text-gray-400 mt-1">Deslize para escolher entre 15 e 20 números</div>
+      </div>
+
+      <!-- Tabela de Valores -->
+      <div class="mb-6">
+        <h4 class="font-bold text-center mb-3 text-[#00E38C]">Tabela de Valores</h4>
+        <div class="bg-gray-800 rounded-lg p-4 max-h-48 overflow-y-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-gray-600">
+                <th class="text-left py-2 text-[#00E38C]">Números</th>
+                <th class="text-right py-2 text-[#00E38C]">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="py-2">15 números</td>
+                <td class="text-right py-2">R$ 3,50</td>
+              </tr>
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="py-2">16 números</td>
+                <td class="text-right py-2">R$ 56,00</td>
+              </tr>
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="py-2">17 números</td>
+                <td class="text-right py-2">R$ 476,00</td>
+              </tr>
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="py-2">18 números</td>
+                <td class="text-right py-2">R$ 2.856,00</td>
+              </tr>
+              <tr class="border-b border-gray-700 hover:bg-gray-700">
+                <td class="py-2">19 números</td>
+                <td class="text-right py-2">R$ 13.566,00</td>
+              </tr>
+              <tr class="hover:bg-gray-700">
+                <td class="py-2">20 números</td>
+                <td class="text-right py-2">R$ 54.264,00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Controle de Qualidade para Repetidos -->
+      <div class="mb-6">
+        <h4 class="font-bold text-center mb-3 text-[#00E38C]">🎯 Controle de Qualidade</h4>
+        
+        <!-- Faixa de Repetidos -->
+        <div class="mb-4">
+          <label class="block text-sm font-medium mb-2 text-gray-300">Faixa de Repetidos (vs. último concurso):</label>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Mínimo:</label>
+              <input type="range" id="sliderRepetidosMin" min="5" max="15" value="7" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider">
+              <span id="valorRepetidosMin" class="text-[#00E38C] font-bold text-sm">7</span>
+            </div>
+            <div>
+              <label class="block text-xs text-gray-400 mb-1">Máximo:</label>
+              <input type="range" id="sliderRepetidosMax" min="5" max="15" value="11" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider">
+              <span id="valorRepetidosMax" class="text-[#00E38C] font-bold text-sm">11</span>
+            </div>
+          </div>
+          <div class="text-xs text-gray-400 mt-1 text-center">
+            <span id="faixaRepetidosInfo">Faixa ideal: 7-11 (96.6% dos casos)</span>
+          </div>
+        </div>
+        
+        <!-- Modo Conservador -->
+        <div class="mb-4">
+          <label class="flex items-center space-x-2 cursor-pointer">
+            <input type="checkbox" id="modoConservador" class="form-checkbox h-4 w-4 text-[#00E38C] bg-gray-700 border-gray-600 rounded">
+            <span class="text-sm text-gray-300">Modo Conservador (faixa mais ampla)</span>
+          </label>
+          <div class="text-xs text-gray-400 mt-1 ml-6">
+            <span id="faixaConservadoraInfo">Faixa conservadora: 6-12 (98.1% dos casos)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Valor da Aposta Selecionada -->
+      <div class="mb-6 text-center">
+        <div class="bg-[#00E38C] text-black p-4 rounded-xl">
+          <h4 class="font-bold text-lg">Valor da Aposta</h4>
+          <p id="valorApostaModal" class="text-2xl font-bold">R$ 3,50</p>
+          <p class="text-sm">15 números selecionados</p>
+        </div>
       </div>
 
       <div class="flex justify-end space-x-4">
@@ -845,16 +968,16 @@
       }
     }
 
-    // Selecionar número (manual - limite de 15 para Lotofácil)
+    // Selecionar número (manual - limite de 20 para Lotofácil)
     function selecionarNumero(numero, elemento) {
       if (numerosSelecionados.includes(numero)) {
         // Deselecionar número
         numerosSelecionados = numerosSelecionados.filter(n => n !== numero);
         elemento.classList.remove('selecionado');
       } else {
-        // Verificar limite de 15 números
-        if (numerosSelecionados.length >= 15) {
-          alert('Você já selecionou 15 números! Limite máximo para a Lotofácil.');
+        // Verificar limite de 20 números
+        if (numerosSelecionados.length >= 20) {
+          alert('Você já selecionou 20 números! Limite máximo para a Lotofácil.');
           elemento.classList.remove('selecionado');
           elemento.blur();
           elemento.style.pointerEvents = 'none';
@@ -959,13 +1082,20 @@
     function calcularEAtualizarValorAposta() {
       const qtdeNum = numerosSelecionados.length;
       
-      if (qtdeNum === 15) {
-        // Lotofácil: 15 números fixos = R$ 3,00
-        atualizarValorAposta(3.00, 1, qtdeNum);
-      } else if (qtdeNum >= 15 && qtdeNum < 25) {
-        // Para Lotofácil, qualquer quantidade entre 15-24 é válida
-        // Mostrar apenas a quantidade de números selecionados
-        atualizarValorAposta(null, null, qtdeNum);
+      // Tabela de valores da Lotofácil
+      const valoresLotofacil = {
+        15: 3.50,
+        16: 56.00,
+        17: 476.00,
+        18: 2856.00,
+        19: 13566.00,
+        20: 54264.00
+      };
+      
+      if (qtdeNum >= 15 && qtdeNum <= 20) {
+        // Valor específico da Lotofácil para a quantidade selecionada
+        const valor = valoresLotofacil[qtdeNum];
+        atualizarValorAposta(valor, 1, qtdeNum);
       } else if (qtdeNum > 0 && qtdeNum < 15) {
         // Mostrar quantidade de números selecionados (mínimo 15)
         atualizarValorAposta(null, null, qtdeNum);
@@ -1110,11 +1240,170 @@
     // Abrir modal de configuração
     function abrirModalConfiguracao() {
       document.getElementById('modalConfiguracao').classList.remove('hidden');
+      
+      // Configurar o slider de quantidade
+      const slider = document.getElementById('sliderQuantidade');
+      const valorQuantidade = document.getElementById('valorQuantidade');
+      const valorApostaModal = document.getElementById('valorApostaModal');
+      
+      // Atualizar valor inicial
+      atualizarValorModal(slider.value);
+      
+      // Event listener para o slider de quantidade
+      slider.addEventListener('input', function() {
+        const quantidade = this.value;
+        valorQuantidade.textContent = quantidade;
+        atualizarValorModal(quantidade);
+        atualizarControlesRepetidos(quantidade);
+      });
+      
+      // Configurar controles de repetidos
+      configurarControlesRepetidos();
+      
+      // Atualizar controles baseado na quantidade inicial
+      atualizarControlesRepetidos(slider.value);
     }
 
     // Fechar modal
     function fecharModal() {
       document.getElementById('modalConfiguracao').classList.add('hidden');
+    }
+
+    // Atualizar valor no modal baseado na quantidade selecionada
+    function atualizarValorModal(quantidade) {
+      const valoresLotofacil = {
+        15: 3.50,
+        16: 56.00,
+        17: 476.00,
+        18: 2856.00,
+        19: 13566.00,
+        20: 54264.00
+      };
+      
+      const valor = valoresLotofacil[quantidade];
+      const valorApostaModal = document.getElementById('valorApostaModal');
+      const descricaoQuantidade = document.querySelector('#modalConfiguracao .text-sm');
+      
+      if (valorApostaModal) {
+        valorApostaModal.textContent = `R$ ${valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      }
+      
+      if (descricaoQuantidade) {
+        descricaoQuantidade.textContent = `${quantidade} números selecionados`;
+      }
+    }
+
+    // Configurar controles de repetidos
+    function configurarControlesRepetidos() {
+      const sliderMin = document.getElementById('sliderRepetidosMin');
+      const sliderMax = document.getElementById('sliderRepetidosMax');
+      const valorMin = document.getElementById('valorRepetidosMin');
+      const valorMax = document.getElementById('valorRepetidosMax');
+      const modoConservador = document.getElementById('modoConservador');
+      
+      // Event listeners para os sliders
+      sliderMin.addEventListener('input', function() {
+        const valor = this.value;
+        valorMin.textContent = valor;
+        
+        // Garantir que min <= max
+        if (parseInt(valor) > parseInt(sliderMax.value)) {
+          sliderMax.value = valor;
+          valorMax.textContent = valor;
+        }
+        
+        atualizarInfoRepetidos();
+      });
+      
+      sliderMax.addEventListener('input', function() {
+        const valor = this.value;
+        valorMax.textContent = valor;
+        
+        // Garantir que min <= max
+        if (parseInt(valor) < parseInt(sliderMin.value)) {
+          sliderMin.value = valor;
+          valorMin.textContent = valor;
+        }
+        
+        atualizarInfoRepetidos();
+      });
+      
+      // Event listener para modo conservador
+      modoConservador.addEventListener('change', function() {
+        atualizarControlesRepetidos(document.getElementById('sliderQuantidade').value);
+      });
+    }
+
+    // Atualizar controles de repetidos baseado na quantidade
+    function atualizarControlesRepetidos(quantidade) {
+      const sliderMin = document.getElementById('sliderRepetidosMin');
+      const sliderMax = document.getElementById('sliderRepetidosMax');
+      const modoConservador = document.getElementById('modoConservador');
+      
+      if (quantidade == 15) {
+        // Para 15 números: faixa ideal 7-11, conservadora 6-12
+        sliderMin.min = 5;
+        sliderMin.max = 12;
+        sliderMax.min = 7;
+        sliderMax.max = 15;
+        
+        if (modoConservador.checked) {
+          sliderMin.value = 6;
+          sliderMax.value = 12;
+        } else {
+          sliderMin.value = 7;
+          sliderMax.value = 11;
+        }
+      } else {
+        // Para 16-20 números: faixa ideal 11-13, conservadora 10-14
+        sliderMin.min = 8;
+        sliderMin.max = 13;
+        sliderMax.min = 10;
+        sliderMax.max = 15;
+        
+        if (modoConservador.checked) {
+          sliderMin.value = 10;
+          sliderMax.value = 14;
+        } else {
+          sliderMin.value = 11;
+          sliderMax.value = 13;
+        }
+      }
+      
+      // Atualizar valores exibidos
+      document.getElementById('valorRepetidosMin').textContent = sliderMin.value;
+      document.getElementById('valorRepetidosMax').textContent = sliderMax.value;
+      
+      atualizarInfoRepetidos();
+    }
+
+    // Atualizar informações de repetidos
+    function atualizarInfoRepetidos() {
+      const quantidade = document.getElementById('sliderQuantidade').value;
+      const min = document.getElementById('sliderRepetidosMin').value;
+      const max = document.getElementById('sliderRepetidosMax').value;
+      const modoConservador = document.getElementById('modoConservador').checked;
+      
+      const faixaRepetidosInfo = document.getElementById('faixaRepetidosInfo');
+      const faixaConservadoraInfo = document.getElementById('faixaConservadoraInfo');
+      
+      if (quantidade == 15) {
+        if (modoConservador) {
+          faixaRepetidosInfo.textContent = `Faixa conservadora: ${min}-${max} (98.1% dos casos)`;
+          faixaConservadoraInfo.textContent = `Faixa ideal: 7-11 (96.6% dos casos)`;
+        } else {
+          faixaRepetidosInfo.textContent = `Faixa ideal: ${min}-${max} (96.6% dos casos)`;
+          faixaConservadoraInfo.textContent = `Faixa conservadora: 6-12 (98.1% dos casos)`;
+        }
+      } else {
+        if (modoConservador) {
+          faixaRepetidosInfo.textContent = `Faixa conservadora: ${min}-${max} (88% dos casos)`;
+          faixaConservadoraInfo.textContent = `Faixa ideal: 11-13 (38.5% dos casos)`;
+        } else {
+          faixaRepetidosInfo.textContent = `Faixa ideal: ${min}-${max} (38.5% dos casos)`;
+          faixaConservadoraInfo.textContent = `Faixa conservadora: 10-14 (88% dos casos)`;
+        }
+      }
     }
 
     // Limpar seleção
@@ -1175,7 +1464,20 @@
       
       if (btnGerar) {
         btnGerar.addEventListener('click', function() {
-          gerarApostaLotofacil();
+          const quantidade = document.getElementById('sliderQuantidade').value;
+          const repetidosMin = document.getElementById('sliderRepetidosMin').value;
+          const repetidosMax = document.getElementById('sliderRepetidosMax').value;
+          const modoConservador = document.getElementById('modoConservador').checked;
+          
+          // Preparar preferências de controle de qualidade
+          const preferencias = {
+            quantidade: parseInt(quantidade),
+            repetidos_min: parseInt(repetidosMin),
+            repetidos_max: parseInt(repetidosMax),
+            modo_conservador: modoConservador
+          };
+          
+          gerarApostaLotofacil(parseInt(quantidade), preferencias);
           fecharModal();
         });
       }
@@ -1235,18 +1537,30 @@
     });
 
     // Gerar aposta da Lotofácil via API
-    async function gerarApostaLotofacil() {
+    async function gerarApostaLotofacil(quantidade = 15, preferencias = null) {
       try {
         // Limpar seleção atual
         limparSelecao();
         
-        // Chamar API da Lotofácil
+        // Preparar corpo da requisição
+        const requestBody = { quantidade: quantidade };
+        
+        // Adicionar preferências de controle de qualidade se fornecidas
+        if (preferencias) {
+          requestBody.preferencias = {
+            repetidos_min: preferencias.repetidos_min,
+            repetidos_max: preferencias.repetidos_max,
+            modo_conservador: preferencias.modo_conservador
+          };
+        }
+        
+        // Chamar API da Lotofácil com a quantidade e preferências
         const response = await fetch('/api/gerar-aposta-lotofacil', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({})
+          body: JSON.stringify(requestBody)
         });
         
         if (!response.ok) {
