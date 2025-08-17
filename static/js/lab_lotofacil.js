@@ -101,8 +101,8 @@ function render(){
       d.className = "h-8 rounded border border-purple-900/40 text-[11px] flex items-center justify-center";
       if(val===0){
         d.textContent = "0";
-        d.style.background = "rgba(236,72,153,.15)"; // rosa (não saiu)
-        d.style.color = "#fda4af";
+        d.style.background = "rgba(156,163,175,.15)"; // cinza transparente (não saiu)
+        d.style.color = "#9ca3af";
       }else{
         d.textContent = val.toString().padStart(2,'0');
         d.style.background = "rgba(234,179,8,.15)";  // amarelo (saiu)

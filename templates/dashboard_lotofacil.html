@@ -308,7 +308,7 @@
       display: block;
       width: 100%;
       height: 3px;
-      background-color: #A855F7;
+      background-color: #00E38C;
       border-radius: 3px;
       transition: all 0.3s ease;
     }
@@ -360,7 +360,7 @@
     }
 
     .nav-header h3 {
-      color: #A855F7;
+      color: #00E38C;
       margin: 0;
       font-size: 1.2rem;
       font-weight: 600;
@@ -581,6 +581,50 @@
         gap: 0.2rem;
       }
     }
+
+    /* Tooltips elegantes para a interface */
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip-container .tooltip {
+      visibility: hidden;
+      width: 280px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+      color: #F9FAFB;
+      text-align: center;
+      border-radius: 12px;
+      padding: 16px 20px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      font-size: 14px;
+      line-height: 1.5;
+      backdrop-filter: blur(10px);
+    }
+
+    .tooltip-container .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -8px;
+      border-width: 8px;
+      border-style: solid;
+      border-color: #2d1b69 transparent transparent transparent;
+    }
+
+    .tooltip-container:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
   </style>
 </head>
 <body class="p-4 sm:p-6">
@@ -718,10 +762,10 @@
     </div>
   </header>
 
-  <!-- Informação dos sorteios -->
-  <div class="text-center mb-4" style="margin-left: -15px;">
-    <p class="text-orange-500 font-semibold text-lg mb-0">Sorteios: Segundas a sábado >
-  </div>
+      <!-- Informação dos sorteios -->
+    <div class="text-center mb-4" style="margin-left: -15px;">
+      <p class="text-purple-700 font-semibold text-lg mb-0">Sorteios: Segundas a sábado 
+    </div>
 
   <!-- Cartão de jogo -->
   <section class="bg-[#1A1D25] p-6 rounded-2xl shadow-md mb-8 flex flex-col">
@@ -734,24 +778,26 @@
     <div class="mt-6 p-4 bg-[#2E303A] rounded-xl">
       <div class="grid grid-cols-2 gap-6">
         <!-- Coluna 1: Números principais -->
-        <div>
+        <div class="tooltip-container">
           <h4 class="text-sm font-semibold mb-2">Números Selecionados:</h4>
           <div class="flex gap-2 flex-wrap" id="numeros-selecionados">
             <span class="text-gray-400">Nenhum número selecionado</span>
           </div>
+          <div class="tooltip">📊 <strong>Acompanhe sua Seleção</strong><br><br>Neste campo você vê a lista dos números selecionados e do valor total da aposta.</div>
         </div>
         
         <!-- Coluna 2: Valor da aposta -->
-        <div class="flex flex-col justify-center items-center">
+        <div class="flex flex-col justify-center items-center tooltip-container">
           <div id="valor-aposta-container" class="text-center">
             <div class="text-gray-400 text-sm">Aguardando sua seleção de números para calcular o valor</div>
           </div>
+          <div class="tooltip">💰 <strong>Valor da Aposta</strong><br><br>O sistema calcula automaticamente o valor baseado na quantidade de números selecionados.</div>
         </div>
       </div>
     </div>
 
     <!-- Container específico para o Gerador de Números Lotofácil -->
-    <div class="gerador-container mt-6 p-6 bg-[#1A1D25] rounded-xl shadow-md">
+    <div class="gerador-container mt-6 p-6 bg-[#1A1D25] rounded-xl shadow-md tooltip-container">
       <h3 class="text-lg font-semibold mb-4 text-center">🎲 Gerador de Números Lotofácil</h3>
       
       <div class="botoes-mobile-ajustados">
@@ -763,12 +809,13 @@
           🗑️ Limpar Tudo<br><small>&nbsp;</small>
         </button>
       </div>
+      <div class="tooltip">🎲 <strong>Gerador de Números</strong><br><br>Use "Gerar Palpite da Sorte" para números aleatórios ou "Limpar Tudo" para recomeçar.</div>
     </div>
   </section>
 
   <!-- Seção de Estatísticas Rápidas -->
   <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="stat-card p-6 rounded-2xl">
+    <div class="stat-card p-6 rounded-2xl tooltip-container">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">🔥 Números Quentes</h3>
         <div class="flex space-x-2">
@@ -787,6 +834,7 @@
       <div class="text-sm text-gray-300" id="numeros-quentes">
         Carregando...
       </div>
+      <div class="tooltip">🔥 <strong>Números Quentes</strong><br><br>Números que mais apareceram nos últimos sorteios. Use para orientar suas escolhas.</div>
     </div>
     <div class="stat-card p-6 rounded-2xl">
       <div class="flex justify-between items-center mb-2">
@@ -1638,5 +1686,224 @@
       background-color: rgba(255, 255, 255, 0.1) !important;
     }
   </style>
+
+  <!-- Tour Guiado -->
+  <div id="tour-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[9999]">
+    <div id="tour-tip" class="absolute bg-[#2a2a3e] border-2 border-[rgba(168,85,247,0.6)] rounded-lg p-4 shadow-2xl max-w-sm text-white" style="box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(168, 85, 247, 0.2);">
+      <div id="tour-content" class="mb-4">
+        <!-- Conteúdo do tip será inserido dinamicamente -->
+      </div>
+      <div class="flex justify-between items-center">
+        <button id="tour-prev" class="bg-[#2E303A] hover:bg-[#3E404A] text-white px-3 py-2 rounded-lg transition-colors">
+          ← Anterior
+        </button>
+        <div class="flex items-center space-x-2">
+          <span id="tour-progress" class="text-sm text-gray-400">1/6</span>
+          <button id="tour-skip" class="text-gray-400 hover:text-white text-sm">Pular Tour</button>
+        </div>
+        <button id="tour-next" class="bg-[#00E38C] hover:bg-[#00C973] text-black px-3 py-2 rounded-lg transition-colors">
+          Próximo →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão de ativação do Tour -->
+  <button id="tour-activate" class="fixed top-20 right-4 bg-[#00E38C] hover:bg-[#00C973] text-black px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-200 hover:scale-105">
+    🎯 Tour Guiado
+  </button>
+
+  <script>
+    // Configuração do Tour Guiado
+    const tourSteps = [
+      {
+        target: '.lab-card h2',
+        content: '🎯 <strong>Bem-vindo à Lotofácil!</strong><br><br>Selecione de 15 a 20 números entre 01 e 25 para formar sua aposta.',
+        position: 'bottom'
+      },
+      {
+        target: '#numeros-container',
+        content: '🔢 <strong>Grade de Números</strong><br><br>Clique nos números para selecioná-los. Você pode selecionar de 15 a 20 números.',
+        position: 'bottom'
+      },
+      {
+        target: '#numeros-selecionados',
+        content: '📊 <strong>Acompanhe sua Seleção</strong><br><br>Neste campo você vê a lista dos números selecionados e do valor total da aposta.',
+        position: 'right'
+      },
+      {
+        target: '#valor-aposta-container',
+        content: '💰 <strong>Valor da Aposta</strong><br><br>O sistema calcula automaticamente o valor baseado na quantidade de números selecionados.',
+        position: 'bottom'
+      },
+      {
+        target: '.gerador-container',
+        content: '🎲 <strong>Gerador de Números</strong><br><br>Use "Gerar Palpite da Sorte" para números aleatórios ou "Limpar Tudo" para recomeçar.',
+        position: 'bottom'
+      },
+      {
+        target: '.stat-card',
+        content: '🔥 <strong>Estatísticas Rápidas</strong><br><br>Veja os números mais quentes (frequentes), frios (raros) e secos para orientar suas escolhas.',
+        position: 'bottom'
+      }
+    ];
+
+    let currentStep = 0;
+    let isFirstVisit = !localStorage.getItem('tourCompletedLotofacil');
+
+    // Função para mostrar o tour
+    function showTour() {
+      document.getElementById('tour-overlay').classList.remove('hidden');
+      showStep(0);
+    }
+
+    // Função para mostrar um step específico
+    function showStep(stepIndex) {
+      const step = tourSteps[stepIndex];
+      const tip = document.getElementById('tour-tip');
+      const content = document.getElementById('tour-content');
+      const progress = document.getElementById('tour-progress');
+      
+      // Atualizar conteúdo
+      content.innerHTML = step.content;
+      progress.textContent = `${stepIndex + 1}/${tourSteps.length}`;
+      
+      // Posicionar o tip
+      const target = document.querySelector(step.target);
+      if (target) {
+        const rect = target.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        
+        let left, top;
+        
+        switch (step.position) {
+          case 'bottom':
+            left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+            top = rect.bottom + 10;
+            break;
+          case 'top':
+            left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+            top = rect.top - tipRect.height - 10;
+            break;
+          case 'left':
+            left = rect.left - tipRect.width - 10;
+            top = rect.top + (rect.height / 2) - (tipRect.height / 2);
+            break;
+          case 'right':
+            left = rect.right + 10;
+            top = rect.top + (rect.height / 2) - (tipRect.height / 2);
+            break;
+          case 'center':
+            left = rect.left + (rect.width / 2) - (tipRect.width / 2);
+            top = rect.top + (rect.height / 2) - (tipRect.height / 2);
+            break;
+          case 'bottom-right':
+            left = rect.right - tipRect.width - 800;
+            top = rect.bottom + 10;
+            break;
+        }
+        
+        // Ajustar para não sair da tela
+        left = Math.max(10, Math.min(left, window.innerWidth - tipRect.width - 10));
+        top = Math.max(10, Math.min(top, window.innerHeight - tipRect.height - 10));
+        
+        tip.style.left = left + 'px';
+        tip.style.top = top + 'px';
+      }
+      
+      // Atualizar botões
+      const prevBtn = document.getElementById('tour-prev');
+      const nextBtn = document.getElementById('tour-next');
+      
+      prevBtn.style.display = stepIndex === 0 ? 'none' : 'block';
+      nextBtn.textContent = stepIndex === tourSteps.length - 1 ? 'Finalizar' : 'Próximo →';
+    }
+
+    // Event listeners do tour
+    document.addEventListener('DOMContentLoaded', function() {
+      const tourActivate = document.getElementById('tour-activate');
+      const tourNext = document.getElementById('tour-next');
+      const tourPrev = document.getElementById('tour-prev');
+      const tourSkip = document.getElementById('tour-skip');
+      const tourOverlay = document.getElementById('tour-overlay');
+
+      if (tourActivate) {
+        tourActivate.addEventListener('click', showTour);
+      }
+      
+      if (tourNext) {
+        tourNext.addEventListener('click', () => {
+          if (currentStep < tourSteps.length - 1) {
+            currentStep++;
+            showStep(currentStep);
+          } else {
+            // Finalizar tour
+            tourOverlay.classList.add('hidden');
+            localStorage.setItem('tourCompletedLotofacil', 'true');
+            showCompletionMessage();
+          }
+        });
+      }
+      
+      if (tourPrev) {
+        tourPrev.addEventListener('click', () => {
+          if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+          }
+        });
+      }
+      
+      if (tourSkip) {
+        tourSkip.addEventListener('click', () => {
+          tourOverlay.classList.add('hidden');
+          localStorage.setItem('tourCompletedLotofacil', 'true');
+        });
+      }
+      
+      // Fechar tour ao clicar fora
+      if (tourOverlay) {
+        tourOverlay.addEventListener('click', (e) => {
+          if (e.target.id === 'tour-overlay') {
+            tourOverlay.classList.add('hidden');
+            localStorage.setItem('tourCompletedLotofacil', 'true');
+          }
+        });
+      }
+
+      // Tour só abre quando clicado no botão (não automático)
+      // if (isFirstVisit) {
+      //   setTimeout(() => {
+      //     showTour();
+      //   }, 2000);
+      // }
+    });
+
+    // Função para mostrar mensagem de conclusão
+    function showCompletionMessage() {
+      const message = document.createElement('div');
+      message.className = 'fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#1A1D25] border-2 border-[#00E38C] rounded-xl p-6 shadow-2xl text-white text-center z-[10000]';
+      message.innerHTML = `
+        <h3 class="text-xl font-bold mb-4 text-[#00E38C]">🎉 Tour Concluído!</h3>
+        <p class="mb-4">Agora você conhece todos os elementos principais! Comece selecionando seus números de 1 a 25.</p>
+        <div class="flex space-x-3">
+          <button onclick="gerarPalpiteAleatorio()" class="bg-[#00E38C] hover:bg-[#00C973] text-black px-4 py-2 rounded-lg transition-colors">
+            🎲 Gerar Primeiro Palpite
+          </button>
+          <button onclick="this.parentElement.parentElement.remove()" class="bg-[#2E303A] hover:bg-[#3E404A] text-white px-4 py-2 rounded-lg transition-colors">
+            Explorar Mais
+          </button>
+        </div>
+      `;
+      document.body.appendChild(message);
+      
+      // Remover mensagem após 10 segundos
+      setTimeout(() => {
+        if (message.parentElement) {
+          message.remove();
+        }
+      }, 10000);
+    }
+  </script>
 </body>
 </html>
