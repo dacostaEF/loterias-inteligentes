@@ -2,6 +2,7 @@
  * Laboratório de Simulação Lotofácil - LAYOUT CORRETO
  * JavaScript completo com matriz de concursos e indicadores
  * ORDEM INVERTIDA: último concurso na primeira linha
+ * SELEÇÃO: apenas no cabeçalho 1-25 (números para jogar)
  */
 
 const FIBO   = new Set([1,2,3,5,8,13,21]);
@@ -15,15 +16,49 @@ let SELECIONADOS = new Set();
 
 function fmtMoney(v){ return v.toLocaleString('pt-BR', {style:'currency', currency:'BRL'}); }
 function valorAposta(q){
-  return q===15?3: q===16?48: q===17?408: q===18?2448: q===19?11628: q===20?46512: 0;
+  // Tabela de valores correta da Lotofácil (igual ao dashboard)
+  const valoresLotofacil = {
+    15: 3.50,
+    16: 56.00,
+    17: 476.00,
+    18: 2856.00,
+    19: 13566.00,
+    20: 54264.00
+  };
+  
+  // Retorna o valor se estiver no intervalo válido (15-20), senão 0
+  return (q >= 15 && q <= 20) ? valoresLotofacil[q] : 0;
 }
 
 function montarHead(){
   const tpl = document.getElementById('tpl-head-num');
   for(let n=1;n<=25;n++){
-    const d=document.createElement('div');
-    d.className="text-center";
+    const d=document.createElement('button'); // Mudou para button
+    d.className="h-8 rounded border border-purple-900/40 text-[11px] text-center cursor-pointer transition-all duration-200 hover:bg-purple-600/20";
     d.textContent = n.toString().padStart(2,'0');
+    d.dataset.num = n;
+    
+    // Adicionar funcionalidade de seleção no cabeçalho
+    d.addEventListener('click', ()=>{
+      const num = parseInt(d.dataset.num,10);
+      if(SELECIONADOS.has(num)){
+        SELECIONADOS.delete(num);
+        d.classList.remove('ring','ring-green-400','bg-green-600/30');
+        d.classList.add('border-purple-900/40');
+      } else {
+        // Verificar limite máximo de 20 números
+        if(SELECIONADOS.size >= 20){
+          alert('❌ Máximo de 20 números permitido na Lotofácil!');
+          return;
+        }
+        // Selecionar número
+        SELECIONADOS.add(num);
+        d.classList.add('ring','ring-green-400','bg-green-600/30');
+        d.classList.remove('border-purple-900/40');
+      }
+      atualizarKpis();
+    }, {passive:true});
+    
     tpl.parentNode.insertBefore(d, tpl);
   }
   tpl.remove();
@@ -62,9 +97,8 @@ function render(){
 
     for(let n=1;n<=25;n++){
       const val = linha[n];
-      const d = document.createElement('button');
-      d.className = "h-8 rounded border border-purple-900/40 text-[11px]";
-      d.dataset.num = n;
+      const d = document.createElement('div'); // Mudou para div (sem seleção)
+      d.className = "h-8 rounded border border-purple-900/40 text-[11px] flex items-center justify-center";
       if(val===0){
         d.textContent = "0";
         d.style.background = "rgba(236,72,153,.15)"; // rosa (não saiu)
@@ -74,13 +108,7 @@ function render(){
         d.style.background = "rgba(234,179,8,.15)";  // amarelo (saiu)
         d.style.color = "#fde68a";
       }
-      // seleção manual (primeira linha = último concurso)
-      d.addEventListener('click', ()=>{
-        const num = parseInt(d.dataset.num,10);
-        if(SELECIONADOS.has(num)){ SELECIONADOS.delete(num); d.classList.remove('ring','ring-green-400'); }
-        else{ SELECIONADOS.add(num); d.classList.add('ring','ring-green-400'); }
-        atualizarKpis();
-      }, {passive:true});
+      // SEM seleção - apenas visualização dos resultados históricos
       row.appendChild(d);
     }
     grade.appendChild(row);
@@ -107,16 +135,71 @@ function atualizarKpis(){
   const mult = sel.filter(n=>MULT3.has(n)).length;
   const rep  = sel.filter(n=>ULTIMO.slice(1).includes(n)).length;
 
-  document.getElementById('k_fibo').textContent  = fibo;
-  document.getElementById('k_primos').textContent= prim;
-  document.getElementById('k_mold').textContent  = mold;
-  document.getElementById('k_mult').textContent  = mult;
-  document.getElementById('k_rep').textContent   = rep;
+  // Atualizar valores e aplicar cores baseadas nos intervalos padrão
+  const k_fibo = document.getElementById('k_fibo');
+  const k_primos = document.getElementById('k_primos');
+  const k_mold = document.getElementById('k_mold');
+  const k_mult = document.getElementById('k_mult');
+  const k_rep = document.getElementById('k_rep');
+  
+  // Definir intervalos padrão para Lotofácil (15 números)
+  const intervalos = {
+    fibonacci: { min: 3, max: 5 },    // 3-5 números Fibonacci (ideal)
+    primos: { min: 4, max: 7 },       // 4-7 números primos (ideal)
+    moldura: { min: 8, max: 12 },     // 8-12 números da moldura (ideal)
+    multiplos: { min: 3, max: 6 },    // 3-6 múltiplos de 3 (ideal)
+    repetidos: { min: 2, max: 5 }     // 2-5 repetidos do último (ideal)
+  };
+  
+  // Aplicar valores e cores
+  k_fibo.textContent = fibo;
+  k_primos.textContent = prim;
+  k_mold.textContent = mold;
+  k_mult.textContent = mult;
+  k_rep.textContent = rep;
+  
+  // Aplicar cores baseadas nos intervalos
+  k_fibo.className = (fibo >= intervalos.fibonacci.min && fibo <= intervalos.fibonacci.max) ? 
+    'controle-valor text-green-400' : 'controle-valor text-gray-300';
+    
+  k_primos.className = (prim >= intervalos.primos.min && prim <= intervalos.primos.max) ? 
+    'controle-valor text-green-400' : 'controle-valor text-gray-300';
+    
+  k_mold.className = (mold >= intervalos.moldura.min && mold <= intervalos.moldura.max) ? 
+    'controle-valor text-green-400' : 'controle-valor text-gray-300';
+    
+  k_mult.className = (mult >= intervalos.multiplos.min && mult <= intervalos.multiplos.max) ? 
+    'controle-valor text-green-400' : 'controle-valor text-gray-300';
+    
+  k_rep.className = (rep >= intervalos.repetidos.min && rep <= intervalos.repetidos.max) ? 
+    'controle-valor text-green-400' : 'controle-valor text-gray-300';
+    
   document.getElementById('k_sel').textContent   = sel.length;
 
   document.getElementById('totalSel').textContent = sel.length;
-  document.getElementById('valorPagar').textContent = fmtMoney(valorAposta(sel.length));
+  
+  // Validação da quantidade de números selecionados
+  const valor = valorAposta(sel.length);
+  if(sel.length >= 15 && sel.length <= 20){
+    // Quantidade válida para Lotofácil
+    document.getElementById('valorPagar').textContent = fmtMoney(valor);
+    document.getElementById('valorPagar').className = 'font-bold text-green-400';
+  } else if(sel.length > 0 && sel.length < 15){
+    // Quantidade insuficiente
+    document.getElementById('valorPagar').textContent = `Mínimo 15 números (${sel.length}/15)`;
+    document.getElementById('valorPagar').className = 'font-bold text-orange-400';
+  } else if(sel.length > 20){
+    // Quantidade excessiva
+    document.getElementById('valorPagar').textContent = 'Máximo 20 números!';
+    document.getElementById('valorPagar').className = 'font-bold text-red-400';
+  } else {
+    // Nenhum número selecionado
+    document.getElementById('valorPagar').textContent = 'Selecione números para jogar';
+    document.getElementById('valorPagar').className = 'font-bold text-gray-400';
+  }
 }
+
+
 
 function abrirModal(id){ document.querySelector(id).style.display="block"; }
 function fecharModal(id){ document.querySelector(id).style.display="none"; }
@@ -136,7 +219,11 @@ document.addEventListener('click', e=>{
 });
 document.getElementById('btnReset').onclick = ()=>{
   SELECIONADOS.clear();
-  document.querySelectorAll('#gradeWrap button').forEach(b=> b.classList.remove('ring','ring-green-400'));
+  // Reset apenas no cabeçalho (onde está a seleção)
+  document.querySelectorAll('.grade-header button').forEach(b=> {
+    b.classList.remove('ring','ring-green-400','bg-green-600/30');
+    b.classList.add('border-purple-900/40');
+  });
   atualizarKpis();
 };
 document.getElementById('btnProximo').onclick = ()=>{
