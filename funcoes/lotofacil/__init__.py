@@ -14,6 +14,14 @@ from .gerarCombinacao_numeros_aleatoriosLotofacil import (
     controlar_qualidade_repetidos_lotofacil
 )
 
+# Funções do Laboratório de Simulação
+from .laboratorio_funcoes import (
+    calcular_valor_pago,
+    analisar_padroes_concurso,
+    obter_constantes_lotofacil,
+    calcular_score_qualidade
+)
+
 __all__ = [
     'carregar_dados_lotofacil',
     'obter_ultimos_concursos_lotofacil',
@@ -22,5 +30,9 @@ __all__ = [
     'gerar_aposta_personalizada_lotofacil',
     'gerar_aposta_aleatoria_lotofacil',
     'balancear_par_impar_lotofacil',
-    'controlar_qualidade_repetidos_lotofacil'
+    'controlar_qualidade_repetidos_lotofacil',
+    'calcular_valor_pago',
+    'analisar_padroes_concurso',
+    'obter_constantes_lotofacil',
+    'calcular_score_qualidade'
 ]

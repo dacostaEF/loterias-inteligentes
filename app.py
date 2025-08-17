@@ -317,7 +317,18 @@ def analise_frequencia_lotofacil_api():
         resultado = obter_estatisticas_rapidas_lotofacil()
         
         if resultado:
-            return jsonify(resultado)
+            # Formatar dados para compatibilidade com o JavaScript
+            # O JavaScript espera: numeros_quentes_frios.numeros_quentes, etc.
+            dados_formatados = {
+                'numeros_quentes_frios': {
+                    'numeros_quentes': [[num, 0] for num in resultado.get('numeros_quentes', [])],
+                    'numeros_frios': [[num, 0] for num in resultado.get('numeros_frios', [])],
+                    'numeros_secos': [[num, 0] for num in resultado.get('numeros_secos', [])]
+                },
+                'status': resultado.get('status', 'real')
+            }
+            
+            return jsonify(dados_formatados)
         else:
             return jsonify({"error": "Não foi possível analisar os dados da Lotofácil"}), 500
             
@@ -1193,6 +1204,11 @@ def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html')
 
+@app.route('/lotofacil_laboratorio')
+def lotofacil_laboratorio():
+    """Renderiza a página do Laboratório de Simulação da Lotofácil."""
+    return render_template('lotofacil_laboratorio.html')
+
 # --- Rotas da Lotomania ---
 @app.route('/dashboard_lotomania')
 def dashboard_lotomania():
@@ -1418,6 +1434,45 @@ def get_analise_seca_quina():
             'success': False,
             'error': f'Erro interno: {str(e)}'
         }), 500
+
+@app.route('/api/lotofacil/matriz')
+def api_lotofacil_matriz():
+    """API para obter matriz de concursos da Lotofácil para o laboratório"""
+    try:
+        # Parâmetros
+        limit = int(request.args.get("limit", 25))
+        
+        # df_lotofacil já existe no app (mesmo input do site)
+        df = df_lotofacil.copy()
+        
+        # Ordena do mais novo p/ mais antigo
+        df = df.sort_values("Concurso", ascending=False)
+        
+        # Pega N concursos e inverte para cronológico (como no GUI)
+        fatia = df.head(limit)[["Concurso"] + [f"Bola{i}" for i in range(1,16)]].iloc[::-1]
+        
+        # Monta matriz de 26 colunas (0 = concurso, 1..25 = números)
+        import numpy as np
+        matriz = []
+        for _, row in fatia.iterrows():
+            linha = [int(row["Concurso"])] + [0]*25
+            for j in range(1,16):
+                n = int(row[f"Bola{j}"])
+                linha[n] = n
+            matriz.append(linha)
+        
+        # Último concurso completo (para o modal "Escolhidos × Próximo")
+        ultimo = df.head(1)[["Concurso"] + [f"Bola{i}" for i in range(1,16)]].iloc[0].tolist()
+        # [concurso, b1..b15]
+        
+        return jsonify({
+            "matriz": matriz,           # lista de linhas [concurso, n1..n25] (0 quando não saiu)
+            "ultimo_concurso": ultimo   # [conc, b1..b15]
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro ao gerar matriz da Lotofácil: {e}")
+        return jsonify({"error": "Erro interno do servidor"}), 500
 
 
 
