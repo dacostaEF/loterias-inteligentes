@@ -522,10 +522,10 @@
       color: #94a3b8;
       padding: 0.75rem 0.25rem;
       background: transparent;
-      border: 1px solid rgba(139, 92, 246, 0.4);
+      border: 1px solid rgba(139, 92, 246, 0.3);
       border-radius: 6px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
       font-size: 0.75rem;
       font-weight: 600;
       min-width: 24px;
@@ -541,21 +541,56 @@
       border-color: rgba(139, 92, 246, 0.6);
     }
 
-    /* Estilos para botões selecionados */
+    /* Estilos para botões selecionados - Elegante e fino */
     .grade-header button.ring {
       border-color: #10B981;
-      background: rgba(16, 185, 129, 0.2);
+      background: rgba(16, 185, 129, 0.1);
+      border-width: 2px;
+      color: #00FF88 !important; /* Verde neon */
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); /* Brilho neon */
     }
 
     .grade-header button.ring-green-400 {
-      box-shadow: 0 0 0 3px #34D399;
+      box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.6);
       border-color: #10B981;
+      border-width: 2px;
+      color: #00FF88 !important; /* Verde neon */
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); /* Brilho neon */
     }
 
     .grade-header button.bg-green-600\/30 {
-      background: rgba(16, 185, 129, 0.3);
-      color: #000;
+      background: rgba(16, 185, 129, 0.15);
+      color: #00FF88 !important; /* Verde neon */
       font-weight: 700;
+      border-width: 2px;
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.6); /* Brilho neon */
+    }
+
+    /* Estado hover mais suave para botões selecionados */
+    .grade-header button.ring:hover,
+    .grade-header button.ring-green-400:hover,
+    .grade-header button.bg-green-600\/30:hover {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #059669;
+      box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.8);
+      color: #00FF88 !important; /* Verde neon */
+      text-shadow: 0 0 12px rgba(0, 255, 136, 0.8); /* Brilho neon mais intenso */
+    }
+
+    /* Efeito de brilho neon adicional para números selecionados */
+    .grade-header button.ring,
+    .grade-header button.ring-green-400,
+    .grade-header button.bg-green-600\/30 {
+      animation: neonPulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes neonPulse {
+      from {
+        text-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+      }
+      to {
+        text-shadow: 0 0 12px rgba(0, 255, 136, 0.8), 0 0 20px rgba(0, 255, 136, 0.4);
+      }
     }
 
     .grade-content {
