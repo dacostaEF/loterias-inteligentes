@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, send_file
 import pandas as pd
 import os
 import math
@@ -1209,6 +1209,11 @@ def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
     return render_template('lotofacil_laboratorio.html')
 
+@app.route('/teste_api')
+def teste_api():
+    """Página de teste da API"""
+    return send_file('teste_api.html')
+
 # --- Rotas da Lotomania ---
 @app.route('/dashboard_lotomania')
 def dashboard_lotomania():
@@ -1439,17 +1444,30 @@ def get_analise_seca_quina():
 def api_lotofacil_matriz():
     """API para obter matriz de concursos da Lotofácil para o laboratório"""
     try:
+        print("🔍 API Lotofácil Matriz chamada!")
+        
+        # Verificar se df_lotofacil existe
+        if df_lotofacil is None or df_lotofacil.empty:
+            print("❌ df_lotofacil está vazio ou None!")
+            return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
+        
+        print(f"✅ df_lotofacil carregado: {df_lotofacil.shape}")
+        print(f"✅ Colunas: {list(df_lotofacil.columns)}")
+        
         # Parâmetros
         limit = int(request.args.get("limit", 25))
+        print(f"🔍 Limit: {limit}")
         
         # df_lotofacil já existe no app (mesmo input do site)
         df = df_lotofacil.copy()
         
         # Ordena do mais novo p/ mais antigo
         df = df.sort_values("Concurso", ascending=False)
+        print(f"✅ Primeiros concursos: {df['Concurso'].head().tolist()}")
         
         # Pega N concursos e inverte para cronológico (como no GUI)
         fatia = df.head(limit)[["Concurso"] + [f"Bola{i}" for i in range(1,16)]].iloc[::-1]
+        print(f"✅ Fatia criada: {len(fatia)} linhas")
         
         # Monta matriz de 26 colunas (0 = concurso, 1..25 = números)
         import numpy as np
@@ -1463,16 +1481,74 @@ def api_lotofacil_matriz():
         
         # Último concurso completo (para o modal "Escolhidos × Próximo")
         ultimo = df.head(1)[["Concurso"] + [f"Bola{i}" for i in range(1,16)]].iloc[0].tolist()
-        # [concurso, b1..b15]
+        print(f"✅ Último concurso: {ultimo}")
         
-        return jsonify({
+        resultado = {
             "matriz": matriz,           # lista de linhas [concurso, n1..n25] (0 quando não saiu)
             "ultimo_concurso": ultimo   # [conc, b1..b15]
-        })
+        }
+        
+        print(f"✅ API retornando: matriz({len(matriz)} linhas), último({len(ultimo)} elementos)")
+        return jsonify(resultado)
         
     except Exception as e:
-        logger.error(f"Erro ao gerar matriz da Lotofácil: {e}")
-        return jsonify({"error": "Erro interno do servidor"}), 500
+        print(f"❌ Erro ao gerar matriz da Lotofácil: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
+
+@app.route('/estatisticas-frequencia')
+def get_estatisticas_frequencia():
+    """Retorna a frequência dos números nos últimos 25 concursos da Lotofácil"""
+    try:
+        print("🔍 API Estatísticas Frequência chamada!")
+        
+        # Verificar se df_lotofacil existe
+        if df_lotofacil is None or df_lotofacil.empty:
+            print("❌ df_lotofacil está vazio ou None!")
+            return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
+        
+        print(f"✅ df_lotofacil carregado: {df_lotofacil.shape}")
+        
+        # Parâmetros
+        num_concursos = int(request.args.get("num_concursos", 25))
+        print(f"🔍 Número de concursos: {num_concursos}")
+        
+        # df_lotofacil já existe no app (mesmo input do site)
+        df = df_lotofacil.copy()
+        
+        # Ordena do mais novo p/ mais antigo e pega os últimos N concursos
+        df = df.sort_values("Concurso", ascending=False)
+        df_limitado = df.head(num_concursos)
+        print(f"✅ Concursos analisados: {len(df_limitado)}")
+        
+        # Inicializar estrutura de dados para frequências
+        resultados_frequencia = {}
+        for num in range(1, 26):
+            resultados_frequencia[num] = {}
+            for pos in range(1, 16):
+                resultados_frequencia[num][pos] = 0
+        
+        # Calcular frequências reais baseadas nos dados históricos
+        for _, row in df_limitado.iterrows():
+            for pos in range(1, 16):
+                numero = int(row[f"Bola{pos}"])
+                if 1 <= numero <= 25:
+                    resultados_frequencia[numero][pos] += 1
+        
+        print(f"✅ Frequências calculadas para {len(resultados_frequencia)} números")
+        
+        # Log de exemplo para debug
+        exemplo_freq = resultados_frequencia[1][1] if resultados_frequencia[1][1] > 0 else 0
+        print(f"🔍 Exemplo: Número 1 na posição 1 apareceu {exemplo_freq} vezes")
+        
+        return jsonify(resultados_frequencia)
+        
+    except Exception as e:
+        print(f"❌ Erro ao calcular frequências da Lotofácil: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 
 

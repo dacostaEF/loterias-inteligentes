@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste API Lotofácil</title>
+</head>
+<body>
+    <h1>Teste API Lotofácil</h1>
+    <button onclick="testarAPI()">Testar API</button>
+    <div id="resultado"></div>
+
+    <script>
+        async function testarAPI() {
+            try {
+                console.log('🔍 Testando API...');
+                const response = await fetch('/api/lotofacil/matriz?limit=5');
+                console.log('📡 Status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('📊 Dados recebidos:', data);
+                
+                document.getElementById('resultado').innerHTML = `
+                    <h3>✅ API funcionando!</h3>
+                    <p>Matriz: ${data.matriz.length} linhas</p>
+                    <p>Último concurso: ${data.ultimo_concurso[0]}</p>
+                    <p>Números do último: ${data.ultimo_concurso.slice(1).join(', ')}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Erro:', error);
+                document.getElementById('resultado').innerHTML = `
+                    <h3>❌ Erro na API</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
