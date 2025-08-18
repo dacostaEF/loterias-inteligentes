@@ -424,6 +424,17 @@ function configurarEventListeners(){
     console.log('✅ Event listener do Gráficos configurado');
   }
   
+  // Botão Análise de Padrões
+  const btnPadroes = document.getElementById('btnPadroes');
+  if(btnPadroes){
+    btnPadroes.onclick = ()=>{
+      console.log('🔍 Abrindo modal de Análise de Padrões...');
+      abrirModal('#modalPadroes');
+      console.log('✅ Modal de Padrões aberto!');
+    };
+    console.log('✅ Event listener do Padrões configurado');
+  }
+  
   console.log('🎯 Todos os event listeners configurados!');
 }
 
@@ -704,6 +715,8 @@ function configurarBotoesVisualizacao() {
   
   console.log('✅ Botões de visualização configurados!');
 }
+
+
 
 // Configurar botões de visualização quando o modal abrir
 document.addEventListener('DOMContentLoaded', () => {

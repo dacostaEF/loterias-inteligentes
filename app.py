@@ -1551,7 +1551,136 @@ def get_estatisticas_frequencia():
         return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 
-
+@app.route('/analisar', methods=['POST'])
+def analisar_cartoes():
+    """Analisa padrões dos últimos 25 concursos da Lotofácil"""
+    try:
+        print("🔍 API Analisar Padrões dos Últimos 25 Concursos chamada!")
+        
+        # Verificar se df_lotofacil existe
+        if df_lotofacil is None or df_lotofacil.empty:
+            print("❌ df_lotofacil está vazio ou None!")
+            return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
+        
+        # Obter os últimos 25 concursos
+        df = df_lotofacil.copy()
+        df = df.sort_values("Concurso", ascending=False)
+        df_limitado = df.head(25)
+        
+        print(f"📊 Analisando padrões dos últimos {len(df_limitado)} concursos")
+        
+        # Inicializar contadores para cada padrão
+        padroes_01_25 = {"00_00": 0, "01_00": 0, "00_25": 0, "01_25": 0}
+        padroes_01_02_03 = {"00_00_00": 0, "01_00_00": 0, "00_02_00": 0, "00_00_03": 0, 
+                            "01_02_00": 0, "01_00_03": 0, "00_02_03": 0, "01_02_03": 0}
+        padroes_03_06_09 = {"00_00_00": 0, "03_00_00": 0, "00_06_00": 0, "00_00_09": 0,
+                            "03_06_00": 0, "03_00_09": 0, "00_06_09": 0, "03_06_09": 0}
+        padroes_23_24_25 = {"00_00_00": 0, "23_00_00": 0, "00_24_00": 0, "00_00_25": 0,
+                            "23_24_00": 0, "23_00_25": 0, "00_24_25": 0, "23_24_25": 0}
+        
+        # Analisar cada concurso
+        for _, row in df_limitado.iterrows():
+            numeros_concurso = []
+            for i in range(1, 16):
+                numero = int(row[f'Bola{i}'])
+                numeros_concurso.append(numero)
+            
+            # Padrão 01-25
+            tem_01 = 1 if 1 in numeros_concurso else 0
+            tem_25 = 1 if 25 in numeros_concurso else 0
+            padrao_01_25 = f"{tem_01}{tem_25}"
+            if padrao_01_25 == "00":
+                padroes_01_25["00_00"] += 1
+            elif padrao_01_25 == "10":
+                padroes_01_25["01_00"] += 1
+            elif padrao_01_25 == "01":
+                padroes_01_25["00_25"] += 1
+            elif padrao_01_25 == "11":
+                padroes_01_25["01_25"] += 1
+            
+            # Padrão 01-02-03
+            tem_01 = 1 if 1 in numeros_concurso else 0
+            tem_02 = 1 if 2 in numeros_concurso else 0
+            tem_03 = 1 if 3 in numeros_concurso else 0
+            padrao_01_02_03 = f"{tem_01}{tem_02}{tem_03}"
+            if padrao_01_02_03 == "000":
+                padroes_01_02_03["00_00_00"] += 1
+            elif padrao_01_02_03 == "100":
+                padroes_01_02_03["01_00_00"] += 1
+            elif padrao_01_02_03 == "010":
+                padroes_01_02_03["00_02_00"] += 1
+            elif padrao_01_02_03 == "001":
+                padroes_01_02_03["00_00_03"] += 1
+            elif padrao_01_02_03 == "110":
+                padroes_01_02_03["01_02_00"] += 1
+            elif padrao_01_02_03 == "101":
+                padroes_01_02_03["01_00_03"] += 1
+            elif padrao_01_02_03 == "011":
+                padroes_01_02_03["00_02_03"] += 1
+            elif padrao_01_02_03 == "111":
+                padroes_01_02_03["01_02_03"] += 1
+            
+            # Padrão 03-06-09
+            tem_03 = 1 if 3 in numeros_concurso else 0
+            tem_06 = 1 if 6 in numeros_concurso else 0
+            tem_09 = 1 if 9 in numeros_concurso else 0
+            padrao_03_06_09 = f"{tem_03}{tem_06}{tem_09}"
+            if padrao_03_06_09 == "000":
+                padroes_03_06_09["00_00_00"] += 1
+            elif padrao_03_06_09 == "100":
+                padroes_03_06_09["03_00_00"] += 1
+            elif padrao_03_06_09 == "010":
+                padroes_03_06_09["00_06_00"] += 1
+            elif padrao_03_06_09 == "001":
+                padroes_03_06_09["00_00_09"] += 1
+            elif padrao_03_06_09 == "110":
+                padroes_03_06_09["03_06_00"] += 1
+            elif padrao_03_06_09 == "101":
+                padroes_03_06_09["03_00_09"] += 1
+            elif padrao_03_06_09 == "011":
+                padroes_03_06_09["00_06_09"] += 1
+            elif padrao_03_06_09 == "111":
+                padroes_03_06_09["03_06_09"] += 1
+            
+            # Padrão 23-24-25
+            tem_23 = 1 if 23 in numeros_concurso else 0
+            tem_24 = 1 if 24 in numeros_concurso else 0
+            tem_25 = 1 if 25 in numeros_concurso else 0
+            padrao_23_24_25 = f"{tem_23}{tem_24}{tem_25}"
+            if padrao_23_24_25 == "000":
+                padroes_23_24_25["00_00_00"] += 1
+            elif padrao_23_24_25 == "100":
+                padroes_23_24_25["23_00_00"] += 1
+            elif padrao_23_24_25 == "010":
+                padroes_23_24_25["00_24_00"] += 1
+            elif padrao_23_24_25 == "001":
+                padroes_23_24_25["00_00_25"] += 1
+            elif padrao_23_24_25 == "110":
+                padroes_23_24_25["23_24_00"] += 1
+            elif padrao_23_24_25 == "101":
+                padroes_23_24_25["23_00_25"] += 1
+            elif padrao_23_24_25 == "011":
+                padroes_23_24_25["00_24_25"] += 1
+            elif padrao_23_24_25 == "111":
+                padroes_23_24_25["23_24_25"] += 1
+        
+        resultado = {
+            "total_concursos": len(df_limitado),
+            "padroes_01_25": padroes_01_25,
+            "padroes_01_02_03": padroes_01_02_03,
+            "padroes_03_06_09": padroes_03_06_09,
+            "padroes_23_24_25": padroes_23_24_25,
+            "concursos_analisados": df_limitado['Concurso'].tolist()
+        }
+        
+        print(f"✅ Padrões calculados: {len(df_limitado)} concursos analisados")
+        return jsonify(resultado)
+        
+    except Exception as e:
+        print(f"❌ Erro ao analisar cartões: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
