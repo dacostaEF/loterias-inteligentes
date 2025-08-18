@@ -842,6 +842,47 @@
         grid-template-columns: 1fr;
       }
     }
+
+    /* Dimensões fixas para os gráficos do modal de padrões */
+    .chart-area {
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .chart-area canvas {
+      width: 100% !important;
+      height: 350px !important;
+      display: block;
+    }
+
+    /* Botão de fechar (X) dos modais - maior, vermelho e com destaque no hover */
+    .modal-content { position: relative; }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      display: inline-block;
+      font-size: 28px; /* maior */
+      line-height: 1;
+      color: #ef4444; /* vermelho */
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 6px 10px; /* área clicável maior */
+      border-radius: 8px;
+      text-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+      transition: background-color .2s ease, transform .15s ease, box-shadow .2s ease, color .2s ease;
+    }
+    .close:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ffffff;
+      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3), 0 6px 16px rgba(239, 68, 68, 0.25);
+      transform: scale(1.05);
+    }
+    .close:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);
+    }
   </style>
 </head>
 
@@ -1241,7 +1282,7 @@
       };
 
       const options = {
-        responsive: true,
+        responsive: false,
         maintainAspectRatio: false,
         scales: {
           y: {
@@ -1249,7 +1290,8 @@
             min: 0,
             max: yMax !== undefined ? yMax : undefined,
             ticks: {
-              stepSize: yMax ? Math.max(1, Math.ceil(yMax / 5)) : undefined
+              stepSize: 1,
+              precision: 0
             },
             title: {
               display: true,
@@ -1345,7 +1387,7 @@
             // Aguarda um pouco para o modal ser renderizado
             setTimeout(() => {
               console.log('🎨 Desenhando histograma Padrões 01-25...');
-              const yMax = data.total_concursos || 25; // Fixar o eixo Y pelo total analisado
+              const yMax = 25; // Fixar máximo do eixo Y ao total de concursos analisados (25)
               desenharHistograma('padroes01_25Chart', padroes01_25Labels, padroes01_25Values, yMax);
               
               console.log('🎨 Desenhando histograma Padrões 01-02-03...');
