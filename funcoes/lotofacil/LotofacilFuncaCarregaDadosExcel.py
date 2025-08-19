@@ -18,7 +18,7 @@ def carregar_dados_lotofacil():
     """
     try:
         # Caminho para o arquivo Excel da Lotofácil
-        caminho_arquivo = "LoteriasExcel/Lotofacil_edt.xlsx"
+        caminho_arquivo = "LoteriasExcel/Lotofacil_edt2.xlsx"
         
         # Verifica se o arquivo existe
         if not os.path.exists(caminho_arquivo):
@@ -28,8 +28,10 @@ def carregar_dados_lotofacil():
         # Carrega o arquivo Excel
         logger.info(f"Carregando dados da Lotofácil de: {caminho_arquivo}")
         
-        # Tenta carregar o arquivo
-        df = pd.read_excel(caminho_arquivo)
+        # Tenta carregar o arquivo (engine explícito ajuda no Windows)
+        df = pd.read_excel(caminho_arquivo, engine='openpyxl')
+        # Remover colunas totalmente vazias
+        df = df.dropna(axis=1, how='all')
         
         # Log das informações básicas
         logger.info(f"Dados carregados com sucesso!")

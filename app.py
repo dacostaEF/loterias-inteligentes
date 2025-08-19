@@ -65,7 +65,11 @@ from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_fr
 # --- Importações para Lotofácil ---
 from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil, obter_ultimos_concursos_lotofacil
 from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import analisar_frequencia_lotofacil, obter_estatisticas_rapidas_lotofacil
-from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosLotofacil import gerar_aposta_personalizada_lotofacil, gerar_aposta_aleatoria_lotofacil
+from funcoes.lotofacil.funcao_analise_de_distribuicao_lotofacil import analisar_distribuicao_lotofacil
+from funcoes.lotofacil.funcao_analise_de_combinacoes_lotofacil import analisar_combinacoes_lotofacil
+from funcoes.lotofacil.funcao_analise_de_padroes_sequencia_lotofacil import analisar_padroes_sequencias_lotofacil
+from funcoes.lotofacil.analise_estatistica_avancada_lotofacil import AnaliseEstatisticaAvancadaLotofacil, realizar_analise_estatistica_avancada_lotofacil
+from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosL_lotofacil import gerar_aposta_personalizada_lotofacil, gerar_aposta_aleatoria_lotofacil
 
 
 app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
@@ -223,6 +227,10 @@ def get_analise_de_distribuicao_megasena():
 
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
+        if qtd_concursos is None or qtd_concursos <= 0:
+            qtd_concursos = 200
+        elif qtd_concursos > 200:
+            qtd_concursos = 200
         # print(f"🎯 Distribuição Mega Sena - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
         # print(f"🎯 Tipo de df_megasena: {type(df_megasena)}")  # DEBUG - COMENTADO
         # print(f"🎯 Shape de df_megasena: {df_megasena.shape if hasattr(df_megasena, 'shape') else 'N/A'}")  # DEBUG - COMENTADO
@@ -336,6 +344,84 @@ def analise_frequencia_lotofacil_api():
         logger.error(f"Erro ao analisar frequência da Lotofácil: {e}")
         return jsonify({"error": "Erro interno do servidor"}), 500
 
+
+@app.route('/api/analise-frequencia-lotofacil-v2')
+def analise_frequencia_lotofacil_v2_api():
+    """API v2 para análise de frequência da Lotofácil (fluxo Premium, 15 bolas)."""
+    try:
+        from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil_2 import analisar_frequencia_lotofacil2
+        from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=25)
+
+        # Forçar recarga a partir do Excel (edt2) para evitar cache desatualizado
+        resultado = analisar_frequencia_lotofacil2(None, qtd_concursos=qtd_concursos)
+
+        # Montar dados para a matriz visual (concursos_para_matriz)
+        concursos_para_matriz = []
+        try:
+            df = carregar_dados_lotofacil()
+            if df is not None and not df.empty:
+                # Detectar coluna de concurso
+                concurso_col = None
+                for c in df.columns:
+                    if 'concurso' in str(c).strip().lower():
+                        concurso_col = c
+                        break
+                # Detectar colunas de bolas (1..15)
+                def achar_col(df_cols, n):
+                    chaves = [f'bola{n}', f'bola{n:02d}', f'dezena{n}', f'd{n}', f'num{n}', f'n{n}', f'b{n}']
+                    lower_map = {str(col).strip().lower(): col for col in df_cols}
+                    for key in chaves:
+                        if key in lower_map:
+                            return lower_map[key]
+                    for k, v in lower_map.items():
+                        if k.endswith(str(n)) and any(prefix in k for prefix in ('bola', 'dez', 'd', 'num', 'n', 'b')):
+                            return v
+                    return None
+
+                bolas_cols = []
+                for i in range(1, 16):
+                    col = achar_col(df.columns, i)
+                    if col is None:
+                        bolas_cols = []
+                        break
+                    bolas_cols.append(col)
+
+                if concurso_col and bolas_cols:
+                    df_ord = df.sort_values(concurso_col, ascending=False)
+                    limite = qtd_concursos if qtd_concursos else 300
+                    for _, row in df_ord.head(limite).iloc[::-1].iterrows():
+                        try:
+                            concurso_num = int(row[concurso_col]) if not pd.isna(row[concurso_col]) else None
+                            if concurso_num is None:
+                                continue
+                            numeros = []
+                            for col in bolas_cols:
+                                val = row[col]
+                                if pd.notna(val):
+                                    numeros.append(int(val))
+                            if len(numeros) == 15:
+                                concursos_para_matriz.append({
+                                    'concurso': concurso_num,
+                                    'numeros': numeros
+                                })
+                        except Exception:
+                            continue
+        except Exception:
+            pass
+
+        if not resultado:
+            return jsonify({"error": "Não foi possível analisar os dados (v2)"}), 500
+
+        # Acrescentar matriz ao payload, se disponível
+        payload = dict(resultado)
+        payload['concursos_para_matriz'] = concursos_para_matriz
+        return jsonify(payload)
+    except Exception as e:
+        logger.error(f"Erro ao analisar frequência v2 da Lotofácil: {e}")
+        return jsonify({"error": "Erro interno do servidor"}), 500
+
 @app.route('/api/analise_de_distribuicao-quina', methods=['GET'])
 def get_analise_de_distribuicao_quina():
     """Retorna os dados da análise de distribuição da Quina."""
@@ -345,6 +431,10 @@ def get_analise_de_distribuicao_quina():
 
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
+        if qtd_concursos is None or qtd_concursos <= 0:
+            qtd_concursos = 200
+        elif qtd_concursos > 200:
+            qtd_concursos = 200
 
         resultado = analisar_distribuicao_quina(df_quina, qtd_concursos)
         
@@ -353,6 +443,22 @@ def get_analise_de_distribuicao_quina():
         print(f"❌ Erro na API de distribuição Quina: {e}")
         import traceback
         traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/analise_de_distribuicao-lotofacil', methods=['GET'])
+def get_analise_de_distribuicao_lotofacil():
+    """Retorna os dados da análise de distribuição da Lotofácil."""
+    try:
+        if df_lotofacil is None or df_lotofacil.empty:
+            return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
+
+        # Verificar se há parâmetro de quantidade de concursos
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+
+        resultado = analisar_distribuicao_lotofacil(df_lotofacil, qtd_concursos)
+        
+        return jsonify(resultado)
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise_de_combinacoes-quina', methods=['GET'])
@@ -374,6 +480,21 @@ def get_analise_de_combinacoes_quina():
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/analise_de_combinacoes-lotofacil', methods=['GET'])
+def get_analise_de_combinacoes_lotofacil():
+    """Retorna os dados da análise de combinações da Lotofácil."""
+    try:
+        if df_lotofacil is None or df_lotofacil.empty:
+            return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+
+        resultado = analisar_combinacoes_lotofacil(df_lotofacil, qtd_concursos)
+        
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/analise_padroes_sequencias-quina', methods=['GET'])
 def get_analise_padroes_sequencias_quina():
     """Retorna os dados da análise de padrões e sequências da Quina."""
@@ -391,6 +512,165 @@ def get_analise_padroes_sequencias_quina():
         print(f"❌ Erro na API de padrões Quina: {e}")
         import traceback
         traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/analise_padroes_sequencias-lotofacil', methods=['GET'])
+def get_analise_padroes_sequencias_lotofacil():
+    """Retorna os dados da análise de padrões e sequências da Lotofácil."""
+    try:
+        if df_lotofacil is None or df_lotofacil.empty:
+            return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int)
+
+        resultado = analisar_padroes_sequencias_lotofacil(df_lotofacil, qtd_concursos)
+        
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# --- PASSO 5: Análise de Seca - LOTOFÁCIL ---
+@app.route('/api/analise_seca_lotofacil', methods=['GET'])
+def api_analise_seca_lotofacil():
+    try:
+        if df_lotofacil is None or df_lotofacil.empty:
+            return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=200)
+        if not qtd_concursos or qtd_concursos <= 0:
+            qtd_concursos = 200
+        qtd_concursos = min(qtd_concursos, 200)
+
+        # Detectores locais de colunas (concurso e bolas 1..15)
+        def _detectar_coluna_concurso_local(df: pd.DataFrame):
+            possiveis = ['concurso', 'nrconcurso', 'n_concurso', 'numero_concurso', 'idconcurso']
+            lower = {str(c).strip().lower(): c for c in df.columns}
+            for k in possiveis:
+                if k in lower:
+                    return lower[k]
+            for k, v in lower.items():
+                if 'concurso' in k:
+                    return v
+            return None
+
+        def _detectar_colunas_bolas_local(df: pd.DataFrame):
+            lower = {str(c).strip().lower(): c for c in df.columns}
+            def achar(n):
+                chaves = [f'bola{n}', f'bola{n:02d}', f'dezena{n}', f'd{n}', f'num{n}', f'n{n}', f'b{n}']
+                for key in chaves:
+                    if key in lower:
+                        return lower[key]
+                for k, v in lower.items():
+                    if k.endswith(str(n)) and any(p in k for p in ('bola','dez','d','num','n','b')):
+                        return v
+                return None
+            cols = []
+            for n in range(1, 16):
+                c = achar(n)
+                if c is None:
+                    return None
+                cols.append(c)
+            return cols
+
+        concurso_col = _detectar_coluna_concurso_local(df_lotofacil)
+        bolas = _detectar_colunas_bolas_local(df_lotofacil)
+        if concurso_col is None or not bolas:
+            return jsonify({'error': 'Colunas de concurso/bolas não detectadas.'}), 500
+
+        df = df_lotofacil.copy()
+        for col in bolas:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+        df = df.dropna(subset=bolas)
+        mask_validos = (df[bolas] >= 1).all(axis=1) & (df[bolas] <= 25).all(axis=1)
+        df = df[mask_validos]
+        if df.empty:
+            return jsonify({'error': 'Sem linhas válidas após limpeza.'}), 500
+
+        df = df.tail(qtd_concursos).copy()
+
+        # Calcular seca atual por número (contando a partir do último concurso)
+        seca_por_numero = {n: {'seca_atual': 0} for n in range(1, 26)}
+        # Lista de sorteios do mais recente para o mais antigo
+        sorteios = list(reversed(df[bolas].values.tolist()))
+        for n in range(1, 26):
+            cont = 0
+            for sorteio in sorteios:
+                if n in sorteio:
+                    break
+                cont += 1
+            seca_por_numero[n]['seca_atual'] = cont
+
+        # Estatísticas simples
+        valores = [v['seca_atual'] for v in seca_por_numero.values()]
+        seca_max = int(max(valores) if valores else 0)
+        seca_med = float(pd.Series(valores).median()) if valores else 0.0
+        seca_media = float(pd.Series(valores).mean()) if valores else 0.0
+
+        # Top números em maior seca
+        numeros_maior_seca = sorted([(n, seca_por_numero[n]) for n in range(1, 26)],
+                                     key=lambda x: x[1]['seca_atual'], reverse=True)
+
+        # Números que saíram mais recentemente (último concurso)
+        ultimo = df[bolas].iloc[-1].tolist()
+        numeros_recentes = [int(x) for x in ultimo if pd.notna(x)]
+
+        payload = {
+            'numeros_seca': {
+                'seca_por_numero': seca_por_numero,
+                'estatisticas': {
+                    'seca_maxima': seca_max,
+                    'seca_mediana': seca_med,
+                    'seca_media': round(seca_media, 2)
+                },
+                'numeros_maior_seca': [[n, info] for n, info in numeros_maior_seca[:10]],
+                'numeros_recentes': numeros_recentes
+            },
+            'periodo_analisado': {
+                'qtd_concursos_solicitada': qtd_concursos,
+                'concursos_analisados': df[concurso_col].tolist()
+            }
+        }
+
+        return jsonify(payload)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Diagnóstico: concursos que tiveram blocos consecutivos de um tamanho específico
+@app.route('/api/lotofacil/sequencias/detalhe', methods=['GET'])
+def get_lotofacil_sequencias_detalhe():
+    try:
+        if df_lotofacil is None or df_lotofacil.empty:
+            return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
+
+        tamanho = request.args.get('tamanho', type=int, default=11)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=200)
+        if qtd_concursos is None or qtd_concursos <= 0:
+            qtd_concursos = 200
+        qtd_concursos = min(qtd_concursos, 200)
+
+        resultado = analisar_padroes_sequencias_lotofacil(df_lotofacil, qtd_concursos)
+        if not resultado:
+            return jsonify({'error': 'Análise indisponível'}), 500
+
+        consec = resultado.get('numeros_consecutivos', {})
+        concursos = (consec.get('consecutivos_por_tamanho_concursos', {}) or {}).get(tamanho, [])
+        por_concurso = consec.get('por_concurso', [])
+
+        detalhes = []
+        for item in por_concurso:
+            if item.get('concurso') in concursos:
+                blocos = [seq for seq in item.get('consecutivos', []) if len(seq) == tamanho]
+                if blocos:
+                    detalhes.append({'concurso': item.get('concurso'), 'blocos': blocos})
+
+        return jsonify({
+            'tamanho': tamanho,
+            'qtd_concursos': qtd_concursos,
+            'concursos': concursos,
+            'detalhes': detalhes,
+            'periodo_analisado': resultado.get('periodo_analisado', {})
+        })
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/estatisticas_avancadas_quina', methods=['GET'])
@@ -530,6 +810,46 @@ def gerar_aposta_premium_quina():
         return jsonify(resultado)
     except Exception as e:
         print(f"❌ Erro na API de geração premium Quina: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/estatisticas_avancadas_lotofacil', methods=['GET'])
+def get_estatisticas_avancadas_lotofacil():
+    """Retorna os dados das estatísticas avançadas da Lotofácil."""
+    try:
+        if df_lotofacil is None or df_lotofacil.empty:
+            return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
+
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=25)
+
+        analise = AnaliseEstatisticaAvancadaLotofacil(df_lotofacil)
+        resultado = analise.executar_analise_completa(qtd_concursos)
+
+        resultado_limpo = limpar_valores_problematicos(resultado)
+        return jsonify(resultado_limpo)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/gerar-aposta-aleatoria-lotofacil', methods=['POST'])
+def gerar_aposta_aleatoria_lotofacil_api():
+    """Gera uma aposta aleatória da Lotofácil (15 a 20 números)."""
+    try:
+        payload = request.get_json(silent=True) or {}
+        qtde_num = int(payload.get('qtde_num', 15))
+        # Garantir faixa válida para Lotofácil
+        if qtde_num < 15:
+            qtde_num = 15
+        if qtde_num > 20:
+            qtde_num = 20
+
+        numeros = gerar_aposta_aleatoria_lotofacil(qtde_num)
+        return jsonify({
+            'numeros': numeros,
+            'qtde_apostas': 1
+        })
+    except Exception as e:
+        print(f"❌ Erro na API de aposta aleatória Lotofácil: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
@@ -1444,30 +1764,30 @@ def get_analise_seca_quina():
 def api_lotofacil_matriz():
     """API para obter matriz de concursos da Lotofácil para o laboratório"""
     try:
-        print("🔍 API Lotofácil Matriz chamada!")
+        # print("🔍 API Lotofácil Matriz chamada!")
         
         # Verificar se df_lotofacil existe
         if df_lotofacil is None or df_lotofacil.empty:
-            print("❌ df_lotofacil está vazio ou None!")
+            # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
         
-        print(f"✅ df_lotofacil carregado: {df_lotofacil.shape}")
-        print(f"✅ Colunas: {list(df_lotofacil.columns)}")
+        # print(f"✅ df_lotofacil carregado: {df_lotofacil.shape}")
+        # print(f"✅ Colunas: {list(df_lotofacil.columns)}")
         
         # Parâmetros
         limit = int(request.args.get("limit", 25))
-        print(f"🔍 Limit: {limit}")
+        # print(f"🔍 Limit: {limit}")
         
         # df_lotofacil já existe no app (mesmo input do site)
         df = df_lotofacil.copy()
         
         # Ordena do mais novo p/ mais antigo
         df = df.sort_values("Concurso", ascending=False)
-        print(f"✅ Primeiros concursos: {df['Concurso'].head().tolist()}")
+        # print(f"✅ Primeiros concursos: {df['Concurso'].head().tolist()}")
         
         # Pega N concursos e inverte para cronológico (como no GUI)
         fatia = df.head(limit)[["Concurso"] + [f"Bola{i}" for i in range(1,16)]].iloc[::-1]
-        print(f"✅ Fatia criada: {len(fatia)} linhas")
+        # print(f"✅ Fatia criada: {len(fatia)} linhas")
         
         # Monta matriz de 26 colunas (0 = concurso, 1..25 = números)
         import numpy as np
@@ -1481,38 +1801,38 @@ def api_lotofacil_matriz():
         
         # Último concurso completo (para o modal "Escolhidos × Próximo")
         ultimo = df.head(1)[["Concurso"] + [f"Bola{i}" for i in range(1,16)]].iloc[0].tolist()
-        print(f"✅ Último concurso: {ultimo}")
+        # print(f"✅ Último concurso: {ultimo}")
         
         resultado = {
             "matriz": matriz,           # lista de linhas [concurso, n1..n25] (0 quando não saiu)
             "ultimo_concurso": ultimo   # [conc, b1..b15]
         }
         
-        print(f"✅ API retornando: matriz({len(matriz)} linhas), último({len(ultimo)} elementos)")
+        # print(f"✅ API retornando: matriz({len(matriz)} linhas), último({len(ultimo)} elementos)")
         return jsonify(resultado)
         
     except Exception as e:
-        print(f"❌ Erro ao gerar matriz da Lotofácil: {e}")
-        import traceback
-        traceback.print_exc()
+        # print(f"❌ Erro ao gerar matriz da Lotofácil: {e}")
+        # import traceback
+        # traceback.print_exc()
         return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 @app.route('/estatisticas-frequencia')
 def get_estatisticas_frequencia():
     """Retorna a frequência dos números nos últimos 25 concursos da Lotofácil"""
     try:
-        print("🔍 API Estatísticas Frequência chamada!")
+        # print("🔍 API Estatísticas Frequência chamada!")
         
         # Verificar se df_lotofacil existe
         if df_lotofacil is None or df_lotofacil.empty:
-            print("❌ df_lotofacil está vazio ou None!")
+            # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
         
-        print(f"✅ df_lotofacil carregado: {df_lotofacil.shape}")
+        # print(f"✅ df_lotofacil carregado: {df_lotofacil.shape}")
         
         # Parâmetros
         num_concursos = int(request.args.get("num_concursos", 25))
-        print(f"🔍 Número de concursos: {num_concursos}")
+        # print(f"🔍 Número de concursos: {num_concursos}")
         
         # df_lotofacil já existe no app (mesmo input do site)
         df = df_lotofacil.copy()
@@ -1520,7 +1840,7 @@ def get_estatisticas_frequencia():
         # Ordena do mais novo p/ mais antigo e pega os últimos N concursos
         df = df.sort_values("Concurso", ascending=False)
         df_limitado = df.head(num_concursos)
-        print(f"✅ Concursos analisados: {len(df_limitado)}")
+        # print(f"✅ Concursos analisados: {len(df_limitado)}")
         
         # Inicializar estrutura de dados para frequências
         resultados_frequencia = {}
@@ -1536,18 +1856,18 @@ def get_estatisticas_frequencia():
                 if 1 <= numero <= 25:
                     resultados_frequencia[numero][pos] += 1
         
-        print(f"✅ Frequências calculadas para {len(resultados_frequencia)} números")
+        # print(f"✅ Frequências calculadas para {len(resultados_frequencia)} números")
         
         # Log de exemplo para debug
-        exemplo_freq = resultados_frequencia[1][1] if resultados_frequencia[1][1] > 0 else 0
-        print(f"🔍 Exemplo: Número 1 na posição 1 apareceu {exemplo_freq} vezes")
+        # exemplo_freq = resultados_frequencia[1][1] if resultados_frequencia[1][1] > 0 else 0
+        # print(f"🔍 Exemplo: Número 1 na posição 1 apareceu {exemplo_freq} vezes")
         
         return jsonify(resultados_frequencia)
         
     except Exception as e:
-        print(f"❌ Erro ao calcular frequências da Lotofácil: {e}")
-        import traceback
-        traceback.print_exc()
+        # print(f"❌ Erro ao calcular frequências da Lotofácil: {e}")
+        # import traceback
+        # traceback.print_exc()
         return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 
@@ -1555,11 +1875,11 @@ def get_estatisticas_frequencia():
 def analisar_cartoes():
     """Analisa padrões dos últimos 25 concursos da Lotofácil"""
     try:
-        print("🔍 API Analisar Padrões dos Últimos 25 Concursos chamada!")
+        # print("🔍 API Analisar Padrões dos Últimos 25 Concursos chamada!")
         
         # Verificar se df_lotofacil existe
         if df_lotofacil is None or df_lotofacil.empty:
-            print("❌ df_lotofacil está vazio ou None!")
+            # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
         
         # Obter os últimos 25 concursos
@@ -1567,7 +1887,7 @@ def analisar_cartoes():
         df = df.sort_values("Concurso", ascending=False)
         df_limitado = df.head(25)
         
-        print(f"📊 Analisando padrões dos últimos {len(df_limitado)} concursos")
+        # print(f"📊 Analisando padrões dos últimos {len(df_limitado)} concursos")
         
         # Inicializar contadores para cada padrão
         padroes_01_25 = {"00_00": 0, "01_00": 0, "00_25": 0, "01_25": 0}
@@ -1673,13 +1993,13 @@ def analisar_cartoes():
             "concursos_analisados": df_limitado['Concurso'].tolist()
         }
         
-        print(f"✅ Padrões calculados: {len(df_limitado)} concursos analisados")
+        # print(f"✅ Padrões calculados: {len(df_limitado)} concursos analisados")
         return jsonify(resultado)
         
     except Exception as e:
-        print(f"❌ Erro ao analisar cartões: {e}")
-        import traceback
-        traceback.print_exc()
+        # print(f"❌ Erro ao analisar cartões: {e}")
+        # import traceback
+        # traceback.print_exc()
         return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 

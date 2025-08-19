@@ -1126,9 +1126,9 @@
       <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Configurar Aposta Aleatória</h3>
 
       <div class="mb-5">
-        <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (6-12)</label>
-        <input type="range" id="sliderNumeros" min="6" max="12" value="8" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
-        <span id="valorNumeros" class="block text-center text-lg font-bold mt-2 text-[#00E38C]">8</span>
+        <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (5-15)</label>
+        <input type="range" id="sliderNumeros" min="5" max="15" value="5" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
+        <span id="valorNumeros" class="block text-center text-lg font-bold mt-2 text-[#00E38C]">5</span>
       </div>
 
 
@@ -3290,8 +3290,8 @@
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📊 Estatísticas</h4>
                   <div class="space-y-2">
-                    <p class="text-sm text-gray-300">Intervalo médio: <span class="text-[#00E38C] font-bold">${intervalos.intervalo_medio || 0} concursos</span></p>
-                    <p class="text-sm text-gray-300">Maior intervalo: <span class="text-[#00E38C] font-bold">${intervalos.maior_intervalo || 0} concursos</span></p>
+                    <p class="text-sm text-gray-300">Intervalo médio: <span class="text-[#00E38C] font-bold">${(intervalos.intervalo_medio_geral ?? 0).toFixed(1)} concursos</span></p>
+                    <p class="text-sm text-gray-300">Maior intervalo histórico: <span class="text-[#00E38C] font-bold">${intervalos.maior_intervalo_historico ?? 0} concursos</span></p>
                   </div>
                 </div>
                 
@@ -3299,8 +3299,8 @@
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">🚫 Números Mais Ausentes</h4>
                   <div class="space-y-2">
-                    ${Object.entries(intervalos.numeros_mais_ausentes || {}).slice(0, 5).map(([numero, qtd]) => 
-                      `<p class="text-sm text-gray-300">Número ${numero}: <span class="text-[#00E38C] font-bold">${qtd} concursos</span></p>`
+                    ${((intervalos.numeros_mais_ausentes || [])).slice(0, 10).map(([numero, atraso]) => 
+                      `<p class=\"text-sm text-gray-300\">Número ${numero}: <span class=\"text-[#00E38C] font-bold\">${atraso} concursos</span></p>`
                     ).join('')}
                   </div>
                 </div>
@@ -5038,7 +5038,7 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            qtde_num: qtdeNum
+            qtde_num: Math.min(15, Math.max(5, qtdeNum))
           })
         });
 

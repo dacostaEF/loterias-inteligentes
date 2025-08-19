@@ -3,22 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
+
   <!-- Meta tags para colorir a status bar dos dispositivos móveis -->
   <meta name="theme-color" content="#7C3AED">
   <meta name="msapplication-navbutton-color" content="#7C3AED">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  
-  <title>Mega Sena | Dashboard Inteligente</title>
-  
+
+  <title>Lotofácil | Inteligência Estatística</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+
   <!-- Favicons otimizados para todos os dispositivos -->
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="16x16">
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="48x48">
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="192x192">
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="512x512">
-  
+
   <!-- Apple Touch Icons para iOS -->
   <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="180x180">
   <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="152x152">
@@ -29,16 +34,16 @@
   <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="72x72">
   <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="60x60">
   <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="57x57">
-  
+
   <!-- Android Chrome Icons -->
   <link rel="icon" type="image/png" sizes="192x192" href="/static/img/Favicon_LI.png">
   <link rel="icon" type="image/png" sizes="512x512" href="/static/img/Favicon_LI.png">
-  
+
   <!-- Windows Tiles -->
   <meta name="msapplication-TileColor" content="#7C3AED">
   <meta name="msapplication-TileImage" content="/static/img/Favicon_LI.png">
   <meta name="msapplication-config" content="none">
-  
+
   <!-- Manifest para PWA -->
   <link rel="manifest" href="/static/manifest.json">
 
@@ -91,36 +96,92 @@
       }
     }
 
+    /* Auto-ajuste centralizado da imagem da Lotofácil */
+    .lotofacil-logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      position: relative;
+    }
+
+    .lotofacil-logo {
+      max-width: 240px;
+      min-width: 96px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+      margin-left: 15px !important;
+      margin-bottom: -8px;
+      transition: all 0.3s ease;
+      vertical-align: bottom;
+      transform: translateX(15px);
+    }
+
+    /* Responsividade total para mobile e tablet */
+    @media (max-width: 640px) {
+      .lotofacil-logo {
+        max-width: 144px;
+        min-width: 72px;
+        height: 58px;
+      }
+    }
+
+    @media (min-width: 641px) and (max-width: 768px) {
+      .lotofacil-logo {
+        max-width: 180px;
+        min-width: 84px;
+        height: 77px;
+      }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .lotofacil-logo {
+        max-width: 216px;
+        min-width: 96px;
+        height: 96px;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      .lotofacil-logo {
+        max-width: 240px;
+        min-width: 120px;
+        height: 115px;
+      }
+    }
+
     /* Responsividade para smartphones - remover títulos dos eixos */
     @media (max-width: 640px) {
       .js-plotly-plot .g-gtitle {
         font-size: 14px !important;
       }
-      
+
       /* Remover títulos dos eixos Y em smartphones */
       .js-plotly-plot .g-ytitle,
       .js-plotly-plot .g-ytitle-2 {
         display: none !important;
       }
-      
+
       /* Ajustar margens para smartphones */
       .js-plotly-plot .plotly {
         margin-left: 20px !important;
         margin-right: 20px !important;
       }
     }
-    
+
     /* Reduzir tamanho dos títulos dos gráficos e módulos - APENAS para smartphones */
     @media (max-width: 640px) {
       .chart-container h3 {
         font-size: 14px !important;
       }
-      
+
       .bg-dark h4 {
         font-size: 14px !important;
       }
     }
-    
+
     /* Reduzir tamanho das fontes dos eixos do Plotly - APENAS para smartphones */
     @media (max-width: 640px) {
       .js-plotly-plot .g-xtick text,
@@ -135,7 +196,7 @@
         font-size: 6px !important;
         font-size: 6px !important;
       }
-      
+
       /* Forçar tamanho da fonte para todos os elementos de texto dos eixos */
       .js-plotly-plot .g-xtick *,
       .js-plotly-plot .g-ytick *,
@@ -143,13 +204,13 @@
         font-size: 6px !important;
       }
     }
-    
+
     /* Cor vermelha para valores do eixo Y2 (frequência relativa) - GLOBAL */
     .js-plotly-plot .g-ytick2 text {
       fill: red !important;
       color: red !important;
     }
-    
+
     /* Garantir que a cor vermelha seja aplicada em todos os dispositivos */
     .js-plotly-plot .g-ytick2 text,
     .js-plotly-plot .g-ytick2 .tick text,
@@ -158,7 +219,7 @@
       fill: red !important;
       color: red !important;
     }
-    
+
     /* Estilos para a matriz visual */
     .matriz-container {
       display: flex;
@@ -220,19 +281,19 @@
         /* Scrollbars mais finas no mobile */
         scrollbar-width: thin;
       }
-      
+
       /* Scrollbars menores no mobile */
       .matriz-container::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
-      
+
       /* Garante que as linhas não quebrem no mobile */
       .linha-concurso {
         min-width: max-content; /* Força largura mínima baseada no conteúdo */
         width: max-content; /* Garante que a linha ocupe todo o espaço necessário */
       }
-      
+
       /* Células com tamanho fixo no mobile */
       .celula-numero {
         flex-shrink: 0 !important;
@@ -246,13 +307,13 @@
 
 
     .linha-concurso {
-      display: flex; /* Mantém as células lado a lado */
-      gap: 3px;
-      padding: 1px 0; /* Reduzido de 2px para 1px - menos espaço interno */
-      flex-shrink: 0; /* Para garantir que não haja encolhimento das células */
-      /* Melhorias para muitos concursos */
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03); /* Linha mais sutil */
-      transition: background-color 0.2s ease; /* Transição suave */
+      display: grid; /* Preenche toda a largura do container */
+      grid-template-columns: repeat(25, 1fr); /* 25 colunas iguais (1-25) */
+      gap: 4px;
+      padding: 2px 0;
+      width: 100%;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      transition: background-color 0.2s ease;
     }
 
     /* Hover effect para melhor identificação das linhas */
@@ -310,14 +371,14 @@
         padding-left: 0px !important;
         padding-right: 0px !important;
       }
-      
+
       /* Ajuste agressivo do modal para mobile - Quase 100% da largura */
       .modal-content {
         width: 98% !important; /* Quase 100% da largura do viewport */
         max-width: 98% !important; /* Garante que não haja limite de largura */
         margin: 2% auto !important; /* Reduz margem superior/inferior para ocupar mais tela */
         /* Reduzir drasticamente os paddings laterais */
-        padding-left: 10px !important; 
+        padding-left: 10px !important;
         padding-right: 10px !important;
         /* Manter padding vertical se necessário */
         padding-top: 20px !important;
@@ -332,20 +393,21 @@
     }
 
     .celula-numero {
-      font-size: 9px !important;
+      font-size: clamp(8px, 0.8vw, 12px) !important;
       font-family: 'Inter', sans-serif;
-      line-height: 22px;
       text-align: center;
-      min-width: 22px;
-      max-width: 22px;
-      height: 22px;
+      width: 100% !important;
+      min-width: 0 !important;
+      max-width: none !important;
+      height: auto !important;
+      aspect-ratio: 1 / 1; /* Mantém quadrado e usa 100% da coluna */
+      line-height: 1; /* Evita estourar verticalmente */
       border-radius: 4px;
       background-color: #222;
       color: #eee;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-shrink: 0; /* IMPEDE QUE A CÉLULA ENCOLHA */
     }
 
     .celula-numero.sorteado {
@@ -379,13 +441,13 @@
       color: red !important;
       stroke: red !important;
     }
-    
+
     /* Forçar cor vermelha para todos os elementos do eixo Y2 */
     .js-plotly-plot .g-ytick2 * {
       fill: red !important;
       color: red !important;
     }
-    
+
     /* Reduzir altura dos gráficos para 70% - APENAS para smartphones */
     @media (max-width: 640px) {
       .chart-container div[id^="grafico"] {
@@ -401,13 +463,13 @@
         min-width: 100% !important;
         max-width: 100% !important;
       }
-      
+
       /* Remover qualquer padding que possa estar limitando a largura */
       .chart-container {
         padding-left: 0px !important;
         padding-right: 0px !important;
       }
-      
+
       /* Otimizar o container do gráfico para máxima expansão */
       .grafico-frequencia-container {
         width: 100% !important;
@@ -700,13 +762,13 @@
       padding: 8px 0;
       margin-bottom: 20px;
     }
-    
+
     .breadcrumbs {
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 20px;
     }
-    
+
     .breadcrumb-list {
       display: flex;
       align-items: center;
@@ -715,20 +777,20 @@
       padding: 0;
       font-size: 0.9rem;
     }
-    
+
     .breadcrumb-item {
       display: flex;
       align-items: center;
       color: #94a3b8;
     }
-    
+
     .breadcrumb-item:not(:last-child)::after {
       content: "›";
       margin: 0 8px;
       color: #64748b;
       font-weight: bold;
     }
-    
+
     .breadcrumb-link {
       color: #cbd5e1;
       text-decoration: none;
@@ -737,32 +799,32 @@
       transition: all 0.3s ease;
       font-weight: 500;
     }
-    
+
     .breadcrumb-item:not(.active) .breadcrumb-link:hover {
       color: #A855F7;
       background: rgba(168, 85, 247, 0.1);
     }
-    
+
     .breadcrumb-item.active .breadcrumb-link {
       color: #00E38C;
       font-weight: 600;
     }
-    
+
     /* Responsividade para breadcrumbs */
     @media (max-width: 768px) {
       .breadcrumbs-container {
         padding: 6px 0;
         margin-bottom: 15px;
       }
-      
+
       .breadcrumbs {
         padding: 0 15px;
       }
-      
+
       .breadcrumb-list {
         font-size: 0.85rem;
       }
-      
+
       .breadcrumb-item:not(:last-child)::after {
         margin: 0 6px;
       }
@@ -804,62 +866,6 @@
         padding-top: 1rem !important;
       }
     }
-
-    /* Auto-ajuste centralizado da imagem da Mega-Sena */
-    .megasena-logo-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      position: relative;
-    }
-    
-    .megasena-logo {
-      max-width: 240px;
-      min-width: 96px;
-      height: auto;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
-      margin-left: 15px !important;
-      margin-bottom: -8px;
-      transition: all 0.3s ease;
-      vertical-align: bottom;
-      transform: translateX(15px);
-    }
-    
-    /* Responsividade total para mobile e tablet */
-    @media (max-width: 640px) {
-      .megasena-logo {
-        max-width: 144px;
-        min-width: 72px;
-        height: 58px;
-      }
-    }
-    
-    @media (min-width: 641px) and (max-width: 768px) {
-      .megasena-logo {
-        max-width: 180px;
-        min-width: 84px;
-        height: 77px;
-      }
-    }
-    
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .megasena-logo {
-        max-width: 216px;
-        min-width: 96px;
-        height: 96px;
-      }
-    }
-    
-    @media (min-width: 1025px) {
-      .megasena-logo {
-        max-width: 240px;
-        min-width: 120px;
-        height: 115px;
-      }
-    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
@@ -878,10 +884,10 @@
         </div>
       </div>
       <div class="dropdown">
-        <a href="#" class="dropdown-toggle active"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+        <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
         <div class="dropdown-content">
           <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium_MS" class="active"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+          <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
         </div>
       </div>
       <div class="dropdown">
@@ -930,43 +936,43 @@
     </div>
     <ul>
       <li><a href="/"><i class="fa fa-home"></i> Início</a></li>
-              <li>
-          <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
-          <div class="mobile-dropdown">
-            <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-            <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          </div>
-        </li>
-        <li>
-          <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
-          <div class="mobile-dropdown">
-            <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-            <a href="/aposta_inteligente_premium_MS" class="active"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          </div>
-        </li>
-        <li>
-          <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
-          <div class="mobile-dropdown">
-            <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-            <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          </div>
-        </li>
-        <li>
-          <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
-          <div class="mobile-dropdown">
-            <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          </div>
-        </li>
-        <li>
-                  <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-hashtag"></i> Quina ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_quina" class="active"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
         <div class="mobile-dropdown">
           <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
           <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
-        </li>
-        <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-        <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+      </li>
+      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
+      <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
     </ul>
   </nav>
 
@@ -975,7 +981,7 @@
                     <nav class="breadcrumbs" aria-label="Breadcrumb">
                         <ol class="breadcrumb-list">
                             <li class="breadcrumb-item">
-                                <a href="#" class="breadcrumb-link">🎰 Mega Sena</a>
+                                <a href="#" class="breadcrumb-link">🎲 Lotofácil</a>
                             </li>
                             <li class="breadcrumb-item active">
                                 <span class="breadcrumb-link">📊 Inteligência Estatística</span>
@@ -987,12 +993,12 @@
   <!-- Header -->
   <header class="flex justify-between items-center mb-8">
     <!-- Título deslocado para a direita -->
-    <div class="flex-1 text-center megasena-logo-container">
-      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex justify-center items-center">
-        <img src="/static/img/MegaSena.png" alt="Mega Sena" class="megasena-logo">
+    <div class="flex-1 text-center lotofacil-logo-container">
+      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex justify-center items-end">
+                    <img src="/static/img/Lotofacil.png" alt="Lotofácil" class="lotofacil-logo">
       </h1>
     </div>
-    
+
     <!-- Logo no lado direito -->
     <div class="flex justify-end items-center">
       <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
@@ -1002,7 +1008,7 @@
   <!-- Conteúdo Premium será adicionado aqui -->
   <div class="container mx-auto">
     <h2 class="text-2xl font-bold text-white mb-6 text-center">🎯 Aposta Inteligente Premium</h2>
-    
+
     <!-- Conteúdo será adicionado posteriormente -->
     <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-md">
       <div class="bloco-texto-aposta">
@@ -1014,11 +1020,11 @@
         </p>
       </div>
     </div>
-    
+
     <!-- Bloco Explicativo com Passo a Passo -->
     <div class="mt-8 bg-[#1A1D25] p-6 rounded-2xl shadow-md">
       <h3 class="text-xl font-bold text-white mb-6 text-center">📘 Como usar a aposta inteligente:</h3>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- Passo 1: Frequência -->
         <div id="passo1" class="bg-[#2E303A] p-4 rounded-xl">
@@ -1093,7 +1099,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Botão principal do Machine Learning - NO FINAL -->
     <div id="passo6" class="mt-8 text-center">
       <div class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] p-1 rounded-xl inline-block">
@@ -1126,16 +1132,12 @@
       <h3 class="text-xl font-bold mb-6 text-center text-[#00E38C]">🎲 Configurar Aposta Aleatória</h3>
 
       <div class="mb-5">
-        <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (6-20)</label>
-        <input type="range" id="sliderNumeros" min="6" max="20" value="6" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
-        <span id="valorNumeros" class="block text-center text-lg font-bold mt-2 text-[#00E38C]">6</span>
+        <label for="sliderNumeros" class="block text-gray-300 text-sm font-semibold mb-2">Quantos números principais? (15-20)</label>
+        <input type="range" id="sliderNumeros" min="15" max="20" value="15" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
+        <span id="valorNumeros" class="block text-center text-lg font-bold mt-2 text-[#00E38C]">15</span>
       </div>
 
-      <div class="mb-8">
-        <label for="sliderTrevos" class="block text-gray-300 text-sm font-semibold mb-2">🍀 Quantos números para Trevos? (2-6)</label>
-        <input type="range" id="sliderTrevos" min="2" max="6" value="2" class="w-full h-2 bg-[#2E303A] rounded-lg appearance-none cursor-pointer range-lg">
-        <span id="valorTrevos" class="block text-center text-lg font-bold mt-2 text-[#8B5CF6]">2</span>
-      </div>
+
 
       <div class="flex justify-end space-x-4">
         <button id="btnCancelarModal" class="bg-gray-600 text-white px-4 py-2 rounded-xl font-semibold hover:opacity-80 transition-all">Cancelar</button>
@@ -1146,7 +1148,7 @@
 
   <!-- Modal Premium - Análise Estatística Premium -->
   <div id="modal-premium" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
-    <div class="bg-[#1A1D25] rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-white relative">
+    <div class="bg-[#1A1D25] rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto text-white relative" style="border: 2px solid #8B5CF6; box-shadow: 0 0 8px rgba(139,92,246,0.85), 0 0 16px rgba(139,92,246,0.55), 0 0 24px rgba(139,92,246,0.35), 0 12px 28px rgba(0,0,0,0.6);">
         <h3 class="text-[#00E38C] text-2xl font-semibold mb-4 text-center">🎯 Gerar Aposta Inteligente (Premium)</h3>
 
         <p class="text-gray-300 text-sm mb-4">Revise e ajuste os parâmetros selecionados nas análises. Estes serão usados para gerar sua aposta inteligente:</p>
@@ -1175,7 +1177,7 @@
         </button>
 
         <div id="resultado-sugestao" class="bg-[#2E303A] p-4 rounded-md mt-6 hidden">
-            <h4 class="text-[#00E38C] text-xl font-semibold mb-3 text-center">🎯 Sua Aposta Sugerida da Mega Sena:</h4>
+            <h4 class="text-[#00E38C] text-xl font-semibold mb-3 text-center">🎯 Sua Aposta Sugerida da Quina:</h4>
             <div id="lista-apostas-geradas" class="space-y-4">
             </div>
         </div>
@@ -1204,7 +1206,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Botão de ativação do Tour -->
   <button id="tour-activate" class="fixed top-20 right-4 bg-[#00E38C] hover:bg-[#00C973] text-black px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-200 hover:scale-105">
     🎯 Tour Guiado
@@ -1373,13 +1375,13 @@
     function showCompletionMessage() {
       const tip = document.getElementById('tour-tip');
       const content = document.getElementById('tour-content');
-      
+
       content.innerHTML = '<strong>🎉 Tour Concluído!</strong><br><br>Agora você conhece todas as funcionalidades da nossa Inteligência Estatística Premium. Comece a explorar e transforme suas apostas com dados e algoritmos avançados!';
-      
+
       document.getElementById('tour-prev').style.display = 'none';
       document.getElementById('tour-next').style.display = 'none';
       document.getElementById('tour-skip').textContent = 'Fechar';
-      
+
       // Centralizar a mensagem
       const tipRect = tip.getBoundingClientRect();
       tip.style.left = (window.innerWidth / 2) - (tipRect.width / 2) + 'px';
@@ -1456,7 +1458,7 @@
       gerarNumeros();
       gerarTrevos();
       carregarEstatisticasRapidas();
-      
+
       // Removido: chamada automática de atualizarAnaliseFrequencia()
       // A função será chamada apenas quando o modal for aberto
     }
@@ -1468,7 +1470,7 @@
       // DOM já carregado, aguarda estilos
       window.addEventListener('load', inicializarAplicacao);
     }
-    
+
 
 
     // Gerar números de 1 a 50 - DESABILITADO NA PÁGINA PREMIUM
@@ -1498,7 +1500,7 @@
         }, 100);
         return;
       }
-      
+
       if (numerosSelecionados.includes(numero)) {
         numerosSelecionados = numerosSelecionados.filter(n => n !== numero);
         elemento.classList.remove('selecionado');
@@ -1534,7 +1536,7 @@
         }, 100);
         return;
       }
-      
+
       if (trevosSelecionados.includes(trevo)) {
         trevosSelecionados = trevosSelecionados.filter(t => t !== trevo);
         elemento.classList.remove('selecionado');
@@ -1580,7 +1582,7 @@
           style: 'currency',
           currency: 'BRL'
         }).format(valor);
-        
+
         container.innerHTML = `
           <div class="bg-[#00E38C] text-black p-3 rounded-xl font-bold text-lg mb-2">
             ${valorFormatado}
@@ -1601,7 +1603,7 @@
     function calcularEAtualizarValorAposta() {
       const qtdeNum = numerosSelecionados.length;
       const qtdeTrevos = trevosSelecionados.length;
-      
+
       // Só calcular se tiver seleção mínima (6 números + 2 trevos)
       if (qtdeNum >= 6 && qtdeTrevos >= 2) {
         // Tabela de preços simplificada para seleção manual
@@ -1642,10 +1644,10 @@
           "12,5": {apostas: 9240, valor: 55440.00},
           "12,6": {apostas: 13860, valor: 83160.00}
         };
-        
+
         const chave = `${qtdeNum},${qtdeTrevos}`;
         const infoAposta = tabelaPrecos[chave];
-        
+
         if (infoAposta) {
           atualizarValorAposta(infoAposta.valor, infoAposta.apostas, qtdeNum, qtdeTrevos);
         } else {
@@ -1673,14 +1675,14 @@
       popups.forEach(popup => {
         popup.style.display = 'none';
       });
-      
+
       // Usar modal genérico para todos
       const modal = document.getElementById('modal');
       const titulo = document.getElementById('titulo-modal');
       const conteudo = document.getElementById('conteudo-modal');
-      
+
       modal.classList.remove('hidden');
-      
+
       switch(tipo) {
         case 'frequencia':
           titulo.textContent = '📊 Análise de Frequência';
@@ -1763,12 +1765,12 @@
     function renderizarNumerosQuentesFrios(data) {
       const numerosQuentes = data.numeros_quentes_frios?.numeros_quentes || [];
       const numerosFrios = data.numeros_quentes_frios?.numeros_frios || [];
-      
+
       return {
-        quentes: numerosQuentes.slice(0, 10).map(n => 
+        quentes: numerosQuentes.slice(0, 10).map(n =>
           `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
         ).join(''),
-        frios: numerosFrios.slice(0, 10).map(n => 
+        frios: numerosFrios.slice(0, 10).map(n =>
           `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
         ).join('')
       };
@@ -1779,9 +1781,9 @@
       container.innerHTML = "🔄 Carregando análise de frequência...";
 
       try {
-        const response = await fetch('/api/analise-frequencia-MS?qtd_concursos=500');
+        const response = await fetch('/api/analise-frequencia-lotofacil-v2?qtd_concursos=400');
         const data = await response.json();
-        
+
         console.log('Dados recebidos em carregarAnaliseFrequencia:', data);
 
         if (data.error) {
@@ -1790,7 +1792,7 @@
         }
 
         const numerosRenderizados = renderizarNumerosQuentesFrios(data);
-        
+
         container.innerHTML = `
           <div class="space-y-6">
             <!-- Cabeçalho com título e ajuda -->
@@ -1800,7 +1802,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="350">Últimos 350 concursos</option>
+                    <option value="300">Últimos 300 concursos</option>
                     <option value="25">Últimos 25 concursos</option>
                     <option value="50">Últimos 50 concursos</option>
                     <option value="100">Últimos 100 concursos</option>
@@ -1813,26 +1815,26 @@
                 ❓
               </button>
             </div>
-            
+
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
                 ${numerosRenderizados.quentes}
               </div>
             </div>
-            
+
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
                 ${numerosRenderizados.frios}
               </div>
             </div>
-            
+
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Frequência Absoluta  vs  Relativa <span style="color: red;">(%)</span>  </h3>
               <div id="grafico-frequencia" class="grafico-frequencia-container"></div>
             </div>
-            
+
             <div class="chart-container">
               <h3 class="titulo-matriz">🔢 Matriz Visual dos Últimos Concursos</h3>
               <div class="matriz-info">
@@ -1844,7 +1846,7 @@
               </div>
               <div id="matriz-frequencia" class="matriz-container"></div>
             </div>
-            
+
             <!-- SUGESTÕES PARA APOSTA PREMIUM -->
             <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
               <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
@@ -1862,7 +1864,7 @@
                 <div class="flex items-center">
                   <label for="freq-periodo" class="text-white">Considerar período:</label>
                   <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
-                    <option value="350">Últimos 350 Concursos</option>
+                    <option value="300">Últimos 300 Concursos</option>
                     <option value="25">Últimos 25 Concursos</option>
                     <option value="50">Últimos 50 Concursos</option>
                   </select>
@@ -1875,13 +1877,15 @@
             </div>
           </div>
         `;
-        
+
         // Criar gráfico combinado: Absoluta vs Relativa
-        const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
-        const yFreqAbs = data.frequencia_absoluta_numeros.map(e => e.frequencia);
-        const yFreqRelComb = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperadaComb = Array(60).fill(2); // Linha de referência 2%
-        
+        const freqAbsObj = (data?.frequencia_absoluta?.numeros) || {};
+        const freqRelObj = (data?.frequencia_relativa?.numeros) || {};
+        const xNumeros = Object.keys(freqAbsObj).map(n=>Number(n)).sort((a,b)=>a-b);
+        const yFreqAbs = xNumeros.map(n => freqAbsObj[n] ?? 0);
+        const yFreqRelComb = xNumeros.map(n => freqRelObj[n] ?? 0);
+        const linhaEsperadaComb = Array(25).fill((15/25)*100/15); // referência proporcional (aprox 4%)
+
         // Detectar se é smartphone para ajustar tamanho da fonte
         const isMobile = window.innerWidth <= 640;
         const fontSize = isMobile ? 6 : 12; // 6px para mobile, 12px para desktop
@@ -1927,21 +1931,21 @@
           autosize: true,
           responsive: true,
           // Reduzir as margens ao mínimo necessário para os rótulos dos eixos
-          margin: { 
+          margin: {
             l: 25, // Margem esquerda mínima
             r: 25, // Margem direita mínima
             b: 70, // Ajuste para acomodar rótulos inclinados do eixo X
             t: 40, // Margem superior
             pad: 0 // Sem padding extra interno ao gráfico
           },
-          xaxis: { 
+          xaxis: {
             automargin: true,
             // CHAVE PARA OS RÓTULOS SOBREPOSTOS:
             tickangle: 45, // Incline os rótulos em 45 graus
             tickfont: { size: 8 }, // Diminua o tamanho da fonte dos rótulos para que caibam melhor
             // showgrid: false // Remover grade vertical para menos poluição visual se não for essencial
           },
-          yaxis: { 
+          yaxis: {
             automargin: true,
             title: {
               text: 'Abs.', // Título do eixo Y mais curto para economizar espaço
@@ -1949,7 +1953,7 @@
             },
             tickfont: { size: 9 } // Fonte menor para os rótulos do eixo Y
           },
-          yaxis2: { 
+          yaxis2: {
             side: 'right',
             overlaying: 'y',
             automargin: true,
@@ -1986,7 +1990,7 @@
       }
     }
 
-    // Mock JS com dados fictícios da Mega Sena (até conectar com a API real)
+            // Mock JS com dados fictícios da Quina (até conectar com a API real)
     const concursosMock = [
       { concurso: 1, numeros: [12, 23, 35, 44, 46, 50] },
       { concurso: 2, numeros: [3, 15, 21, 33, 42, 49] },
@@ -2011,7 +2015,7 @@
       console.log('Tipo de concursos:', typeof concursos);
       console.log('É array?', Array.isArray(concursos));
       console.log('Quantidade de concursos:', concursos ? concursos.length : 'N/A');
-      
+
       const container = document.getElementById('matriz-frequencia');
       if (!container) {
         console.error('Elemento matriz-frequencia não encontrado');
@@ -2029,21 +2033,21 @@
       let concursosProcessados = 0;
       // Inverter a ordem dos concursos para mostrar mais recente no topo
       const concursosInvertidos = [...concursos].reverse();
-      
+
       concursosInvertidos.forEach((concurso, index) => { // Itera por cada concurso
         console.log(`Processando concurso ${index + 1}:`, concurso);
-        
+
         if (!concurso.numeros || !Array.isArray(concurso.numeros)) {
           console.error(`Concurso ${index + 1} sem dados válidos:`, concurso);
           return;
         }
-        
+
         // --- UMA ÚNICA LINHA POR CONCURSO ---
         const linhaConcurso = document.createElement('div');
         linhaConcurso.className = 'linha-concurso';
-        
-        // Adicionar todos os 60 números na mesma linha (Mega Sena)
-        for (let i = 1; i <= 60; i++) {
+
+        // Adicionar todos os 25 números na mesma linha (Lotofácil)
+        for (let i = 1; i <= 25; i++) {
           const celula = document.createElement('div');
           celula.className = 'celula-numero';
           celula.textContent = i;
@@ -2052,19 +2056,19 @@
           }
           linhaConcurso.appendChild(celula);
         }
-        
+
         container.appendChild(linhaConcurso);
         concursosProcessados++;
         console.log(`Concurso ${index + 1} processado com sucesso. Total processados: ${concursosProcessados}`);
       });
       console.log('Matriz montada com sucesso!');
-      
+
       // Atualizar contador de concursos
       const contadorElement = document.getElementById('matriz-concursos-count');
       if (contadorElement) {
         contadorElement.textContent = `${concursosProcessados} concursos exibidos`;
       }
-      
+
       // Configuração adicional para melhor experiência de scroll
       const matrizContainer = document.getElementById('matriz-frequencia');
       if (matrizContainer) {
@@ -2081,16 +2085,16 @@
       const janelaElement = document.getElementById('janela-analise');
       const janela = janelaElement ? janelaElement.value : '500'; // Valor padrão se elemento não existir
       const container = document.getElementById('conteudo-modal');
-      
+
       container.innerHTML = "🔄 Atualizando análise...";
 
       try {
         // Garantir que sempre envie o parâmetro qtd_concursos, mesmo que seja 500
-        const url = `/api/analise-frequencia-MS?qtd_concursos=${janela}`;
+        const url = `/api/analise-frequencia-lotofacil-v2?qtd_concursos=${janela}`;
         console.log('Fazendo requisição para:', url);
         const response = await fetch(url);
         const data = await response.json();
-        
+
         console.log('Dados recebidos da API:', data);
         console.log('data.concursos_para_matriz:', data.concursos_para_matriz);
         console.log('Tamanho de data.concursos_para_matriz:', data.concursos_para_matriz ? data.concursos_para_matriz.length : 'N/A');
@@ -2110,7 +2114,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="atualizarAnaliseFrequencia()">
-                    <option value="350" ${janela === '' || janela === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
+                    <option value="300" ${janela === '' || janela === '300' ? 'selected' : ''}>Últimos 300 concursos</option>
                     <option value="25" ${janela === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${janela === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${janela === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -2123,30 +2127,30 @@
                 ❓
               </button>
             </div>
-            
+
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_quentes_frios.numeros_quentes.slice(0, 10).map(n => 
+                ${data.numeros_quentes_frios.numeros_quentes.slice(0, 10).map(n =>
                   `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
                 ).join('')}
               </div>
             </div>
-            
+
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_quentes_frios.numeros_frios.slice(0, 10).map(n => 
+                ${data.numeros_quentes_frios.numeros_frios.slice(0, 10).map(n =>
                   `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
                 ).join('')}
               </div>
             </div>
-            
+
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Frequência Absoluta  vs  Relativa <span style="color: red;">(%)</span>  </h3>
               <div id="grafico-frequencia" class="grafico-frequencia-container"></div>
             </div>
-            
+
             <h3 class="titulo-matriz">🔢 Matriz Visual dos Últimos Concursos</h3>
             <div class="matriz-info">
               <span id="matriz-concursos-count" class="text-sm text-gray-400">Carregando...</span>
@@ -2156,7 +2160,7 @@
               </div>
             </div>
             <div id="matriz-frequencia" class="matriz-container"></div>
-            
+
             <!-- SUGESTÕES PARA APOSTA PREMIUM -->
             <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
               <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
@@ -2164,17 +2168,17 @@
                 <div class="flex items-center">
                   <input type="checkbox" id="freq-priorizar-quentes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarQuentes" data-pref-period="completa">
                   <label for="freq-priorizar-quentes" class="text-white">Priorizar Números MAIS Frequentes</label>
-                  <input type="number" id="freq-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="60">
+                  <input type="number" id="freq-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="25">
                 </div>
                 <div class="flex items-center">
                   <input type="checkbox" id="freq-priorizar-frios" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarFrios" data-pref-period="completa">
                   <label for="freq-priorizar-frios" class="text-white">Priorizar Números MENOS Frequentes</label>
-                  <input type="number" id="freq-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="60">
+                  <input type="number" id="freq-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="25">
                 </div>
                 <div class="flex items-center">
                   <label for="freq-periodo" class="text-white">Considerar período:</label>
                   <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
-                    <option value="350">Últimos 350 Concursos</option>
+                    <option value="300">Últimos 300 Concursos</option>
                     <option value="25">Últimos 25 Concursos</option>
                     <option value="50">Últimos 50 Concursos</option>
                   </select>
@@ -2187,13 +2191,15 @@
             </div>
           </div>
         `;
-        
+
         // Criar gráfico combinado: Absoluta vs Relativa
-        const xNumeros = data.frequencia_absoluta_numeros.map(e => e.numero);
-        const yFreqAbs = data.frequencia_absoluta_numeros.map(e => e.frequencia);
-        const yFreqRelComb = data.frequencia_relativa_numeros.map(e => e.frequencia);
-        const linhaEsperadaComb = Array(60).fill(2); // Linha de referência 2%
-        
+        const freqAbsObj2 = (data?.frequencia_absoluta?.numeros) || {};
+        const freqRelObj2 = (data?.frequencia_relativa?.numeros) || {};
+        const xNumeros = Object.keys(freqAbsObj2).map(n=>Number(n)).sort((a,b)=>a-b);
+        const yFreqAbs = xNumeros.map(n => freqAbsObj2[n] ?? 0);
+        const yFreqRelComb = xNumeros.map(n => freqRelObj2[n] ?? 0);
+        const linhaEsperadaComb = Array(25).fill((15/25)*100/15); // referência proporcional (aprox 4%)
+
         // Detectar se é smartphone para ajustar tamanho da fonte
         const isMobile = window.innerWidth <= 640;
         const fontSize = isMobile ? 6 : 12; // 6px para mobile, 12px para desktop
@@ -2239,25 +2245,25 @@
           autosize: true,
           responsive: true,
           // Reduzir as margens ao mínimo necessário para os rótulos dos eixos
-          margin: { 
+          margin: {
             l: 25, // Margem esquerda mínima
             r: 25, // Margem direita mínima
             b: 70, // Ajuste para acomodar rótulos inclinados do eixo X
             t: 40, // Margem superior
             pad: 0 // Sem padding extra interno ao gráfico
           },
-          xaxis: { 
+          xaxis: {
             automargin: true,
             // CHAVE PARA OS RÓTULOS SOBREPOSTOS:
             tickangle: 45, // Incline os rótulos em 45 graus
             tickfont: { size: 8 }, // Diminua o tamanho da fonte dos rótulos para que caibam melhor
             // showgrid: false // Remover grade vertical para menos poluição visual se não for essencial
-            range: [0, 61], // Força o range de 1-60
+            range: [0, 26], // Força o range de 1-25
             tickmode: 'linear',
             tick0: 1,
             dtick: 5
           },
-          yaxis: { 
+          yaxis: {
             automargin: true,
             title: {
               text: 'Abs.', // Título do eixo Y mais curto para economizar espaço
@@ -2265,7 +2271,7 @@
             },
             tickfont: { size: 9 } // Fonte menor para os rótulos do eixo Y
           },
-          yaxis2: { 
+          yaxis2: {
             side: 'right',
             overlaying: 'y',
             automargin: true,
@@ -2291,14 +2297,14 @@
           console.log('Tentando carregar matriz...');
           console.log('data.concursos_para_matriz:', data.concursos_para_matriz);
           console.log('concursosMock:', concursosMock);
-          
+
           if (data.concursos_para_matriz && Array.isArray(data.concursos_para_matriz) && data.concursos_para_matriz.length > 0) {
             console.log('Usando dados reais da API para matriz');
             montarMatriz(data.concursos_para_matriz);
           } else {
             console.log('Dados reais não disponíveis, tentando novamente...');
             // Se não temos dados reais, tentar fazer uma nova requisição específica para a matriz
-            fetch(`/api/analise-frequencia-MS?qtd_concursos=${janela || '500'}`)
+            fetch(`/api/analise-frequencia-lotofacil-v2?qtd_concursos=${janela || '400'}`)
               .then(response => response.json())
               .then(dataRetry => {
                 if (dataRetry.concursos_para_matriz && Array.isArray(dataRetry.concursos_para_matriz) && dataRetry.concursos_para_matriz.length > 0) {
@@ -2324,7 +2330,7 @@
           frequencia_completa: data.frequencia_completa,
           timestamp: new Date().toISOString()
         };
-        
+
         armazenarAnalise('frequencia', dadosFrequencia);
         console.log('✅ Dados de frequência salvos no localStorage');
 
@@ -2375,14 +2381,14 @@
 
       try {
         console.log("Iniciando fetch para /api/analise_de_distribuicao...");
-        const url = qtdConcursos ? `/api/analise_de_distribuicao-MS?qtd_concursos=${qtdConcursos}` : '/api/analise_de_distribuicao-MS';
+        const url = qtdConcursos ? `/api/analise_de_distribuicao-lotofacil?qtd_concursos=${qtdConcursos}` : '/api/analise_de_distribuicao-lotofacil';
         const response = await fetch(url);
         console.log("Response status:", response.status);
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         console.log("Dados recebidos:", data);
         console.log("Tipo de data:", typeof data);
@@ -2412,7 +2418,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectDistribuicaoPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateDistribuicaoModal()">
-                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
+                    <option value="300" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '300' ? 'selected' : ''}>Últimos 300 concursos</option>
                     <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
@@ -2422,22 +2428,22 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="distribuicaoPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 350 concursos.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 300 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaDistribuicao()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar estes gráficos?">
                 ❓
               </button>
             </div>
-            
+
             <!-- Gráfico de Paridade - Números Principais -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔢 Paridade - Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-paridade-numeros" style="height: 400px;"></div>
             </div>
-            
 
-            
+
+
             <!-- Estatísticas de Paridade -->
             <div class="grid grid-cols-1 gap-4">
               <div class="stat-card p-4">
@@ -2446,15 +2452,15 @@
                 <p class="text-sm text-gray-400">Média de Ímpares: <span class="text-[#00E38C]">${data.paridade.numeros_principais.media_impares.toFixed(2)}</span></p>
               </div>
             </div>
-            
+
             <!-- Gráfico de Soma - Números Principais -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Soma dos Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-soma-numeros" style="height: 400px;"></div>
             </div>
-            
 
-            
+
+
             <!-- Estatísticas de Soma -->
             <div class="grid grid-cols-1 gap-4">
               <div class="stat-card p-4">
@@ -2465,13 +2471,13 @@
                 <p class="text-sm text-gray-400">Moda: <span class="text-[#00E38C]">${data.soma_dos_numeros.numeros_principais.moda}</span></p>
               </div>
             </div>
-            
+
             <!-- Gráfico de Amplitude - Números Principais -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📏 Amplitude dos Números Principais${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
               <div id="grafico-amplitude-numeros" style="height: 400px;"></div>
             </div>
-            
+
             <!-- Estatísticas de Amplitude -->
             <div class="grid grid-cols-1 gap-4">
               <div class="stat-card p-4">
@@ -2482,7 +2488,7 @@
                 <p class="text-sm text-gray-400">Moda: <span class="text-[#00E38C]">${data.amplitude_dos_numeros.moda}</span></p>
               </div>
             </div>
-            
+
             <!-- SUGESTÕES PARA APOSTA PREMIUM -->
             <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
               <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
@@ -2491,7 +2497,7 @@
                   <input type="checkbox" id="dist-priorizar-pares-impares" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="distribuicao" data-pref-name="priorizarParesImpares">
                   <label for="dist-priorizar-pares-impares" class="text-white">Priorizar Paridade (Pares/Ímpares)</label>
                   <select id="dist-paridade-desejada" class="select-premium-pref ml-auto bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="distribuicao" data-pref-name="paridadeDesejada">
-                    <option value="equilibrado">Equilibrada (3 pares/3 ímpares)</option>
+                    <option value="equilibrado">Equilibrada (2 pares/3 ímpares ou 3 pares/2 ímpares)</option>
                     <option value="mais_pares">Mais Pares</option>
                     <option value="mais_impares">Mais Ímpares</option>
                   </select>
@@ -2502,9 +2508,9 @@
                 </div>
                 <div class="flex items-center ml-auto">
                   <label for="dist-soma-min" class="text-gray-300 text-sm mr-2">Soma Min:</label>
-                  <input type="number" id="dist-soma-min" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="100" min="21" max="285">
+                  <input type="number" id="dist-soma-min" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="100" min="15" max="390">
                   <label for="dist-soma-max" class="text-gray-300 text-sm ml-4 mr-2">Soma Max:</label>
-                  <input type="number" id="dist-soma-max" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="200" min="21" max="285">
+                  <input type="number" id="dist-soma-max" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="200" min="15" max="390">
                 </div>
               </div>
               <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
@@ -2523,13 +2529,13 @@
           trevos: data.paridade?.trevos
         });
 
-        // Criar gráficos (apenas para Mega Sena - sem trevos)
+        // Criar gráficos (apenas para Quina - sem trevos)
         criarGraficoParidadeNumeros(data.paridade.numeros_principais.distribuicao);
         criarGraficoSomaNumeros(data.soma_dos_numeros.numeros_principais);
         criarGraficoAmplitude(data.amplitude_dos_numeros);
 
         console.log("Dados de distribuição recebidos:", data);
-        
+
       } catch (error) {
         console.error('Erro ao carregar análise de distribuição:', error);
         container.innerHTML = '<p class="text-center text-red-500 mt-4">Erro ao carregar a análise de distribuição. Verifique o console para detalhes.</p>';
@@ -2548,10 +2554,10 @@
         type: 'bar',
         marker: {
           color: labels.map(label => {
-            // Cores baseadas nas combinações P/I
-            if (label.includes('6P')) return '#4CAF50'; // Mais pares
+            // Cores baseadas nas combinações P/I para Quina (5 números)
+            if (label.includes('5P')) return '#4CAF50'; // Mais pares
             if (label.includes('0P')) return '#F44336'; // Mais ímpares
-            if (label.includes('3P-3I')) return '#2196F3'; // Equilíbrio
+            if (label.includes('2P-3I') || label.includes('3P-2I')) return '#2196F3'; // Equilíbrio
             return '#9C27B0'; // Outros
           })
         }
@@ -2597,7 +2603,7 @@
       }];
 
       const layout = {
-        title: 'Distribuição da Soma dos 6 Números Principais',
+        title: 'Distribuição da Soma dos 5 Números Principais',
         xaxis: { title: 'Soma dos Números', automargin: true },
         yaxis: { title: 'Frequência', automargin: true },
         plot_bgcolor: '#1a1d25',
@@ -2650,7 +2656,7 @@
       }];
 
       const layout = {
-        title: 'Distribuição da Amplitude dos 6 Números Principais',
+        title: 'Distribuição da Amplitude dos 5 Números Principais',
         xaxis: { title: 'Amplitude (Maior - Menor Número)', automargin: true },
         yaxis: { title: 'Frequência', automargin: true },
         plot_bgcolor: '#1a1d25',
@@ -2683,9 +2689,9 @@
       container.innerHTML = "🔄 Carregando análise de afinidades...";
 
       try {
-        let url = '/api/analise_de_combinacoes-MS';
-        // Sempre enviar qtd_concursos, default para '500' se não especificado
-        const qtdToSend = qtdConcursos || '500';
+        let url = '/api/analise_de_combinacoes-lotofacil';
+        // Sempre enviar qtd_concursos, limite máximo 200 para performance
+        const qtdToSend = (qtdConcursos && Number(qtdConcursos) <= 200) ? qtdConcursos : '200';
         url += `?qtd_concursos=${qtdToSend}`;
 
         console.log("=== REQUISIÇÃO AFINIDADES ===");
@@ -2706,7 +2712,7 @@
 
         const afinidades = data.afinidade_entre_numeros;
         const periodoInfo = data.periodo_analisado;
-        
+
         // Debug específico da tabela
         console.log("=== DEBUG TABELA DETALHADA ===");
         console.log("Período solicitado:", qtdConcursos);
@@ -2714,7 +2720,7 @@
         console.log("Pares com maior afinidade:", afinidades.pares_com_maior_afinidade);
         console.log("Primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5));
         console.log("Frequências dos primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5).map(p => p[1]));
-        
+
         // Verificar se os dados estão no formato correto
         if (!afinidades || !afinidades.pares_com_maior_afinidade || !afinidades.numeros_com_maior_afinidade_geral) {
           container.innerHTML = `<p style="color: red;">Erro: Dados de afinidade incompletos ou em formato incorreto.</p>`;
@@ -2730,7 +2736,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-afinidades" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateAfinidadeModal()">
-                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
+                    <option value="200" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '200' ? 'selected' : ''}>Últimos 200 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -2743,12 +2749,12 @@
                 ❓
               </button>
             </div>
-            
+
             <!-- Top 15 Pares com Maior Afinidade -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔗 Pares com Maior Afinidade (Top 15)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${afinidades.pares_com_maior_afinidade.slice(0, 15).map(par => 
+                ${afinidades.pares_com_maior_afinidade.slice(0, 15).map(par =>
                   `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">
                     <div class="text-lg">${par[0][0]} ↔ ${par[0][1]}</div>
                     <div class="text-xs">${par[1]} vezes</div>
@@ -2756,12 +2762,12 @@
                 ).join('')}
               </div>
             </div>
-            
+
             <!-- Top 15 Números com Maior Afinidade Geral -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">⭐ Números com Maior Afinidade Geral (Top 15)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${afinidades.numeros_com_maior_afinidade_geral.slice(0, 15).map(num => 
+                ${afinidades.numeros_com_maior_afinidade_geral.slice(0, 15).map(num =>
                   `<div class="bg-[#8B5CF6] text-white p-3 rounded text-center font-semibold">
                     <div class="text-lg">${num[0]}</div>
                     <div class="text-xs">${num[1]} pts</div>
@@ -2769,7 +2775,7 @@
                 ).join('')}
               </div>
             </div>
-            
+
             <!-- Tabela Detalhada de Pares -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📋 Tabela Detalhada - Pares com Maior Afinidade</h3>
@@ -2796,32 +2802,32 @@
                 </table>
               </div>
             </div>
-            
+
             <!-- Debug da Tabela -->
             <div class="mt-4 p-3 bg-gray-800 rounded text-xs text-gray-300">
-              <strong>Debug Tabela:</strong> 
-              Período: ${qtdConcursos || 'Todos'}, 
-              Total de pares: ${afinidades.pares_com_maior_afinidade.length}, 
+              <strong>Debug Tabela:</strong>
+              Período: ${qtdConcursos || 'Todos'},
+              Total de pares: ${afinidades.pares_com_maior_afinidade.length},
               Primeiros 3 pares: ${afinidades.pares_com_maior_afinidade.slice(0, 3).map(p => `${p[0][0]}-${p[0][1]}(${p[1]})`).join(', ')}
             </div>
-            
+
             <!-- Gráfico de Pares com Maior Afinidade -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Gráfico de Pares com Maior Afinidade</h3>
               <div id="grafico-pares-afinidade" style="height: 400px;"></div>
             </div>
-            
+
             <!-- Gráfico de Números com Maior Afinidade Geral -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📈 Gráfico de Afinidade Geral por Número</h3>
               <div id="grafico-afinidade-geral" style="height: 400px;"></div>
             </div>
-            
+
             <!-- Gráfico de Rede de Afinidade -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🕸️ Rede de Afinidade entre Números</h3>
               <p class="text-sm text-gray-400 mb-4">Visualize as conexões entre números. Linhas mais grossas = maior afinidade</p>
-              
+
               <!-- Legenda das cores -->
               <div class="flex justify-center gap-6 mb-4 text-xs">
                 <div class="flex items-center gap-2">
@@ -2837,15 +2843,15 @@
                   <span class="text-gray-300">Alta afinidade</span>
                 </div>
               </div>
-              
+
               <div id="grafico-rede-afinidade" style="height: 500px;"></div>
             </div>
-            
+
             <!-- Dica Estratégica -->
             <div class="mt-8 p-4 bg-blue-900 bg-opacity-30 rounded-lg text-center text-blue-300 border border-blue-800 shadow">
               <span class="font-semibold">💡 Dica Estratégica:</span> Combine números com forte afinidade e alta conexão geral para aumentar suas chances de formar grupos vencedores!
             </div>
-            
+
             <!-- SUGESTÕES PARA APOSTA PREMIUM -->
             <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
               <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestão para Aposta Inteligente (Afinidades)</h4>
@@ -2868,14 +2874,14 @@
             </div>
           </div>
         `;
-        
+
         // Criar gráfico de pares com maior afinidade
         console.log("Dados de afinidade:", afinidades);
         console.log("Pares com maior afinidade:", afinidades.pares_com_maior_afinidade);
         console.log("Primeiro par:", afinidades.pares_com_maior_afinidade[0]);
         console.log("Tipo do primeiro par:", typeof afinidades.pares_com_maior_afinidade[0]);
         console.log("É array?", Array.isArray(afinidades.pares_com_maior_afinidade[0]));
-        
+
         // Verificar se há dados válidos para o gráfico
         if (afinidades.pares_com_maior_afinidade && afinidades.pares_com_maior_afinidade.length > 0) {
           const paresLabels = afinidades.pares_com_maior_afinidade.slice(0, 15).map((par, index) => {
@@ -2891,7 +2897,7 @@
               return `Erro-${index}`;
             }
           });
-          
+
           const paresValues = afinidades.pares_com_maior_afinidade.slice(0, 15).map((par, index) => {
             if (Array.isArray(par) && par.length >= 2 && Array.isArray(par[0])) {
               return par[1];
@@ -2903,7 +2909,7 @@
               return 0;
             }
           });
-          
+
           console.log("Labels dos pares:", paresLabels);
           console.log("Valores dos pares:", paresValues);
 
@@ -2930,49 +2936,64 @@
         }
 
         // Criar gráfico de afinidade geral por número
-        const numerosLabels = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[0]);
-        const numerosValues = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[1]);
+        console.log("=== DEBUG GRÁFICO AFINIDADE GERAL ===");
+        console.log("Dados de afinidade geral:", afinidades.numeros_com_maior_afinidade_geral);
+        console.log("Tipo:", typeof afinidades.numeros_com_maior_afinidade_geral);
+        console.log("É array?", Array.isArray(afinidades.numeros_com_maior_afinidade_geral));
+        console.log("Tamanho:", afinidades.numeros_com_maior_afinidade_geral ? afinidades.numeros_com_maior_afinidade_geral.length : 'undefined');
 
-        Plotly.newPlot('grafico-afinidade-geral', [{
-          x: numerosLabels,
-          y: numerosValues,
-          type: 'bar',
-          marker: { color: '#8B5CF6' }
-        }], {
-          title: 'Afinidade Geral por Número',
-          paper_bgcolor: '#1a1a1a',
-          plot_bgcolor: '#1a1a1a',
-          font: { color: 'white' },
-          xaxis: { automargin: true },
-          yaxis: { automargin: true },
-          showlegend: false,
-          autosize: true,
-          responsive: true,
-          margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
-        }, { displayModeBar: false });
+        if (afinidades.numeros_com_maior_afinidade_geral && afinidades.numeros_com_maior_afinidade_geral.length > 0) {
+          const numerosLabels = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[0]);
+          const numerosValues = afinidades.numeros_com_maior_afinidade_geral.slice(0, 20).map(num => num[1]);
+
+          console.log("Labels processados:", numerosLabels);
+          console.log("Values processados:", numerosValues);
+
+          Plotly.newPlot('grafico-afinidade-geral', [{
+            x: numerosLabels,
+            y: numerosValues,
+            type: 'bar',
+            marker: { color: '#8B5CF6' }
+          }], {
+            title: 'Afinidade Geral por Número',
+            paper_bgcolor: '#1a1a1a',
+            plot_bgcolor: '#1a1a1a',
+            font: { color: 'white' },
+            xaxis: { automargin: true },
+            yaxis: { automargin: true },
+            showlegend: false,
+            autosize: true,
+            responsive: true,
+            margin: { l: 40, r: 20, t: 40, b: 40, pad: 5 }
+          }, { displayModeBar: false });
+        } else {
+          console.error("Dados de afinidade geral não encontrados ou vazios");
+          document.getElementById('grafico-afinidade-geral').innerHTML = '<p style="color: red; text-align: center;">Erro: Dados de afinidade geral não encontrados</p>';
+        }
 
         // Criar gráfico de rede de afinidade
         console.log("=== CRIANDO GRÁFICO DE REDE ===");
-        
+
         // Pegar TODOS os pares para a rede (ou usar top 30 se não houver todos_pares_afinidade)
         const todosParesRede = afinidades.todos_pares_afinidade || afinidades.pares_com_maior_afinidade;
         const topParesRede = todosParesRede.slice(0, 30); // Usar top 30 para não sobrecarregar
         console.log("Total de pares disponíveis:", todosParesRede.length);
         console.log("Pares para rede (top 30):", topParesRede.length);
-        
+
         // Criar nós (números únicos)
         const numerosUnicos = new Set();
         topParesRede.forEach(par => {
           numerosUnicos.add(par[0][0]);
           numerosUnicos.add(par[0][1]);
         });
-        
+
         const nodes = Array.from(numerosUnicos).map(num => ({
           id: num,
           label: num.toString(),
+          // Mesmo critério da Quina: tamanho base + score/10
           size: 20 + (afinidades.numeros_com_maior_afinidade_geral.find(n => n[0] === num)?.[1] || 0) / 10
         }));
-        
+
         // Criar arestas (conexões)
         const edges = topParesRede.map((par, index) => ({
           from: par[0][0],
@@ -2980,22 +3001,22 @@
           value: par[1],
           title: `${par[0][0]} ↔ ${par[0][1]}: ${par[1]} vezes`
         }));
-        
+
         console.log("Nós da rede:", nodes);
         console.log("Arestas da rede:", edges);
-        
+
         // Criar dados para Plotly
         const nodeX = [];
         const nodeY = [];
         const nodeText = [];
         const nodeSize = [];
         const nodeColor = [];
-        
+
         // Posicionar nós em círculo
         const radius = 200;
         const centerX = 0;
         const centerY = 0;
-        
+
         nodes.forEach((node, i) => {
           const angle = (i / nodes.length) * 2 * Math.PI;
           nodeX.push(centerX + radius * Math.cos(angle));
@@ -3004,54 +3025,60 @@
           nodeSize.push(node.size);
           nodeColor.push('#00E38C');
         });
-        
+
         // Criar arestas
         const edgeX = [];
         const edgeY = [];
         const edgeWidth = [];
         const edgeColors = [];
-        
+
         // Calcular valores mínimos e máximos para normalização
         const maxFreq = Math.max(...edges.map(e => e.value));
         const minFreq = Math.min(...edges.map(e => e.value));
         const freqRange = maxFreq - minFreq;
-        
+
         console.log("=== DEBUG ESPESSURA DAS LINHAS ===");
         console.log("Frequência máxima:", maxFreq);
         console.log("Frequência mínima:", minFreq);
         console.log("Range de frequências:", freqRange);
-        
+        console.log("Primeiros 5 pares com frequências:", edges.slice(0, 5).map(e => `${e.from}-${e.to}: ${e.value}`));
+
+        // Calcular limiares por tercis para garantir as três classes de cor
+        const freqValuesSorted = edges.map(e => e.value).sort((a, b) => a - b);
+        const q33Idx = Math.floor(freqValuesSorted.length * 0.33);
+        const q66Idx = Math.floor(freqValuesSorted.length * 0.66);
+        const thrLow = freqValuesSorted[q33Idx] ?? minFreq;
+        const thrHigh = freqValuesSorted[q66Idx] ?? maxFreq;
+
         edges.forEach(edge => {
           const fromNode = nodes.find(n => n.id === edge.from);
           const toNode = nodes.find(n => n.id === edge.to);
-          
+
           if (fromNode && toNode) {
             const fromIndex = nodes.indexOf(fromNode);
             const toIndex = nodes.indexOf(toNode);
-            
+
             edgeX.push([nodeX[fromIndex], nodeX[toIndex], null]);
             edgeY.push([nodeY[fromIndex], nodeY[toIndex], null]);
-            
-            // Normalizar a espessura baseada na frequência
-            let normalizedWidth;
-            if (freqRange === 0) {
-              normalizedWidth = 3; // Se todas as frequências são iguais
-            } else {
-              const normalizedFreq = (edge.value - minFreq) / freqRange;
-              normalizedWidth = 2 + (normalizedFreq * 8); // Espessura de 2 a 10
+
+            // Classificação por faixas (baixa, média, alta) com largura fixa por classe
+            let color = '#8B5CF6'; // baixa (roxo)
+            let width = 2;
+            if (edge.value > thrHigh) { // alta (verde)
+              color = '#00E38C';
+              width = 8;
+            } else if (edge.value > thrLow) { // média (laranja)
+              color = '#FFA500';
+              width = 5;
             }
-            
-            edgeWidth.push(normalizedWidth);
-            
-            // Cor baseada na intensidade da afinidade
-            const intensity = (edge.value - minFreq) / freqRange;
-            const color = intensity > 0.7 ? '#00E38C' : intensity > 0.4 ? '#FFA500' : '#8B5CF6';
+
+            edgeWidth.push(width);
             edgeColors.push(color);
-            
-            console.log(`Par ${edge.from}-${edge.to}: Frequência=${edge.value}, Espessura=${normalizedWidth.toFixed(2)}, Cor=${color}`);
+
+            console.log(`Par ${edge.from}-${edge.to}: Frequência=${edge.value}, Espessura=${width.toFixed(2)}, Cor=${color}`);
           }
         });
-        
+
         // Criar trace das arestas
         const edgeTraces = edgeX.map((x, i) => ({
           x: x,
@@ -3066,7 +3093,7 @@
           hovertext: edges[i].title,
           showlegend: false
         }));
-        
+
         // Criar trace dos nós
         const nodeTrace = {
           x: nodeX,
@@ -3083,16 +3110,12 @@
               width: 2
             }
           },
-          textfont: {
-            color: '#000000',
-            size: 12,
-            weight: 'bold'
-          },
+          textfont: { color: '#000000', size: 11, weight: 'bold' },
           hoverinfo: 'text',
           hovertext: nodeText.map((text, i) => `Número ${text}<br>Tamanho: ${nodeSize[i].toFixed(1)}`),
           showlegend: false
         };
-        
+
         // Layout do gráfico
         const layout = {
           title: `Rede de Afinidade ${qtdConcursos ? `(Últimos ${qtdConcursos} concursos)` : '(Análise completa)'}`,
@@ -3116,7 +3139,7 @@
           responsive: true,
           margin: { l: 20, r: 20, t: 40, b: 20, pad: 5 }
         };
-        
+
         // Plotar o gráfico
         Plotly.newPlot('grafico-rede-afinidade', [nodeTrace, ...edgeTraces], layout, { displayModeBar: false });
 
@@ -3139,10 +3162,41 @@
             janela: selectedQtd,
             timestamp: new Date().toISOString()
           };
-          
+
           armazenarAnalise('afinidades', dadosAfinidades);
           console.log('✅ Dados de afinidades salvos no localStorage');
         });
+      }
+    }
+
+    // Exibe concursos que possuem blocos de consecutivos do tamanho solicitado
+    async function verExemplosConsecutivos(tamanho) {
+      try {
+        const select = document.getElementById('janela-analise-sequencias');
+        const qtd = select ? (select.value || '100') : '100';
+        const resp = await fetch(`/api/lotofacil/sequencias/detalhe?tamanho=${tamanho}&qtd_concursos=${qtd}`);
+        const dados = await resp.json();
+        const box = document.getElementById('detalhes-consecutivos');
+        if (!box) return;
+        if (dados.error) {
+          box.classList.remove('hidden');
+          box.innerHTML = `<p class=\"text-red-400\">Erro: ${dados.error}</p>`;
+          return;
+        }
+        const lista = (dados.detalhes || []).map(d => `Concurso ${d.concurso}: ${d.blocos.map(b => '['+b.join(', ')+']').join(' ')}`).join('<br>');
+        box.classList.remove('hidden');
+        box.innerHTML = `
+          <h4 class=\"text-md font-semibold mb-3 text-[#00E38C]\">📜 Exemplos de sequências (${tamanho})</h4>
+          <p class=\"text-sm text-gray-300\">Período analisado: últimos ${qtd} concursos</p>
+          <div class=\"mt-2 text-sm text-gray-200\">${lista || 'Nenhum exemplo encontrado.'}</div>
+        `;
+        box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) {
+        const box = document.getElementById('detalhes-consecutivos');
+        if (box) {
+          box.classList.remove('hidden');
+          box.innerHTML = `<p class=\"text-red-400\">Erro ao buscar exemplos: ${e.message}</p>`;
+        }
       }
     }
 
@@ -3151,7 +3205,7 @@
       container.innerHTML = "🔄 Carregando análise de Sequências...";
 
       try {
-        let url = '/api/analise_padroes_sequencias-MS';
+        let url = '/api/analise_padroes_sequencias-lotofacil';
         if (qtdConcursos !== null && qtdConcursos !== '') {
           url += `?qtd_concursos=${qtdConcursos}`;
         }
@@ -3194,7 +3248,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="janela-analise-sequencias" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSequenciasModal()">
-                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
+                    <option value="300" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '300' ? 'selected' : ''}>Últimos 300 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -3207,7 +3261,7 @@
                 ❓
               </button>
             </div>
-            
+
             <!-- Números Consecutivos -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔢 Números Consecutivos</h3>
@@ -3221,25 +3275,31 @@
                     <p class="text-sm text-gray-300">Maior sequência: <span class="text-[#00E38C] font-bold">${numerosConsecutivos.maior_sequencia_consecutiva || 0} números</span></p>
                   </div>
                 </div>
-                
+
                 <!-- Tipos de Consecutivos -->
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">🎯 Tipos de Consecutivos</h4>
                   <div class="space-y-2">
-                    ${Object.entries(numerosConsecutivos.tipos_consecutivos || {}).map(([tipo, qtd]) => 
-                      `<p class="text-sm text-gray-300">${tipo}: <span class="text-[#00E38C] font-bold">${qtd}</span></p>`
-                    ).join('')}
+                    ${Object.entries(numerosConsecutivos.tipos_consecutivos || {}).map(([tipo, qtd]) => {
+                      const t = Number(tipo);
+                      return `<p class=\"text-sm text-gray-300\">${t}: <span class=\"text-[#00E38C] font-bold\">${qtd}</span>
+                        <a href=\"#\" class=\"ml-2 text-xs text-blue-400 hover:underline\" onclick=\"verExemplosConsecutivos(${t});return false;\">ver</a>
+                      </p>`;
+                    }).join('')}
                   </div>
                 </div>
               </div>
-              
+
+              <!-- Detalhes de concursos por tamanho de consecutivo -->
+              <div id="detalhes-consecutivos" class="mt-4 hidden bg-[#2E303A] p-4 rounded-xl"></div>
+
               <!-- Gráfico de Consecutivos -->
               <div class="mt-6">
                 <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Distribuição de Consecutivos</h4>
                 <div id="grafico-consecutivos" style="height: 400px;"></div>
               </div>
             </div>
-            
+
             <!-- Repetições entre Concursos -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔄 Repetições entre Concursos</h3>
@@ -3252,25 +3312,25 @@
                     <p class="text-sm text-gray-300">Maior sequência sem repetição: <span class="text-[#00E38C] font-bold">${repeticoes.maior_sequencia_sem_repeticao || 0} concursos</span></p>
                   </div>
                 </div>
-                
+
                 <!-- Números que Mais Repetem -->
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">🏆 Números que Mais Repetem</h4>
                   <div class="space-y-2">
-                    ${Object.entries(repeticoes.numeros_que_mais_repetem || {}).slice(0, 5).map(([numero, qtd]) => 
+                    ${Object.entries(repeticoes.numeros_que_mais_repetem || {}).slice(0, 5).map(([numero, qtd]) =>
                       `<p class="text-sm text-gray-300">Número ${numero}: <span class="text-[#00E38C] font-bold">${qtd} vezes</span></p>`
                     ).join('')}
                   </div>
                 </div>
               </div>
-              
+
               <!-- Gráfico de Repetições -->
               <div class="mt-6">
                 <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Histograma de Repetições</h4>
                 <div id="grafico-repeticoes" style="height: 400px;"></div>
               </div>
             </div>
-            
+
             <!-- Intervalos de Ausência -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">⏰ Intervalos de Ausência</h3>
@@ -3283,25 +3343,25 @@
                     <p class="text-sm text-gray-300">Maior intervalo histórico: <span class="text-[#00E38C] font-bold">${intervalos.maior_intervalo_historico ?? 0} concursos</span></p>
                   </div>
                 </div>
-                
+
                 <!-- Números Mais Ausentes -->
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">🚫 Números Mais Ausentes</h4>
                   <div class="space-y-2">
-                    ${((intervalos.numeros_mais_ausentes || [])).slice(0, 10).map(([numero, atraso]) => 
+                    ${((intervalos.numeros_mais_ausentes || [])).slice(0, 10).map(([numero, atraso]) =>
                       `<p class=\"text-sm text-gray-300\">Número ${numero}: <span class=\"text-[#00E38C] font-bold\">${atraso} concursos</span></p>`
                     ).join('')}
                   </div>
                 </div>
               </div>
-              
+
               <!-- Gráfico de Intervalos -->
               <div class="mt-6">
                 <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Distribuição de Intervalos</h4>
                 <div id="grafico-intervalos" style="height: 400px;"></div>
               </div>
             </div>
-            
+
             <!-- Ciclos de Retorno -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔄 Ciclos de Retorno</h3>
@@ -3310,27 +3370,27 @@
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📊 Estatísticas</h4>
                   <div class="space-y-2">
-                    <p class="text-sm text-gray-300">Ciclo médio: <span class="text-[#00E38C] font-bold">${ciclos.ciclo_medio || 0} concursos</span></p>
-                    <p class="text-sm text-gray-300">Ciclo mais comum: <span class="text-[#00E38C] font-bold">${ciclos.ciclo_mais_comum || 0} concursos</span></p>
+                    <p class="text-sm text-gray-300">Ciclo médio: <span class="text-[#00E38C] font-bold">${(ciclos.ciclo_medio_geral ?? 0).toFixed(2)} concursos</span></p>
+                    <p class="text-sm text-gray-300">Ciclo mais comum: <span id="ciclo-moda" class="text-[#00E38C] font-bold">calculando...</span> concursos</p>
                   </div>
                 </div>
-                
+
                 <!-- Números com Ciclos Curtos -->
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">⚡ Números com Ciclos Curtos</h4>
                   <div class="space-y-2">
-                    ${(ciclos.ciclos_curtos || []).slice(0, 5).map(([numero, ciclo]) => 
+                    ${(ciclos.ciclos_curtos || []).slice(0, 5).map(([numero, ciclo]) =>
                       `<p class="text-sm text-gray-300">Número ${numero}: <span class="text-[#00E38C] font-bold">${ciclo.toFixed(1)} concursos</span></p>`
                     ).join('')}
                   </div>
                 </div>
               </div>
-              
+
               <!-- Gráfico de Ciclos -->
               <div class="mt-6">
                 <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📈 Distribuição de Ciclos</h4>
                 <div id="grafico-ciclos" style="height: 400px;"></div>
-                
+
                 <!-- Legenda das Cores -->
                 <div class="mt-4 flex flex-wrap gap-4 justify-center">
                   <div class="flex items-center">
@@ -3351,12 +3411,26 @@
           </div>
         `;
 
+        // Calcular moda de ciclos (mais frequente) e preencher no card
+        try {
+          const porNumero = ciclos.por_numero || {};
+          const todosCiclos = Object.values(porNumero).flatMap(d => d?.ciclos || []);
+          let moda = 0;
+          if (todosCiclos.length) {
+            const freq = {};
+            for (const c of todosCiclos) freq[c] = (freq[c] || 0) + 1;
+            moda = Number(Object.entries(freq).sort((a,b)=>b[1]-a[1])[0][0]);
+          }
+          const modaEl = document.getElementById('ciclo-moda');
+          if (modaEl) modaEl.textContent = isFinite(moda) ? moda : '0';
+        } catch {}
+
         // Criar gráficos
         criarGraficoConsecutivos(numerosConsecutivos);
         criarGraficoRepeticoes(repeticoes);
         criarGraficoIntervalos(intervalos);
         criarGraficoCiclos(ciclos);
-        
+
         // Adicionar seção de sugestões após os gráficos serem criados
         setTimeout(() => {
           const containerDiv = container.querySelector('.space-y-6');
@@ -3412,7 +3486,7 @@
           janela: selectedQtd,
           timestamp: new Date().toISOString()
         };
-        
+
         armazenarAnalise('sequencias', dadosSequencias);
         console.log('✅ Dados de sequências salvos no localStorage');
       });
@@ -3422,7 +3496,7 @@
     function criarGraficoConsecutivos(numerosConsecutivos) {
       const tipos = Object.keys(numerosConsecutivos.tipos_consecutivos || {});
       const valores = Object.values(numerosConsecutivos.tipos_consecutivos || {});
-      
+
       const data = [{
         x: tipos,
         y: valores,
@@ -3449,12 +3523,12 @@
           text: '🔢 Distribuição de Tipos de Consecutivos',
           font: { size: 18, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Tipo de Consecutivo',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 14 }
         },
-        yaxis: { 
+        yaxis: {
           title: 'Quantidade',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -3473,14 +3547,16 @@
       const dados = repeticoes.numeros_que_mais_repetem || {};
       const numeros = Object.keys(dados).slice(0, 10);
       const valores = Object.values(dados).slice(0, 10);
-      
+
       console.log("=== DEBUG GRÁFICO REPETIÇÕES ===");
       console.log("Dados brutos:", dados);
       console.log("Números:", numeros);
       console.log("Valores:", valores);
       console.log("Tipo dos números:", typeof numeros[0]);
       console.log("Primeiros 5 números:", numeros.slice(0, 5));
-      
+      console.log("Range dos números:", Math.min(...numeros.map(Number)), "a", Math.max(...numeros.map(Number)));
+      console.log("Números como strings:", numeros.map(n => String(n)));
+
       const data = [{
         x: numeros.map(n => String(n)),  // Força conversão para string
         y: valores,
@@ -3507,7 +3583,7 @@
           text: '🔄 Números que Mais Repetem',
           font: { size: 18, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Número',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 14 },
@@ -3516,7 +3592,7 @@
           tickvals: numeros,  // Define explicitamente os valores do eixo X
           ticktext: numeros.map(n => `Nº ${n}`)  // Formata os labels
         },
-        yaxis: { 
+        yaxis: {
           title: 'Quantidade de Repetições',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -3535,7 +3611,7 @@
       const dados = intervalos.numeros_mais_ausentes || [];
       const numeros = dados.slice(0, 10).map(item => item[0]);
       const valores = dados.slice(0, 10).map(item => item[1]);
-      
+
       const data = [{
         x: numeros,
         y: valores,
@@ -3562,12 +3638,12 @@
           text: '⏰ Números Mais Ausentes',
           font: { size: 18, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Número',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 14 }
         },
-        yaxis: { 
+        yaxis: {
           title: 'Concursos sem Sair',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -3583,18 +3659,19 @@
 
     function criarGraficoCiclos(ciclos) {
       // Obter dados de ciclos médios para todos os números
-      const ciclo_medio_numeros = ciclos.ciclo_medio_numeros || {};
-      
-      // Criar array completo de 1 a 60
+      const por_numero = ciclos.por_numero || {};
+
+      // Criar array completo de 1 a 25
       const numeros = [];
       const valores = [];
       const cores = [];
-      
-      for (let i = 1; i <= 60; i++) {
+
+      for (let i = 1; i <= 25; i++) {
         numeros.push(i);
-        const ciclo_medio = ciclo_medio_numeros[i] || 0;
+        const dados_numero = por_numero[i] || {};
+        const ciclo_medio = dados_numero.ciclo_medio || 0;
         valores.push(ciclo_medio);
-        
+
         // Classificar por cor baseado no ciclo
         if (ciclo_medio <= 3) {
           cores.push('#00E38C'); // Verde - Ciclos curtos
@@ -3604,7 +3681,12 @@
           cores.push('#EF4444'); // Vermelho - Ciclos longos
         }
       }
-      
+
+      console.log("=== DEBUG GRÁFICO CICLOS ===");
+      console.log("Números:", numeros);
+      console.log("Valores:", valores);
+      console.log("Cores:", cores);
+
       const data = [{
         x: numeros,
         y: valores,
@@ -3631,16 +3713,17 @@
           text: '🔄 Números de Ciclos',
           font: { size: 18, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Número',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 14 },
-          type: 'category',  // Força o eixo X a ser categórico
+          type: 'category',
           tickmode: 'array',
           tickvals: numeros,  // Define explicitamente os valores do eixo X
-          ticktext: numeros  // Mostra apenas os números
+          ticktext: numeros,  // Mostra apenas os números
+          range: [0, 26]
         },
-        yaxis: { 
+        yaxis: {
           title: 'Ciclo Médio (concursos)',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -3659,39 +3742,39 @@
         // Carregar análise de seca
     async function carregarAnaliseSeca(container, qtdConcursos = null) {
       container.innerHTML = `<p class="text-center text-gray-400">🔄 Carregando análise de seca...</p>`;
-      
+
         try {
-          let url = '/api/analise_seca_MS';
+          let url = '/api/analise_seca_lotofacil';
           if (qtdConcursos !== null && qtdConcursos !== '') {
             url += `?qtd_concursos=${qtdConcursos}`;
           }
-          
+
           const response = await fetch(url);
           const data = await response.json();
-        
+
         if (data.error) {
           container.innerHTML = `<p class="text-red-500 text-center">Erro: ${data.error}</p>`;
           return;
         }
-        
+
         const numerosSeca = data.numeros_seca;
-        
+
         if (!numerosSeca) {
           container.innerHTML = `<p class="text-red-500 text-center">Dados de seca incompletos ou não encontrados.</p>`;
           return;
         }
-        
+
         // Preparar dados para exibição
-        const maiorSecaNumeros = numerosSeca.numeros_maior_seca && numerosSeca.numeros_maior_seca.length > 0 
+        const maiorSecaNumeros = numerosSeca.numeros_maior_seca && numerosSeca.numeros_maior_seca.length > 0
           ? `${numerosSeca.numeros_maior_seca[0][0]} (${numerosSeca.numeros_maior_seca[0][1].seca_atual} concursos)`
           : 'N/A';
-        
+
         const recentesNumeros = numerosSeca.numeros_recentes && numerosSeca.numeros_recentes.length > 0
           ? numerosSeca.numeros_recentes.slice(0, 3).join(', ')
           : 'N/A';
-        
 
-        
+
+
         // Criar HTML completo para o modal genérico
         container.innerHTML = `
           <div class="space-y-6">
@@ -3714,7 +3797,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectSecaPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateSecaModal()">
-                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
+                    <option value="300" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '300' ? 'selected' : ''}>Últimos 300 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
                     <option value="100" ${qtdConcursos === '100' ? 'selected' : ''}>Últimos 100 concursos</option>
@@ -3723,7 +3806,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="secaPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 350 concursos.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 300 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaSeca()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
@@ -3731,11 +3814,11 @@
               </button>
             </div>
 
-            <!-- Números da Mega Sena -->
+            <!-- Números da Lotofácil -->
             <div class="grid grid-cols-1 gap-6">
               <!-- Números -->
               <div class="bg-gray-800 p-4 rounded-lg shadow">
-                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Números da Mega Sena (1-60)</h3>
+                <h3 class="text-xl font-semibold text-[#00E38C] mb-4 text-center">Números da Lotofácil (1-25)</h3>
                 <div class="text-gray-300 mb-4">
                   <p class="mb-2"><strong>Em Maior Seca:</strong> <span class="font-bold text-lg text-red-400">${maiorSecaNumeros}</span></p>
                   <p class="mb-2"><strong>Recentemente Sorteados:</strong> <span class="font-bold text-lg text-green-400">${recentesNumeros}</span></p>
@@ -3758,7 +3841,7 @@
             <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#8B5CF6]">
               <h3 class="text-xl font-semibold text-[#8B5CF6] mb-2">Interpretação dos Gráficos de Seca 📊</h3>
               <ul class="list-disc list-inside text-gray-300 ml-4">
-                <li><strong>Eixo X:</strong> Números da Mega Sena (1-60).</li>
+                <li><strong>Eixo X:</strong> Números da Lotofácil (1-25).</li>
                 <li><strong>Eixo Y:</strong> Concursos em que estão sem sair.</li>
                 <li><strong>Barras altas:</strong> Maior tempo de seca.</li>
                 <li><strong>Barras baixas:</strong> Sorteados recentemente.</li>
@@ -3780,7 +3863,7 @@
             <div class="mt-8 text-center text-gray-400">
               <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística histórica. Não garante resultados futuros. Aposte com responsabilidade.</p>
             </div>
-            
+
             <!-- SUGESTÕES PARA APOSTA PREMIUM -->
             <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
               <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
@@ -3807,12 +3890,12 @@
             </div>
           </div>
         `;
-        
+
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
           plotGraficoSecaNumeros(numerosSeca);
         }, 100);
-        
+
       } catch (error) {
         console.error('❌ Erro ao carregar dados de seca:', error);
         console.error('❌ Stack trace:', error.stack);
@@ -3824,7 +3907,7 @@
           const secaNumerosRecentes = document.getElementById('secaNumerosRecentes');
           const secaTrevosMaior = document.getElementById('secaTrevosMaior');
           const secaTrevosRecentes = document.getElementById('secaTrevosRecentes');
-          
+
           if (secaNumerosMaior) secaNumerosMaior.textContent = `Erro: ${error.message}`;
           if (secaNumerosRecentes) secaNumerosRecentes.textContent = `Erro: ${error.message}`;
           if (secaTrevosMaior) secaTrevosMaior.textContent = `Erro: ${error.message}`;
@@ -3832,14 +3915,14 @@
         }
       }
     }
-    
 
-    
+
+
     // Função para atualizar o modal quando o filtro de período é alterado
     function updateSecaModal() {
       const selectElement = document.getElementById('selectSecaPeriodo');
       const selectedQtd = selectElement.value;
-      
+
       // Carregar dados no modal genérico
       const conteudo = document.getElementById('conteudo-modal');
       if (conteudo) {
@@ -3849,13 +3932,13 @@
             janela: selectedQtd,
             timestamp: new Date().toISOString()
           };
-          
+
           armazenarAnalise('seca', dadosSeca);
           console.log('✅ Dados de seca salvos no localStorage');
         });
       }
     }
-    
+
     // Função para abrir popup de ajuda da análise de seca
     function abrirPopupAjudaSeca() {
       document.getElementById("popupAjudaSeca").style.display = "block";
@@ -3864,22 +3947,22 @@
     function fecharPopupAjudaSeca() {
       document.getElementById("popupAjudaSeca").style.display = "none";
     }
-    
+
     // Função para criar gráfico de seca dos números principais
     function plotGraficoSecaNumeros(numerosSeca) {
       if (!numerosSeca || !numerosSeca.seca_por_numero) {
         console.error('Dados de seca dos números não disponíveis');
         return;
       }
-      
+
       // Converter seca_por_numero em arrays para o gráfico
       const secaPorNumero = numerosSeca.seca_por_numero;
-      
-      // Garantir que todos os números de 1-60 estejam presentes
+
+      // Garantir que todos os números de 1-25 estejam presentes
       const labels = [];
       const valores = [];
-      
-      for (let i = 1; i <= 60; i++) {
+
+      for (let i = 1; i <= 25; i++) {
         labels.push(i);
         if (secaPorNumero[i]) {
           valores.push(secaPorNumero[i].seca_atual);
@@ -3887,20 +3970,20 @@
           valores.push(0); // Se não encontrado, assume seca 0
         }
       }
-      
+
       // Cores baseadas na seca (vermelho para maior seca, verde para menor)
       const cores = valores.map(valor => {
         const maxSeca = Math.max(...valores);
         const minSeca = Math.min(...valores);
         const normalized = (valor - minSeca) / (maxSeca - minSeca);
-        
+
         if (normalized > 0.8) return '#EF4444'; // Vermelho (maior seca)
         if (normalized > 0.6) return '#F97316'; // Laranja
         if (normalized > 0.4) return '#EAB308'; // Amarelo
         if (normalized > 0.2) return '#22C55E'; // Verde claro
         return '#00E38C'; // Verde (menor seca)
       });
-      
+
       const data = [{
         x: labels,
         y: valores,
@@ -3922,22 +4005,22 @@
         },
         hovertemplate: '<b>Número %{x}</b><br>Em seca há: %{y} concursos<extra></extra>'
       }];
-      
+
       const layout = {
         title: {
-          text: '🌵 Seca dos Números da Mega Sena (1-60)',
+          text: '🌵 Seca dos Números da Lotofácil (1-25)',
           font: { size: 18, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Número',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 12 },
           tickmode: 'linear',
           tick0: 1,
           dtick: 5,
-          range: [0, 61]  // Força o range de 1-60
+          range: [0, 26]
         },
-        yaxis: { 
+        yaxis: {
           title: 'Concursos em Seca',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -3956,28 +4039,37 @@
           font: { color: 'gray', size: 12 }
         }]
       };
-      
-      Plotly.newPlot('graficoSecaNumeros', data, layout, { 
+
+      Plotly.newPlot('graficoSecaNumeros', data, layout, {
         displayModeBar: false,
         responsive: true
       });
     }
-    
+
 
 
     // Carregar análise de estatísticas avançadas
     async function carregarAnaliseEstatisticasAvancadas(container, qtdConcursos = null) {
+      console.log('🚀 Iniciando carregamento de estatísticas avançadas...');
       container.innerHTML = "🔄 Carregando análise de estatísticas avançadas...";
 
       try {
         // Construir URL com parâmetro de concursos se fornecido
-        let url = '/api/estatisticas_avancadas_MS';
+        let url = '/api/estatisticas_avancadas_lotofacil';
         if (qtdConcursos) {
           url += `?qtd_concursos=${qtdConcursos}`;
         }
 
+        console.log('📡 Fazendo requisição para:', url);
+
         const response = await fetch(url);
+        console.log('📥 Resposta recebida:', response.status, response.statusText);
+
         const data = await response.json();
+        console.log('📊 Dados recebidos:', data);
+        console.log('🔍 Distribuição de números:', data.distribuicao_numeros);
+        console.log('🔍 Tipo da distribuição:', typeof data.distribuicao_numeros);
+        console.log('🔍 É lista?', Array.isArray(data.distribuicao_numeros));
 
         if (data.error) {
           container.innerHTML = `<p style="color: red;">Erro: ${data.error}</p>`;
@@ -4000,7 +4092,7 @@
                 <div class="flex flex-wrap gap-3 items-center">
                   <label class="text-sm text-gray-300">Período:</label>
                   <select id="selectEstatisticasAvancadasPeriodo" class="bg-[#1A1D25] text-white px-3 py-2 rounded-lg border border-gray-600 focus:border-[#00E38C] focus:outline-none" onchange="updateEstatisticasAvancadasModal()">
-                    <option value="350" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '350' ? 'selected' : ''}>Últimos 350 concursos</option>
+                    <option value="300" ${qtdConcursos === '' || !qtdConcursos || qtdConcursos === '300' ? 'selected' : ''}>Últimos 300 concursos</option>
                     <option value="10" ${qtdConcursos === '10' ? 'selected' : ''}>Últimos 10 concursos</option>
                     <option value="25" ${qtdConcursos === '25' ? 'selected' : ''}>Últimos 25 concursos</option>
                     <option value="50" ${qtdConcursos === '50' ? 'selected' : ''}>Últimos 50 concursos</option>
@@ -4010,7 +4102,7 @@
                   <span class="text-xs text-gray-400">(Selecione para atualizar a análise)</span>
                 </div>
                 <div class="mt-2 text-xs text-gray-400" id="estatisticasAvancadasPeriodoDisplay">
-                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 350 concursos.'}
+                  ${qtdConcursos ? `Análise dos últimos ${qtdConcursos} concursos.` : 'Análise dos últimos 300 concursos.'}
                 </div>
               </div>
               <button onclick="abrirPopupAjudaEstatisticasAvancadas()" class="ml-4 bg-red-600 hover:bg-red-700 text-white p-2 rounded-lg transition-colors duration-200" title="Como usar esta análise?">
@@ -4037,7 +4129,7 @@
             <!-- Gráfico de Distribuição -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">📊 Distribuição de Frequência dos Números${qtdConcursos ? ` (Últimos ${qtdConcursos} concursos)` : ''}</h3>
-              
+
               <!-- Controles de Ordenação -->
               <div class="flex justify-center items-center mb-4 gap-4">
                 <span class="text-gray-300 text-sm">Ordenar por:</span>
@@ -4048,16 +4140,16 @@
                   📊 Por Frequência
                 </button>
               </div>
-              
+
               <!-- Estatísticas Rápidas -->
               <div class="text-center text-xs text-gray-400 mb-2">
                 <span id="stats-distribuicao">
-                  Total: <span id="total-numeros">0</span> | 
-                  Média: <span id="media-frequencia">0</span> | 
+                  Total: <span id="total-numeros">0</span> |
+                  Média: <span id="media-frequencia">0</span> |
                   Máximo: <span id="max-frequencia">0</span>
                 </span>
               </div>
-              
+
               <div id="grafico-estatisticas-distribuicao" style="height: 400px;"></div>
             </div>
 
@@ -4090,7 +4182,7 @@
             <!-- Interpretação -->
             <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-[#8B5CF6]">
               <h3 class="text-xl font-semibold text-[#8B5CF6] mb-2">Interpretação das Estatísticas Avançadas 📊</h3>
-              
+
               <div class="mb-4">
                 <h4 class="text-lg font-semibold text-[#8B5CF6] mb-2">🧪 Teste de Aleatoriedade</h4>
                 <p class="text-gray-300 mb-3">
@@ -4108,7 +4200,7 @@
                   🔍 Em outras palavras, esse teste ajuda a descobrir se há algum "sinal escondido" nos sorteios, ou se tudo está mesmo no reino da sorte e do acaso.
                 </p>
               </div>
-              
+
               <div class="border-t border-gray-600 pt-4">
                 <h4 class="text-lg font-semibold text-[#8B5CF6] mb-2">Outras Análises:</h4>
                 <ul class="list-disc list-inside text-gray-300 ml-4">
@@ -4136,7 +4228,7 @@
             <div class="mt-8 text-center text-gray-400">
               <p>⚠️ <strong>Importante:</strong> Esta é uma análise estatística avançada. Não garante resultados futuros. Aposte com responsabilidade.</p>
             </div>
-            
+
             <!-- SUGESTÕES PARA APOSTA PREMIUM -->
             <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
               <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente (Clusters)</h4>
@@ -4147,7 +4239,7 @@
             </div>
           </div>
         `;
-        
+
         // Armazenar dados da distribuição globalmente para os controles de ordenação
         window.ultimaDistribuicaoNumeros = data.distribuicao_numeros;
         window.ultimoPeriodoEstatisticas = qtdConcursos;
@@ -4155,61 +4247,61 @@
           distribuicao: window.ultimaDistribuicaoNumeros,
           periodo: window.ultimoPeriodoEstatisticas
         });
-        
+
         // Armazenar dados dos clusters globalmente para as preferências premium
         window.analiseResultados = {
             avancada: {
                 clusters: clusters
             }
         };
-        
-        // SALVAR PREFERÊNCIAS DO PASSO 6 (ESTATÍSTICAS AVANÇADAS) - MEGA SENA
-        window.userPremiumPreferencesMS = window.userPremiumPreferencesMS || {};
-        
+
+        // SALVAR PREFERÊNCIAS DO PASSO 6 (ESTATÍSTICAS AVANÇADAS) - QUINA
+        window.userPremiumPreferencesQuina = window.userPremiumPreferencesQuina || {};
+
         // Salvar preferências de padrões baseadas na análise de seca
-        window.userPremiumPreferencesMS.padroes = {
+        window.userPremiumPreferencesQuina.padroes = {
             priorizarAtrasados: true,
-            minAtraso: 20, // Valor padrão para Mega Sena
+            minAtraso: 15, // Valor padrão para Quina
             evitarConsecutivos: true,
             evitarRepeticoesSeguidas: true
         };
-        
+
         // Salvar dados de clusters para uso no modal premium
         if (clusters && clusters.resumo_clusters) {
             // Os clusters serão selecionados pelo usuário via checkboxes
-            window.userPremiumPreferencesMS.clusters = [];
+            window.userPremiumPreferencesQuina.clusters = [];
         }
-        
+
         // Salvar no localStorage
         if (typeof savePremiumPreferencesMS === 'function') {
             savePremiumPreferencesMS();
         }
-        
+
         // Debug: verificar se os dados estão sendo armazenados corretamente
         console.log('Dados dos clusters armazenados:', window.analiseResultados.avancada.clusters);
         console.log('Resumo dos clusters:', window.analiseResultados.avancada.clusters?.resumo_clusters);
-        console.log('Preferências salvas:', window.userPremiumPreferencesMS);
-        
+        console.log('Preferências salvas:', window.userPremiumPreferencesQuina);
+
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
           plotGraficoEstatisticasDistribuicao(data.distribuicao_numeros, 'numerica', qtdConcursos);
           plotGraficoEstatisticasClusters(clusters, qtdConcursos);
           plotGraficoEstatisticasCorrelacao(correlacao, qtdConcursos);
           plotGraficoEstatisticasProbabilidades(probabilidades, qtdConcursos);
-          
+
           // Adicionar logs para debug
           console.log("🔍 Dados de correlação para gráfico:", correlacao);
           console.log("🔍 Container do gráfico existe:", !!document.getElementById('grafico-estatisticas-correlacao'));
-          
+
           // Configurar event listeners para os botões de ordenação
           configurarControlesOrdenacao();
-          
+
           // Renderizar checkboxes de clusters para as preferências premium
           if (typeof renderClusterCheckboxes === 'function') {
             renderClusterCheckboxes();
           }
         }, 100);
-        
+
       } catch (error) {
         console.error('Erro ao carregar estatísticas avançadas:', error);
         container.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
@@ -4241,17 +4333,17 @@
     function updateEstatisticasAvancadasModal() {
       const selectElement = document.getElementById('selectEstatisticasAvancadasPeriodo');
       const selectedQtd = selectElement.value;
-      
+
       // Atualizar o texto do período
       const periodoDisplay = document.getElementById('estatisticasAvancadasPeriodoDisplay');
       if (periodoDisplay) {
         if (selectedQtd) {
           periodoDisplay.textContent = `Análise dos últimos ${selectedQtd} concursos.`;
         } else {
-          periodoDisplay.textContent = 'Análise dos últimos 350 concursos.';
+          periodoDisplay.textContent = 'Análise dos últimos 300 concursos.';
         }
       }
-      
+
       // Carregar dados no modal genérico
       const conteudo = document.getElementById('conteudo-modal');
       if (conteudo) {
@@ -4261,13 +4353,13 @@
             janela: selectedQtd,
             timestamp: new Date().toISOString()
           };
-          
+
           armazenarAnalise('estatisticas', dadosEstatisticas);
           console.log('✅ Dados de estatísticas avançadas salvos no localStorage');
         });
       }
     }
-    
+
     // Função para abrir popup de ajuda das estatísticas avançadas
     function abrirPopupAjudaEstatisticasAvancadas() {
       document.getElementById("popupAjudaEstatisticasAvancadas").style.display = "block";
@@ -4276,7 +4368,7 @@
     function fecharPopupAjudaEstatisticasAvancadas() {
       document.getElementById("popupAjudaEstatisticasAvancadas").style.display = "none";
     }
-    
+
     // Função para criar gráfico de clusters com interface melhorada
     function plotGraficoEstatisticasClusters(clusters, periodo = null) {
       console.log('Dados de clusters recebidos:', clusters);
@@ -4284,25 +4376,25 @@
         console.error('Dados de clusters não disponíveis');
         return;
       }
-      
+
       const clusterData = clusters.estatisticas_clusters;
       const resumoClusters = clusters.resumo_clusters || {};
       console.log('Resumo clusters:', resumoClusters);
       const labels = Object.keys(clusterData);
       const valores = Object.values(clusterData).map(cluster => cluster.quantidade);
-      
+
       // Criar título com período
       let titulo = '🔗 Clusters de Números Identificados';
       if (periodo) {
         titulo += `<br>(Últimos ${periodo} concursos)`;
       }
-      
+
       // Usar cores dos clusters se disponíveis
       const cores = labels.map(label => {
         const resumo = resumoClusters[label];
         return resumo && resumo.cor ? resumo.cor : '#00E38C';
       });
-      
+
       const data = [{
         x: labels,
         y: valores,
@@ -4324,18 +4416,18 @@
         },
         hovertemplate: '<b>Cluster %{x}</b><br>Números: %{y}<extra></extra>'
       }];
-      
+
       const layout = {
         title: {
           text: titulo,
           font: { size: 14, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Cluster',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 12 }
         },
-        yaxis: { 
+        yaxis: {
           title: 'Quantidade de Números',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -4345,13 +4437,13 @@
         font: { color: 'white' },
         margin: { l: 80, r: 30, t: 70, b: 80, pad: 5 }
       };
-      
+
       Plotly.newPlot('grafico-estatisticas-clusters', data, layout, { displayModeBar: false });
-      
+
       // Criar cards de interpretação dos clusters
       criarCardsInterpretacaoClusters(resumoClusters);
     }
-    
+
     // Função para criar cards de interpretação dos clusters
     function criarCardsInterpretacaoClusters(resumoClusters) {
       console.log('Criando cards de interpretação:', resumoClusters);
@@ -4360,14 +4452,14 @@
         console.log('Container ou resumoClusters não encontrado:', { container: !!container, resumoClusters: !!resumoClusters });
         return;
       }
-      
+
       container.innerHTML = '';
-      
+
       Object.values(resumoClusters).forEach(cluster => {
         const card = document.createElement('div');
         card.className = 'bg-card p-4 rounded-lg border-l-4 shadow-lg hover:shadow-xl transition-shadow duration-300';
         card.style.borderLeftColor = cluster.cor;
-        
+
         card.innerHTML = `
           <div class="flex items-center justify-between mb-3">
             <h4 class="text-lg font-semibold text-text">${cluster.id}</h4>
@@ -4375,12 +4467,12 @@
               ${cluster.tipo}
             </span>
           </div>
-          
+
           <div class="text-sm text-textSecondary mb-3">
             <p class="mb-2 leading-relaxed">${cluster.descricao_curta}</p>
             <p class="text-yellow-400 font-semibold text-sm">${cluster.recomendacao}</p>
           </div>
-          
+
           <div class="text-xs text-textSecondary mb-3 bg-surface p-2 rounded">
             <div class="grid grid-cols-2 gap-2">
               <div><strong>Freq:</strong> ${cluster.caracteristicas_principais.frequencia_media}</div>
@@ -4390,10 +4482,10 @@
             </div>
           </div>
         `;
-        
+
         container.appendChild(card);
       });
-      
+
       // Adicionar event listeners para as caixinhas clicáveis
       const clusterBadges = document.querySelectorAll('.click-cluster-badge');
       clusterBadges.forEach(badge => {
@@ -4408,7 +4500,7 @@
         });
       });
     }
-    
+
     // Função para exibir números do cluster em popup
     function exibirNumerosDoCluster(titulo, numeros) {
       const modal = document.getElementById('modal-numeros-cluster');
@@ -4419,7 +4511,7 @@
       modalTitulo.innerText = `${titulo}: Números`;
 
       // Limpar conteúdo anterior
-      modalConteudo.innerHTML = ''; 
+      modalConteudo.innerHTML = '';
 
       // Adicionar os números formatados
       numeros.forEach(num => {
@@ -4443,11 +4535,11 @@
         }
       };
     }
-    
+
     // Função para criar gráfico de correlação
     function plotGraficoEstatisticasCorrelacao(correlacao, periodo = null) {
       console.log("🔍 plotGraficoEstatisticasCorrelacao chamada com:", { correlacao, periodo });
-      
+
       if (!correlacao || !correlacao.correlacoes_positivas) {
         console.error('❌ Dados de correlação não disponíveis:', correlacao);
         const container = document.getElementById('grafico-estatisticas-correlacao');
@@ -4456,15 +4548,15 @@
         }
         return;
       }
-      
+
       console.log("📊 Correlações positivas:", correlacao.correlacoes_positivas);
       console.log("📊 Correlações negativas:", correlacao.correlacoes_negativas);
-      
+
       // Combinar correlações positivas e negativas
       const todasCorrelacoes = [...(correlacao.correlacoes_positivas || []), ...(correlacao.correlacoes_negativas || [])];
-      
+
       console.log("📊 Todas as correlações combinadas:", todasCorrelacoes);
-      
+
       // Verificar se há dados suficientes para plotar
       if (todasCorrelacoes.length === 0) {
         console.warn('⚠️ Nenhuma correlação significativa encontrada para este período');
@@ -4474,19 +4566,19 @@
         }
         return;
       }
-      
+
       const pares = todasCorrelacoes.map(pair => `${pair[0]}-${pair[1]}`);
       const valores = todasCorrelacoes.map(pair => pair[2]);
-      
+
       console.log("📊 Pares criados:", pares);
       console.log("📊 Valores criados:", valores);
-      
+
       // Criar título com período
       let titulo = '📈 Correlações Significativas<br>entre Números';
       if (periodo) {
         titulo += `<br>(Últimos ${periodo} concursos)`;
       }
-      
+
       const data = [{
         x: pares,
         y: valores,
@@ -4508,20 +4600,20 @@
         },
         hovertemplate: '<b>%{x}</b><br>Correlação: %{y}<extra></extra>'
       }];
-      
+
       const layout = {
         title: {
           text: titulo,
           font: { size: 14, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Pares de Números',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 10 },
           type: 'category', // Força o eixo X a ser categórico
           automargin: true // Ajuda com labels longos
         },
-        yaxis: { 
+        yaxis: {
           title: 'Coeficiente de Correlação',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -4531,11 +4623,11 @@
         font: { color: 'white' },
         margin: { l: 40, r: 40, t: 70, b: 80, pad: 5 }
       };
-      
+
       console.log("🎯 Tentando criar gráfico Plotly...");
       console.log("📊 Data para Plotly:", data);
       console.log("📊 Layout para Plotly:", layout);
-      
+
       try {
         Plotly.newPlot('grafico-estatisticas-correlacao', data, layout, { displayModeBar: false });
         console.log(`✅ Gráfico de correlação criado com ${todasCorrelacoes.length} pares significativos`);
@@ -4544,11 +4636,11 @@
         console.error("❌ Detalhes do erro:", error.message);
       }
     }
-    
+
     // Função para criar gráfico de probabilidades condicionais
     function plotGraficoEstatisticasProbabilidades(probabilidades, periodo = null) {
       console.log('🔍 DEBUG - Dados recebidos em plotGraficoEstatisticasProbabilidades:', probabilidades);
-      
+
       if (!probabilidades || !probabilidades.dependencias_fortes) {
         console.error('Dados de probabilidades condicionais não disponíveis');
         const container = document.getElementById('grafico-estatisticas-probabilidades');
@@ -4557,10 +4649,10 @@
         }
         return;
       }
-      
+
       const dependencias = probabilidades.dependencias_fortes || [];
       console.log('🔍 DEBUG - Dependências encontradas:', dependencias);
-      
+
       // Verificar se há dados suficientes para plotar
       if (dependencias.length === 0) {
         console.warn('Nenhuma dependência forte encontrada para este período');
@@ -4570,19 +4662,19 @@
         }
         return;
       }
-      
+
       const pares = dependencias.map(dep => `${dep[0]}-${dep[1]}`);
       const valores = dependencias.map(dep => dep[2]);
-      
+
       console.log('🔍 DEBUG - Pares processados:', pares);
       console.log('🔍 DEBUG - Valores processados:', valores);
-      
+
       // Criar título com período
       let titulo = '🎯 Probabilidades Condicionais';
       if (periodo) {
         titulo += `<br>(Últimos ${periodo} concursos)`;
       }
-      
+
       const data = [{
         x: pares,
         y: valores,
@@ -4604,22 +4696,22 @@
         },
         hovertemplate: '<b>%{x}</b><br>Probabilidade: %{y}<extra></extra>'
       }];
-      
+
       console.log('🔍 DEBUG - Dados finais para Plotly:', data);
-      
+
       const layout = {
         title: {
           text: titulo,
           font: { size: 14, color: 'white' }
         },
-        xaxis: { 
+        xaxis: {
           title: 'Pares de Números',
           titlefont: { color: 'white' },
           tickfont: { color: 'white', size: 10 },
           type: 'category', // Força o eixo X a ser categórico
           automargin: true // Ajuda com labels longos
         },
-        yaxis: { 
+        yaxis: {
           title: 'Probabilidade',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -4629,7 +4721,7 @@
         font: { color: 'white' },
         margin: { l: 40, r: 40, t: 70, b: 80, pad: 5 }
       };
-      
+
       Plotly.newPlot('grafico-estatisticas-probabilidades', data, layout, { displayModeBar: false });
       console.log(`✅ Gráfico de probabilidades condicionais criado com ${dependencias.length} dependências`);
     }
@@ -4650,19 +4742,19 @@
       if (ordenacao === 'frequencia') {
         distribuicaoParaPlotar.sort((a, b) => b.frequencia - a.frequencia); // Do maior para o menor
         console.log('🔍 Ordenação por frequência aplicada. Primeiros 5 números:', distribuicaoParaPlotar.slice(0, 5).map(item => `${item.numero}:${item.frequencia}`));
-      } else { // 'numerica' ou qualquer outro valor, mantém a ordem original (1 a 60)
+      } else { // 'numerica' ou qualquer outro valor, mantém a ordem original (1 a 80)
         distribuicaoParaPlotar.sort((a, b) => a.numero - b.numero);
         console.log('🔍 Ordenação numérica aplicada. Primeiros 5 números:', distribuicaoParaPlotar.slice(0, 5).map(item => `${item.numero}:${item.frequencia}`));
       }
 
       const numeros = distribuicaoParaPlotar.map(item => item.numero);
       const frequencias = distribuicaoParaPlotar.map(item => item.frequencia);
-      
+
       // Para ordenação por frequência, converter números para string para forçar eixo categórico
-      const numerosParaEixo = ordenacao === 'frequencia' 
-        ? numeros.map(num => num.toString()) 
+      const numerosParaEixo = ordenacao === 'frequencia'
+        ? numeros.map(num => num.toString())
         : numeros;
-      
+
       console.log('🔍 Tipo de ordenação:', ordenacao);
       console.log('🔍 Primeiros 5 números para eixo X:', numerosParaEixo.slice(0, 5));
       console.log('🔍 Tipo do eixo X:', ordenacao === 'frequencia' ? 'category' : 'linear');
@@ -4676,7 +4768,7 @@
       const totalElement = document.getElementById('total-numeros');
       const mediaElement = document.getElementById('media-frequencia');
       const maximoElement = document.getElementById('max-frequencia');
-      
+
       if (totalElement) totalElement.textContent = total;
       if (mediaElement) mediaElement.textContent = media.toFixed(1);
       if (maximoElement) maximoElement.textContent = maximo;
@@ -4707,7 +4799,7 @@
           size: 8,
           weight: 'bold'
         },
-        hovertemplate: ordenacao === 'frequencia' 
+        hovertemplate: ordenacao === 'frequencia'
           ? '<b>Número %{x}</b><br>Frequência: %{y}<br><i>Ordenado por frequência</i><extra></extra>'
           : '<b>Número %{x}</b><br>Frequência: %{y}<extra></extra>'
       }];
@@ -4737,9 +4829,12 @@
           gridcolor: '#2E303A',
           tickfont: { color: 'white', size: 10 },
           linecolor: '#2E303A',
-          automargin: true
+          automargin: true,
+          range: [0, 26],
+          tickmode: 'linear',
+          dtick: 5
         },
-        yaxis: { 
+        yaxis: {
           title: 'Frequência',
           titlefont: { color: 'white' },
           tickfont: { color: 'white' }
@@ -4759,7 +4854,7 @@
     function atualizarBotoesOrdenacao(ordenacaoAtiva) {
       const btnNumerica = document.getElementById('btn-ordenar-numerica');
       const btnFrequencia = document.getElementById('btn-ordenar-frequencia');
-      
+
       if (btnNumerica && btnFrequencia) {
         if (ordenacaoAtiva === 'numerica') {
           btnNumerica.className = 'px-4 py-2 rounded-lg bg-[#00E38C] text-black font-semibold hover:opacity-80 transition-all';
@@ -4780,7 +4875,7 @@
         // Remover event listeners anteriores para evitar duplicação
         btnOrdenarNumerica.replaceWith(btnOrdenarNumerica.cloneNode(true));
         btnOrdenarFrequencia.replaceWith(btnOrdenarFrequencia.cloneNode(true));
-        
+
         // Recuperar referências após clonagem
         const btnNumerica = document.getElementById('btn-ordenar-numerica');
         const btnFrequencia = document.getElementById('btn-ordenar-frequencia');
@@ -4801,7 +4896,7 @@
 
         // Definir estado inicial (ordem numérica ativa)
         atualizarBotoesOrdenacao('numerica');
-        
+
         console.log('✅ Controles de ordenação configurados!');
       }
     }
@@ -4815,20 +4910,20 @@
       // Capturar o botão no início da função
       const botao = event.target;
       const textoOriginal = botao.innerHTML;
-      
+
       try {
         // Mostrar loading
         botao.innerHTML = '🍀 Gerando Palpite...';
         botao.disabled = true;
-        
+
         // Chamar API para gerar números aleatórios
         const response = await fetch('/api/gerar-numeros-aleatorios');
         const dados = await response.json();
-        
+
         if (dados.success) {
           // Limpar seleções anteriores (sem mostrar mensagem)
           limparSelecaoSilenciosa();
-          
+
           // Selecionar números aleatórios
           dados.numeros.forEach(numero => {
             const elementos = document.querySelectorAll('#numeros-container .numero');
@@ -4837,10 +4932,10 @@
               selecionarNumero(numero, elemento);
             }
           });
-          
+
           // Selecionar trevos (corrigido para usar a nova estrutura)
           const trevoElementos = document.querySelectorAll('#trevos-container .trevo-icon-container');
-          
+
           // Função para selecionar trevo sem validação de limite (para geração automática)
           function selecionarTrevoAutomatico(trevo, elemento) {
             if (!trevosSelecionados.includes(trevo)) {
@@ -4849,23 +4944,23 @@
             }
             atualizarTrevosSelecionados();
           }
-          
+
           // Selecionar primeiro trevo
-          const trevo1Elemento = Array.from(trevoElementos).find(el => 
+          const trevo1Elemento = Array.from(trevoElementos).find(el =>
             el.querySelector('.trevo-number').textContent.trim() === dados.trevo1.toString()
           );
           if (trevo1Elemento) {
             selecionarTrevoAutomatico(dados.trevo1, trevo1Elemento);
           }
-          
+
           // Selecionar segundo trevo
-          const trevo2Elemento = Array.from(trevoElementos).find(el => 
+          const trevo2Elemento = Array.from(trevoElementos).find(el =>
             el.querySelector('.trevo-number').textContent.trim() === dados.trevo2.toString()
           );
           if (trevo2Elemento) {
             selecionarTrevoAutomatico(dados.trevo2, trevo2Elemento);
           }
-          
+
           // Mostrar sucesso
           mostrarMensagem('🍀 Palpite da Sorte gerado com sucesso!', 'success');
         } else {
@@ -4888,13 +4983,13 @@
       document.querySelectorAll('#numeros-container .numero').forEach(el => {
         el.classList.remove('selecionado');
       });
-      
+
       // Limpar trevos (corrigido para usar a nova classe)
       trevosSelecionados = [];
       document.querySelectorAll('#trevos-container .trevo-icon-container').forEach(el => {
         el.classList.remove('selecionado');
       });
-      
+
       // Atualizar displays
       atualizarNumerosSelecionados();
       atualizarTrevosSelecionados();
@@ -4917,10 +5012,10 @@
         'bg-blue-600'
       }`;
       mensagem.textContent = texto;
-      
+
       // Adicionar ao DOM
       document.body.appendChild(mensagem);
-      
+
       // Remover após 3 segundos
       setTimeout(() => {
         mensagem.remove();
@@ -4928,33 +5023,48 @@
     }
 
     // ===== MODAL DE CONFIGURAÇÃO DE APOSTA =====
-    
+
     // Elementos do modal
     const modalConfiguracao = document.getElementById('modalConfiguracao');
     const btnCancelarModal = document.getElementById('btnCancelarModal');
     const btnGerarNoModal = document.getElementById('btnGerarNoModal');
     const sliderNumeros = document.getElementById('sliderNumeros');
     const valorNumeros = document.getElementById('valorNumeros');
-    const sliderTrevos = document.getElementById('sliderTrevos');
-    const valorTrevos = document.getElementById('valorTrevos');
+
+    // CORREÇÃO: A Quina não tem trevos, então não tenta acessar esses elementos
+    // const sliderTrevos = document.getElementById('sliderTrevos');
+    // const valorTrevos = document.getElementById('valorTrevos');
 
     // Atualiza os valores exibidos pelos sliders
-    sliderNumeros.oninput = () => {
-      valorNumeros.textContent = sliderNumeros.value;
-      atualizarCorSlider(sliderNumeros);
-    };
-    sliderTrevos.oninput = () => {
-      valorTrevos.textContent = sliderTrevos.value;
-      atualizarCorSlider(sliderTrevos);
-    };
+    if (sliderNumeros && valorNumeros) {
+        // Lotofácil: 15 a 20 números
+        sliderNumeros.min = 15;
+        sliderNumeros.max = 20;
+        if (parseInt(sliderNumeros.value) < 15 || parseInt(sliderNumeros.value) > 20) {
+          sliderNumeros.value = 15;
+        }
+        valorNumeros.textContent = sliderNumeros.value;
+        sliderNumeros.oninput = () => {
+            valorNumeros.textContent = sliderNumeros.value;
+            atualizarCorSlider(sliderNumeros);
+        };
+    }
+
+    // CORREÇÃO: Removido código dos trevos para a Quina
+    // if (sliderTrevos && valorTrevos) {
+    //     sliderTrevos.oninput = () => {
+    //         valorTrevos.textContent = sliderTrevos.value;
+    //         atualizarCorSlider(sliderTrevos);
+    //     };
+    // }
 
     // Função para atualizar a cor da barra do slider dinamicamente
     function atualizarCorSlider(slider) {
       const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
-      
+
       // Atualiza o gradiente da barra baseado no valor
       slider.style.background = `linear-gradient(to right, #00E38C 0%, #00E38C ${value}%, #2E303A ${value}%, #2E303A 100%)`;
-      
+
       // Adiciona efeito de brilho sutil
       slider.style.boxShadow = `inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 227, 140, ${value * 0.01})`;
     }
@@ -4964,9 +5074,10 @@
       if (sliderNumeros) {
         atualizarCorSlider(sliderNumeros);
       }
-      if (sliderTrevos) {
-        atualizarCorSlider(sliderTrevos);
-      }
+      // CORREÇÃO: A Quina não tem trevos, então não tenta acessar sliderTrevos
+      // if (sliderTrevos) {
+      //   atualizarCorSlider(sliderTrevos);
+      // }
     });
 
     // Abrir o modal
@@ -4982,7 +5093,8 @@
     // Gerar aposta ao clicar no botão dentro do modal
     btnGerarNoModal.addEventListener('click', () => {
       const qtdeNum = parseInt(sliderNumeros.value);
-      const qtdeTrevos = parseInt(sliderTrevos.value);
+      // CORREÇÃO: A Quina não tem trevos, então usa 0 como padrão
+      const qtdeTrevos = 0; // parseInt(sliderTrevos.value);
       gerarApostaAleatoria(qtdeNum, qtdeTrevos);
       modalConfiguracao.classList.add('hidden'); // Fecha o modal após gerar
     });
@@ -4990,20 +5102,15 @@
     async function gerarApostaAleatoria(qtdeNum, qtdeTrevos) {
       try {
         mostrarMensagem('🎲 Gerando sua aposta...', 'info');
-        
-        // Para compatibilidade com o backend, dividimos os trevos em 2 grupos
-        const qtdeTrevo1 = Math.ceil(qtdeTrevos / 2);
-        const qtdeTrevo2 = Math.floor(qtdeTrevos / 2);
-        
-        const response = await fetch('/api/gerar-aposta-milionaria', {
+
+        // Lotofácil: usa a API dedicada
+        const response = await fetch('/api/gerar-aposta-aleatoria-lotofacil', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            qtde_num: qtdeNum,
-            qtde_trevo1: qtdeTrevo1,
-            qtde_trevo2: qtdeTrevo2
+            qtde_num: qtdeNum
           })
         });
 
@@ -5013,78 +5120,28 @@
 
         const data = await response.json();
         console.log("Aposta Gerada:", data);
-        
+
         // Limpar seleções anteriores
         limparSelecaoSilenciosa();
-        
-        // Atualizar limite de trevos baseado no modal
-        const limiteTrevos = qtdeTrevos;
-        
+
+        // CORREÇÃO: A Quina não tem trevos, então só seleciona números
         // Selecionar números aleatórios automaticamente
-        data.numeros.forEach(numero => {
-          const elementos = document.querySelectorAll('#numeros-container .numero');
-          const elemento = Array.from(elementos).find(el => el.textContent.trim() === numero.toString().padStart(2, '0'));
-          if (elemento) {
-            selecionarNumeroAutomatico(numero, elemento);
-          }
-        });
-        
-        // Selecionar múltiplos números para Trevos (corrigido para usar a nova estrutura)
-        const trevoElementos = document.querySelectorAll('#trevos-container .trevo-icon-container');
-        
-        // Função para selecionar trevo sem validação de limite (para geração automática)
-        function selecionarTrevoAutomatico(trevo, elemento) {
-          if (!trevosSelecionados.includes(trevo)) {
-            trevosSelecionados.push(trevo);
-            elemento.classList.add('selecionado');
-          }
-          atualizarTrevosSelecionados();
-        }
-        
-        // Selecionar múltiplos números para Trevo 1
-        if (Array.isArray(data.trevo1)) {
-          data.trevo1.forEach(trevo => {
-            const trevoElemento = Array.from(trevoElementos).find(el => 
-              el.querySelector('.trevo-number').textContent.trim() === trevo.toString()
-            );
-            if (trevoElemento) {
-              selecionarTrevoAutomatico(trevo, trevoElemento);
+        if (data.numeros && Array.isArray(data.numeros)) {
+          data.numeros.forEach(numero => {
+            const elementos = document.querySelectorAll('#numeros-container .numero');
+            const elemento = Array.from(elementos).find(el => el.textContent.trim() === numero.toString().padStart(2, '0'));
+            if (elemento) {
+              selecionarNumeroAutomatico(numero, elemento);
             }
           });
-        } else {
-          // Fallback para compatibilidade (trevo único)
-          const trevoElemento = Array.from(trevoElementos).find(el => 
-            el.querySelector('.trevo-number').textContent.trim() === data.trevo1.toString()
-          );
-          if (trevoElemento) {
-            selecionarTrevoAutomatico(data.trevo1, trevoElemento);
-          }
         }
-        
-        // Selecionar múltiplos números para Trevo 2
-        if (Array.isArray(data.trevo2)) {
-          data.trevo2.forEach(trevo => {
-            const trevoElemento = Array.from(trevoElementos).find(el => 
-              el.querySelector('.trevo-number').textContent.trim() === trevo.toString()
-            );
-            if (trevoElemento) {
-              selecionarTrevoAutomatico(trevo, trevoElemento);
-            }
-          });
-        } else {
-          // Fallback para compatibilidade (trevo único)
-          const trevoElemento = Array.from(trevoElementos).find(el => 
-            el.querySelector('.trevo-number').textContent.trim() === data.trevo2.toString()
-          );
-          if (trevoElemento) {
-            selecionarTrevoAutomatico(data.trevo2, trevoElemento);
-          }
+
+        // Atualizar valor da aposta (sem trevos)
+        if (data.valor && data.qtde_apostas) {
+          atualizarValorAposta(data.valor, data.qtde_apostas, qtdeNum, 0, 0);
         }
-        
-        // Atualizar valor da aposta
-        atualizarValorAposta(data.valor, data.qtde_apostas, qtdeNum, qtdeTrevos, qtdeTrevos);
-        
-        mostrarMensagem(`✅ Aposta gerada com sucesso! ${data.qtde_apostas} combinações`, 'success');
+
+        mostrarMensagem(`✅ Aposta gerada com sucesso! ${data.qtde_apostas || 1} combinações`, 'success');
 
       } catch (error) {
         console.error("Erro ao gerar aposta:", error);
@@ -5096,7 +5153,7 @@
     function updateDistribuicaoModal() {
       const selectElement = document.getElementById('selectDistribuicaoPeriodo');
       const selectedQtd = selectElement.value;
-      
+
       // Carregar dados no modal genérico
       const conteudo = document.getElementById('conteudo-modal');
       if (conteudo) {
@@ -5106,7 +5163,7 @@
             janela: selectedQtd,
             timestamp: new Date().toISOString()
           };
-          
+
           armazenarAnalise('distribuicao', dadosDistribuicao);
           console.log('✅ Dados de distribuição salvos no localStorage');
         });
@@ -5175,25 +5232,25 @@
     <div class="modal-content">
       <span class="close" onclick="fecharPopupAjudaDistribuicao()">×</span>
       <h2>🧠 Entendendo a Análise de Distribuição</h2>
-      <p>Esta análise revela a "forma" como os números da Mega Sena se comportam, mostrando padrões estatísticos, desequilíbrios, aglomerados e dispersão. Compreender esses padrões pode guiar suas escolhas com mais estratégia.</p>
+      <p>Esta análise revela a "forma" como os números da Quina se comportam, mostrando padrões estatísticos, desequilíbrios, aglomerados e dispersão. Compreender esses padrões pode guiar suas escolhas com mais estratégia.</p>
 
       <h3>📊 Paridade (Pares vs Ímpares)</h3>
       <p>
-        O que mostra: A frequência de sorteios com diferentes combinações de números pares e ímpares nos 6 números principais da Mega Sena. (Ex: 3 Pares-3 Ímpares, 4 Pares-2 Ímpares, etc.).<br>
+        O que mostra: A frequência de sorteios com diferentes combinações de números pares e ímpares nos 5 números principais da Quina. (Ex: 3 Pares-2 Ímpares, 2 Pares-3 Ímpares, etc.).<br>
         <strong>✔ Útil para:</strong> Equilibrar sua aposta e identificar padrões comuns ou combinações historicamente raras.<br>
-        <strong💡 Dica:</strong> A maioria dos sorteios da Mega Sena tem 3 números pares e 3 números ímpares.
+        <strong💡 Dica:</strong> A maioria dos sorteios da Quina tem entre 2 e 3 números pares.
       </p>
 
       <h3>🔢 Distribuição por Faixas Numéricas</h3>
       <p>
-        O que mostra: Quantas vezes os números sorteados caem em diferentes faixas numéricas (1-10, 11-20, 21-30, etc. até 51-60). Também exibe a média e a moda de ocorrências por faixa.<br>
-        <strong>✔ Útil para:</strong> Observar se algumas faixas da Mega Sena (1-60) são historicamente mais sorteadas do que outras.<br>
+        O que mostra: Quantas vezes os números sorteados caem em diferentes faixas numéricas (1-5, 6-10, 11-15, 16-20, 21-25). Também exibe a média e a moda de ocorrências por faixa.<br>
+        <strong>✔ Útil para:</strong> Observar se algumas faixas da Lotofácil (1-25) são historicamente mais sorteadas do que outras.<br>
         <strong💡 Dica:</strong> Ajuda a balancear sua aposta para incluir números de faixas mais ativas ou, se preferir, de faixas menos exploradas.
       </p>
 
       <h3>➕ Soma dos Números Principais</h3>
       <p>
-        O que mostra: Um histograma da frequência da soma total dos 6 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
+        O que mostra: Um histograma da frequência da soma total dos 5 números principais sorteados. Apresenta também o valor mínimo, máximo, a média e a(s) moda(s) das somas.<br>
         <strong>✔ Útil para:</strong> Escolher combinações com somas que estejam dentro da faixa de valores mais comuns historicamente.<br>
         <strong💡 Dica:</strong> Evite somas muito altas ou muito baixas, que são estatisticamente menos frequentes.
       </p>
@@ -5202,9 +5259,9 @@
 
       <h3>↔️ Amplitude dos Números Principais</h3>
       <p>
-        O que mostra: Um histograma da frequência da diferença entre o maior e o menor número sorteado em cada concurso da Mega Sena. (Ex: Números 5 e 55 = amplitude 50).<br>
+        O que mostra: Um histograma da frequência da diferença entre o maior e o menor número sorteado em cada concurso da Quina. (Ex: Números 5 e 75 = amplitude 70).<br>
         <strong>✔ Útil para:</strong> Avaliar a "dispersão" dos números sorteados e evitar apostar em números muito próximos ou muito distantes entre si.<br>
-        <strong💡 Dica:</strong> Na Mega Sena, amplitudes entre 30 e 50 são as mais frequentes historicamente.
+        <strong💡 Dica:</strong> Na Quina, amplitudes entre 40 e 70 são as mais frequentes historicamente.
       </p>
 
       <h3>🎯 Como Usar na Prática</h3>
@@ -5352,14 +5409,14 @@
       <h3>🎯 Janela de Análise Temporal</h3>
       <p>
         Use o seletor de período para analisar diferentes janelas de tempo:<br>
-        <strong>Últimos 350 concursos:</strong> Análise completa do histórico disponível.<br>
+        <strong>Últimos 300 concursos:</strong> Análise completa do histórico disponível.<br>
         <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
         <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
       </p>
 
       <h3>📈 Interpretando os Gráficos</h3>
       <p>
-        <strong>Eixo X:</strong> Números (1-60).<br>
+        <strong>Eixo X:</strong> Números (1-25).<br>
         <strong>Eixo Y:</strong> Concursos em que estão sem sair.<br>
         <strongBarras vermelhas:</strong> Maior tempo de seca (mais "atrasados").<br>
         <strongBarras verdes:</strong> Sorteados recentemente.<br>
@@ -5451,7 +5508,7 @@
       <h3>🎯 Janela de Análise Temporal</h3>
       <p>
         Use o seletor de período para analisar diferentes janelas de tempo:<br>
-        <strong>Últimos 350 concursos:</strong> Análise completa do histórico disponível.<br>
+        <strong>Últimos 300 concursos:</strong> Análise completa do histórico disponível.<br>
         <strongÚltimos 25/50/100/200:</strong> Foco em períodos mais recentes.<br>
         <strong💡 Dica:</strong> Períodos menores mostram tendências mais recentes, períodos maiores mostram padrões históricos consolidados.
       </p>
@@ -5526,12 +5583,12 @@
       padding: 5px;
       margin: 5px 0;
     }
-    
+
     .chart-container h3 {
       font-size: 1rem;
       margin-bottom: 0.5rem;
     }
-    
+
     .chart-container div[id^="grafico-"] {
       height: 350px !important; /* Aumenta ainda mais sem títulos de eixo */
       width: 100% !important;
@@ -5542,17 +5599,17 @@
     .chart-container div[id^="grafico-"] {
       height: 310px !important; /* Aumenta ainda mais sem títulos de eixo */
     }
-    
+
     /* Otimizações específicas para gráficos Plotly em mobile */
     .js-plotly-plot .plotly .modebar {
       display: none !important;
     }
-    
+
     /* Esconde legendas em mobile para economizar espaço */
     .js-plotly-plot .plotly .legend {
       display: none !important;
     }
-    
+
     .js-plotly-plot .plotly .legend .traces {
       display: none !important;
     }
@@ -5564,7 +5621,7 @@
       display: block !important;
       font-size: 11px !important;
     }
-    
+
     .js-plotly-plot .plotly .legend .traces {
       display: block !important;
       font-size: 11px !important;
@@ -5708,5 +5765,6 @@
     </div>
   </div>
 </body>
-</html> 
-</html> 
+</html>
+</html>
+
