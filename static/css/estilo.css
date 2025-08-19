@@ -602,6 +602,29 @@ p {
     transform: scale(1);
 }
 
+/* Neon lilás global para todos os modais do site */
+[id^="modal"] > .modal-content,
+[id^="modal"] > div,
+.modal .modal-content {
+    border: 2px solid #8B5CF6;
+    box-shadow: 0 0 8px rgba(139, 92, 246, 0.85),
+                0 0 16px rgba(139, 92, 246, 0.55),
+                0 0 24px rgba(139, 92, 246, 0.35),
+                0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 640px) {
+    [id^="modal"] > .modal-content,
+    [id^="modal"] > div,
+    .modal .modal-content {
+        border-width: 1.5px;
+        box-shadow: 0 0 6px rgba(139, 92, 246, 0.8),
+                    0 0 12px rgba(139, 92, 246, 0.5),
+                    0 0 18px rgba(139, 92, 246, 0.3),
+                    0 8px 20px rgba(0, 0, 0, 0.6);
+    }
+}
+
 .modal-header {
     display: flex;
     justify-content: space-between;

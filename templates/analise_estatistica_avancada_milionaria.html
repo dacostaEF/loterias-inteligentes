@@ -1820,8 +1820,8 @@
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_quentes.slice(0, 10).map(n => 
-                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
+                ${((data.numeros_quentes_frios && data.numeros_quentes_frios.quentes) ? data.numeros_quentes_frios.quentes : []).slice(0, 10).map(n => 
+                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${Array.isArray(n) ? n[0] : n}</div>`
                 ).join('')}
               </div>
             </div>
@@ -1829,8 +1829,8 @@
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${data.numeros_frios.slice(0, 10).map(n => 
-                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
+                ${((data.numeros_quentes_frios && data.numeros_quentes_frios.frios) ? data.numeros_quentes_frios.frios : []).slice(0, 10).map(n => 
+                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${Array.isArray(n) ? n[0] : n}</div>`
                 ).join('')}
               </div>
             </div>

@@ -316,7 +316,7 @@ def analisar_distribuicao_lotofacil(df_lotofacil=None, qtd_concursos=50):
         resultado = analise_distribuicao_lotofacil_completa(df_filtrado, qtd_concursos=None)
         
         if not resultado:
-            print("⚠️  Erro: Não foi possível obter dados de distribuição da Quina")
+            print("⚠️  Erro: Não foi possível obter dados de distribuição da Lotofácil")
             return {}
         
         return resultado
@@ -396,54 +396,33 @@ def exibir_analise_distribuicao_detalhada_lotofacil(resultado):
 # Exemplo de uso com dados da Lotofácil
 if __name__ == "__main__":
     try:
-        # Tentar importar e usar dados reais da Quina
-        from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
-        
-        print("🔄 Carregando dados da Quina...")
-        df_quina = carregar_dados_quina()
-        
+        # Carregar dados reais da Lotofácil
+        from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
+        print("🔄 Carregando dados da Lotofácil...")
+        df_lf = carregar_dados_lotofacil()
+
         print("\n" + "="*80)
         print("📊 ANÁLISE COMPLETA (Todos os concursos)")
         print("="*80)
-        resultado_completo = analise_distribuicao_quina_completa(df_quina)
-        exibir_analise_distribuicao_detalhada_quina(resultado_completo)
-        
+        resultado_completo = analise_distribuicao_lotofacil_completa(df_lf)
+        exibir_analise_distribuicao_detalhada_lotofacil(resultado_completo)
+
         print("\n" + "="*80)
         print("📊 ANÁLISE DOS ÚLTIMOS 25 CONCURSOS")
         print("="*80)
-        resultado_25 = analise_distribuicao_quina_completa(df_quina, qtd_concursos=25)
-        exibir_analise_distribuicao_detalhada_quina(resultado_25)
-        
-        print("\n" + "="*80)
-        print("📊 ANÁLISE DOS ÚLTIMOS 50 CONCURSOS")
-        print("="*80)
-        resultado_50 = analise_distribuicao_quina_completa(df_quina, qtd_concursos=50)
-        exibir_analise_distribuicao_detalhada_quina(resultado_50)
-        
-    except ImportError:
-        print("⚠️  Dados da Quina não encontrados. Usando dados de exemplo...")
-        
-        # Dados de exemplo da Quina (5 concursos)
+        resultado_25 = analise_distribuicao_lotofacil_completa(df_lf, qtd_concursos=25)
+        exibir_analise_distribuicao_detalhada_lotofacil(resultado_25)
+    except Exception:
+        print("⚠️  Dados da Lotofácil não disponíveis. Usando dados de exemplo...")
+        # Dados de exemplo da Lotofácil (cada sorteio: concurso + 15 dezenas 1-25)
         dados_exemplo = [
-            [1, 1, 3, 7, 15, 23],
-            [2, 13, 16, 35, 41, 42],
-            [3, 1, 9, 17, 30, 31],
-            [4, 6, 23, 25, 33, 34],
-            [5, 6, 16, 21, 24, 26],
-            [6, 2, 4, 8, 12, 14], # Exemplo com muitos pares/sequenciais
-            [7, 1, 5, 11, 19, 29], # Exemplo com muitos primos
-            [8, 10, 20, 30, 40, 45] # Exemplo de soma alta
+            [1, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
+            [2, 1,3,5,7,9,11,13,15,2,4,6,8,10,12,14],
+            [3, 2,4,6,8,10,12,14,16,18,20,22,24,1,3,5],
+            [4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],
+            [5, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],
         ]
 
-        print("\n📊 Análise completa (todos os dados):")
-        resultado_analise = analise_de_distribuicao_quina(dados_exemplo)
-        exibir_analise_distribuicao_detalhada_quina(resultado_analise)
-        
-        print("\n📊 Análise dos últimos 5 concursos:")
-        resultado_5 = analise_de_distribuicao_quina(dados_exemplo, qtd_concursos=5)
-        exibir_analise_distribuicao_detalhada_quina(resultado_5)
-
-        # Teste com dados vazios
-        print("\n--- Teste com Dados Vazios ---")
-        resultado_vazio = analise_de_distribuicao_quina([])
-        exibir_analise_distribuicao_detalhada_quina(resultado_vazio)
+        print("\n📊 Análise completa (dados de exemplo):")
+        resultado_analise = analise_de_distribuicao_lotofacil(dados_exemplo)
+        exibir_analise_distribuicao_detalhada_lotofacil(resultado_analise)
