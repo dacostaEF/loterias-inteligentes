@@ -278,75 +278,104 @@ window.premiumModalPrepareAndRender = premiumModalPrepareAndRenderLF;
 // Carregar preferências na inicialização
 document.addEventListener('DOMContentLoaded', loadPremiumPreferencesLF);
 
-// Coletar preferências atuais da UI (LF)
-function collectCurrentPrefsLF() {
-  const scope = document;
-  const pick = (sel) => scope.querySelector(sel);
-  const checked = (sel) => !!pick(sel)?.checked;
-  const intVal = (sel, def=0) => parseInt(pick(sel)?.value || def, 10);
-  const txtVal = (sel, def='') => pick(sel)?.value || def;
+// Helpers de coleta segura (não sobrescrevem quando elemento não existe)
+function lf_pick(sel) { return document.querySelector(sel); }
+function lf_checkedOpt(sel) { const el = lf_pick(sel); return el ? !!el.checked : undefined; }
+function lf_intOpt(sel, def) { const el = lf_pick(sel); if (!el) return undefined; const v = parseInt(el.value, 10); return Number.isFinite(v) ? v : def; }
+function lf_txtOpt(sel) { const el = lf_pick(sel); return el ? el.value : undefined; }
+function lf_set(obj, key, val) { if (val !== undefined) obj[key] = val; }
 
+// Coletar preferências atuais da UI (LF) sem perder estado anterior
+function collectCurrentPrefsLF() {
   const prefs = { ...(userPremiumPreferencesLF || {}) };
 
   // Frequência
-  const freq = prefs.frequencia = prefs.frequencia || {};
-  freq.priorizarQuentes = checked('[data-pref-type="frequencia"][data-pref-name="priorizarQuentes"]');
-  freq.qtdeQuentes      = intVal('#freq-qtde-quentes', 10);
-  freq.priorizarFrios   = checked('[data-pref-type="frequencia"][data-pref-name="priorizarFrios"]');
-  freq.qtdeFrios        = intVal('#freq-qtde-frios', 10);
-  freq.considerarPeriodo= txtVal('#freq-periodo', 'completa');
+  prefs.frequencia = { ...(prefs.frequencia || {}) };
+  lf_set(prefs.frequencia, 'priorizarQuentes', lf_checkedOpt('[data-pref-type="frequencia"][data-pref-name="priorizarQuentes"]'));
+  lf_set(prefs.frequencia, 'qtdeQuentes', lf_intOpt('#freq-qtde-quentes', 10));
+  lf_set(prefs.frequencia, 'priorizarFrios', lf_checkedOpt('[data-pref-type="frequencia"][data-pref-name="priorizarFrios"]'));
+  lf_set(prefs.frequencia, 'qtdeFrios', lf_intOpt('#freq-qtde-frios', 10));
+  lf_set(prefs.frequencia, 'considerarPeriodo', lf_txtOpt('#freq-periodo'));
 
   // Afinidades
-  const afi = prefs.afinidades = prefs.afinidades || {};
-  afi.priorizarParesFortes       = checked('[data-pref-type="afinidades"][data-pref-name="priorizarParesFortes"]');
-  afi.qtdePares                  = intVal('#afinidade-qtde-pares', 3);
-  afi.priorizarNumerosConectados = checked('[data-pref-type="afinidades"][data-pref-name="priorizarNumerosConectados"]');
-  afi.qtdeNumeros                = intVal('#afinidade-qtde-numeros', 4);
-  afi.evitarParesFracos          = checked('#afinidade-evitar-pares-fracos');
+  prefs.afinidades = { ...(prefs.afinidades || {}) };
+  lf_set(prefs.afinidades, 'priorizarParesFortes', lf_checkedOpt('[data-pref-type="afinidades"][data-pref-name="priorizarParesFortes"]'));
+  lf_set(prefs.afinidades, 'qtdePares', lf_intOpt('#afinidade-qtde-pares', 3));
+  lf_set(prefs.afinidades, 'priorizarNumerosConectados', lf_checkedOpt('[data-pref-type="afinidades"][data-pref-name="priorizarNumerosConectados"]'));
+  lf_set(prefs.afinidades, 'qtdeNumeros', lf_intOpt('#afinidade-qtde-numeros', 4));
+  lf_set(prefs.afinidades, 'evitarParesFracos', lf_checkedOpt('#afinidade-evitar-pares-fracos'));
 
   // Padrões/Seca
-  const pad = prefs.padroes = prefs.padroes || {};
-  pad.evitarConsecutivos       = checked('[data-pref-type="padroes"][data-pref-name="evitarConsecutivos"]');
-  pad.priorizarAtrasados       = checked('[data-pref-type="padroes"][data-pref-name="priorizarAtrasados"]');
-  pad.minAtraso                = intVal('#padrao-min-atraso', 20);
-  pad.evitarRepeticoesSeguidas = checked('[data-pref-type="padroes"][data-pref-name="evitarRepeticoesSeguidas"]');
+  prefs.padroes = { ...(prefs.padroes || {}) };
+  lf_set(prefs.padroes, 'evitarConsecutivos', lf_checkedOpt('[data-pref-type="padroes"][data-pref-name="evitarConsecutivos"]'));
+  lf_set(prefs.padroes, 'priorizarAtrasados', lf_checkedOpt('[data-pref-type="padroes"][data-pref-name="priorizarAtrasados"]'));
+  lf_set(prefs.padroes, 'minAtraso', lf_intOpt('#padrao-min-atraso', 20));
+  lf_set(prefs.padroes, 'evitarRepeticoesSeguidas', lf_checkedOpt('[data-pref-type="padroes"][data-pref-name="evitarRepeticoesSeguidas"]'));
 
   // Sequências
-  const seq = prefs.sequencias = prefs.sequencias || {};
-  seq.evitarConsecutivos       = checked('#sequencia-evitar-consecutivos');
-  seq.priorizarAtrasados       = checked('#sequencia-priorizar-atrasados');
-  seq.minAtraso                = intVal('#sequencia-min-atraso', 20);
-  seq.evitarSequencias         = checked('#sequencia-evitar-sequencias');
-  seq.evitarRepeticoesSeguidas = checked('#sequencia-evitar-repeticoes');
+  prefs.sequencias = { ...(prefs.sequencias || {}) };
+  lf_set(prefs.sequencias, 'evitarConsecutivos', lf_checkedOpt('#sequencia-evitar-consecutivos'));
+  lf_set(prefs.sequencias, 'priorizarAtrasados', lf_checkedOpt('#sequencia-priorizar-atrasados'));
+  lf_set(prefs.sequencias, 'minAtraso', lf_intOpt('#sequencia-min-atraso', 20));
+  lf_set(prefs.sequencias, 'evitarSequencias', lf_checkedOpt('#sequencia-evitar-sequencias'));
+  lf_set(prefs.sequencias, 'evitarRepeticoesSeguidas', lf_checkedOpt('#sequencia-evitar-repeticoes'));
 
-  // Clusters (preferência: ler checkboxes; fallback: localStorage 'li_lf_clusters_sel')
-  let clustersSelecionados = [];
+  // Clusters (só define se tiver algo selecionado; caso contrário, mantém os existentes)
   try {
     const container = document.getElementById('avancada-opcoes-clusters');
     if (container) {
-      clustersSelecionados = Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
+      const selecionados = Array.from(container.querySelectorAll('input[type="checkbox"]:checked'))
         .map(cb => cb.value)
         .filter(Boolean);
-    }
-    if (!clustersSelecionados.length) {
-      clustersSelecionados = JSON.parse(localStorage.getItem('li_lf_clusters_sel') || '[]');
+      if (selecionados.length) prefs.clusters = selecionados;
+    } else {
+      const ls = JSON.parse(localStorage.getItem('li_lf_clusters_sel') || '[]');
+      if (Array.isArray(ls) && ls.length) prefs.clusters = ls;
     }
   } catch (_) {}
-  prefs.clusters = Array.isArray(clustersSelecionados) ? clustersSelecionados : [];
 
   // Parâmetros de saída
-  const q = intVal('#qtde-numeros-aposta', 15);
-  prefs.qtdeNumerosAposta = Math.min(20, Math.max(15, Number.isFinite(q) ? q : 15));
-  prefs.numApostasGerar   = intVal('#num-apostas-gerar', 1);
-  prefs.qtd_concursos     = freq.considerarPeriodo;
+  const q = lf_intOpt('#qtde-numeros-aposta', 15);
+  if (q !== undefined) prefs.qtdeNumerosAposta = Math.min(20, Math.max(15, q));
+  const n = lf_intOpt('#num-apostas-gerar', 1);
+  if (n !== undefined) prefs.numApostasGerar = n;
+  if (prefs.frequencia && prefs.frequencia.considerarPeriodo !== undefined) {
+    prefs.qtd_concursos = prefs.frequencia.considerarPeriodo;
+  }
 
   return prefs;
 }
 
+// Atualiza e persiste o estado completo a cada interação
+function updateAllPreferences() {
+  try {
+    loadPremiumPreferencesLF();
+    const merged = collectCurrentPrefsLF();
+    userPremiumPreferencesLF = { ...userPremiumPreferencesLF, ...merged };
+    savePremiumPreferencesLF();
+  } catch (e) {
+    console.warn('[Lotofácil] updateAllPreferences falhou:', e);
+  }
+}
+
 // Listener do botão "Gerar Sugestão" (LF)
 document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('gerar-sugestao-btn');
+  let btn = document.getElementById('gerar-sugestao-btn');
+  // Persistir a cada mudança de qualquer preferência
+  const sel = '.checkbox-premium-pref, .select-premium-pref, #qtde-numeros-aposta, #num-apostas-gerar';
+  try { document.querySelectorAll(sel).forEach(el => el.addEventListener('change', updateAllPreferences)); } catch (_) {}
   if (!btn) return;
+  // Remover possíveis listeners globais clonando o botão e anexando apenas o nosso
+  try {
+    if (btn && btn.parentNode) {
+      const clone = btn.cloneNode(true);
+      btn.parentNode.replaceChild(clone, btn);
+      btn = clone;
+    }
+  } catch (e) {
+    console.warn('[Lotofácil] Falha ao clonar botão gerar-sugestao-btn:', e);
+  }
+
   btn.addEventListener('click', async () => {
     try {
       const prefs = collectCurrentPrefsLF();
@@ -364,11 +393,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const box = document.getElementById('resultado-sugestao');
       if (lista && box) {
         lista.innerHTML = '';
-        (data.apostas || []).forEach((a, idx) => {
-          const numeros = (a.numeros || []).map(n => String(n).padStart(2, '0')).join(' - ');
+        (data.apostas || []).forEach((aposta, idx) => {
+          const pills = (aposta.numeros || []).map(num => {
+            const v = String(num).padStart(2, '0');
+            return `<span class=\"bg-[#00E38C] text-black px-3 py-1 rounded-full font-semibold\">${v}</span>`;
+          }).join(' ');
           const item = document.createElement('div');
-          item.className = 'bg-[#1A1D25] border border-gray-700 rounded p-3';
-          item.innerHTML = `<div class="font-semibold">Aposta ${idx + 1}</div><div class="text-sm text-gray-300">${numeros}</div>`;
+          item.className = 'bg-[#1A1D25] border border-[#00E38C] rounded p-3';
+          item.innerHTML = `
+            <div class=\"font-semibold mb-2 text-white\">Aposta ${idx + 1}</div>
+            <div class=\"flex flex-wrap gap-2 justify-center items-center\">${pills}</div>
+          `;
           lista.appendChild(item);
         });
         box.classList.remove('hidden');
