@@ -193,6 +193,14 @@ function renderPremiumPreferencesSummaryLF() {
     if (s.evitarRepeticoesSeguidas) parts.push('Evitar Repetição do Último Concurso');
     out += `<div class="bg-card p-3 rounded-md border border-surface mb-3"><p class="font-semibold text-primary">Sequências:</p><ul class="list-disc list-inside ml-4 text-textSecondary"><li>${parts.join('; ')}</li></ul></div>`;
   }
+  const a = userPremiumPreferencesLF.afinidades;
+  if (a && (a.priorizarParesFortes || a.priorizarNumerosConectados || a.evitarParesFracos)) {
+    const parts = [];
+    if (a.priorizarParesFortes) parts.push(`Priorizar ${a.qtdePares} Pares com Forte Afinidade`);
+    if (a.priorizarNumerosConectados) parts.push(`Priorizar ${a.qtdeNumeros} Números com Alta Conexão Geral`);
+    if (a.evitarParesFracos) parts.push('Evitar Pares com Afinidade Fraca');
+    out += `<div class=\"bg-card p-3 rounded-md border border-surface mb-3\"><p class=\"font-semibold text-primary\">Afinidades:</p><ul class=\"list-disc list-inside ml-4 text-textSecondary\"><li>${parts.join('; ')}</li></ul></div>`;
+  }
   const c = userPremiumPreferencesLF.clusters;
   if (Array.isArray(c) && c.length) {
     out += `<div class=\"bg-card p-3 rounded-md border border-surface mb-3\"><p class=\"font-semibold text-primary\">Clusters:</p><ul class=\"list-disc list-inside ml-4 text-textSecondary\"><li>${c.map(x=>`<strong>${x}</strong>`).join(', ')}</li></ul></div>`;
@@ -251,6 +259,14 @@ function premiumModalPrepareAndRenderLF() {
     else userPremiumPreferencesLF.seca = { ...(userPremiumPreferencesLF.seca || {}), ...a };
   }
 
+  // Hidratar a partir do estado atual da UI (garante refletir as escolhas mais recentes)
+  try {
+    const prefsNow = collectCurrentPrefsLF();
+    userPremiumPreferencesLF = { ...userPremiumPreferencesLF, ...prefsNow };
+  } catch (e) {
+    console.warn('[Lotofácil] Falha ao coletar preferências atuais da UI:', e);
+  }
+
   savePremiumPreferencesLF();
   renderPremiumPreferencesSummaryLF();
 }
@@ -286,6 +302,7 @@ function collectCurrentPrefsLF() {
   afi.qtdePares                  = intVal('#afinidade-qtde-pares', 3);
   afi.priorizarNumerosConectados = checked('[data-pref-type="afinidades"][data-pref-name="priorizarNumerosConectados"]');
   afi.qtdeNumeros                = intVal('#afinidade-qtde-numeros', 4);
+  afi.evitarParesFracos          = checked('#afinidade-evitar-pares-fracos');
 
   // Padrões/Seca
   const pad = prefs.padroes = prefs.padroes || {};
