@@ -133,7 +133,14 @@ def get_analise_frequencia_nova():
             'frequencia_absoluta_trevos': [{'trevo': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['trevos'].items())],
             'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
             'frequencia_relativa_trevos': [{'trevo': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['trevos'].items())],
-            'numeros_quentes_frios': resultado['numeros_quentes_frios'],
+            # Manter estrutura atual e adicionar aliases compatíveis
+            'numeros_quentes_frios': {
+                'quentes': resultado.get('numeros_quentes_frios', {}).get('quentes') or resultado.get('numeros_quentes_frios', {}).get('numeros_quentes', []),
+                'frios': resultado.get('numeros_quentes_frios', {}).get('frios') or resultado.get('numeros_quentes_frios', {}).get('numeros_frios', []),
+            },
+            # Aliases legacy (se algum front ainda esperar estes nomes)
+            'numeros_quentes': (resultado.get('numeros_quentes_frios', {}).get('quentes') or resultado.get('numeros_quentes_frios', {}).get('numeros_quentes', [])),
+            'numeros_frios': (resultado.get('numeros_quentes_frios', {}).get('frios') or resultado.get('numeros_quentes_frios', {}).get('numeros_frios', [])),
             'analise_temporal': resultado['analise_temporal'],
             'periodo_analisado': resultado['periodo_analisado']
         })
@@ -1624,6 +1631,39 @@ def gerar_aposta_premium():
             'success': False,
             'error': f'Erro interno: {str(e)}'
         }), 500
+
+@app.route('/api/gerar_aposta_premium_lotofacil', methods=['POST'])
+def gerar_aposta_premium_lotofacil():
+    """Gera aposta inteligente da Lotofácil (1..25, 15–20 dezenas)."""
+    try:
+        from funcoes.lotofacil.geracao_inteligente_lotofacil import gerar_aposta_inteligente_lotofacil
+        preferencias_ml = request.get_json(silent=True) or {}
+
+        analysis_cache = {}
+        try:
+            from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil_2 import analisar_frequencia_lotofacil2
+            analysis_cache['frequencia'] = analisar_frequencia_lotofacil2(None, qtd_concursos=preferencias_ml.get('qtd_concursos', 25))
+        except Exception:
+            pass
+        try:
+            from funcoes.lotofacil.funcao_analise_de_combinacoes_lotofacil import analisar_combinacoes_lotofacil
+            analysis_cache['afinidades_completa'] = analisar_combinacoes_lotofacil(None, qtd_concursos=min(200, preferencias_ml.get('qtd_concursos', 50)))
+        except Exception:
+            pass
+
+        qtde = preferencias_ml.get('qtdeNumerosAposta')
+        preferencias_ml['qtdeNumerosAposta'] = max(15, min(20, int(qtde) if isinstance(qtde, int) else 15))
+
+        apostas = gerar_aposta_inteligente_lotofacil(preferencias_ml, analysis_cache)
+        for a in apostas:
+            a['numeros'] = sorted([n for n in a.get('numeros', []) if isinstance(n, int) and 1 <= n <= 25])
+
+        return jsonify({'success': True, 'apostas': apostas, 'qtde_apostas': len(apostas)})
+    except Exception as e:
+        print(f"❌ Erro ao gerar aposta premium Lotofácil: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/gerar_aposta_premium_MS', methods=['POST'])
 def gerar_aposta_premium_megasena():

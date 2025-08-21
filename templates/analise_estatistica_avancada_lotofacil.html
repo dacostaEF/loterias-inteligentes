@@ -13,6 +13,7 @@
   <title>Lotofácil | Inteligência Estatística</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="{{ url_for('static', filename='js/graficos_lotofacil.js') }}" defer></script>
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
@@ -54,6 +55,64 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
+    // Definição antecipada (HEAD) para evitar ReferenceError em qualquer ponto
+    if (typeof window.armazenarAnalise !== 'function') {
+      window.armazenarAnalise = function(tipo, dados) {
+        try {
+          const key = 'analisesSelecionadas_LF';
+          const existentes = JSON.parse(localStorage.getItem(key)) || {};
+          existentes[tipo] = dados;
+          localStorage.setItem(key, JSON.stringify(existentes));
+        } catch (e) {
+          // Silencioso para não quebrar a UI
+        }
+      };
+    }
+
+    // === Preferências LF (fallback local) ===
+    const PREFS_KEY_LF = 'userPremiumPreferencesLF';
+    const getPrefsLF = () => JSON.parse(localStorage.getItem(PREFS_KEY_LF) || '{}');
+    const savePrefsLF = (p) => localStorage.setItem(PREFS_KEY_LF, JSON.stringify(p));
+
+    function collectCurrentPrefsLF() {
+      const scope = document;
+      const pick = (sel) => scope.querySelector(sel);
+      const checked = (sel) => !!pick(sel)?.checked;
+      const intVal = (sel, def=0) => parseInt(pick(sel)?.value || def, 10);
+      const txtVal = (sel, def='') => pick(sel)?.value || def;
+
+      const prefs = getPrefsLF();
+
+      const freq = prefs.frequencia = prefs.frequencia || {};
+      freq.priorizarQuentes = checked('[data-pref-type="frequencia"][data-pref-name="priorizarQuentes"]');
+      freq.qtdeQuentes      = intVal('#freq-qtde-quentes', 10);
+      freq.priorizarFrios   = checked('[data-pref-type="frequencia"][data-pref-name="priorizarFrios"]');
+      freq.qtdeFrios        = intVal('#freq-qtde-frios', 10);
+      freq.considerarPeriodo= txtVal('#freq-periodo', 'completa');
+
+      const afi = prefs.afinidades = prefs.afinidades || {};
+      afi.priorizarParesFortes       = checked('[data-pref-type="afinidades"][data-pref-name="priorizarParesFortes"]');
+      afi.qtdePares                  = intVal('#afinidade-qtde-pares', 3);
+      afi.priorizarNumerosConectados = checked('[data-pref-type="afinidades"][data-pref-name="priorizarNumerosConectados"]');
+      afi.qtdeNumeros                = intVal('#afinidade-qtde-numeros', 4);
+
+      const pad = prefs.padroes = prefs.padroes || {};
+      pad.evitarConsecutivos       = checked('[data-pref-type="padroes"][data-pref-name="evitarConsecutivos"]');
+      pad.priorizarAtrasados       = checked('[data-pref-type="padroes"][data-pref-name="priorizarAtrasados"]');
+      pad.minAtraso                = intVal('#padrao-min-atraso', 20);
+      pad.evitarRepeticoesSeguidas = checked('[data-pref-type="padroes"][data-pref-name="evitarRepeticoesSeguidas"]');
+
+      prefs.qtdeNumerosAposta = intVal('#qtde-numeros-aposta', 15);
+      prefs.numApostasGerar   = intVal('#num-apostas-gerar', 1);
+      prefs.qtd_concursos     = freq.considerarPeriodo;
+
+      return prefs;
+    }
+
+    // renderPremiumPreferencesSummary: usar versão do graficos_lotofacil.js
+
+    // Ação premium: consolidar preferências e gerar pela rota da Lotofácil
+    // Handler do botão premium: usar versão do graficos_lotofacil.js
     tailwind.config = {
       important: false,
       corePlugins: {
@@ -1164,7 +1223,7 @@
             <h4 class="text-white text-lg font-semibold mb-3">⚙️ Configuração da Aposta Gerada:</h4>
             <div class="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
                 <label for="qtde-numeros-aposta" class="text-gray-300">Quantos números na aposta?</label>
-                <input type="number" id="qtde-numeros-aposta" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="6" min="6" max="15">
+                <input type="number" id="qtde-numeros-aposta" class="w-20 bg-[#1A1D25] border border-gray-600 text-white rounded px-2 py-1 text-sm" value="15" min="15" max="20">
             </div>
             <div class="flex items-center">
                 <label for="num-apostas-gerar" class="text-gray-300">Quantas apostas gerar?</label>
@@ -1177,7 +1236,7 @@
         </button>
 
         <div id="resultado-sugestao" class="bg-[#2E303A] p-4 rounded-md mt-6 hidden">
-            <h4 class="text-[#00E38C] text-xl font-semibold mb-3 text-center">🎯 Sua Aposta Sugerida da Quina:</h4>
+            <h4 class="text-[#00E38C] text-xl font-semibold mb-3 text-center">🎯 Sua Aposta Sugerida da Lotofácil:</h4>
             <div id="lista-apostas-geradas" class="space-y-4">
             </div>
         </div>
@@ -1214,6 +1273,21 @@
 
   <!-- Scripts -->
   <script>
+    // Guardar função antes de qualquer uso neste bloco
+    if (typeof window.armazenarAnalise !== 'function') {
+      window.armazenarAnalise = function(tipo, dados) {
+        try {
+          const key = 'analisesSelecionadas_LF';
+          const existentes = JSON.parse(localStorage.getItem(key)) || {};
+          existentes[tipo] = dados;
+          localStorage.setItem(key, JSON.stringify(existentes));
+          console.log(`✅ armazenarAnalise (LF) definido no topo do script para: ${tipo}`);
+        } catch (e) {
+          console.warn('⚠️ armazenarAnalise (LF) falhou ao salvar:', e);
+        }
+      };
+    }
+
     // Dados simulados (serão substituídos pelos dados reais)
     const dadosMilionaria = {
       frequencia: {
@@ -1847,34 +1921,7 @@
               <div id="matriz-frequencia" class="matriz-container"></div>
             </div>
 
-            <!-- SUGESTÕES PARA APOSTA PREMIUM -->
-            <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
-              <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
-              <div class="space-y-3">
-                <div class="flex items-center">
-                  <input type="checkbox" id="freq-priorizar-quentes" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarQuentes" data-pref-period="completa">
-                  <label for="freq-priorizar-quentes" class="text-white">Priorizar Números MAIS Frequentes</label>
-                  <input type="number" id="freq-qtde-quentes" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
-                </div>
-                <div class="flex items-center">
-                  <input type="checkbox" id="freq-priorizar-frios" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="frequencia" data-pref-name="priorizarFrios" data-pref-period="completa">
-                  <label for="freq-priorizar-frios" class="text-white">Priorizar Números MENOS Frequentes</label>
-                  <input type="number" id="freq-qtde-frios" class="ml-auto w-16 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="10" min="1" max="50">
-                </div>
-                <div class="flex items-center">
-                  <label for="freq-periodo" class="text-white">Considerar período:</label>
-                  <select id="freq-periodo" class="select-premium-pref ml-2 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" data-pref-type="frequencia" data-pref-name="considerarPeriodo">
-                    <option value="300">Últimos 300 Concursos</option>
-                    <option value="25">Últimos 25 Concursos</option>
-                    <option value="50">Últimos 50 Concursos</option>
-                  </select>
-                </div>
-              </div>
-              <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
-                <p class="text-sm text-[#00E38C] font-medium">💡 Dica:</p>
-                <p class="text-xs text-gray-300">Marque as opções que fazem sentido para sua estratégia. Elas serão usadas na Análise Premium.</p>
-              </div>
-            </div>
+            <!-- SUGESTÕES PARA APOSTA PREMIUM (removido bloco duplicado; usar bloco consolidado adiante) -->
           </div>
         `;
 
@@ -4255,13 +4302,13 @@
             }
         };
 
-        // SALVAR PREFERÊNCIAS DO PASSO 6 (ESTATÍSTICAS AVANÇADAS) - QUINA
-        window.userPremiumPreferencesQuina = window.userPremiumPreferencesQuina || {};
+        // SALVAR PREFERÊNCIAS DO PASSO 6 (ESTATÍSTICAS AVANÇADAS) - LOTOFÁCIL
+        window.userPremiumPreferencesLF = window.userPremiumPreferencesLF || {};
 
         // Salvar preferências de padrões baseadas na análise de seca
-        window.userPremiumPreferencesQuina.padroes = {
+        window.userPremiumPreferencesLF.padroes = {
             priorizarAtrasados: true,
-            minAtraso: 15, // Valor padrão para Quina
+            minAtraso: 15, // Valor padrão para Lotofácil
             evitarConsecutivos: true,
             evitarRepeticoesSeguidas: true
         };
@@ -4269,18 +4316,18 @@
         // Salvar dados de clusters para uso no modal premium
         if (clusters && clusters.resumo_clusters) {
             // Os clusters serão selecionados pelo usuário via checkboxes
-            window.userPremiumPreferencesQuina.clusters = [];
+            window.userPremiumPreferencesLF.clusters = [];
         }
 
-        // Salvar no localStorage
-        if (typeof savePremiumPreferencesMS === 'function') {
-            savePremiumPreferencesMS();
+        // Salvar no localStorage (Lotofácil)
+        if (typeof savePremiumPreferencesLF === 'function') {
+            savePremiumPreferencesLF();
         }
 
         // Debug: verificar se os dados estão sendo armazenados corretamente
-        console.log('Dados dos clusters armazenados:', window.analiseResultados.avancada.clusters);
-        console.log('Resumo dos clusters:', window.analiseResultados.avancada.clusters?.resumo_clusters);
-        console.log('Preferências salvas:', window.userPremiumPreferencesQuina);
+        console.log('Dados dos clusters armazenados (LF):', window.analiseResultados.avancada.clusters);
+        console.log('Resumo dos clusters (LF):', window.analiseResultados.avancada.clusters?.resumo_clusters);
+        console.log('Preferências salvas (LF):', window.userPremiumPreferencesLF);
 
         // Criar gráficos após o HTML ser inserido
         setTimeout(() => {
@@ -4301,6 +4348,59 @@
             renderClusterCheckboxes();
           }
         }, 100);
+
+        // Fallback: tentar renderizar os checkboxes de clusters quando a função for carregada
+        (function tentarRenderClusters(maxTentativas = 20) {
+          let tentativas = 0;
+          const timer = setInterval(() => {
+            const pronto = typeof renderClusterCheckboxes === 'function' &&
+              window.analiseResultados &&
+              window.analiseResultados.avancada &&
+              window.analiseResultados.avancada.clusters &&
+              window.analiseResultados.avancada.clusters.resumo_clusters;
+            if (pronto) {
+              try { renderClusterCheckboxes(); } catch (_) {}
+              clearInterval(timer);
+            }
+            tentativas++;
+            if (tentativas >= maxTentativas) {
+              clearInterval(timer);
+            }
+          }, 200);
+        })();
+
+        // Fallback: define uma versão local do renderClusterCheckboxes caso o JS global não carregue
+        if (typeof window.renderClusterCheckboxes !== 'function') {
+          window.renderClusterCheckboxes = function() {
+            const opcoesDiv = document.getElementById('avancada-opcoes-clusters');
+            const dados = window.analiseResultados && window.analiseResultados.avancada && window.analiseResultados.avancada.clusters;
+            if (!opcoesDiv) return;
+            if (!dados || !dados.resumo_clusters) {
+              opcoesDiv.innerHTML = '<p class="col-span-2 text-red-500 text-center">Dados de clusters não disponíveis.</p>';
+              return;
+            }
+            const resumo = dados.resumo_clusters;
+            const selKey = 'li_lf_clusters_sel';
+            const selecionados = JSON.parse(localStorage.getItem(selKey) || '[]');
+            let html = '';
+            Object.keys(resumo).forEach(key => {
+              const c = resumo[key];
+              const checked = selecionados.includes(key) ? 'checked' : '';
+              html += `
+                <div>
+                  <input type="checkbox" id="cluster-${key}" value="${key}" ${checked} class="form-checkbox h-5 w-5 text-[#00E38C] rounded">
+                  <label for="cluster-${key}" class="text-white">${c.id || key} — ${c.descricao_curta || ''}</label>
+                </div>`;
+            });
+            opcoesDiv.innerHTML = html || '<p class="col-span-2 text-gray-300 text-center">Nenhum cluster identificado.</p>';
+            opcoesDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+              cb.addEventListener('change', () => {
+                const arr = Array.from(opcoesDiv.querySelectorAll('input[type="checkbox"]:checked')).map(x => x.value);
+                localStorage.setItem(selKey, JSON.stringify(arr));
+              });
+            });
+          }
+        }
 
       } catch (error) {
         console.error('Erro ao carregar estatísticas avançadas:', error);
@@ -5749,7 +5849,28 @@
   }
   </style>
 
-  <script src="{{ url_for('static', filename='js/graficos_megasena.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
+
+  <script>
+    // Fallback para armazenar análises no localStorage caso não exista no JS global
+    (function(){
+      if (typeof window.armazenarAnalise !== 'function') {
+        window.armazenarAnalise = function(tipo, dados) {
+          try {
+            const key = 'analisesSelecionadas_LF';
+            const existentes = JSON.parse(localStorage.getItem(key)) || {};
+            existentes[tipo] = dados;
+            localStorage.setItem(key, JSON.stringify(existentes));
+            console.log(`✅ Fallback armazenarAnalise (LF) salvou: ${tipo}`);
+          } catch (e) {
+            console.warn('⚠️ Fallback armazenarAnalise (LF) falhou:', e);
+          }
+        }
+      }
+    })();
+
+    // Abertura/fechamento do modal Premium: controlado pelo graficos_lotofacil.js
+  </script>
 
   <!-- Modal para Números do Cluster -->
   <div id="modal-numeros-cluster" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">

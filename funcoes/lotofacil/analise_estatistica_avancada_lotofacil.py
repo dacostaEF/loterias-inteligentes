@@ -707,42 +707,7 @@ def realizar_analise_estatistica_avancada_lotofacil(df_lotofacil=None, qtd_concu
         traceback.print_exc()
         return {'erro': f'Erro interno: {str(e)}'}
 
-# Exemplo de uso
-if __name__ == "__main__":
-    try:
-        from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
-        
-        print("📊 ANÁLISE ESTATÍSTICA AVANÇADA - QUINA")
-        print("="*80)
-        
-        df_quina = carregar_dados_quina()
-        
-        if df_quina is not None and not df_quina.empty:
-            # Criar instância da análise
-            analise = AnaliseEstatisticaAvancadaQuina(df_quina)
-            
-            # Executar análise completa
-            resultados = analise.executar_analise_completa()
-            
-            # Exibir resultados
-            exibir_analise_estatistica_avancada_quina(resultados)
-            
-        else:
-            print("❌ Não foi possível carregar os dados da Quina")
-            
-    except ImportError:
-        print("⚠️  Módulo de carregamento não encontrado. Usando dados de exemplo...")
-        
-        # Dados de exemplo para teste
-        dados_exemplo = [
-            [1, 1, 3, 7, 15, 23],
-            [2, 13, 16, 35, 41, 42],
-            [3, 1, 9, 17, 30, 31],
-            [4, 6, 23, 25, 33, 34],
-            [5, 6, 16, 21, 24, 26]
-        ]
-        df_exemplo = pd.DataFrame(dados_exemplo, columns=['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5'])
-        
-        analise = AnaliseEstatisticaAvancadaQuina(df_exemplo)
-        resultados = analise.executar_analise_completa()
-        exibir_analise_estatistica_avancada_quina(resultados) 
+"""
+Nota: bloco de execução direta removido deste módulo.
+Scripts de exemplo/diagnóstico foram movidos para scripts/diagnostico/.
+"""

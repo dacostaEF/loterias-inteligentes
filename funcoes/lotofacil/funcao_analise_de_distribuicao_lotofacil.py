@@ -393,36 +393,7 @@ def exibir_analise_distribuicao_detalhada_lotofacil(resultado):
     print(f"  📊 Média: {amp['media']}")
     print(f"  🎯 Moda: {amp['moda']}")
 
-# Exemplo de uso com dados da Lotofácil
-if __name__ == "__main__":
-    try:
-        # Carregar dados reais da Lotofácil
-        from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
-        print("🔄 Carregando dados da Lotofácil...")
-        df_lf = carregar_dados_lotofacil()
-
-        print("\n" + "="*80)
-        print("📊 ANÁLISE COMPLETA (Todos os concursos)")
-        print("="*80)
-        resultado_completo = analise_distribuicao_lotofacil_completa(df_lf)
-        exibir_analise_distribuicao_detalhada_lotofacil(resultado_completo)
-
-        print("\n" + "="*80)
-        print("📊 ANÁLISE DOS ÚLTIMOS 25 CONCURSOS")
-        print("="*80)
-        resultado_25 = analise_distribuicao_lotofacil_completa(df_lf, qtd_concursos=25)
-        exibir_analise_distribuicao_detalhada_lotofacil(resultado_25)
-    except Exception:
-        print("⚠️  Dados da Lotofácil não disponíveis. Usando dados de exemplo...")
-        # Dados de exemplo da Lotofácil (cada sorteio: concurso + 15 dezenas 1-25)
-        dados_exemplo = [
-            [1, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],
-            [2, 1,3,5,7,9,11,13,15,2,4,6,8,10,12,14],
-            [3, 2,4,6,8,10,12,14,16,18,20,22,24,1,3,5],
-            [4, 5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],
-            [5, 7,8,9,10,11,12,13,14,15,16,17,18,19,20,21],
-        ]
-
-        print("\n📊 Análise completa (dados de exemplo):")
-        resultado_analise = analise_de_distribuicao_lotofacil(dados_exemplo)
-        exibir_analise_distribuicao_detalhada_lotofacil(resultado_analise)
+"""
+Nota: bloco de execução direta removido deste módulo.
+Scripts de exemplo/diagnóstico foram movidos para scripts/diagnostico/.
+"""

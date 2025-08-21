@@ -102,6 +102,30 @@ const DEFAULT_LAYOUT = {
     }
 };
 
+// Fallback global: garantir que armazenarAnalise exista em todas as páginas
+if (typeof window.armazenarAnalise !== 'function') {
+    window.armazenarAnalise = function(tipo, dados) {
+        try {
+            const path = (window.location && window.location.pathname) ? window.location.pathname.toLowerCase() : '';
+            const title = (document && document.title) ? document.title.toLowerCase() : '';
+            const loteria = path.includes('lotofacil') || title.includes('lotofácil') ? 'LF'
+                           : path.includes('megasena') || title.includes('mega') ? 'MS'
+                           : path.includes('quina') || title.includes('quina') ? 'QN'
+                           : 'GEN';
+            const key = loteria === 'LF' ? 'analisesSelecionadas_LF'
+                       : loteria === 'MS' ? 'analisesSelecionadas_MS'
+                       : loteria === 'QN' ? 'analisesSelecionadas_QN'
+                       : 'analisesSelecionadas_GEN';
+            const existentes = JSON.parse(localStorage.getItem(key)) || {};
+            existentes[tipo] = dados;
+            localStorage.setItem(key, JSON.stringify(existentes));
+            console.log(`✅ armazenarAnalise fallback ativo (${key}) →`, tipo);
+        } catch (e) {
+            console.warn('⚠️ armazenarAnalise fallback falhou:', e);
+        }
+    };
+}
+
 // --- SISTEMA DE PREFERÊNCIAS PREMIUM ---
 // =======================================
 
@@ -122,6 +146,14 @@ let userPremiumPreferences = {
         priorizarSoma: false,
         somaMin: 100,
         somaMax: 200 // Exemplo de faixa de soma
+    },
+    // Preferências específicas para Sequências (usado em Mega e Lotofácil)
+    sequencias: {
+        evitarConsecutivos: false,
+        priorizarAtrasados: false,
+        minAtraso: 20,
+        evitarSequencias: false,
+        evitarRepeticoesSeguidas: false
     },
     padroes: {
         evitarConsecutivos: false,
@@ -1056,26 +1088,38 @@ document.addEventListener('DOMContentLoaded', function() {
 // --- FUNÇÕES PARA SALVAR E RECUPERAR ANÁLISES ---
 // =================================================
 
-// Função para armazenar análises no localStorage (Milionária)
+// Função para armazenar análises no localStorage (sensível à loteria)
 function armazenarAnalise(tipo, dados) {
     try {
-        const existentes = JSON.parse(localStorage.getItem("analisesSelecionadas_MIL")) || {};
+        const titulo = (document && document.title ? document.title : '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+        const path = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+        let key = 'analisesSelecionadas_MIL';
+        if (titulo.includes('lotofacil') || path.includes('lotofacil')) key = 'analisesSelecionadas_LF';
+        else if (titulo.includes('mega') || path.includes('megasena')) key = 'analisesSelecionadas_MS';
+        else if (titulo.includes('quina') || path.includes('quina')) key = 'analisesSelecionadas_QN';
+        const existentes = JSON.parse(localStorage.getItem(key)) || {};
         existentes[tipo] = dados;
-        localStorage.setItem("analisesSelecionadas_MIL", JSON.stringify(existentes));
-        console.log(`✅ Análise ${tipo} armazenada no localStorage:`, dados);
+        localStorage.setItem(key, JSON.stringify(existentes));
+        console.log(`✅ Análise ${tipo} armazenada no localStorage (${key}):`, dados);
     } catch (error) {
         console.error(`❌ Erro ao armazenar análise ${tipo}:`, error);
     }
 }
 
-// Função para recuperar análises do localStorage (Milionária)
+// Função para recuperar análises do localStorage (sensível à loteria)
 function recuperarAnalises() {
     try {
-        const dados = JSON.parse(localStorage.getItem("analisesSelecionadas_MIL")) || {};
-        console.log("📊 Análises recuperadas do localStorage (Milionária):", dados);
+        const titulo = (document && document.title ? document.title : '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+        const path = (window.location && window.location.pathname ? window.location.pathname : '').toLowerCase();
+        let key = 'analisesSelecionadas_MIL';
+        if (titulo.includes('lotofacil') || path.includes('lotofacil')) key = 'analisesSelecionadas_LF';
+        else if (titulo.includes('mega') || path.includes('megasena')) key = 'analisesSelecionadas_MS';
+        else if (titulo.includes('quina') || path.includes('quina')) key = 'analisesSelecionadas_QN';
+        const dados = JSON.parse(localStorage.getItem(key)) || {};
+        console.log(`📊 Análises recuperadas do localStorage (${key}):`, dados);
         return dados;
     } catch (error) {
-        console.error("❌ Erro ao recuperar análises (Milionária):", error);
+        console.error("❌ Erro ao recuperar análises:", error);
         return {};
     }
 }
@@ -1095,69 +1139,163 @@ const qtdeTrevosApostaInput = document.getElementById('qtde-trevos-aposta');
 const numApostasGerarInput = document.getElementById('num-apostas-gerar');
 const listaApostasGeradasDiv = document.getElementById('lista-apostas-geradas');
 
+// Capturar preferências atuais diretamente da UI dos modais/passos
+function hydratePreferencesFromUI() {
+    // Escopo preferencial: modal de análise aberto; fallback para documento inteiro
+    const scope = document.querySelector('#modal:not(.hidden)') || document;
+
+    // Helpers que toleram IDs duplicados escolhendo o último elemento
+    const pickLast = (selector) => {
+        const nodes = scope.querySelectorAll(selector);
+        return nodes.length ? nodes[nodes.length - 1] : null;
+    };
+    const pickBoolAttr = (type, name) => !!pickLast(`[data-pref-type="${type}"][data-pref-name="${name}"]`)?.checked;
+    const pickIntById = (id, def) => {
+        const el = pickLast(`#${id}`);
+        const val = el?.value ?? '';
+        const n = parseInt(val, 10);
+        return Number.isFinite(n) ? n : def;
+    };
+    const pickTextById = (id, def) => pickLast(`#${id}`)?.value || def;
+
+    // Frequência
+    userPremiumPreferences.frequencia.priorizarQuentes = pickBoolAttr('frequencia', 'priorizarQuentes');
+    userPremiumPreferences.frequencia.qtdeQuentes = pickIntById('freq-qtde-quentes', 10);
+    userPremiumPreferences.frequencia.priorizarFrios = pickBoolAttr('frequencia', 'priorizarFrios');
+    userPremiumPreferences.frequencia.qtdeFrios = pickIntById('freq-qtde-frios', 10);
+    userPremiumPreferences.frequencia.considerarPeriodo = pickTextById('freq-periodo', 'completa');
+
+    // Distribuição
+    userPremiumPreferences.distribuicao.priorizarParesImpares = pickLast('#dist-priorizar-pares-impares')?.checked || false;
+    userPremiumPreferences.distribuicao.paridadeDesejada = pickTextById('dist-paridade-desejada', 'equilibrado');
+    userPremiumPreferences.distribuicao.priorizarSoma = pickLast('#dist-priorizar-soma')?.checked || false;
+    userPremiumPreferences.distribuicao.somaMin = pickIntById('dist-soma-min', 100);
+    userPremiumPreferences.distribuicao.somaMax = pickIntById('dist-soma-max', 200);
+
+    // Afinidades
+    userPremiumPreferences.afinidades.priorizarParesFortes = pickBoolAttr('afinidades', 'priorizarParesFortes');
+    userPremiumPreferences.afinidades.qtdePares = pickIntById('afinidade-qtde-pares', 3);
+    userPremiumPreferences.afinidades.priorizarNumerosConectados = pickBoolAttr('afinidades', 'priorizarNumerosConectados');
+    userPremiumPreferences.afinidades.qtdeNumeros = pickIntById('afinidade-qtde-numeros', 4);
+    userPremiumPreferences.afinidades.evitarParesFracos = pickBoolAttr('afinidades', 'evitarParesFracos');
+
+    // Padrões/Seca
+    userPremiumPreferences.padroes.evitarConsecutivos = pickBoolAttr('padroes', 'evitarConsecutivos');
+    userPremiumPreferences.padroes.priorizarAtrasados = pickBoolAttr('padroes', 'priorizarAtrasados');
+    userPremiumPreferences.padroes.minAtraso = pickIntById('padrao-min-atraso', 20);
+    userPremiumPreferences.padroes.evitarRepeticoesSeguidas = pickBoolAttr('padroes', 'evitarRepeticoesSeguidas');
+
+    // Sequências (passo dedicado)
+    userPremiumPreferences.sequencias.evitarConsecutivos = !!pickLast('#sequencia-evitar-consecutivos')?.checked;
+    userPremiumPreferences.sequencias.priorizarAtrasados = !!pickLast('#sequencia-priorizar-atrasados')?.checked;
+    userPremiumPreferences.sequencias.evitarSequencias = !!pickLast('#sequencia-evitar-sequencias')?.checked;
+    userPremiumPreferences.sequencias.evitarRepeticoesSeguidas = !!pickLast('#sequencia-evitar-repeticoes')?.checked;
+    userPremiumPreferences.sequencias.minAtraso = pickIntById('sequencia-min-atraso', 20);
+
+    // Clusters (se já renderizados)
+    const clusterChecks = scope.querySelectorAll('#avancada-opcoes-clusters input[type="checkbox"]:checked');
+    if (clusterChecks && clusterChecks.length >= 0) {
+        userPremiumPreferences.clusters = Array.from(clusterChecks).map(el => el.value);
+    }
+
+    savePremiumPreferences();
+}
+
+// Função para preparar e renderizar o modal Premium (usada no listener e em fallbacks)
+function premiumModalPrepareAndRender() {
+    // Recuperar dados das análises do localStorage
+    const analisesRecuperadas = recuperarAnalises();
+    console.log("📊 Análises recuperadas do localStorage (Milionária):", analisesRecuperadas);
+
+    // Atualizar as preferências com os dados das análises
+    if (analisesRecuperadas.frequencia) {
+        // Pode vir como objeto {tipo, nome, valor, periodo} ou como mapa de propriedades
+        const a = analisesRecuperadas.frequencia;
+        if (a && a.nome !== undefined) {
+            userPremiumPreferences.frequencia[a.nome] = a.valor;
+            if (a.periodo) userPremiumPreferences.frequencia.considerarPeriodo = a.periodo;
+        } else {
+            userPremiumPreferences.frequencia = { ...userPremiumPreferences.frequencia, ...a };
+        }
+    }
+    if (analisesRecuperadas.distribuicao) {
+        const a = analisesRecuperadas.distribuicao;
+        if (a && a.nome !== undefined) {
+            userPremiumPreferences.distribuicao[a.nome] = a.valor;
+        } else {
+            userPremiumPreferences.distribuicao = { ...userPremiumPreferences.distribuicao, ...a };
+        }
+    }
+    if (analisesRecuperadas.afinidades) {
+        const a = analisesRecuperadas.afinidades;
+        if (a && a.nome !== undefined) {
+            userPremiumPreferences.afinidades[a.nome] = a.valor;
+        } else {
+            userPremiumPreferences.afinidades = { ...userPremiumPreferences.afinidades, ...a };
+        }
+    }
+    if (analisesRecuperadas.padroes) {
+        const a = analisesRecuperadas.padroes;
+        if (a && a.nome !== undefined) {
+            userPremiumPreferences.padroes[a.nome] = a.valor;
+        } else {
+            userPremiumPreferences.padroes = { ...userPremiumPreferences.padroes, ...a };
+        }
+    }
+    if (analisesRecuperadas.sequencias) {
+        const a = analisesRecuperadas.sequencias;
+        if (a && a.nome !== undefined) {
+            if (!userPremiumPreferences.sequencias) userPremiumPreferences.sequencias = {};
+            userPremiumPreferences.sequencias[a.nome] = a.valor;
+            if (a.nome === 'minAtraso' && typeof a.valor === 'number') {
+                userPremiumPreferences.sequencias.minAtraso = a.valor;
+            }
+        } else {
+            userPremiumPreferences.sequencias = { ...userPremiumPreferences.sequencias, ...a };
+        }
+    }
+    if (analisesRecuperadas.seca) {
+        const a = analisesRecuperadas.seca;
+        if (a && a.nome !== undefined) {
+            userPremiumPreferences.seca = { ...(userPremiumPreferences.seca || {}), [a.nome]: a.valor };
+        } else {
+            userPremiumPreferences.seca = { ...(userPremiumPreferences.seca || {}), ...a };
+        }
+    }
+    if (analisesRecuperadas.trevos) {
+        const a = analisesRecuperadas.trevos;
+        if (a && a.nome !== undefined) {
+            userPremiumPreferences.trevos[a.nome] = a.valor;
+        } else {
+            userPremiumPreferences.trevos = { ...userPremiumPreferences.trevos, ...a };
+        }
+    }
+    if (analisesRecuperadas.estatisticas) {
+        console.log("📊 Dados de estatísticas avançadas disponíveis, mantendo clusters como array.");
+    }
+
+    // Hidratar preferências a partir do estado atual da UI (garante refletir escolhas feitas agora)
+    try { hydratePreferencesFromUI(); } catch (e) { console.warn('hydratePreferencesFromUI falhou:', e); }
+
+    // Carregar e exibir as preferências atuais
+    renderPremiumPreferencesSummary();
+
+    // Carregar os valores de qtdeNumerosAposta, qtdeTrevosAposta e numApostasGerar
+    if (qtdeNumerosApostaInput) qtdeNumerosApostaInput.value = userPremiumPreferences.qtdeNumerosAposta;
+    if (qtdeTrevosApostaInput) qtdeTrevosApostaInput.value = userPremiumPreferences.qtdeTrevosAposta;
+    if (numApostasGerarInput) numApostasGerarInput.value = userPremiumPreferences.numApostasGerar;
+}
+
+// Tornar acessível globalmente para fallbacks em templates
+window.premiumModalPrepareAndRender = premiumModalPrepareAndRender;
+
 // Event listeners do modal premium
 if (abrirModalPremiumBtn) {
     abrirModalPremiumBtn.addEventListener('click', () => {
         console.log("🎯 Botão abrir modal premium clicado (Milionária)!");
         modalPremium.classList.remove('hidden');
-        resultadoSugestaoDiv.classList.add('hidden'); // Esconde o resultado ao abrir
-
-        // Recuperar dados das análises do localStorage
-        const analisesRecuperadas = recuperarAnalises();
-        console.log("📊 Análises recuperadas do localStorage (Milionária):", analisesRecuperadas);
-
-        // Atualizar as preferências com os dados das análises
-        if (analisesRecuperadas.frequencia) {
-            userPremiumPreferences.frequencia = {
-                ...userPremiumPreferences.frequencia,
-                ...analisesRecuperadas.frequencia
-            };
-        }
-        if (analisesRecuperadas.distribuicao) {
-            userPremiumPreferences.distribuicao = {
-                ...userPremiumPreferences.distribuicao,
-                ...analisesRecuperadas.distribuicao
-            };
-        }
-        if (analisesRecuperadas.afinidades) {
-            userPremiumPreferences.afinidades = {
-                ...userPremiumPreferences.afinidades,
-                ...analisesRecuperadas.afinidades
-            };
-        }
-        if (analisesRecuperadas.padroes) {
-            userPremiumPreferences.padroes = {
-                ...userPremiumPreferences.padroes,
-                ...analisesRecuperadas.padroes
-            };
-        }
-        if (analisesRecuperadas.seca) {
-            userPremiumPreferences.seca = {
-                ...userPremiumPreferences.seca,
-                ...analisesRecuperadas.seca
-            };
-        }
-        if (analisesRecuperadas.trevos) {
-            userPremiumPreferences.trevos = {
-                ...userPremiumPreferences.trevos,
-                ...analisesRecuperadas.trevos
-            };
-        }
-        if (analisesRecuperadas.estatisticas) {
-            // Não sobrescrever clusters - manter como array
-            console.log("📊 Dados de estatísticas avançadas disponíveis, mas clusters mantidos como array");
-        }
-
-        // Salvar as preferências atualizadas
-        savePremiumPreferences();
-
-        // Carregar e exibir as preferências atuais
-        renderPremiumPreferencesSummary();
-
-        // Carregar os valores de qtdeNumerosAposta, qtdeTrevosAposta e numApostasGerar
-        if (qtdeNumerosApostaInput) qtdeNumerosApostaInput.value = userPremiumPreferences.qtdeNumerosAposta;
-        if (qtdeTrevosApostaInput) qtdeTrevosApostaInput.value = userPremiumPreferences.qtdeTrevosAposta;
-        if (numApostasGerarInput) numApostasGerarInput.value = userPremiumPreferences.numApostasGerar;
+        resultadoSugestaoDiv.classList.add('hidden');
+        premiumModalPrepareAndRender();
     });
 }
 
@@ -1274,6 +1412,32 @@ function renderPremiumPreferencesSummary() {
         console.log('✅ Padrões adicionados ao resumo');
     } else {
         console.log('❌ Padrões não adicionados - nenhuma opção selecionada');
+    }
+
+    // --- 3.5. Sequências ---
+    const sequenciasPref = userPremiumPreferences.sequencias;
+    if (sequenciasPref && (sequenciasPref.evitarConsecutivos || sequenciasPref.priorizarAtrasados || sequenciasPref.evitarSequencias || sequenciasPref.evitarRepeticoesSeguidas)) {
+        let sequenciasDetails = [];
+        if (sequenciasPref.evitarConsecutivos) {
+            sequenciasDetails.push('Evitar Números Consecutivos');
+        }
+        if (sequenciasPref.priorizarAtrasados) {
+            sequenciasDetails.push(`Priorizar Números MUITO Atrasados (Mínimo ${sequenciasPref.minAtraso} concursos sem sair)`);
+        }
+        if (sequenciasPref.evitarSequencias) {
+            sequenciasDetails.push('Evitar Sequências Específicas');
+        }
+        if (sequenciasPref.evitarRepeticoesSeguidas) {
+            sequenciasDetails.push('Evitar Números Repetidos do Último Concurso');
+        }
+        summaryHtml += `
+            <div class="bg-card p-3 rounded-md border border-surface mb-3">
+                <p class="font-semibold text-primary">Sequências:</p>
+                <ul class="list-disc list-inside ml-4 text-textSecondary">
+                    <li>${sequenciasDetails.join('; ')}</li>
+                </ul>
+            </div>
+        `;
     }
 
     // --- 4. Clusters (Análise Estatística Avançada) ---
@@ -1404,16 +1568,21 @@ if (gerarSugestaoBtn) {
 
         // Função para detectar qual loteria está sendo usada
         function detectarLoteria() {
-            const titulo = document.title;
-            const pathname = window.location.pathname;
-            
-            if (titulo.includes('Quina') || pathname.includes('quina')) {
-                return 'quina';
-            } else if (titulo.includes('Mega') || pathname.includes('megasena')) {
-                return 'megasena';
-            } else {
-                return 'milionaria'; // Padrão
+            const titulo = document.title || '';
+            const pathname = (window.location && window.location.pathname) || '';
+            const t = titulo.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+            const p = pathname.toLowerCase();
+
+            if (t.includes('lotofacil') || p.includes('lotofacil')) {
+                return 'lotofacil';
             }
+            if (t.includes('quina') || p.includes('quina')) {
+                return 'quina';
+            }
+            if (t.includes('mega') || p.includes('megasena')) {
+                return 'megasena';
+            }
+            return 'milionaria'; // Padrão
         }
 
         const loteria = detectarLoteria();
@@ -1422,6 +1591,9 @@ if (gerarSugestaoBtn) {
         // Determinar a API correta baseada na loteria
         let apiEndpoint;
         switch (loteria) {
+            case 'lotofacil':
+                apiEndpoint = '/api/gerar_aposta_premium_lotofacil';
+                break;
             case 'quina':
                 apiEndpoint = '/api/gerar_aposta_premium_quina';
                 break;
@@ -1455,6 +1627,10 @@ if (gerarSugestaoBtn) {
                 data.apostas.forEach((aposta, index) => {
                     // Determinar se é +Milionária (tem trevos) ou outras loterias (só números)
                     const temTrevos = aposta.trevos && aposta.trevos.length > 0;
+                    // Salvaguarda: clamp para Lotofácil
+                    if (loteria === 'lotofacil' && Array.isArray(aposta.numeros)) {
+                        aposta.numeros = aposta.numeros.filter(n => Number.isInteger(n) && n >= 1 && n <= 25);
+                    }
                     
                     apostasHtml += `
                         <div class="bg-[#1A1D25] p-3 rounded-md text-center border border-[#00E38C]">
