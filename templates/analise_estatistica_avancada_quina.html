@@ -3189,6 +3189,12 @@
                     const ciclos = data.ciclos_de_retorno || {};
                     const periodoInfo = data.periodo_analisado || {};
 
+                    // Alinhar chaves esperadas pelo front com as do backend e calcular percentual
+                    const totalConcursosComConsecutivos = numerosConsecutivos.concursos_com_consecutivos || 0;
+                    const totalConcursos = (periodoInfo && (periodoInfo.total_concursos || (Array.isArray(periodoInfo.concursos_analisados) ? periodoInfo.concursos_analisados.length : 0))) || 0;
+                    const percentualConcursosComConsecutivos = totalConcursos ? ((totalConcursosComConsecutivos / totalConcursos) * 100).toFixed(1) : 0;
+                    const maiorSequenciaConsecutiva = numerosConsecutivos.maior_sequencia || 0;
+
                             console.log("=== DEBUG SEQUÊNCIAS ===");
                     console.log("Números consecutivos:", numerosConsecutivos);
                     console.log("Repetições:", repeticoes);
@@ -3227,9 +3233,9 @@
                 <div class="bg-[#2E303A] p-4 rounded-xl">
                   <h4 class="text-md font-semibold mb-3 text-[#00E38C]">📊 Estatísticas Gerais</h4>
                   <div class="space-y-2">
-                    <p class="text-sm text-gray-300">Concursos com consecutivos: <span class="text-[#00E38C] font-bold">${numerosConsecutivos.total_concursos_com_consecutivos || 0}</span></p>
-                    <p class="text-sm text-gray-300">Percentual: <span class="text-[#00E38C] font-bold">${numerosConsecutivos.percentual_concursos_com_consecutivos || 0}%</span></p>
-                    <p class="text-sm text-gray-300">Maior sequência: <span class="text-[#00E38C] font-bold">${numerosConsecutivos.maior_sequencia_consecutiva || 0} números</span></p>
+                    <p class="text-sm text-gray-300">Concursos com consecutivos: <span class="text-[#00E38C] font-bold">${totalConcursosComConsecutivos}</span></p>
+                    <p class="text-sm text-gray-300">Percentual: <span class="text-[#00E38C] font-bold">${percentualConcursosComConsecutivos}%</span></p>
+                    <p class="text-sm text-gray-300">Maior sequência: <span class="text-[#00E38C] font-bold">${maiorSequenciaConsecutiva} números</span></p>
                   </div>
                 </div>
                 
