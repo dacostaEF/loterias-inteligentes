@@ -311,6 +311,23 @@
   // Inicialização leve
   document.addEventListener('DOMContentLoaded', () => {
     loadPreferencesQN();
+    // Exclusão mútua Quentes/Frios (Quina, isolado)
+    try {
+      const q = document.getElementById('freq-priorizar-quentes');
+      const f = document.getElementById('freq-priorizar-frios');
+      if (q && f) {
+        if (q.checked && f.checked) f.checked = false;
+        q.addEventListener('change', () => {
+          if (q.checked) f.checked = false;
+          // Persistir imediatamente
+          savePreferencesQN({ frequencia: { ...(loadPreferencesQN().frequencia || {}), priorizarQuentes: !!q.checked, priorizarFrios: !!f.checked } });
+        });
+        f.addEventListener('change', () => {
+          if (f.checked) q.checked = false;
+          savePreferencesQN({ frequencia: { ...(loadPreferencesQN().frequencia || {}), priorizarQuentes: !!q.checked, priorizarFrios: !!f.checked } });
+        });
+      }
+    } catch (_) {}
     // Handlers do modal Premium (apenas quando a flag estiver ligada)
     try {
       const modal = document.getElementById('modal-premium');

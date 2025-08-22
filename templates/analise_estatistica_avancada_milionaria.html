@@ -1773,9 +1773,9 @@
           }
           
           // Salvar preferências se identificou o modal
-          if (modalPrefix && typeof salvarPreferenciasDoModal === 'function') {
-            console.log(`💾 Salvando preferências do modal: ${modalPrefix}`);
-            salvarPreferenciasDoModal(modalPrefix);
+          if (modalPrefix && typeof salvarPreferenciasDoPassoMIL === 'function') {
+            console.log(`💾 Salvando preferências do modal (+MIL): ${modalPrefix}`);
+            salvarPreferenciasDoPassoMIL(modalPrefix);
           }
         }
       }
@@ -5789,6 +5789,378 @@
       </button>
     </div>
   </div>
+
+  <script>
+  (function MILPreferenciasIsoladas() {
+    if (window.__MIL_PREFS_INIT__) return;
+    window.__MIL_PREFS_INIT__ = true;
+    const STORAGE_KEY = 'milionariaPremiumPreferences';
+
+    function getPrefsMIL() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (_) { return {}; }
+    }
+
+    function setPrefsMIL(p) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p || {})); } catch (_) {}
+    }
+
+    // Salva SOMENTE o passo informado, preservando os demais (merge incremental)
+    window.salvarPreferenciasDoPassoMIL = function(prefix) {
+      const prefs = getPrefsMIL();
+      let sub = {};
+
+      switch (prefix) {
+        case 'freq': {
+          const elPeriodo = document.getElementById('freq-periodo');
+          const elQuentes = document.getElementById('freq-priorizar-quentes');
+          const elQtdeQuentes = document.getElementById('freq-qtde-quentes');
+          const elFrios = document.getElementById('freq-priorizar-frios');
+          const elQtdeFrios = document.getElementById('freq-qtde-frios');
+          // Se nenhum campo do passo existir no DOM, não sobrescreva o storage
+          if (!elPeriodo && !elQuentes && !elQtdeQuentes && !elFrios && !elQtdeFrios) return;
+          const next = {};
+          if (elPeriodo) next.janelaAnalise = elPeriodo.value || '';
+          if (elQuentes) next.priorizarQuentes = Array.from(document.querySelectorAll('#freq-priorizar-quentes')).some(el => el.checked);
+          if (elQtdeQuentes) next.qtdeQuentes = parseInt(elQtdeQuentes.value || '0', 10);
+          if (elFrios) next.priorizarFrios = Array.from(document.querySelectorAll('#freq-priorizar-frios')).some(el => el.checked);
+          if (elQtdeFrios) next.qtdeFrios = parseInt(elQtdeFrios.value || '0', 10);
+          if (!Object.keys(next).length) return;
+          sub = next;
+          break; }
+        case 'dist': {
+          const elParidade = document.getElementById('dist-priorizar-pares-impares');
+          const elParidadeDesejada = document.getElementById('dist-paridade-desejada');
+          const elSoma = document.getElementById('dist-priorizar-soma');
+          const elSomaMin = document.getElementById('dist-soma-min');
+          const elSomaMax = document.getElementById('dist-soma-max');
+          if (!elParidade && !elParidadeDesejada && !elSoma && !elSomaMin && !elSomaMax) return;
+          const next = {};
+          if (elParidade) next.priorizarParidade = !!elParidade.checked;
+          if (elParidadeDesejada) next.paridadeDesejada = elParidadeDesejada.value || 'equilibrado';
+          if (elSoma) next.priorizarSoma = !!elSoma.checked;
+          if (elSomaMin) next.somaMin = parseInt(elSomaMin.value || '0', 10);
+          if (elSomaMax) next.somaMax = parseInt(elSomaMax.value || '0', 10);
+          if (!Object.keys(next).length) return;
+          sub = next;
+          break; }
+        case 'afinidade': {
+          const all = document.querySelectorAll('input[name="par-afinidade"]');
+          if (!all || all.length === 0) return;
+          sub = {
+            paresFavoritos: Array.from(document.querySelectorAll('input[name="par-afinidade"]:checked')).map(i => i.value)
+          };
+          break; }
+        case 'padrao': {
+          const anySeq = document.querySelectorAll('input[name="padrao-seq"]');
+          const elEvCon = document.getElementById('evitar-consecutivos');
+          const elEvRep = document.getElementById('evitar-repeticoes');
+          if ((!anySeq || anySeq.length === 0) && !elEvCon && !elEvRep) return;
+          const next = {};
+          if (anySeq && anySeq.length) next.sequencias = Array.from(document.querySelectorAll('input[name="padrao-seq"]:checked')).map(i => i.value);
+          if (elEvCon) next.evitarConsecutivos = !!elEvCon.checked;
+          if (elEvRep) next.evitarRepeticoesSeguidas = !!elEvRep.checked;
+          sub = next;
+          break; }
+        case 'trevo': {
+          const all = document.querySelectorAll('input[name="trevo-pref"]');
+          if (!all || all.length === 0) return;
+          sub = {
+            preferenciaTrevos: Array.from(document.querySelectorAll('input[name="trevo-pref"]:checked')).map(i => i.value)
+          };
+          break; }
+        case 'seca': {
+          const el = document.getElementById('limite-seca');
+          if (!el) return;
+          sub = { maxSeca: el.value || '' };
+          break; }
+        case 'avancada': {
+          const all = document.querySelectorAll('input[name="cluster-opt"]');
+          if (!all || all.length === 0) return;
+          sub = {
+            clusters: Array.from(document.querySelectorAll('input[name="cluster-opt"]:checked')).map(i => i.value)
+          };
+          break; }
+        default:
+          return;
+      }
+
+      // Merge incremental no passo para não apagar campos anteriores do mesmo passo
+      const mergedStep = { ...(prefs[prefix] || {}), ...(sub || {}) };
+      setPrefsMIL({ ...prefs, [prefix]: mergedStep });
+    };
+
+    // Hidrata o objeto global do modal com o que foi salvo por passo
+    window.hidratarPreferenciasDoModalMIL = function() {
+      const byStep = getPrefsMIL();
+      const map = {
+        freq: 'frequencia',
+        dist: 'distribuicao',
+        afinidade: 'afinidades',
+        padrao: 'padroes',
+        trevo: 'trevos',
+        seca: 'seca',
+        avancada: 'clusters'
+      };
+
+      const g = window.userPremiumPreferences || {};
+      for (const [prefix, sub] of Object.entries(byStep)) {
+        const key = map[prefix];
+        if (!key) continue;
+        if (key === 'clusters') {
+          const arr = Array.isArray(sub?.clusters) ? sub.clusters : (Array.isArray(sub) ? sub : []);
+          g.clusters = Array.isArray(g.clusters) ? Array.from(new Set([...(g.clusters || []), ...arr])) : arr;
+        } else {
+          g[key] = { ...(g[key] || {}), ...(sub || {}) };
+        }
+      }
+      window.userPremiumPreferences = g;
+    };
+
+    // Monta o resumo "Parâmetros Ativos" do Premium a partir do storage
+    window.montarResumoParametrosAtivosMIL = function() {
+      try {
+        const prefs = getPrefsMIL();
+        const linhas = [];
+        if (prefs.freq) {
+          linhas.push(`📊 Frequência: janela=${prefs.freq.janelaAnalise || '-'}; quentes=${prefs.freq.qtdeQuentes ?? '-'}; frios=${prefs.freq.qtdeFrios ?? '-'}`);
+        }
+        if (prefs.dist) {
+          const parts = [];
+          if (prefs.dist.priorizarParidade) {
+            const mapa = { equilibrado: 'Equilibrada', mais_pares: 'Mais Pares', mais_impares: 'Mais Ímpares' };
+            parts.push(`Paridade: ${mapa[prefs.dist.paridadeDesejada] || '-'}`);
+          }
+          if (prefs.dist.priorizarSoma) {
+            parts.push(`Soma: ${prefs.dist.somaMin ?? '-'}–${prefs.dist.somaMax ?? '-'}`);
+          }
+          if (parts.length) linhas.push(`🔢 Distribuição: ${parts.join(' · ')}`);
+        }
+        if (prefs.afinidade && Array.isArray(prefs.afinidade.paresFavoritos) && prefs.afinidade.paresFavoritos.length) linhas.push(`🤝 Afinidades: ${prefs.afinidade.paresFavoritos.join(', ')}`);
+        if (prefs.padrao && Array.isArray(prefs.padrao.sequencias) && prefs.padrao.sequencias.length) linhas.push(`🧩 Padrões: ${prefs.padrao.sequencias.join(', ')}`);
+        if (prefs.trevo && Array.isArray(prefs.trevo.preferenciaTrevos) && prefs.trevo.preferenciaTrevos.length) linhas.push(`🍀 Trevos: ${prefs.trevo.preferenciaTrevos.join(', ')}`);
+        if (prefs.seca) linhas.push(`🌵 Seca: máx=${(prefs.seca.maxSeca ?? '-')}`);
+        if (prefs.avancada && Array.isArray(prefs.avancada.clusters) && prefs.avancada.clusters.length) linhas.push(`🤖 Avançadas: ${prefs.avancada.clusters.join(', ')}`);
+        const html = linhas.length
+          ? `<ul class="list-disc pl-5 space-y-1">${linhas.map(li => `<li>${li}</li>`).join('')}</ul>`
+          : `<p class="text-gray-400">Nenhum parâmetro selecionado ainda.</p>`;
+        const destinos = document.querySelectorAll('#lista-parametros');
+        destinos.forEach(el => { el.innerHTML = html; });
+      } catch (_) {}
+    };
+
+    function attachChange(prefix, selector) {
+      try {
+        document.querySelectorAll(selector).forEach(el => {
+          el.addEventListener('change', () => window.salvarPreferenciasDoPassoMIL(prefix));
+          el.addEventListener('input', () => window.salvarPreferenciasDoPassoMIL(prefix));
+        });
+      } catch (_) {}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Loaders por passo: repõem o que já foi salvo
+      function carregarPreferenciasFrequenciaMIL() {
+        const prefs = getPrefsMIL().freq || {};
+        try {
+          const ja = document.getElementById('janela-analise');
+          const tn = document.getElementById('top-n');
+          const q = document.getElementById('freq-priorizar-quentes');
+          const f = document.getElementById('freq-priorizar-frios');
+          if (prefs.janelaAnalise && ja) ja.value = prefs.janelaAnalise;
+          if (prefs.considerarTopN && tn) tn.value = prefs.considerarTopN;
+          if (typeof prefs.priorizarQuentes === 'boolean' && q) q.checked = !!prefs.priorizarQuentes;
+          if (typeof prefs.priorizarFrios === 'boolean' && f) f.checked = !!prefs.priorizarFrios;
+        } catch (_) {}
+      }
+
+      function carregarPreferenciasDistribuicaoMIL() {
+        const prefs = getPrefsMIL().dist || {};
+        try {
+          (prefs.buckets || []).forEach(v => {
+            const el = document.querySelector(`input[name="bucket-dist"][value="${v}"]`);
+            if (el) el.checked = true;
+          });
+        } catch (_) {}
+      }
+
+      function carregarPreferenciasAfinidadeMIL() {
+        const prefs = getPrefsMIL().afinidade || {};
+        try {
+          (prefs.paresFavoritos || []).forEach(v => {
+            const el = document.querySelector(`input[name="par-afinidade"][value="${v}"]`);
+            if (el) el.checked = true;
+          });
+        } catch (_) {}
+      }
+
+      function carregarPreferenciasTrevoMIL() {
+        const prefs = getPrefsMIL().trevo || {};
+        try {
+          (prefs.preferenciaTrevos || []).forEach(v => {
+            const el = document.querySelector(`input[name="trevo-pref"][value="${v}"]`);
+            if (el) el.checked = true;
+          });
+        } catch (_) {}
+      }
+
+      function carregarPreferenciasSecaMIL() {
+        const prefs = getPrefsMIL().seca || {};
+        try {
+          const el = document.getElementById('limite-seca');
+          if (el && (prefs.maxSeca || prefs.maxSeca === 0)) el.value = prefs.maxSeca;
+        } catch (_) {}
+      }
+
+      function carregarPreferenciasAvancadaMIL() {
+        const prefs = getPrefsMIL().avancada || {};
+        try {
+          (prefs.clusters || []).forEach(v => {
+            const el = document.querySelector(`input[name="cluster-opt"][value="${v}"]`);
+            if (el) el.checked = true;
+          });
+        } catch (_) {}
+      }
+
+      // Executa loaders na inicialização (idempotente)
+      try {
+        carregarPreferenciasFrequenciaMIL();
+        carregarPreferenciasDistribuicaoMIL();
+        carregarPreferenciasAfinidadeMIL();
+        carregarPreferenciasTrevoMIL();
+        carregarPreferenciasSecaMIL();
+        carregarPreferenciasAvancadaMIL();
+      } catch (_) {}
+
+      // Liga salvamento incremental por passo
+      attachChange('freq', '#freq-periodo, #freq-priorizar-quentes, #freq-qtde-quentes, #freq-priorizar-frios, #freq-qtde-frios');
+      attachChange('dist', '#dist-priorizar-pares-impares, #dist-paridade-desejada, #dist-priorizar-soma, #dist-soma-min, #dist-soma-max');
+      attachChange('afinidade', 'input[name="par-afinidade"]');
+      attachChange('padrao', 'input[name="padrao-seq"], #evitar-consecutivos, #evitar-repeticoes');
+      attachChange('trevo', 'input[name="trevo-pref"]');
+      attachChange('seca', '#limite-seca');
+      attachChange('avancada', 'input[name="cluster-opt"]');
+
+      // Delegação global para campos dinâmicos (evita perder eventos em conteúdo injetado)
+      try {
+        document.addEventListener('change', function(e) {
+          try {
+            if (e.target && (e.target.closest && e.target.closest('#freq-periodo, #freq-qtde-quentes, #freq-qtde-frios, #freq-priorizar-quentes, #freq-priorizar-frios'))) {
+              window.salvarPreferenciasDoPassoMIL('freq');
+            }
+            if (e.target && (e.target.closest && e.target.closest('#dist-priorizar-pares-impares, #dist-paridade-desejada, #dist-priorizar-soma, #dist-soma-min, #dist-soma-max'))) {
+              window.salvarPreferenciasDoPassoMIL('dist');
+            }
+          } catch (_) {}
+        });
+        document.addEventListener('input', function(e) {
+          try {
+            if (!e.target) return;
+            const el = e.target;
+            if (el.closest && el.closest('#freq-qtde-quentes, #freq-qtde-frios')) {
+              window.salvarPreferenciasDoPassoMIL('freq');
+            } else if (el.closest && el.closest('#dist-soma-min, #dist-soma-max')) {
+              window.salvarPreferenciasDoPassoMIL('dist');
+            }
+          } catch (_) {}
+        });
+      } catch (_) {}
+
+      // Exclusão mútua Quentes/Frios (somente +Milionária)
+      try {
+        // Pode haver duplicatas dos checkboxes na página; trate todas
+        const allQuentes = Array.from(document.querySelectorAll('#freq-priorizar-quentes'));
+        const allFrios = Array.from(document.querySelectorAll('#freq-priorizar-frios'));
+        if (allQuentes.length && allFrios.length) {
+          const syncExclusao = (tipo) => {
+            const isQuentes = tipo === 'quentes';
+            const fontes = isQuentes ? allQuentes : allFrios;
+            const opostas = isQuentes ? allFrios : allQuentes;
+            // Se qualquer fonte ficar marcada, desmarca todas as opostas
+            if (fontes.some(el => el.checked)) {
+              opostas.forEach(el => { el.checked = false; });
+            }
+            window.salvarPreferenciasDoPassoMIL('freq');
+          };
+          allQuentes.forEach(el => el.addEventListener('change', () => syncExclusao('quentes')));
+          allFrios.forEach(el => el.addEventListener('change', () => syncExclusao('frios')));
+          // Estado inicial consistente
+          if (allQuentes.some(el => el.checked) && allFrios.some(el => el.checked)) {
+            allFrios.forEach(el => { el.checked = false; });
+          }
+        }
+      } catch (_) {}
+
+      // Ao abrir o modal Premium, hidrata e atualiza o resumo antes dos outros handlers
+      const abrir = document.getElementById('abrir-modal-premium');
+      if (abrir) {
+        abrir.addEventListener('click', function() {
+          try {
+            window.hidratarPreferenciasDoModalMIL();
+            window.montarResumoParametrosAtivosMIL();
+          } catch (_) {}
+        }, true);
+      }
+
+      // Enviar payload completo ao backend ao gerar sugestão
+      try {
+        const gerar = document.getElementById('gerar-sugestao-btn');
+        if (gerar && !gerar.__mil_bound__) {
+          gerar.addEventListener('click', async function() {
+            try {
+              // Garante estado mais recente
+              window.hidratarPreferenciasDoModalMIL();
+              const payload = window.userPremiumPreferences || {};
+              const btn = this;
+              const origText = btn.textContent;
+              btn.disabled = true;
+              btn.textContent = 'Gerando...';
+              const resp = await fetch('/api/gerar_aposta_premium', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              const data = await resp.json();
+              btn.disabled = false;
+              btn.textContent = origText;
+              // Render simplificado (pills) se estrutura conhecida
+              const lista = document.getElementById('lista-apostas-geradas');
+              const box = document.getElementById('resultado-sugestao');
+              if (lista && box) {
+                lista.innerHTML = '';
+                const apostas = Array.isArray(data?.apostas) ? data.apostas : (Array.isArray(data) ? data : []);
+                apostas.forEach((aposta, idx) => {
+                  const nums = Array.isArray(aposta?.numeros) ? aposta.numeros : [];
+                  const trevos = Array.isArray(aposta?.trevos) ? aposta.trevos : (Array.isArray(aposta?.trevo1) ? [...(aposta.trevo1||[]), ...(aposta.trevo2||[])] : []);
+                  const pill = (arr, max, cls) => arr
+                    .filter(n => Number.isFinite(n))
+                    .slice(0, max)
+                    .sort((a,b)=>a-b)
+                    .map(n => `<span class=\"${cls}\">${String(n).padStart(2,'0')}</span>`)
+                    .join(' ');
+                  const html = `
+                    <div class=\"bg-[#1A1D25] border border-[#00E38C] rounded p-3\">
+                      <div class=\"font-semibold mb-2 text-white\">Aposta ${idx + 1}</div>
+                      <div class=\"flex flex-wrap gap-2 justify-center items-center mb-2\">${pill(nums, 12, 'bg-[#00E38C] text-black px-3 py-1 rounded-full font-semibold')}</div>
+                      ${trevos.length ? `<div class=\"flex flex-wrap gap-2 justify-center items-center\">${pill(trevos, 6, 'bg-[#8B5CF6] text-white px-3 py-1 rounded-full font-semibold')}</div>` : ''}
+                    </div>`;
+                  const item = document.createElement('div');
+                  item.innerHTML = html;
+                  lista.appendChild(item);
+                });
+                box.classList.remove('hidden');
+              }
+            } catch (e) {
+              console.error('Falha ao gerar aposta premium (+Milionária)', e);
+              alert('Falha ao gerar aposta. Tente novamente.');
+              try { this.disabled = false; this.textContent = 'Gerar Sugestão'; } catch (_) {}
+            }
+          });
+          gerar.__mil_bound__ = true;
+        }
+      } catch (_) {}
+    });
+  })();
+  </script>
 </body>
 </html> 
 </html> 

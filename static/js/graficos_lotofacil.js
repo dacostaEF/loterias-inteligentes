@@ -361,6 +361,21 @@ function updateAllPreferences() {
 // Listener do botão "Gerar Sugestão" (LF)
 document.addEventListener('DOMContentLoaded', () => {
   let btn = document.getElementById('gerar-sugestao-btn');
+  // Exclusão mútua Quentes/Frios (Lotofácil, isolado)
+  try {
+    const q = document.getElementById('freq-priorizar-quentes');
+    const f = document.getElementById('freq-priorizar-frios');
+    if (q && f) {
+      if (q.checked && f.checked) f.checked = false;
+      const persist = () => {
+        loadPremiumPreferencesLF();
+        userPremiumPreferencesLF.frequencia = { ...(userPremiumPreferencesLF.frequencia || {}), priorizarQuentes: !!q.checked, priorizarFrios: !!f.checked };
+        savePremiumPreferencesLF();
+      };
+      q.addEventListener('change', () => { if (q.checked) f.checked = false; persist(); });
+      f.addEventListener('change', () => { if (f.checked) q.checked = false; persist(); });
+    }
+  } catch (_) {}
   // Persistir a cada mudança de qualquer preferência
   const sel = '.checkbox-premium-pref, .select-premium-pref, #qtde-numeros-aposta, #num-apostas-gerar';
   try { document.querySelectorAll(sel).forEach(el => el.addEventListener('change', updateAllPreferences)); } catch (_) {}
