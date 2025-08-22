@@ -67,9 +67,24 @@ def gerar_aposta_inteligente_quina(preferencias: dict, analysis_cache: dict) -> 
             estatisticas_clusters = analise_clusters.get('estatisticas_clusters', {})
             numeros_dos_clusters_selecionados = set()
             for cluster_id in cluster_pref:
-                if cluster_id in estatisticas_clusters:
+                # Correção de nomenclatura: 'resumo_clusters' usa 'cluster_{i}',
+                # enquanto 'estatisticas_clusters' foi gerado com 'cluster_{i+1}'.
+                key = cluster_id
+                if key not in estatisticas_clusters:
+                    try:
+                        idx = int(str(cluster_id).split('_')[1])
+                        alt_key_plus = f'cluster_{idx + 1}'
+                        alt_key_minus = f'cluster_{max(0, idx - 1)}'
+                        if alt_key_plus in estatisticas_clusters:
+                            key = alt_key_plus
+                        elif alt_key_minus in estatisticas_clusters:
+                            key = alt_key_minus
+                    except Exception:
+                        # Mantém a chave original caso parsing falhe
+                        pass
+                if key in estatisticas_clusters:
                     # A Quina usa 'numeros' em vez de 'todos_numeros_do_cluster'
-                    numeros_dos_clusters_selecionados.update(estatisticas_clusters[cluster_id]['numeros'])
+                    numeros_dos_clusters_selecionados.update(estatisticas_clusters[key].get('numeros', []))
             
             if numeros_dos_clusters_selecionados:
                 for num in pool_numeros:
