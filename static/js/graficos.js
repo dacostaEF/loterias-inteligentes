@@ -789,10 +789,7 @@ function salvarPreferenciasDoModal(modalPrefix) {
     // Salvar no localStorage
     savePremiumPreferences();
     
-    // Atualizar o resumo no modal premium se estiver aberto
-    if (!document.getElementById('modal-premium').classList.contains('hidden')) {
-        renderPremiumPreferencesSummary();
-    }
+
     
     console.log('Preferências após salvar:', JSON.parse(JSON.stringify(userPremiumPreferences)));
     console.log('=== FIM SALVAMENTO ===');
@@ -1128,9 +1125,7 @@ function recuperarAnalises() {
 // ================================================
 
 // Elementos do modal premium
-const abrirModalPremiumBtn = document.getElementById('abrir-modal-premium');
-const modalPremium = document.getElementById('modal-premium');
-const fecharModalPremiumBtn = document.getElementById('fechar-modal-premium');
+
 const gerarSugestaoBtn = document.getElementById('gerar-sugestao-btn');
 const resultadoSugestaoDiv = document.getElementById('resultado-sugestao');
 const listaParametrosDiv = document.getElementById('lista-parametros');
@@ -1289,21 +1284,7 @@ function premiumModalPrepareAndRender() {
 // Tornar acessível globalmente para fallbacks em templates
 window.premiumModalPrepareAndRender = premiumModalPrepareAndRender;
 
-// Event listeners do modal premium
-if (abrirModalPremiumBtn) {
-    abrirModalPremiumBtn.addEventListener('click', () => {
-        console.log("🎯 Botão abrir modal premium clicado (Milionária)!");
-        modalPremium.classList.remove('hidden');
-        resultadoSugestaoDiv.classList.add('hidden');
-        premiumModalPrepareAndRender();
-    });
-}
 
-if (fecharModalPremiumBtn) {
-    fecharModalPremiumBtn.addEventListener('click', () => {
-        modalPremium.classList.add('hidden');
-    });
-}
 
 // Função para renderizar o resumo das preferências no modal Premium
 function renderPremiumPreferencesSummary() {
