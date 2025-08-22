@@ -48,8 +48,8 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Ativar modo Quina Premium (flag controlada) -->
-  <script>window.__QN_NEW_PREMIUM__ = true;</script>
+  <!-- Config e JS da Quina (flag premium centralizada) -->
+  <script src="{{ url_for('static', filename='js/config.js') }}" defer></script>
   <!-- JS dedicado da Quina: estado e persistência + premium (controlado por flag) -->
   <script src="{{ url_for('static', filename='js/graficos_quina.js') }}" defer></script>
 
