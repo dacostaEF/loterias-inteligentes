@@ -137,10 +137,116 @@ def gerar_aposta_inteligente_lotofacil(preferencias: Dict[str, Any], analysis_ca
 
         apostas.append({
             'numeros': escolhidos,
-            'valor_estimado': None
+            'valor_estimado': calcular_valor_aposta_lotofacil(len(escolhidos))
         })
 
     return apostas
+
+
+def calcular_valor_aposta_lotofacil(qtde_numeros: int) -> float:
+    """
+    Calcula o valor estimado da aposta baseado na quantidade de números.
+    Valores baseados na tabela oficial da Lotofácil (atualizada).
+    """
+    # Tabela de valores da Lotofácil (valores oficiais)
+    tabela_valores = {
+        15: 3.50,      # 15 números
+        16: 56.00,     # 16 números
+        17: 476.00,    # 17 números
+        18: 2856.00,   # 18 números
+        19: 13566.00,  # 19 números
+        20: 54264.00   # 20 números
+    }
+    
+    return tabela_valores.get(qtde_numeros, 0.0)
+
+
+# Função auxiliar para limpar NaN de dicionários aninhados (útil para resultados de análise avançada)
+def limpar_nan_do_dict(d):
+    """Remove valores NaN de dicionários aninhados, convertendo-os para None."""
+    if isinstance(d, dict):
+        return {k: limpar_nan_do_dict(v) for k, v in d.items()}
+    elif isinstance(d, list):
+        return [limpar_nan_do_dict(elem) for elem in d]
+    elif isinstance(d, float) and (d != d): # Checa se é NaN
+        return None
+    return d
+
+
+if __name__ == '__main__':
+    # Exemplo de como usar a função com um cache simulado para testes
+    print("Testando geracao_inteligente_lotofacil.py diretamente...")
+    
+    # Simula um cache de análise mínimo
+    simulated_cache = {
+        'frequencia_completa': {
+            'frequencia_absoluta_numeros': [
+                {'numero': 1, 'frequencia': 100},
+                {'numero': 2, 'frequencia': 95},
+                {'numero': 3, 'frequencia': 90},
+                {'numero': 4, 'frequencia': 85},
+                {'numero': 5, 'frequencia': 80},
+                {'numero': 6, 'frequencia': 10},
+                {'numero': 7, 'frequencia': 15},
+                {'numero': 8, 'frequencia': 20},
+                {'numero': 9, 'frequencia': 25},
+                {'numero': 10, 'frequencia': 30},
+                {'numero': 21, 'frequencia': 70},
+                {'numero': 22, 'frequencia': 65},
+                {'numero': 23, 'frequencia': 60},
+                {'numero': 24, 'frequencia': 55},
+                {'numero': 25, 'frequencia': 50}
+            ]
+        },
+        'afinidades_completa': {
+            'afinidade_entre_numeros': {
+                'pares_com_maior_afinidade': [
+                    [[1, 2], 0.85],
+                    [[3, 4], 0.80],
+                    [[5, 6], 0.75]
+                ]
+            }
+        },
+        'padroes_completa': {
+            'ultimos_sorteados': [1, 10, 20, 30, 40, 50]
+        }
+    }
+
+    # Simula algumas preferências do usuário
+    user_prefs_exemplo = {
+        'frequencia': {
+            'priorizarQuentes': True,
+            'qtdeQuentes': 5,
+            'considerarPeriodo': 'completa'
+        },
+        'distribuicao': {
+            'priorizarParesImpares': True,
+            'paridadeDesejada': 'equilibrado',
+            'priorizarSoma': True,
+            'somaMin': 150,
+            'somaMax': 260
+        },
+        'padroes': {
+            'evitarConsecutivos': True,
+            'evitarRepeticoesSeguidas': True
+        },
+        'afinidades': {
+            'qtdePares': 3
+        },
+        'qtdeNumerosAposta': 15,
+        'numApostasGerar': 3
+    }
+
+    apostas_geradas = gerar_aposta_inteligente_lotofacil(user_prefs_exemplo, simulated_cache)
+    print("\nApostas geradas:")
+    for i, aposta in enumerate(apostas_geradas):
+        print(f"Aposta {i+1}: Números: {aposta['numeros']}, Valor: R$ {aposta['valor_estimado']:.2f}")
+
+    # Teste com preferências vazias (comportamento aleatório)
+    print("\nTestando com preferências vazias (deve ser mais aleatório):")
+    apostas_aleatorias = gerar_aposta_inteligente_lotofacil({}, simulated_cache)
+    for i, aposta in enumerate(apostas_aleatorias):
+        print(f"Aposta {i+1}: Números: {aposta['numeros']}, Valor: R$ {aposta['valor_estimado']:.2f}")
 
 
 
