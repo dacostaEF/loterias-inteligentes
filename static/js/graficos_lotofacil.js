@@ -415,11 +415,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const v = String(num).padStart(2, '0');
             return `<span class=\"bg-[#00E38C] text-black px-3 py-1 rounded-full font-semibold\">${v}</span>`;
           }).join(' ');
+          const valor = aposta?.valor_estimado || 0;
           const item = document.createElement('div');
           item.className = 'bg-[#1A1D25] border border-[#00E38C] rounded p-3';
           item.innerHTML = `
             <div class=\"font-semibold mb-2 text-white\">Aposta ${idx + 1}</div>
-            <div class=\"flex flex-wrap gap-2 justify-center items-center\">${pills}</div>
+            <div class=\"flex flex-wrap gap-2 justify-center items-center mb-2\">${pills}</div>
+            <div class=\"text-center text-[#00E38C] font-bold\">Valor: R$ ${valor.toFixed(2)}</div>
           `;
           lista.appendChild(item);
         });
