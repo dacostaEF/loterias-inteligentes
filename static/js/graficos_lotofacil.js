@@ -1,6 +1,8 @@
 // === Preferências Premium - Lotofácil (espelhado do padrão Mega Sena) ===
 // Mantém um store dedicado, funções de salvar/carregar e carregadores por modal.
 
+console.log("🚀 graficos_lotofacil.js carregado com sucesso!");
+
 // Logger específico LF
 const logLF = (...args) => console.log('[Lotofácil]', ...args);
 
@@ -428,6 +430,88 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Falha ao gerar aposta.');
     }
   });
+});
+
+// Event listener para o botão "Gerar Aposta Inteligente (Premium)"
+document.addEventListener('DOMContentLoaded', () => {
+  const abrirModalPremiumBtn = document.getElementById('abrir-modal-premium');
+  const modalPremium = document.getElementById('modal-premium');
+  const fecharModalPremiumBtn = document.getElementById('fechar-modal-premium');
+  const qtdeNumerosApostaInput = document.getElementById('qtde-numeros-aposta');
+  const numApostasGerarInput = document.getElementById('num-apostas-gerar');
+
+  console.log("🔍 [Lotofácil] Elementos encontrados:", {
+    abrirModalPremiumBtn: !!abrirModalPremiumBtn,
+    modalPremium: !!modalPremium,
+    fecharModalPremiumBtn: !!fecharModalPremiumBtn,
+    qtdeNumerosApostaInput: !!qtdeNumerosApostaInput,
+    numApostasGerarInput: !!numApostasGerarInput
+  });
+
+  if (abrirModalPremiumBtn) {
+    console.log("✅ [Lotofácil] Event listener adicionado ao botão abrir modal premium");
+    abrirModalPremiumBtn.addEventListener('click', () => {
+      console.log("🎯 [Lotofácil] Botão abrir modal premium clicado!");
+      modalPremium.classList.remove('hidden');
+
+      // Recuperar dados das análises do localStorage
+      const analisesRecuperadas = recuperarAnalises();
+      console.log("📊 [Lotofácil] Análises recuperadas do localStorage:", analisesRecuperadas);
+
+      // Atualizar as preferências com os dados das análises
+      if (analisesRecuperadas.frequencia) {
+        userPremiumPreferencesLF.frequencia = {
+          ...userPremiumPreferencesLF.frequencia,
+          ...analisesRecuperadas.frequencia
+        };
+      }
+      if (analisesRecuperadas.distribuicao) {
+        userPremiumPreferencesLF.distribuicao = {
+          ...userPremiumPreferencesLF.distribuicao,
+          ...analisesRecuperadas.distribuicao
+        };
+      }
+      if (analisesRecuperadas.afinidades) {
+        userPremiumPreferencesLF.afinidades = {
+          ...userPremiumPreferencesLF.afinidades,
+          ...analisesRecuperadas.afinidades
+        };
+      }
+      if (analisesRecuperadas.sequencias) {
+        userPremiumPreferencesLF.sequencias = {
+          ...userPremiumPreferencesLF.sequencias,
+          ...analisesRecuperadas.sequencias
+        };
+      }
+      if (analisesRecuperadas.seca) {
+        userPremiumPreferencesLF.seca = {
+          ...userPremiumPreferencesLF.seca,
+          ...analisesRecuperadas.seca
+        };
+      }
+      if (analisesRecuperadas.estatisticas) {
+        console.log("📊 [Lotofácil] Dados de estatísticas avançadas disponíveis");
+      }
+
+      // Salvar as preferências atualizadas
+      savePremiumPreferencesLF();
+
+      // Carregar e exibir as preferências atuais
+      renderPremiumPreferencesSummaryLF();
+
+      // Carregar os valores de configuração
+      if (qtdeNumerosApostaInput) qtdeNumerosApostaInput.value = userPremiumPreferencesLF.qtdeNumerosAposta;
+      if (numApostasGerarInput) numApostasGerarInput.value = userPremiumPreferencesLF.numApostasGerar;
+    });
+  } else {
+    console.log("❌ [Lotofácil] Botão abrir modal premium não encontrado!");
+  }
+
+  if (fecharModalPremiumBtn) {
+    fecharModalPremiumBtn.addEventListener('click', () => {
+      modalPremium.classList.add('hidden');
+    });
+  }
 });
 
 
