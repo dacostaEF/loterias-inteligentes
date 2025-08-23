@@ -207,7 +207,7 @@ function renderPremiumPreferencesSummaryLF() {
   if (Array.isArray(c) && c.length) {
     out += `<div class=\"bg-card p-3 rounded-md border border-surface mb-3\"><p class=\"font-semibold text-primary\">Clusters:</p><ul class=\"list-disc list-inside ml-4 text-textSecondary\"><li>${c.map(x=>`<strong>${x}</strong>`).join(', ')}</li></ul></div>`;
   }
-  out += `<div class=\"bg-card p-3 rounded-md border border-surface mb-3\"><p class=\"font-semibold text-primary\">Saída:</p><ul class=\"list-disc list-inside ml-4 text-textSecondary\"><li>${userPremiumPreferencesLF.qtdeNumerosAposta} números | ${userPremiumPreferencesLF.numApostasGerar} aposta(s)</li></ul></div>`;
+  // Container "Saída" removido - não é necessário no modal premium
   lista.innerHTML = out || '<p class="text-gray-400">Nenhum parâmetro selecionado ainda.</p>';
 }
 
