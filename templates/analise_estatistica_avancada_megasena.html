@@ -71,7 +71,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 
   <style>
-    /* Moldura Neon Lilás - Desktop */
+    /* Moldura Neon Verde Oliva - Desktop */
     html::before {
       content: '';
       position: fixed;
@@ -79,15 +79,15 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      box-shadow: inset 0 0 0 4px #B96AFF, 0 0 15px #B96AFF, 0 0 30px #B96AFF;
+      box-shadow: inset 0 0 0 4px #9ACD32, 0 0 15px #9ACD32, 0 0 30px #9ACD32;
       z-index: 9999;
       pointer-events: none;
     }
 
-    /* Moldura Neon Lilás - Mobile (mais fina) */
+    /* Moldura Neon Verde Oliva - Mobile (mais fina) */
     @media (max-width: 768px) {
       html::before {
-        box-shadow: inset 0 0 0 2px #B96AFF, 0 0 8px #B96AFF, 0 0 15px #B96AFF;
+        box-shadow: inset 0 0 0 2px #9ACD32, 0 0 8px #9ACD32, 0 0 15px #9ACD32;
       }
     }
 
@@ -427,7 +427,8 @@
       right: 0;
       background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 3px solid #9ACD32;
+      box-shadow: 0 2px 8px rgba(154, 205, 50, 0.15);
       z-index: 1000;
       padding: 1rem 2rem;
       display: flex;
@@ -1001,10 +1002,10 @@
 
   <!-- Conteúdo Premium será adicionado aqui -->
   <div class="container mx-auto">
-    <h2 class="text-2xl font-bold text-white mb-6 text-center">🎯 Aposta Inteligente Premium</h2>
+    <h2 class="text-2xl font-bold mb-6 text-center" style="color: #9ACD32;">🎯 Aposta Inteligente Premium - Mega Sena</h2>
     
     <!-- Conteúdo será adicionado posteriormente -->
-    <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-md">
+    <div class="bg-[#1A1D25] p-8 rounded-2xl shadow-md" style="border: 1px solid #9ACD32; box-shadow: 0 4px 6px -1px rgba(154, 205, 50, 0.2), inset 0 0 0 1px rgba(154, 205, 50, 0.1), 0 0 20px rgba(154, 205, 50, 0.15);">
       <div class="bloco-texto-aposta">
         <p class="texto-desktop">
           Com a Aposta Inteligente Premium, você vai além da sorte: você define os parâmetros, analisa os dados reais e usa inteligência estatística e sistema de pesos computacionais para gerar apostas fundamentadas. 🎯 Configure filtros, selecione padrões e use suas próprias decisões estratégicas para orientar o sistema de análise estatística. O controle está nas suas mãos — com o apoio da tecnologia de dados reais.
@@ -1016,7 +1017,7 @@
     </div>
     
     <!-- Bloco Explicativo com Passo a Passo -->
-    <div class="mt-8 bg-[#1A1D25] p-6 rounded-2xl shadow-md">
+    <div class="mt-8 bg-[#1A1D25] p-6 rounded-2xl shadow-md" style="border: 1px solid #9ACD32; box-shadow: 0 4px 6px -1px rgba(154, 205, 50, 0.2), inset 0 0 0 1px rgba(154, 205, 50, 0.1), 0 0 20px rgba(154, 205, 50, 0.15);">
       <h3 class="text-xl font-bold text-white mb-6 text-center">📘 Como usar a aposta inteligente:</h3>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1024,7 +1025,7 @@
         <div id="passo1" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 1</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Descubra os Números Mais Sorteados</h4>
+            <h4 class="text-lg font-semibold" style="color: #9ACD32;">Descubra os Números Mais Sorteados</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Veja os números que mais saem e use essa informação no seu jogo.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('frequencia')">
@@ -1036,7 +1037,7 @@
         <div id="passo2" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 2</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Entenda Como os Números se Distribuem</h4>
+            <h4 class="text-lg font-semibold" style="color: #9ACD32;">Entenda Como os Números se Distribuem</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Entenda como os números se espalham entre grupos e padrões.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('distribuicao')">
@@ -1048,7 +1049,7 @@
         <div id="passo3" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 3</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Encontre Combinações que Saem Juntas</h4>
+            <h4 class="text-lg font-semibold" style="color: #9ACD32;">Encontre Combinações que Saem Juntas</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Descubra combinações que costumam sair juntas.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('afinidades')">
@@ -1060,7 +1061,7 @@
         <div id="passo4" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 4</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Análise de Sequências</h4>
+            <h4 class="text-lg font-semibold" style="color: #9ACD32;">Análise de Sequências</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Identifique padrões de números consecutivos e sequências.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('sequencias')">
@@ -1072,7 +1073,7 @@
         <div id="passo5" class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 5</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Identifique Números que Não Saem</h4>
+            <h4 class="text-lg font-semibold" style="color: #9ACD32;">Identifique Números que Não Saem</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Evite números que estão há muito tempo sem sair.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('seca')">
@@ -1084,7 +1085,7 @@
         <div class="bg-[#2E303A] p-4 rounded-xl">
           <div class="flex items-center mb-3">
             <span class="bg-[#00E38C] text-black font-bold px-3 py-1 rounded-full text-sm mr-3">Passo 6</span>
-            <h4 class="text-lg font-semibold" style="color: #A855F7;">Estatística Avançada para Padrões Ocultos</h4>
+            <h4 class="text-lg font-semibold" style="color: #9ACD32;">Estatística Avançada para Padrões Ocultos</h4>
           </div>
           <p class="text-gray-300 text-sm mb-3">Explore correlações, padrões ocultos e tendências com análise estatística avançada.</p>
           <button class="bg-[#00E38C] text-black font-semibold px-4 py-2 rounded-lg hover:opacity-80 transition-all text-sm w-full" onclick="abrirModal('estatisticas')">
@@ -1096,7 +1097,7 @@
     
     <!-- Botão principal do Machine Learning - NO FINAL -->
     <div id="passo6" class="mt-8 text-center">
-      <div class="bg-gradient-to-r from-[#00E38C] to-[#8B5CF6] p-1 rounded-xl inline-block">
+      <div class="bg-gradient-to-r from-[#00E38C] to-[#9ACD32] p-1 rounded-xl inline-block">
         <button class="bg-[#1A1D25] text-white font-bold px-8 py-4 rounded-lg hover:bg-[#2E303A] transition-all text-lg" id="abrir-modal-premium">
           🎯 Gerar Aposta Inteligente (Premium)
         </button>
