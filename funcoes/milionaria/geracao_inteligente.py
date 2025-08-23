@@ -186,43 +186,43 @@ def calcular_valor_aposta(qtde_numeros: int, qtde_trevos: int) -> float:
     Calcula o valor estimado da aposta baseado na quantidade de números e trevos.
     Valores baseados na tabela oficial da Mais Milionária.
     """
-    # Tabela de valores da Mais Milionária (valores aproximados)
+    # Tabela de valores da +Milionária (valores oficiais atualizados)
     tabela_valores = {
-        (6, 2): 6.00,   # 6 números + 2 trevos
-        (6, 3): 18.00,  # 6 números + 3 trevos
-        (6, 4): 36.00,  # 6 números + 4 trevos
-        (6, 5): 60.00,  # 6 números + 5 trevos
-        (6, 6): 90.00,  # 6 números + 6 trevos
-        (7, 2): 21.00,  # 7 números + 2 trevos
-        (7, 3): 63.00,  # 7 números + 3 trevos
-        (7, 4): 126.00, # 7 números + 4 trevos
-        (7, 5): 210.00, # 7 números + 5 trevos
-        (7, 6): 315.00, # 7 números + 6 trevos
-        (8, 2): 56.00,  # 8 números + 2 trevos
-        (8, 3): 168.00, # 8 números + 3 trevos
-        (8, 4): 336.00, # 8 números + 4 trevos
-        (8, 5): 560.00, # 8 números + 5 trevos
-        (8, 6): 840.00, # 8 números + 6 trevos
-        (9, 2): 126.00, # 9 números + 2 trevos
-        (9, 3): 378.00, # 9 números + 3 trevos
-        (9, 4): 756.00, # 9 números + 4 trevos
-        (9, 5): 1260.00,# 9 números + 5 trevos
-        (9, 6): 1890.00,# 9 números + 6 trevos
-        (10, 2): 252.00, # 10 números + 2 trevos
-        (10, 3): 756.00, # 10 números + 3 trevos
-        (10, 4): 1512.00,# 10 números + 4 trevos
-        (10, 5): 2520.00,# 10 números + 5 trevos
-        (10, 6): 3780.00,# 10 números + 6 trevos
-        (11, 2): 462.00, # 11 números + 2 trevos
-        (11, 3): 1386.00,# 11 números + 3 trevos
-        (11, 4): 2772.00,# 11 números + 4 trevos
-        (11, 5): 4620.00,# 11 números + 5 trevos
-        (11, 6): 6930.00,# 11 números + 6 trevos
-        (12, 2): 792.00, # 12 números + 2 trevos
-        (12, 3): 2376.00,# 12 números + 3 trevos
-        (12, 4): 4752.00,# 12 números + 4 trevos
-        (12, 5): 7920.00,# 12 números + 5 trevos
-        (12, 6): 11880.00,# 12 números + 6 trevos
+        (6, 2): 6.00,      # 6 números + 2 trevos = 1 aposta simples
+        (6, 3): 18.00,     # 6 números + 3 trevos = 3 apostas simples
+        (6, 4): 36.00,     # 6 números + 4 trevos = 6 apostas simples
+        (6, 5): 60.00,     # 6 números + 5 trevos = 10 apostas simples
+        (6, 6): 90.00,     # 6 números + 6 trevos = 15 apostas simples
+        (7, 2): 42.00,     # 7 números + 2 trevos = 7 apostas simples
+        (7, 3): 126.00,    # 7 números + 3 trevos = 21 apostas simples
+        (7, 4): 252.00,    # 7 números + 4 trevos = 42 apostas simples
+        (7, 5): 420.00,    # 7 números + 5 trevos = 70 apostas simples
+        (7, 6): 630.00,    # 7 números + 6 trevos = 105 apostas simples
+        (8, 2): 168.00,    # 8 números + 2 trevos = 28 apostas simples
+        (8, 3): 504.00,    # 8 números + 3 trevos = 84 apostas simples
+        (8, 4): 1008.00,   # 8 números + 4 trevos = 168 apostas simples
+        (8, 5): 1680.00,   # 8 números + 5 trevos = 280 apostas simples
+        (8, 6): 2520.00,   # 8 números + 6 trevos = 420 apostas simples
+        (9, 2): 504.00,    # 9 números + 2 trevos = 84 apostas simples
+        (9, 3): 1512.00,   # 9 números + 3 trevos = 252 apostas simples
+        (9, 4): 3024.00,   # 9 números + 4 trevos = 504 apostas simples
+        (9, 5): 5040.00,   # 9 números + 5 trevos = 840 apostas simples
+        (9, 6): 7560.00,   # 9 números + 6 trevos = 1260 apostas simples
+        (10, 2): 1260.00,  # 10 números + 2 trevos = 210 apostas simples
+        (10, 3): 3780.00,  # 10 números + 3 trevos = 630 apostas simples
+        (10, 4): 7560.00,  # 10 números + 4 trevos = 1260 apostas simples
+        (10, 5): 12600.00, # 10 números + 5 trevos = 2100 apostas simples
+        (10, 6): 18900.00, # 10 números + 6 trevos = 3150 apostas simples
+        (11, 2): 2772.00,  # 11 números + 2 trevos = 462 apostas simples
+        (11, 3): 8316.00,  # 11 números + 3 trevos = 1386 apostas simples
+        (11, 4): 16632.00, # 11 números + 4 trevos = 2772 apostas simples
+        (11, 5): 27720.00, # 11 números + 5 trevos = 4620 apostas simples
+        (11, 6): 41580.00, # 11 números + 6 trevos = 6930 apostas simples
+        (12, 2): 5544.00,  # 12 números + 2 trevos = 924 apostas simples
+        (12, 3): 16632.00, # 12 números + 3 trevos = 2772 apostas simples
+        (12, 4): 33264.00, # 12 números + 4 trevos = 5544 apostas simples
+        (12, 5): 55440.00, # 12 números + 5 trevos = 9240 apostas simples
+        (12, 6): 83160.00, # 12 números + 6 trevos = 13860 apostas simples
     }
     
     return tabela_valores.get((qtde_numeros, qtde_trevos), 0.0)
