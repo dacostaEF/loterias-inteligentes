@@ -1752,19 +1752,46 @@
         const response = await fetch('/api/analise-frequencia?qtd_concursos=50');
         const dados = await response.json();
         
+        console.log('🔍 DEBUG: Dados recebidos da API:', dados);
+        console.log('🔍 DEBUG: Tipo de dados:', typeof dados);
+        console.log('🔍 DEBUG: Chaves disponíveis:', Object.keys(dados));
+        console.log('🔍 DEBUG: dados.numeros_quentes:', dados.numeros_quentes);
+        console.log('🔍 DEBUG: dados.numeros_frios:', dados.numeros_frios);
+        console.log('🔍 DEBUG: dados.trevos_quentes:', dados.trevos_quentes);
+        
         if (dados.error) {
           console.error('Erro ao carregar dados de frequência:', dados.error);
           return;
         }
         
-        // Extrair números quentes (primeiros 10)
-        const numerosQuentes = dados.numeros_quentes.slice(0, 10).map(item => item[0]);
+        // Verificar se os dados essenciais existem (trevos são opcionais)
+        if (!dados.numeros_quentes || !dados.numeros_frios) {
+          console.error('❌ Dados essenciais incompletos da API:', {
+            numeros_quentes: dados.numeros_quentes,
+            numeros_frios: dados.numeros_frios
+          });
+          throw new Error('Dados essenciais incompletos da API');
+        }
         
-        // Extrair números frios (últimos 10)
-        const numerosFrios = dados.numeros_frios.slice(0, 10).map(item => item[0]);
+        // Log de aviso se trevos não estiverem disponíveis
+        if (!dados.trevos_quentes && !dados.frequencia_absoluta_trevos) {
+          console.warn('⚠️ Dados de trevos não disponíveis, usando fallback');
+        }
         
-        // Extrair trevos mais frequentes (primeiros 3)
-        const trevosFrequentes = dados.trevos_quentes.slice(0, 3).map(item => item[0]);
+        // Extrair números quentes (primeiros 10) - dados.numeros_quentes já é array de arrays
+        const numerosQuentes = dados.numeros_quentes?.slice(0, 10)?.map(item => item[0]) || [];
+        
+        // Extrair números frios (últimos 10) - dados.numeros_frios já é array de arrays  
+        const numerosFrios = dados.numeros_frios?.slice(0, 10)?.map(item => item[0]) || [];
+        
+        // Extrair trevos mais frequentes (primeiros 3) - usando frequência absoluta
+        const trevosFrequentes = dados.frequencia_absoluta_trevos?.slice(0, 3)?.map(item => item.trevo) || [];
+        
+        console.log('🔍 DEBUG: Números extraídos:', {
+          numerosQuentes,
+          numerosFrios, 
+          trevosFrequentes
+        });
         
         // Renderizar números quentes
         document.getElementById('numeros-quentes').innerHTML = 
@@ -1789,20 +1816,32 @@
       } catch (error) {
         console.error('❌ Erro ao carregar estatísticas rápidas:', error);
         // Fallback para dados fake em caso de erro
-        document.getElementById('numeros-quentes').innerHTML = 
-          dadosMilionaria.frequencia.numeros.quentes.slice(0, 10)
-            .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-            .join('');
+        console.log('🔄 Usando dados fallback...');
+        
+        try {
+          document.getElementById('numeros-quentes').innerHTML = 
+            dadosMilionaria.frequencia.numeros.quentes.slice(0, 10)
+              .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+              .join('');
 
-        document.getElementById('numeros-frios').innerHTML = 
-          dadosMilionaria.frequencia.numeros.frios.slice(0, 10)
-            .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
-            .join('');
+          document.getElementById('numeros-frios').innerHTML = 
+            dadosMilionaria.frequencia.numeros.frios.slice(0, 10)
+              .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
+              .join('');
 
-        document.getElementById('trevos-frequentes').innerHTML = 
-          dadosMilionaria.frequencia.trevos.frequentes.slice(0, 3)
-            .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
-            .join('');
+          document.getElementById('trevos-frequentes').innerHTML = 
+            dadosMilionaria.frequencia.trevos.frequentes.slice(0, 3)
+              .map(t => `<span class="bg-[#8B5CF6] text-white px-1 py-0.5 rounded text-xs mr-1">${t}</span>`)
+              .join('');
+              
+          console.log('✅ Fallback aplicado com sucesso');
+        } catch (fallbackError) {
+          console.error('❌ Erro no fallback também:', fallbackError);
+          // Último recurso: mostrar mensagem de erro
+          document.getElementById('numeros-quentes').innerHTML = '<span class="text-red-500">Erro ao carregar</span>';
+          document.getElementById('numeros-frios').innerHTML = '<span class="text-red-500">Erro ao carregar</span>';
+          document.getElementById('trevos-frequentes').innerHTML = '<span class="text-red-500">Erro ao carregar</span>';
+        }
       }
     }
 

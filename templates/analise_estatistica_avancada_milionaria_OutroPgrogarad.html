@@ -116,7 +116,7 @@
         font-size: 14px !important;
       }
       
-      .bg-dark h4 {
+      .bg-[#2E303A] h4 {
         font-size: 14px !important;
       }
     }
@@ -795,62 +795,6 @@
         padding-top: 1rem !important;
       }
     }
-
-    /* Auto-ajuste centralizado da imagem da +Milionária */
-    .milionaria-logo-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      position: relative;
-    }
-    
-    .milionaria-logo {
-      max-width: 240px;
-      min-width: 96px;
-      height: auto;
-      object-fit: contain;
-      display: block;
-      margin: 0 auto;
-      margin-left: 15px !important;
-      margin-bottom: -8px;
-      transition: all 0.3s ease;
-      vertical-align: bottom;
-      transform: translateX(15px);
-    }
-    
-    /* Responsividade total para mobile e tablet */
-    @media (max-width: 640px) {
-      .milionaria-logo {
-        max-width: 144px;
-        min-width: 72px;
-        height: 58px;
-      }
-    }
-    
-    @media (min-width: 641px) and (max-width: 768px) {
-      .milionaria-logo {
-        max-width: 180px;
-        min-width: 84px;
-        height: 77px;
-      }
-    }
-    
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .milionaria-logo {
-        max-width: 216px;
-        min-width: 96px;
-        height: 96px;
-      }
-    }
-    
-    @media (min-width: 1025px) {
-      .milionaria-logo {
-        max-width: 240px;
-        min-width: 120px;
-        height: 115px;
-      }
-    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
@@ -875,27 +819,8 @@
           <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
         </div>
       </div>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-        </div>
-      </div>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-        </div>
-      </div>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
-        </div>
-      </div>
+      <a href="#"><i class="fa fa-dice"></i> Lotofácil</a>
+      <a href="#"><i class="fa fa-hashtag"></i> Quina</a>
       <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
       <a href="#"><i class="fa fa-phone"></i> Contato</a>
     </div>
@@ -921,43 +846,24 @@
     </div>
     <ul>
       <li><a href="/"><i class="fa fa-home"></i> Início</a></li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium" class="active"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
               <li>
-          <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-diamond"></i> +Milionária ▼</a>
-          <div class="mobile-dropdown">
-            <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-            <a href="/aposta_inteligente_premium" class="active"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          </div>
-        </li>
-        <li>
           <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
           <div class="mobile-dropdown">
             <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
             <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          </div>
-        </li>
-        <li>
-          <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
-          <div class="mobile-dropdown">
-            <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-            <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          </div>
-        </li>
-        <li>
-          <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
-          <div class="mobile-dropdown">
-            <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          </div>
-        </li>
-        <li>
-                  <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
-        <div class="mobile-dropdown">
-          <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
         </li>
-        <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-        <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+      <li><a href="#"><i class="fa fa-dice"></i> Lotofácil</a></li>
+      <li><a href="#"><i class="fa fa-hashtag"></i> Quina</a></li>
+      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
+      <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
     </ul>
   </nav>
 
@@ -978,9 +884,9 @@
   <!-- Header -->
   <header class="flex justify-between items-center mb-8">
     <!-- Título deslocado para a direita -->
-    <div class="flex-1 text-center milionaria-logo-container">
-      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex justify-center items-center">
-        <img src="/static/img/Milionaria.png" alt="+Milionária" class="milionaria-logo">
+    <div class="flex-1 text-center">
+      <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2" style="margin-left: 20%;">
+        +Milionária
       </h1>
     </div>
     
@@ -1773,9 +1679,9 @@
           }
           
           // Salvar preferências se identificou o modal
-          if (modalPrefix && typeof salvarPreferenciasDoPassoMIL === 'function') {
-            console.log(`💾 Salvando preferências do modal (+MIL): ${modalPrefix}`);
-            salvarPreferenciasDoPassoMIL(modalPrefix);
+          if (modalPrefix && typeof salvarPreferenciasDoModal === 'function') {
+            console.log(`💾 Salvando preferências do modal: ${modalPrefix}`);
+            salvarPreferenciasDoModal(modalPrefix);
           }
         }
       }
@@ -1820,8 +1726,8 @@
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔥 Números Mais Quentes (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${((data.numeros_quentes_frios && data.numeros_quentes_frios.quentes) ? data.numeros_quentes_frios.quentes : []).slice(0, 10).map(n => 
-                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${Array.isArray(n) ? n[0] : n}</div>`
+                ${data.numeros_quentes.slice(0, 10).map(n => 
+                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">${n[0]}</div>`
                 ).join('')}
               </div>
             </div>
@@ -1829,8 +1735,8 @@
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">❄️ Números Mais Frios (Top 10)</h3>
               <div class="grid grid-cols-5 gap-2">
-                ${((data.numeros_quentes_frios && data.numeros_quentes_frios.frios) ? data.numeros_quentes_frios.frios : []).slice(0, 10).map(n => 
-                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${Array.isArray(n) ? n[0] : n}</div>`
+                ${data.numeros_frios.slice(0, 10).map(n => 
+                  `<div class="bg-gray-600 text-white p-3 rounded text-center font-semibold">${n[0]}</div>`
                 ).join('')}
               </div>
             </div>
@@ -2745,12 +2651,12 @@
         const periodoInfo = data.periodo_analisado;
         
         // Debug específico da tabela
-        // console.log("=== DEBUG TABELA DETALHADA ===");  // DEBUG - COMENTADO
-        // console.log("Período solicitado:", qtdConcursos);  // DEBUG - COMENTADO
-        // console.log("Período analisado:", periodoInfo);  // DEBUG - COMENTADO
-        // console.log("Pares com maior afinidade:", afinidades.pares_com_maior_afinidade);  // DEBUG - COMENTADO
-        // console.log("Primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5));  // DEBUG - COMENTADO
-        // console.log("Frequências dos primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5).map(p => p[1]));  // DEBUG - COMENTADO
+        console.log("=== DEBUG TABELA DETALHADA ===");
+        console.log("Período solicitado:", qtdConcursos);
+        console.log("Período analisado:", periodoInfo);
+        console.log("Pares com maior afinidade:", afinidades.pares_com_maior_afinidade);
+        console.log("Primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5));
+        console.log("Frequências dos primeiros 5 pares:", afinidades.pares_com_maior_afinidade.slice(0, 5).map(p => p[1]));
         
         // Verificar se os dados estão no formato correto
         if (!afinidades || !afinidades.pares_com_maior_afinidade || !afinidades.numeros_com_maior_afinidade_geral) {
@@ -2869,7 +2775,7 @@
                   <span class="text-gray-300">Média afinidade</span>
                 </div>
                 <div class="flex items-center gap-2">
-                  <div class="w-4 h-1 bg-[#00E38C]"></div>
+                  <div class="w-4 h-1 bg-[#FF6B6B]"></div>
                   <span class="text-gray-300">Alta afinidade</span>
                 </div>
               </div>
@@ -3081,7 +2987,7 @@
             
             // Cor baseada na intensidade da afinidade
             const intensity = (edge.value - minFreq) / freqRange;
-            const color = intensity > 0.7 ? '#00E38C' : intensity > 0.4 ? '#FFA500' : '#8B5CF6';
+            const color = intensity > 0.7 ? '#FF6B6B' : intensity > 0.4 ? '#FFA500' : '#8B5CF6';
             edgeColors.push(color);
             
             console.log(`Par ${edge.from}-${edge.to}: Frequência=${edge.value}, Espessura=${normalizedWidth.toFixed(2)}, Cor=${color}`);
@@ -5247,7 +5153,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strongImportante:</strong> A Loteria é um jogo de probabilidades onde a sorte é protagonista. Estas análises estatísticas não garantem acertos, mas ajudam você a criar apostas mais equilibradas e estatisticamente mais prováveis, baseadas em dados históricos reais.
+        <strongImportante:</strong> A Loteria é um jogo de azar. Estas análises estatísticas não garantem acertos, mas ajudam você a criar apostas mais equilibradas e estatisticamente mais prováveis, baseadas em dados históricos reais.
       </p>
     </div>
   </div>
@@ -5300,7 +5206,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong⚠️ Importante:</strong> A Loteria é um jogo de probabilidades onde a sorte é protagonista. Estas análises de afinidade não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+        <strong⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises de afinidade não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
       </p>
     </div>
   </div>
@@ -5353,7 +5259,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strong⚠️ Importante:</strong> A Loteria é um jogo de probabilidades onde a sorte é protagonista. Estas análises dos trevos não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
+        <strong⚠️ Importante:</strong> A Loteria é um jogo de azar. Estas análises dos trevos não garantem acertos, mas ajudam você a entender padrões históricos e criar apostas mais informadas, baseadas em dados reais dos sorteios.
       </p>
     </div>
   </div>
@@ -5395,7 +5301,7 @@
         <strongAtrasados:</strong> Apostar nos números em maior seca, baseado na teoria de que estão "devendo" sair.<br>
         <strongRecentes:</strong> Apostar nos que saíram há pouco, seguindo a tendência de "momentum".<br>
         <strongMisto:</strong> Combinar ambas as estratégias para diversificar sua aposta.<br>
-        <strongAleatoriedade:</strong> Lembre-se: não há garantias! A loteria é um jogo de probabilidades onde a sorte é protagonista.
+        <strongAleatoriedade:</strong> Lembre-se: não há garantias! A loteria é um jogo de azar.
       </p>
 
       <h3>🎯 Como Usar na Prática</h3>
@@ -5415,7 +5321,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strongImportante:</strong> Esta é uma análise estatística histórica que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de probabilidades onde a sorte é protagonista.
+        <strongImportante:</strong> Esta é uma análise estatística histórica que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
       </p>
     </div>
   </div>
@@ -5508,7 +5414,7 @@
       </p>
 
       <p style="margin-top: 20px; font-style: italic;">
-        <strongImportante:</strong> Esta é uma análise estatística avançada que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de probabilidades onde a sorte é protagonista.
+        <strongImportante:</strong> Esta é uma análise estatística avançada que não garante resultados futuros. Use como ferramenta de orientação, mas sempre aposte com responsabilidade e consciência de que a loteria é um jogo de azar.
       </p>
     </div>
   </div>
@@ -5716,9 +5622,7 @@
   }
   </style>
 
-  <script src="{{ url_for('static', filename='js/graficos_milionaria.js') }}"></script>
-  
-
+  <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
 
   <!-- Script para controlar os menus responsivos -->
   <script>
@@ -5778,6 +5682,61 @@
     });
   </script>
 
+  <!-- JavaScript para controlar o Modal Premium -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Elementos do modal premium
+      const modalPremium = document.getElementById('modal-premium');
+      const btnAbrirModalPremium = document.getElementById('abrir-modal-premium');
+      const btnFecharModalPremium = document.getElementById('fechar-modal-premium');
+
+      // Abrir modal premium
+      if (btnAbrirModalPremium) {
+        btnAbrirModalPremium.addEventListener('click', function() {
+          console.log('🎯 Abrindo modal premium...');
+          if (modalPremium) {
+            modalPremium.classList.remove('hidden');
+            // Atualizar resumo de parâmetros ao abrir
+            if (typeof window.montarResumoParametrosAtivosMIL === 'function') {
+              window.montarResumoParametrosAtivosMIL();
+            }
+          }
+        });
+      }
+
+      // Fechar modal premium
+      if (btnFecharModalPremium) {
+        btnFecharModalPremium.addEventListener('click', function() {
+          console.log('❌ Fechando modal premium...');
+          if (modalPremium) {
+            modalPremium.classList.add('hidden');
+          }
+        });
+      }
+
+      // Fechar modal clicando fora dele
+      if (modalPremium) {
+        modalPremium.addEventListener('click', function(e) {
+          if (e.target === modalPremium) {
+            console.log('❌ Fechando modal premium (clique fora)...');
+            modalPremium.classList.add('hidden');
+          }
+        });
+      }
+
+      // Controlar botão de gerar sugestão
+      const btnGerarSugestao = document.getElementById('gerar-sugestao-btn');
+      if (btnGerarSugestao) {
+        btnGerarSugestao.addEventListener('click', function() {
+          console.log('🎲 Gerando sugestão de números...');
+          // Aqui você pode adicionar a lógica para gerar sugestões
+          // Por enquanto, vamos mostrar uma mensagem
+          alert('🎯 Funcionalidade de geração de sugestões será implementada em breve!');
+        });
+      }
+    });
+  </script>
+
   <!-- Modal para Números do Cluster -->
   <div id="modal-numeros-cluster" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
     <div class="bg-card rounded-lg shadow-xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto text-text relative">
@@ -5791,313 +5750,6 @@
       </button>
     </div>
   </div>
-
-  <script>
-  (function MILPreferenciasIsoladas() {
-    if (window.__MIL_PREFS_INIT__) return;
-    window.__MIL_PREFS_INIT__ = true;
-    const STORAGE_KEY = 'milionariaPremiumPreferences';
-
-    function getPrefsMIL() {
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch (_) { return {}; }
-    }
-
-    function setPrefsMIL(p) {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(p || {})); } catch (_) {}
-    }
-
-    // Salva SOMENTE o passo informado, preservando os demais (merge incremental)
-    window.salvarPreferenciasDoPassoMIL = function(prefix) {
-      const prefs = getPrefsMIL();
-      let sub = {};
-
-      switch (prefix) {
-        case 'freq': {
-          const elPeriodo = document.getElementById('freq-periodo');
-          const elQuentes = document.getElementById('freq-priorizar-quentes');
-          const elQtdeQuentes = document.getElementById('freq-qtde-quentes');
-          const elFrios = document.getElementById('freq-priorizar-frios');
-          const elQtdeFrios = document.getElementById('freq-qtde-frios');
-          // Se nenhum campo do passo existir no DOM, não sobrescreva o storage
-          if (!elPeriodo && !elQuentes && !elQtdeQuentes && !elFrios && !elQtdeFrios) return;
-          const next = {};
-          if (elPeriodo) next.janelaAnalise = elPeriodo.value || '';
-          if (elQuentes) next.priorizarQuentes = Array.from(document.querySelectorAll('#freq-priorizar-quentes')).some(el => el.checked);
-          if (elQtdeQuentes) next.qtdeQuentes = parseInt(elQtdeQuentes.value || '0', 10);
-          if (elFrios) next.priorizarFrios = Array.from(document.querySelectorAll('#freq-priorizar-frios')).some(el => el.checked);
-          if (elQtdeFrios) next.qtdeFrios = parseInt(elQtdeFrios.value || '0', 10);
-          if (!Object.keys(next).length) return;
-          sub = next;
-          break; }
-        case 'dist': {
-          const elParidade = document.getElementById('dist-priorizar-pares-impares');
-          const elParidadeDesejada = document.getElementById('dist-paridade-desejada');
-          const elSoma = document.getElementById('dist-priorizar-soma');
-          const elSomaMin = document.getElementById('dist-soma-min');
-          const elSomaMax = document.getElementById('dist-soma-max');
-          if (!elParidade && !elParidadeDesejada && !elSoma && !elSomaMin && !elSomaMax) return;
-          const next = {};
-          if (elParidade) next.priorizarParidade = !!elParidade.checked;
-          if (elParidadeDesejada) next.paridadeDesejada = elParidadeDesejada.value || 'equilibrado';
-          if (elSoma) next.priorizarSoma = !!elSoma.checked;
-          if (elSomaMin) next.somaMin = parseInt(elSomaMin.value || '0', 10);
-          if (elSomaMax) next.somaMax = parseInt(elSomaMax.value || '0', 10);
-          if (!Object.keys(next).length) return;
-          sub = next;
-          break; }
-        case 'afinidade': {
-          const all = document.querySelectorAll('input[name="par-afinidade"]');
-          if (!all || all.length === 0) return;
-          sub = {
-            paresFavoritos: Array.from(document.querySelectorAll('input[name="par-afinidade"]:checked')).map(i => i.value)
-          };
-          break; }
-        case 'padrao': {
-          const anySeq = document.querySelectorAll('input[name="padrao-seq"]');
-          const elEvCon = document.getElementById('evitar-consecutivos');
-          const elEvRep = document.getElementById('evitar-repeticoes');
-          if ((!anySeq || anySeq.length === 0) && !elEvCon && !elEvRep) return;
-          const next = {};
-          if (anySeq && anySeq.length) next.sequencias = Array.from(document.querySelectorAll('input[name="padrao-seq"]:checked')).map(i => i.value);
-          if (elEvCon) next.evitarConsecutivos = !!elEvCon.checked;
-          if (elEvRep) next.evitarRepeticoesSeguidas = !!elEvRep.checked;
-          sub = next;
-          break; }
-        case 'trevo': {
-          const all = document.querySelectorAll('input[name="trevo-pref"]');
-          if (!all || all.length === 0) return;
-          sub = {
-            preferenciaTrevos: Array.from(document.querySelectorAll('input[name="trevo-pref"]:checked')).map(i => i.value)
-          };
-          break; }
-        case 'seca': {
-          const el = document.getElementById('limite-seca');
-          if (!el) return;
-          sub = { maxSeca: el.value || '' };
-          break; }
-        case 'avancada': {
-          const all = document.querySelectorAll('input[name="cluster-opt"]');
-          if (!all || all.length === 0) return;
-          sub = {
-            clusters: Array.from(document.querySelectorAll('input[name="cluster-opt"]:checked')).map(i => i.value)
-          };
-          break; }
-        default:
-          return;
-      }
-
-      // Merge incremental no passo para não apagar campos anteriores do mesmo passo
-      const mergedStep = { ...(prefs[prefix] || {}), ...(sub || {}) };
-      setPrefsMIL({ ...prefs, [prefix]: mergedStep });
-    };
-
-    // Hidrata o objeto global do modal com o que foi salvo por passo
-    window.hidratarPreferenciasDoModalMIL = function() {
-      const byStep = getPrefsMIL();
-      const map = {
-        freq: 'frequencia',
-        dist: 'distribuicao',
-        afinidade: 'afinidades',
-        padrao: 'padroes',
-        trevo: 'trevos',
-        seca: 'seca',
-        avancada: 'clusters'
-      };
-
-      const g = window.userPremiumPreferences || {};
-      for (const [prefix, sub] of Object.entries(byStep)) {
-        const key = map[prefix];
-        if (!key) continue;
-        if (key === 'clusters') {
-          const arr = Array.isArray(sub?.clusters) ? sub.clusters : (Array.isArray(sub) ? sub : []);
-          g.clusters = Array.isArray(g.clusters) ? Array.from(new Set([...(g.clusters || []), ...arr])) : arr;
-        } else {
-          g[key] = { ...(g[key] || {}), ...(sub || {}) };
-        }
-      }
-      window.userPremiumPreferences = g;
-    };
-
-    // Monta o resumo "Parâmetros Ativos" do Premium a partir do storage
-    window.montarResumoParametrosAtivosMIL = function() {
-      try {
-        const prefs = getPrefsMIL();
-        const linhas = [];
-        if (prefs.freq) {
-          linhas.push(`📊 Frequência: janela=${prefs.freq.janelaAnalise || '-'}; quentes=${prefs.freq.qtdeQuentes ?? '-'}; frios=${prefs.freq.qtdeFrios ?? '-'}`);
-        }
-        if (prefs.dist) {
-          const parts = [];
-          if (prefs.dist.priorizarParidade) {
-            const mapa = { equilibrado: 'Equilibrada', mais_pares: 'Mais Pares', mais_impares: 'Mais Ímpares' };
-            parts.push(`Paridade: ${mapa[prefs.dist.paridadeDesejada] || '-'}`);
-          }
-          if (prefs.dist.priorizarSoma) {
-            parts.push(`Soma: ${prefs.dist.somaMin ?? '-'}–${prefs.dist.somaMax ?? '-'}`);
-          }
-          if (parts.length) linhas.push(`🔢 Distribuição: ${parts.join(' · ')}`);
-        }
-        if (prefs.afinidade && Array.isArray(prefs.afinidade.paresFavoritos) && prefs.afinidade.paresFavoritos.length) linhas.push(`🤝 Afinidades: ${prefs.afinidade.paresFavoritos.join(', ')}`);
-        if (prefs.padrao && Array.isArray(prefs.padrao.sequencias) && prefs.padrao.sequencias.length) linhas.push(`🧩 Padrões: ${prefs.padrao.sequencias.join(', ')}`);
-        if (prefs.trevo && Array.isArray(prefs.trevo.preferenciaTrevos) && prefs.trevo.preferenciaTrevos.length) linhas.push(`🍀 Trevos: ${prefs.trevo.preferenciaTrevos.join(', ')}`);
-        if (prefs.seca) linhas.push(`🌵 Seca: máx=${(prefs.seca.maxSeca ?? '-')}`);
-        if (prefs.avancada && Array.isArray(prefs.avancada.clusters) && prefs.avancada.clusters.length) linhas.push(`🤖 Avançadas: ${prefs.avancada.clusters.join(', ')}`);
-        const html = linhas.length
-          ? `<ul class="list-disc pl-5 space-y-1">${linhas.map(li => `<li>${li}</li>`).join('')}</ul>`
-          : `<p class="text-gray-400">Nenhum parâmetro selecionado ainda.</p>`;
-        const destinos = document.querySelectorAll('#lista-parametros');
-        destinos.forEach(el => { el.innerHTML = html; });
-      } catch (_) {}
-    };
-
-    function attachChange(prefix, selector) {
-      try {
-        document.querySelectorAll(selector).forEach(el => {
-          el.addEventListener('change', () => window.salvarPreferenciasDoPassoMIL(prefix));
-          el.addEventListener('input', () => window.salvarPreferenciasDoPassoMIL(prefix));
-        });
-      } catch (_) {}
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      // Loaders por passo: repõem o que já foi salvo
-      function carregarPreferenciasFrequenciaMIL() {
-        const prefs = getPrefsMIL().freq || {};
-        try {
-          const ja = document.getElementById('janela-analise');
-          const tn = document.getElementById('top-n');
-          const q = document.getElementById('freq-priorizar-quentes');
-          const f = document.getElementById('freq-priorizar-frios');
-          if (prefs.janelaAnalise && ja) ja.value = prefs.janelaAnalise;
-          if (prefs.considerarTopN && tn) tn.value = prefs.considerarTopN;
-          if (typeof prefs.priorizarQuentes === 'boolean' && q) q.checked = !!prefs.priorizarQuentes;
-          if (typeof prefs.priorizarFrios === 'boolean' && f) f.checked = !!prefs.priorizarFrios;
-        } catch (_) {}
-      }
-
-      function carregarPreferenciasDistribuicaoMIL() {
-        const prefs = getPrefsMIL().dist || {};
-        try {
-          (prefs.buckets || []).forEach(v => {
-            const el = document.querySelector(`input[name="bucket-dist"][value="${v}"]`);
-            if (el) el.checked = true;
-          });
-        } catch (_) {}
-      }
-
-      function carregarPreferenciasAfinidadeMIL() {
-        const prefs = getPrefsMIL().afinidade || {};
-        try {
-          (prefs.paresFavoritos || []).forEach(v => {
-            const el = document.querySelector(`input[name="par-afinidade"][value="${v}"]`);
-            if (el) el.checked = true;
-          });
-        } catch (_) {}
-      }
-
-      function carregarPreferenciasTrevoMIL() {
-        const prefs = getPrefsMIL().trevo || {};
-        try {
-          (prefs.preferenciaTrevos || []).forEach(v => {
-            const el = document.querySelector(`input[name="trevo-pref"][value="${v}"]`);
-            if (el) el.checked = true;
-          });
-        } catch (_) {}
-      }
-
-      function carregarPreferenciasSecaMIL() {
-        const prefs = getPrefsMIL().seca || {};
-        try {
-          const el = document.getElementById('limite-seca');
-          if (el && (prefs.maxSeca || prefs.maxSeca === 0)) el.value = prefs.maxSeca;
-        } catch (_) {}
-      }
-
-      function carregarPreferenciasAvancadaMIL() {
-        const prefs = getPrefsMIL().avancada || {};
-        try {
-          (prefs.clusters || []).forEach(v => {
-            const el = document.querySelector(`input[name="cluster-opt"][value="${v}"]`);
-            if (el) el.checked = true;
-          });
-        } catch (_) {}
-      }
-
-      // Executa loaders na inicialização (idempotente)
-      try {
-        carregarPreferenciasFrequenciaMIL();
-        carregarPreferenciasDistribuicaoMIL();
-        carregarPreferenciasAfinidadeMIL();
-        carregarPreferenciasTrevoMIL();
-        carregarPreferenciasSecaMIL();
-        carregarPreferenciasAvancadaMIL();
-      } catch (_) {}
-
-      // Liga salvamento incremental por passo
-      attachChange('freq', '#freq-periodo, #freq-priorizar-quentes, #freq-qtde-quentes, #freq-priorizar-frios, #freq-qtde-frios');
-      attachChange('dist', '#dist-priorizar-pares-impares, #dist-paridade-desejada, #dist-priorizar-soma, #dist-soma-min, #dist-soma-max');
-      attachChange('afinidade', 'input[name="par-afinidade"]');
-      attachChange('padrao', 'input[name="padrao-seq"], #evitar-consecutivos, #evitar-repeticoes');
-      attachChange('trevo', 'input[name="trevo-pref"]');
-      attachChange('seca', '#limite-seca');
-      attachChange('avancada', 'input[name="cluster-opt"]');
-
-      // Delegação global para campos dinâmicos (evita perder eventos em conteúdo injetado)
-      try {
-        document.addEventListener('change', function(e) {
-          try {
-            if (e.target && (e.target.closest && e.target.closest('#freq-periodo, #freq-qtde-quentes, #freq-qtde-frios, #freq-priorizar-quentes, #freq-priorizar-frios'))) {
-              window.salvarPreferenciasDoPassoMIL('freq');
-            }
-            if (e.target && (e.target.closest && e.target.closest('#dist-priorizar-pares-impares, #dist-paridade-desejada, #dist-priorizar-soma, #dist-soma-min, #dist-soma-max'))) {
-              window.salvarPreferenciasDoPassoMIL('dist');
-            }
-          } catch (_) {}
-        });
-        document.addEventListener('input', function(e) {
-          try {
-            if (!e.target) return;
-            const el = e.target;
-            if (el.closest && el.closest('#freq-qtde-quentes, #freq-qtde-frios')) {
-              window.salvarPreferenciasDoPassoMIL('freq');
-            } else if (el.closest && el.closest('#dist-soma-min, #dist-soma-max')) {
-              window.salvarPreferenciasDoPassoMIL('dist');
-            }
-          } catch (_) {}
-        });
-      } catch (_) {}
-
-      // Exclusão mútua Quentes/Frios (somente +Milionária)
-      try {
-        // Pode haver duplicatas dos checkboxes na página; trate todas
-        const allQuentes = Array.from(document.querySelectorAll('#freq-priorizar-quentes'));
-        const allFrios = Array.from(document.querySelectorAll('#freq-priorizar-frios'));
-        if (allQuentes.length && allFrios.length) {
-          const syncExclusao = (tipo) => {
-            const isQuentes = tipo === 'quentes';
-            const fontes = isQuentes ? allQuentes : allFrios;
-            const opostas = isQuentes ? allFrios : allQuentes;
-            // Se qualquer fonte ficar marcada, desmarca todas as opostas
-            if (fontes.some(el => el.checked)) {
-              opostas.forEach(el => { el.checked = false; });
-            }
-            window.salvarPreferenciasDoPassoMIL('freq');
-          };
-          allQuentes.forEach(el => el.addEventListener('change', () => syncExclusao('quentes')));
-          allFrios.forEach(el => el.addEventListener('change', () => syncExclusao('frios')));
-          // Estado inicial consistente
-          if (allQuentes.some(el => el.checked) && allFrios.some(el => el.checked)) {
-            allFrios.forEach(el => { el.checked = false; });
-          }
-        }
-      } catch (_) {}
-
-      // REMOVIDO: Event listener conflitante que sobrescrevia o botão do modal
-
-      // REMOVIDO: Event listener conflitante do botão gerar sugestão
-    });
-  })();
-  </script>
 </body>
 </html> 
 </html> 

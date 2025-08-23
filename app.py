@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, jsonify, request, send_file
+from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for
 import pandas as pd
 import os
 import math
@@ -97,7 +97,12 @@ def landing_page():
 
 @app.route('/dashboard')
 def dashboard():
-    """Renderiza a página principal do dashboard."""
+    """Redireciona para o dashboard da Milionária."""
+    return redirect(url_for('dashboard_milionaria'))
+
+@app.route('/dashboard_milionaria')
+def dashboard_milionaria():
+    """Renderiza a página principal do dashboard da Milionária."""
     return render_template('dashboard_milionaria.html')
 
 # --- Rotas de API para as Análises ---
@@ -1541,16 +1546,18 @@ def teste_api():
     """Página de teste da API"""
     return send_file('teste_api.html')
 
-# --- Rotas da Lotomania ---
-@app.route('/dashboard_lotomania')
-def dashboard_lotomania():
-    """Renderiza a página principal do dashboard da Lotomania."""
-    return render_template('dashboard_lotomania.html')
+# --- Rotas da Milionária ---
 
 @app.route('/aposta_inteligente_premium')
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
     return render_template('analise_estatistica_avancada_milionaria.html')
+
+# --- Rotas da Lotomania ---
+@app.route('/dashboard_lotomania')
+def dashboard_lotomania():
+    """Renderiza a página principal do dashboard da Lotomania."""
+    return render_template('dashboard_lotomania.html')
 
 @app.route('/api/gerar_aposta_premium', methods=['POST'])
 def gerar_aposta_premium():
@@ -2041,6 +2048,117 @@ def analisar_cartoes():
         # import traceback
         # traceback.print_exc()
         return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
+
+@app.route('/api/gerar_aposta_premium_milionaria', methods=['POST'])
+def gerar_aposta_premium_milionaria():
+    """Gera aposta inteligente da +Milionária usando Machine Learning."""
+    try:
+        from funcoes.milionaria.geracao_inteligente import gerar_aposta_inteligente
+        
+        # Obter dados do request
+        data = request.get_json()
+        
+        # O frontend envia o objeto userPremiumPreferencesMIL completo
+        preferencias_ml = data  # Usar diretamente o objeto enviado
+        
+        # print(f"📊 Preferências recebidas (+Milionária): {preferencias_ml}")  # DEBUG - COMENTADO
+        
+        # Carregar dados da +Milionária
+        df_milionaria = carregar_dados_milionaria()
+        
+        if df_milionaria.empty:
+            return jsonify({
+                'success': False,
+                'error': 'Dados da +Milionária não disponíveis'
+            }), 500
+        
+        # print(f"📊 Dados da +Milionária carregados: {len(df_milionaria)} concursos")  # DEBUG - COMENTADO
+        
+        # Preparar cache de análise baseado nas preferências
+        analysis_cache = {}
+        
+        # Carregar dados de frequência se necessário
+        if any(key in preferencias_ml for key in ['frequencia']):
+            try:
+                from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia_milionaria_completa
+                dados_freq = analise_frequencia_milionaria_completa(df_milionaria)
+                analysis_cache['frequencia_completa'] = dados_freq
+                # print("✅ Dados de frequência carregados")  # DEBUG - COMENTADO
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar frequência: {e}")
+        
+        # Carregar dados de distribuição se necessário
+        if any(key in preferencias_ml for key in ['distribuicao']):
+            try:
+                from funcoes.milionaria.funcao_analise_de_distribuicao import analise_distribuicao_milionaria
+                dados_dist = analise_distribuicao_milionaria(df_milionaria)
+                analysis_cache['distribuicao_completa'] = dados_dist
+                # print("✅ Dados de distribuição carregados")  # DEBUG - COMENTADO
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar distribuição: {e}")
+        
+        # Carregar dados de padrões se necessário
+        if any(key in preferencias_ml for key in ['padroes', 'sequencias']):
+            try:
+                from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
+                dados_padroes = analise_padroes_sequencias_milionaria(df_milionaria)
+                analysis_cache['padroes_completa'] = dados_padroes
+                # print("✅ Dados de padrões carregados")  # DEBUG - COMENTADO
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar padrões: {e}")
+        
+        # Carregar dados de afinidades (combinacoes) se necessário
+        if any(key in preferencias_ml for key in ['afinidades']):
+            try:
+                from funcoes.milionaria.funcao_analise_de_combinacoes import analise_combinacoes_milionaria
+                dados_afinidades = analise_combinacoes_milionaria(df_milionaria, qtd_concursos=50)  # Últimos 50 concursos
+                analysis_cache['afinidades_completa'] = dados_afinidades
+                # print("✅ Dados de afinidades carregados")  # DEBUG - COMENTADO
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar afinidades: {e}")
+        
+        # Carregar dados avançados se necessário
+        if any(key in preferencias_ml for key in ['clusters']):
+            try:
+                from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
+                analise = AnaliseEstatisticaAvancada(df_milionaria)
+                dados_avancados = analise.executar_analise_completa()
+                analysis_cache['avancada'] = dados_avancados
+                print("✅ Dados avançados carregados")
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar dados avançados: {e}")
+        
+        # Carregar dados de trevos da sorte se necessário
+        if any(key in preferencias_ml for key in ['trevos']):
+            try:
+                from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
+                dados_trevos = analise_trevos_da_sorte(df_milionaria)
+                analysis_cache['trevos_completa'] = dados_trevos
+                # print("✅ Dados de trevos da sorte carregados")  # DEBUG - COMENTADO
+            except Exception as e:
+                print(f"⚠️ Erro ao carregar dados de trevos: {e}")
+        
+        # print(f"📊 Cache de análise preparado: {list(analysis_cache.keys())}")  # DEBUG - COMENTADO
+        
+        # Gerar apostas usando Machine Learning
+        apostas_geradas = gerar_aposta_inteligente(preferencias_ml, analysis_cache)
+        
+        # print(f"🎯 Apostas geradas (+Milionária): {len(apostas_geradas)}")  # DEBUG - COMENTADO
+        
+        return jsonify({
+            'success': True,
+            'apostas': apostas_geradas,
+            'mensagem': f'Aposta inteligente gerada com sucesso! ({len(apostas_geradas)} apostas)'
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao gerar aposta premium (+Milionária): {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Erro interno: {str(e)}'
+        }), 500
 
 
 if __name__ == '__main__':
