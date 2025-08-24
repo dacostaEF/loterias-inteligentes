@@ -1088,12 +1088,100 @@
     
     <!-- Botão principal do Machine Learning - NO FINAL -->
     <div id="passo6" class="mt-8 text-center">
-                      <div class="bg-gradient-to-r from-[#00E38C] to-[#3B82F6] p-1 rounded-xl inline-block">
-                  <button class="bg-gradient-to-r from-[#00E38C] to-[#3B82F6] text-black font-bold px-8 py-4 rounded-lg hover:from-[#00C973] hover:to-[#2563EB] hover:scale-105 hover:shadow-2xl hover:shadow-[#00E38C]/50 transition-all duration-300 text-lg transform" id="abrir-modal-premium">
-                    🎯 Gerar Aposta Inteligente (Premium)
-                  </button>
-                </div>
+      <div class="flex items-center justify-center space-x-4 mb-4">
+        <div class="bg-gradient-to-r from-[#00E38C] to-[#3B82F6] p-1 rounded-xl inline-block">
+          <button class="bg-gradient-to-r from-[#00E38C] to-[#3B82F6] text-black font-bold px-8 py-4 rounded-lg hover:from-[#00C973] hover:to-[#2563EB] hover:scale-105 hover:shadow-2xl hover:shadow-[#00E38C]/50 transition-all duration-300 text-lg transform" id="abrir-modal-premium">
+            🎯 Gerar Aposta Inteligente (Premium)
+          </button>
+        </div>
+        
+        <!-- Botão de Informações -->
+        <button class="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full transition-all duration-300 hover:scale-110" 
+                onclick="toggleInfoPopup()" 
+                title="Como funciona a Aposta Inteligente Premium">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </button>
+      </div>
+      
       <p class="text-gray-400 text-sm mt-3">Após configurar suas preferências, clique aqui para gerar apostas com Inteligencia Estatística</p>
+    </div>
+    
+    <!-- Popup de Informações -->
+    <div id="info-popup" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div class="bg-gray-800 rounded-xl p-6 max-w-4xl max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-white">🎯 Como Funciona a Aposta Inteligente Premium</h2>
+          <button onclick="toggleInfoPopup()" class="text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+        </div>
+        
+        <div class="space-y-6 text-gray-300">
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-white mb-3">📊 Fundamentos Matemáticos</h3>
+            <p class="mb-3">Nossa tecnologia utiliza <strong>análise estatística avançada</strong> combinada com <strong>algoritmos de machine learning</strong> para identificar padrões ocultos nos resultados históricos das loterias.</p>
+            <p class="mb-3">• <strong>Probabilidade Condicional:</strong> Calculamos P(número|contexto) baseado em sequências históricas</p>
+            <p class="mb-3">• <strong>Análise de Correlação:</strong> Identificamos números que tendem a aparecer juntos</p>
+            <p class="mb-3">• <strong>Padrões Temporais:</strong> Detectamos ciclos e sazonalidades nos resultados</p>
+          </div>
+
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-white mb-3">🔍 Passo 1: Análise de Frequência</h3>
+            <p class="mb-3"><strong>O que faz:</strong> Analisa quantas vezes cada número apareceu nos últimos sorteios</p>
+            <p class="mb-3"><strong>Matemática:</strong> Frequência relativa = (ocorrências do número) / (total de sorteios analisados)</p>
+            <p class="mb-3"><strong>Como usar:</strong> Ajuste o peso para favorecer números mais ou menos frequentes. Números com frequência alta têm maior probabilidade histórica, mas podem estar "quentes" demais.</p>
+          </div>
+
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-white mb-3">📈 Passo 2: Análise de Distribuição</h3>
+            <p class="mb-3"><strong>O que faz:</strong> Verifica como os números se distribuem ao longo do range (1-50 para +Milionária)</p>
+            <p class="mb-3"><strong>Matemática:</strong> Distribuição = análise de gaps, concentração e dispersão dos números selecionados</p>
+            <p class="mb-3"><strong>Como usar:</strong> Controle se quer números concentrados em faixas específicas ou bem distribuídos. Distribuição equilibrada pode aumentar as chances de acerto.</p>
+          </div>
+
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-white mb-3">🔗 Passo 3: Análise de Afinidades</h3>
+            <p class="mb-3"><strong>O que faz:</strong> Identifica números que historicamente aparecem juntos com mais frequência</p>
+            <p class="mb-3"><strong>Matemática:</strong> Coeficiente de correlação = Cov(X,Y) / (σx × σy), onde X e Y são frequências de números</p>
+            <p class="mb-3"><strong>Como usar:</strong> Ajuste para incluir ou excluir combinações de números que tendem a aparecer juntos. Afinidades altas podem indicar padrões reais ou apenas coincidências históricas.</p>
+          </div>
+
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-white mb-3">🍀 Passo 4: Análise de Trevos da Sorte</h3>
+            <p class="mb-3"><strong>O que faz:</strong> Analisa especificamente os trevos (1-6) que mais aparecem nos sorteios</p>
+            <p class="mb-3"><strong>Matemática:</strong> Frequência condicional dos trevos + análise de padrões de alternância</p>
+            <p class="mb-3"><strong>Como usar:</strong> Controle o peso dos trevos na seleção. Como são apenas 6 opções, pequenas variações podem ter grande impacto.</p>
+          </div>
+
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-white mb-3">🌵 Passo 5: Análise de Seca</h3>
+            <p class="mb-3"><strong>O que faz:</strong> Identifica números que não aparecem há muito tempo (estão "secos")</p>
+            <p class="mb-3"><strong>Matemática:</strong> Tempo desde último aparecimento × probabilidade teórica de não aparecer</p>
+            <p class="mb-3"><strong>Como usar:</strong> Ajuste para incluir números que "devem" aparecer por estatística. Mas lembre-se: loterias não têm memória - cada sorteio é independente.</p>
+          </div>
+
+          <div class="bg-gray-700 p-4 rounded-lg">
+            <h3 class="text-xl font-semibold text-white mb-3">🧠 Passo 6: Estatísticas Avançadas</h3>
+            <p class="mb-3"><strong>O que faz:</strong> Combina todos os parâmetros anteriores usando algoritmos de otimização</p>
+            <p class="mb-3"><strong>Matemática:</strong> Algoritmo genético + análise de clusters + machine learning para encontrar a melhor combinação de parâmetros</p>
+            <p class="mb-3"><strong>Como usar:</strong> Este é o coração do sistema. Os pesos dos passos anteriores são combinados para gerar a aposta mais inteligente possível.</p>
+          </div>
+
+          <div class="bg-blue-900 p-4 rounded-lg border-l-4 border-blue-400">
+            <h3 class="text-xl font-semibold text-white mb-3">⚡ Geração da Aposta</h3>
+            <p class="mb-3"><strong>Processo:</strong> O sistema gera múltiplas combinações usando diferentes combinações dos parâmetros ajustados</p>
+            <p class="mb-3"><strong>Seleção Final:</strong> As melhores combinações são ranqueadas por score de qualidade calculado a partir dos pesos definidos</p>
+            <p class="mb-3"><strong>Resultado:</strong> Você recebe as apostas com maior probabilidade estatística baseada nos seus parâmetros</p>
+          </div>
+
+          <div class="bg-yellow-900 p-4 rounded-lg border-l-4 border-yellow-400">
+            <h3 class="text-xl font-semibold text-white mb-3">⚠️ Importante</h3>
+            <p class="mb-3">• <strong>Não é garantia de vitória:</strong> Loterias são baseadas em probabilidade e sorte</p>
+            <p class="mb-3">• <strong>Use com moderação:</strong> Aposte apenas o que pode perder</p>
+            <p class="mb-3">• <strong>Experimente:</strong> Teste diferentes combinações de parâmetros para encontrar o que funciona melhor para você</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -6096,6 +6184,40 @@
       // REMOVIDO: Event listener conflitante que sobrescrevia o botão do modal
 
       // REMOVIDO: Event listener conflitante do botão gerar sugestão
+      
+      // Função para controlar o popup de informações
+      window.toggleInfoPopup = function() {
+        const popup = document.getElementById('info-popup');
+        if (popup) {
+          if (popup.classList.contains('hidden')) {
+            popup.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Previne scroll da página
+          } else {
+            popup.classList.add('hidden');
+            document.body.style.overflow = 'auto'; // Restaura scroll da página
+          }
+        }
+      }
+      
+      // Fechar popup ao clicar fora dele
+      document.addEventListener('click', function(e) {
+        const popup = document.getElementById('info-popup');
+        if (popup && !popup.classList.contains('hidden')) {
+          if (e.target === popup) {
+            toggleInfoPopup();
+          }
+        }
+      });
+      
+      // Fechar popup com tecla ESC
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+          const popup = document.getElementById('info-popup');
+          if (popup && !popup.classList.contains('hidden')) {
+            toggleInfoPopup();
+          }
+        }
+      });
     });
   })();
   </script>
