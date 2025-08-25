@@ -10,6 +10,7 @@
   <meta name="msapplication-navbutton-color" content="#7C3AED">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
   
   <title>Loterias Inteligentes - Análise Estatística Científica</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -47,6 +48,10 @@
   <link rel="preload" href="{{ url_for('static', filename='css/estilo.css') }}" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}"></noscript>
+  
+  <!-- Carrossel CSS e JS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/carrossel.css') }}">
+  <script src="{{ url_for('static', filename='js/carrossel.js') }}" defer></script>
   <style>
     /* Moldura Neon Lilás - Desktop */
     html::before {
@@ -78,13 +83,24 @@
       background-color: #000000; /* Padronizado com Dashboard e Premium */
     }
 
+    /* CARROSSEL NO TOPO - SEM FOLGA PARA MENU */
+    .carousel-section-top {
+      position: relative;
+      z-index: 1;
+      margin: 0 auto;
+      width: 100%;
+      max-width: 1200px;
+      padding: 0; /* PADDING ZERO - ajuste perfeito */
+      background: transparent;
+    }
+
     .main-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      padding-top: 2rem; /* Reduzido de 10rem para 2rem */
+      padding-top: 0; /* PADDING ZERO - carrossel já é o header */
       position: relative; /* Necessário para posicionar o menu */
       z-index: 1; /* Para garantir que o conteúdo fique abaixo do menu */
     }
@@ -98,11 +114,16 @@
     .logo {
       max-width: 300px;
       height: auto;
-      margin-bottom: 0.5rem;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      object-fit: contain;
+    }
+
+    /* Estilos específicos para o carrossel como HEADER da landing page */
+    .carousel-section-header {
+      position: relative;
+      z-index: 999; /* ABAIXO do menu que tem z-index: 1000 */
+      margin: 0 auto;
+      width: 100%;
+      max-width: 1200px;
+      padding: 80px 20px 1rem 20px; /* 80px de padding-top para ficar ABAIXO do menu fixo */
     }
 
     h1 {
@@ -232,7 +253,7 @@
 
     /* Menu Desktop */
     .desktop-nav {
-      position: fixed;
+      position: sticky; /* MUDADO: era fixed, agora sticky */
       top: 0;
       left: 0;
       right: 0;
@@ -512,11 +533,11 @@
     .breadcrumbs-container {
       background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(0, 227, 140, 0.05) 100%);
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-      padding: 8px 0;
+      padding: 4px 0; /* REDUZIDO: era 8px 0, agora 4px 0 - mais compacto */
       margin-bottom: 20px;
       position: relative;
       z-index: 998;
-      margin-top: 80px;
+      margin-top: 5px; /* REDUZIDO: era 80px, agora 5px - QUASE COLADO AO MENU */
     }
     
     .breadcrumbs {
@@ -772,7 +793,12 @@
   </style>
 </head>
 <body>
-  <!-- Menu Desktop -->
+  <!-- CARROSSEL NO TOPO - HEADER DA PÁGINA -->
+  <header id="top-carousel" class="carousel-section-top">
+    <div id="carousel-container"></div>
+  </header>
+
+  <!-- MENU (vem depois do carrossel) -->
   <nav class="desktop-nav">
     <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="logo">
     <div class="desktop-nav-links">

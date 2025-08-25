@@ -1,0 +1,288 @@
+/**
+ * Estilos para o Carrossel de Loterias
+ * Segue o padrão visual estabelecido para cada loteria
+ */
+
+/* Container principal do carrossel */
+.carousel-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0; /* PADDING ZERO - sem espaços vazios */
+    background: linear-gradient(135deg, rgba(26, 29, 37, 0.95) 0%, rgba(46, 48, 58, 0.95) 100%);
+    border-radius: 0; /* SEM BORDAS ARREDONDADAS - ajuste perfeito */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    /* POSICIONAMENTO COMO HEADER DA PÁGINA */
+    position: relative;
+    z-index: 999; /* Abaixo do menu (que tem z-index: 1000) */
+}
+
+/* Container dos slides */
+.carousel-slides {
+    display: flex;
+    gap: 20px; /* Mantido */
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 0; /* PADDING ZERO - sem espaços vazios */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+.carousel-slides::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Opera */
+}
+
+/* Slide individual */
+.carousel-slide {
+    width: 127px; /* AUMENTADO +10%: 115px → 127px */
+    height: 105px; /* AUMENTADO +10%: 95px → 105px */
+    border-radius: 15px; /* Ajustado proporcionalmente */
+    padding: 15px 22px 22px 22px; /* Ajustado proporcionalmente para a nova altura */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0; /* Impede que as caixas encolham */
+}
+
+.carousel-slide:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.carousel-slide.active {
+    transform: scale(1.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+/* Conteúdo do slide */
+.slide-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: flex-start; /* MUDADO: começa do topo */
+    gap: 1px; /* REDUZIDO: menos espaçamento entre elementos */
+    padding-top: 0px; /* REMOVIDO: sem padding no topo */
+}
+
+/* Label superior (data/status) - TERCEIRA LINHA */
+.slide-label {
+    background: rgba(255, 255, 255, 0.9);
+    color: #1A1D25;
+    padding: 4px 8px; /* REDUZIDO padding vertical */
+    border-radius: 8px; /* Ajustado */
+    font-size: 10px; /* REDUZIDO 1px: 11px → 10px */
+    font-weight: normal; /* REMOVIDO bold - texto normal */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.3px; /* Ajustado para o novo tamanho */
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    align-self: center; /* CENTRALIZADO */
+    margin: 0 auto; /* CENTRALIZADO */
+    order: 3; /* TERCEIRA LINHA */
+}
+
+/* Valor principal - SEGUNDA LINHA */
+.slide-value {
+    text-align: center;
+    margin: 2px 0; /* REDUZIDO: menos espaço vertical */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row; /* VALOR E UNIDADE EM UMA LINHA */
+    gap: 2px; /* Pequeno espaço entre valor e unidade */
+    order: 2; /* SEGUNDA LINHA */
+}
+
+.main-value {
+    display: inline; /* MUDADO para inline para ficar na mesma linha */
+    font-size: 10px; /* REDUZIDO 1px: 11px → 10px */
+    font-weight: normal; /* REMOVIDO bold - texto normal */
+    line-height: 1;
+    text-shadow: 0.6px 0.6px 1.2px rgba(0, 0, 0, 0.3);
+}
+
+.unit {
+    display: inline; /* MUDADO para inline para ficar na mesma linha */
+    font-size: 5px; /* REDUZIDO 0.5px: 5.5px → 5px */
+    font-weight: normal; /* REMOVIDO bold - texto normal */
+    opacity: 0.9;
+    margin-top: 0; /* REMOVIDO margin-top para ficar na mesma linha */
+}
+
+/* Nome da loteria - PRIMEIRA LINHA */
+.slide-name {
+    text-align: center;
+    font-size: 10px; /* REDUZIDO 1px: 11px → 10px */
+    font-weight: normal; /* REMOVIDO bold - texto normal */
+    text-transform: uppercase; /* JÁ ESTÁ EM CAPSLOCK */
+    letter-spacing: 0.3px; /* Ajustado para o novo tamanho */
+    line-height: 1.1;
+    padding: 2px 6px; /* REDUZIDO AINDA MAIS: padding vertical mínimo */
+    background: rgba(255, 255, 255, 0.15); /* Fundo um pouco mais visível */
+    border-radius: 6px; /* Ajustado proporcionalmente */
+    backdrop-filter: blur(3px); /* Ajustado proporcionalmente */
+    margin: 0 auto; /* CENTRALIZADO */
+    align-self: flex-start; /* MUDADO: alinha no topo */
+    order: 1; /* PRIMEIRA LINHA */
+}
+
+/* Navegação automática - sem controles manuais */
+.carousel-navigation {
+    display: none; /* Esconde toda a navegação manual */
+}
+
+/* Botões de navegação - escondidos */
+.nav-btn {
+    display: none;
+}
+
+/* Indicadores - escondidos */
+.carousel-indicators {
+    display: none;
+}
+
+/* Mensagem de erro */
+.carousel-error {
+    text-align: center;
+    padding: 40px;
+    color: #EF4444;
+}
+
+.carousel-error button {
+    background: #00E38C;
+    color: #1A1D25;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.carousel-error button:hover {
+    background: #00D1A0;
+    transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .carousel-wrapper {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .carousel-slides {
+        gap: 15px;
+        padding: 15px 0;
+    }
+    
+    .carousel-slide {
+        min-width: 160px;
+        height: 240px;
+        padding: 15px;
+    }
+    
+    .main-value {
+        font-size: 36px;
+    }
+    
+    .unit {
+        font-size: 14px;
+    }
+    
+    .slide-name {
+        font-size: 12px;
+        padding: 8px;
+    }
+    
+    .nav-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .indicator {
+        width: 10px;
+        height: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-slide {
+        min-width: 140px;
+        height: 220px;
+        padding: 12px;
+    }
+    
+    .main-value {
+        font-size: 32px;
+    }
+    
+    .slide-label {
+        font-size: 10px;
+        padding: 6px 12px;
+    }
+}
+
+/* Animações */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Movimento dinâmico como filme */
+@keyframes scrollLeft {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%); /* Move metade da largura para movimento infinito */
+    }
+}
+
+.carousel-slide {
+    animation: slideIn 0.5s ease-out;
+}
+
+/* Container dos slides com movimento contínuo */
+.carousel-slides {
+    animation: scrollLeft 30s linear infinite;
+    width: max-content; /* Permite que o conteúdo se estenda */
+}
+
+/* Efeitos especiais para loterias específicas */
+.carousel-slide[style*="#930089"] {
+    background: linear-gradient(135deg, #930089 0%, #7B1FA2 100%);
+}
+
+.carousel-slide[style*="#9ACD32"] {
+    background: linear-gradient(135deg, #9ACD32 0%, #7CB342 100%);
+}
+
+.carousel-slide[style*="#008B8B"] {
+    background: linear-gradient(135deg, #008B8B 0%, #00695C 100%);
+}
+
+.carousel-slide[style*="#3B82F6"] {
+    background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
+}
+
+.carousel-slide[style*="#FF8C00"] {
+    background: linear-gradient(135deg, #FF8C00 0%, #E65100 100%);
+}
+
