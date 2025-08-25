@@ -77,8 +77,9 @@ class CarrosselLoterias {
     createSlide(item, index) {
         const slide = document.createElement('div');
         slide.className = 'carousel-slide';
-        slide.style.borderColor = item.cor_borda;
-        slide.style.backgroundColor = item.cor_fundo;
+        // TRANSPARÊNCIA TOTAL - sem cores de fundo
+        slide.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+        slide.style.backgroundColor = 'transparent';
         slide.style.color = item.cor_texto;
         
         // Estrutura do slide seguindo o layout da imagem
@@ -90,7 +91,7 @@ class CarrosselLoterias {
         
         slide.innerHTML = `
             <div class="slide-content">
-                <div class="slide-label" style="background-color: ${item.cor_borda}; color: ${item.cor_texto};">
+                <div class="slide-label" style="background-color: rgba(255, 255, 255, 0.15); color: ${item.cor_texto};">
                     ${texto_destaque}
                 </div>
                 <div class="slide-value">

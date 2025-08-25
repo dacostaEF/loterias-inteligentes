@@ -265,24 +265,14 @@
     width: max-content; /* Permite que o conteúdo se estenda */
 }
 
-/* Efeitos especiais para loterias específicas */
-.carousel-slide[style*="#930089"] {
-    background: linear-gradient(135deg, #930089 0%, #7B1FA2 100%);
-}
-
-.carousel-slide[style*="#9ACD32"] {
-    background: linear-gradient(135deg, #9ACD32 0%, #7CB342 100%);
-}
-
-.carousel-slide[style*="#008B8B"] {
-    background: linear-gradient(135deg, #008B8B 0%, #00695C 100%);
-}
-
-.carousel-slide[style*="#3B82F6"] {
-    background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%);
-}
-
+/* TRANSPARÊNCIA TOTAL - caixas principais sem cores */
+.carousel-slide[style*="#930089"],
+.carousel-slide[style*="#9ACD32"],
+.carousel-slide[style*="#008B8B"],
+.carousel-slide[style*="#3B82F6"],
 .carousel-slide[style*="#FF8C00"] {
-    background: linear-gradient(135deg, #FF8C00 0%, #E65100 100%);
+    background: transparent !important;
+    border: 2px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: none !important;
 }
 

@@ -100,7 +100,7 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      padding-top: 30px; /* REDUZIDO AINDA MAIS: era 55px, agora 30px - SUPER CENTRALIZADO */
+      padding-top: 15px; /* REDUZIDO PELA METADE: era 30px, agora 15px - MEGA COMPACTO */
       position: relative; /* Necessário para posicionar o menu */
       z-index: 1; /* Para garantir que o conteúdo fique abaixo do menu */
     }
@@ -645,8 +645,8 @@
       }
       
       .main-container {
-        padding-top: 2rem !important; /* Mantém padding menor para mobile */
-        padding-bottom: 2rem !important;
+        padding-top: 1rem !important; /* REDUZIDO PELA METADE: era 2rem, agora 1rem */
+        padding-bottom: 1rem !important;
       }
       
       .logo-container img {
@@ -732,8 +732,8 @@
       }
       
       .main-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 1.5rem !important;
+        padding-top: 0.75rem !important; /* REDUZIDO PELA METADE: era 1.5rem, agora 0.75rem */
+        padding-bottom: 0.75rem !important;
       }
       
       .logo-container img {
@@ -1015,7 +1015,7 @@
 
       if (menu && main) {
         const alturaMenu = menu.offsetHeight;
-        main.style.paddingTop = `${alturaMenu + 24}px`; // 24px de respiro elegante
+        main.style.paddingTop = `${alturaMenu + 6}px`; // REDUZIDO AINDA MAIS: era 12px, agora 6px
       }
     });
   </script>
