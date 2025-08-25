@@ -71,25 +71,25 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 
   <style>
-    /* Moldura Neon Lilás - Desktop */
-    html::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      box-shadow: inset 0 0 0 4px #B96AFF, 0 0 15px #B96AFF, 0 0 30px #B96AFF;
-      z-index: 9999;
-      pointer-events: none;
-    }
+              /* Moldura Neon Roxa - Desktop */
+          html::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            box-shadow: inset 0 0 0 4px #930089, 0 0 15px #930089, 0 0 30px #930089;
+            z-index: 9999;
+            pointer-events: none;
+          }
 
-    /* Moldura Neon Lilás - Mobile (mais fina) */
-    @media (max-width: 768px) {
-      html::before {
-        box-shadow: inset 0 0 0 2px #B96AFF, 0 0 8px #B96AFF, 0 0 15px #B96AFF;
-      }
-    }
+          /* Moldura Neon Roxa - Mobile (mais fina) */
+          @media (max-width: 768px) {
+            html::before {
+              box-shadow: inset 0 0 0 2px #930089, 0 0 8px #930089, 0 0 15px #930089;
+            }
+          }
 
     /* Estilos para os menus responsivos */
     /* Menu Desktop */
@@ -781,7 +781,7 @@
 
       <!-- Informação dos sorteios -->
     <div class="text-center mb-4" style="margin-left: -15px;">
-      <p class="text-purple-700 font-semibold text-lg mb-0">Sorteios: Segundas a sábado 
+      <p class="font-semibold text-lg mb-0" style="color: #930089;">Sorteios: Segundas a sábado 
     </div>
 
   <!-- Cartão de jogo -->

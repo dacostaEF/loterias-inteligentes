@@ -71,25 +71,25 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
 
   <style>
-    /* Moldura Neon Lilás - Desktop */
-    html::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      box-shadow: inset 0 0 0 4px #B96AFF, 0 0 15px #B96AFF, 0 0 30px #B96AFF;
-      z-index: 9999;
-      pointer-events: none;
-    }
+              /* Moldura Neon Verde-Azulada - Desktop */
+          html::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            box-shadow: inset 0 0 0 4px #008B8B, 0 0 15px #008B8B, 0 0 30px #008B8B;
+            z-index: 9999;
+            pointer-events: none;
+          }
 
-    /* Moldura Neon Lilás - Mobile (mais fina) */
-    @media (max-width: 768px) {
-      html::before {
-        box-shadow: inset 0 0 0 2px #B96AFF, 0 0 8px #B96AFF, 0 0 15px #B96AFF;
-      }
-    }
+          /* Moldura Neon Verde-Azulada - Mobile (mais fina) */
+          @media (max-width: 768px) {
+            html::before {
+              box-shadow: inset 0 0 0 2px #008B8B, 0 0 8px #008B8B, 0 0 15px #008B8B;
+            }
+          }
 
     /* Responsividade para smartphones - remover títulos dos eixos */
     @media (max-width: 640px) {
@@ -1009,7 +1009,7 @@
 
   <!-- Informação dos sorteios -->
   <div class="text-center mb-4" style="margin-left: -15px;">
-    <p class="text-blue-500 font-semibold text-lg mb-0">Sorteios: Segunda à Sábado</p>
+    <p class="font-semibold text-lg mb-0" style="color: #008B8B;">Sorteios: Segunda à Sábado</p>
   </div>
 
   <!-- Cartão de jogo -->
