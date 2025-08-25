@@ -493,7 +493,7 @@
       z-index: 1000;
       padding: 1rem 2rem;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
     }
 
@@ -549,6 +549,31 @@
     @media (min-width: 769px) {
       .desktop-nav {
         display: flex;
+      }
+    }
+
+    /* Ajuste de espaçamento para telas menores */
+    @media (max-width: 1200px) {
+      .desktop-nav-links {
+        gap: 1.5rem; /* 24px */
+      }
+    }
+
+    @media (max-width: 1000px) {
+      .desktop-nav-links {
+        gap: 1.25rem; /* 20px */
+      }
+    }
+
+    @media (max-width: 900px) {
+      .desktop-nav-links {
+        gap: 1rem; /* 16px */
+      }
+    }
+
+    @media (max-width: 800px) {
+      .desktop-nav-links {
+        gap: 0.75rem; /* 12px - limite mínimo */
       }
     }
 
@@ -873,7 +898,6 @@
 <body class="p-4 sm:p-6">
   <!-- Menu Desktop -->
   <nav class="desktop-nav">
-    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
     <div class="desktop-nav-links">
       <a href="/"><i class="fa fa-home"></i> Início</a>
       <div class="dropdown">
