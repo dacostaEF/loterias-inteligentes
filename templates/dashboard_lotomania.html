@@ -794,7 +794,7 @@
           </button>
         </div>
       </div>
-      <div class="text-sm text-gray-300" id="numeros-quentes">
+      <div class="text-sm text-gray-300" id="numeros-quentes" style="display: flex; flex-wrap: wrap; gap: 4px; max-height: 120px; overflow-y: auto;">
         Carregando...
       </div>
       <div class="tooltip">🔥 <strong>Números Quentes</strong><br><br>Números que mais apareceram nos últimos sorteios. Use para orientar suas escolhas.</div>
@@ -815,7 +815,7 @@
           </button>
         </div>
       </div>
-      <div class="text-sm text-gray-300" id="numeros-frios">
+      <div class="text-sm text-gray-300" id="numeros-frios" style="display: flex; flex-wrap: wrap; gap: 4px; max-height: 120px; overflow-y: auto;">
         Carregando...
       </div>
     </div>
@@ -835,7 +835,7 @@
           </button>
         </div>
       </div>
-      <div class="text-sm text-gray-300" id="numeros-secos">
+      <div class="text-sm text-gray-300" id="numeros-secos" style="display: flex; flex-wrap: wrap; gap: 4px; max-height: 120px; overflow-y: auto;">
         Carregando...
       </div>
     </div>
@@ -867,6 +867,12 @@
   <script>
     // Variáveis globais
     let numerosSelecionados = [];
+
+    // Função helper para formatar números da Lotomania (100 = 00)
+    function formatarNumeroLotomania(numero) {
+      if (numero === 100) return '00';
+      return numero.toString().padStart(2, '0');
+    }
 
     // Inicialização
     function inicializarAplicacao() {
@@ -1134,38 +1140,38 @@
           // Números quentes (top 20)
           document.getElementById('numeros-quentes').innerHTML = 
             numerosQuentes.slice(0, 20)
-              .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
+              .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${formatarNumeroLotomania(n[0])}</span>`)
               .join('');
 
           // Números frios (top 20)
           document.getElementById('numeros-frios').innerHTML = 
             numerosFrios.slice(0, 20)
-              .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
+              .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${formatarNumeroLotomania(n[0])}</span>`)
               .join('');
 
           // Números secos (top 20)
           document.getElementById('numeros-secos').innerHTML = 
             numerosSecos.slice(0, 20)
-              .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
+              .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${formatarNumeroLotomania(n[0])}</span>`)
               .join('');
         }
       } catch (error) {
         console.error('Erro ao carregar estatísticas:', error);
         // Fallback para dados simulados
-        numerosQuentes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 00, 12, 22, 32, 42, 52, 62, 72, 82, 92, 02].map(n => [n, 0]);
-        numerosFrios = [1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 01, 13, 23, 33, 43, 53, 63, 73, 83, 93].map(n => [n, 0]);
-        numerosSecos = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 05, 17, 27, 37, 47, 57, 67, 77, 87, 97].map(n => [n, 0]);
+        numerosQuentes = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 12, 22, 32, 42, 52, 62, 72, 82, 92, 2].map(n => [n, 0]);
+        numerosFrios = [1, 11, 21, 31, 41, 51, 61, 71, 81, 91, 100, 13, 23, 33, 43, 53, 63, 73, 83, 93].map(n => [n, 0]);
+        numerosSecos = [5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 100, 17, 27, 37, 47, 57, 67, 77, 87, 97].map(n => [n, 0]);
         
         document.getElementById('numeros-quentes').innerHTML = numerosQuentes.map(n => 
-          `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+          `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${formatarNumeroLotomania(n[0])}</span>`
         ).join('');
         
         document.getElementById('numeros-frios').innerHTML = numerosFrios.map(n => 
-          `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+          `<span class="bg-gray-600 text-black px-1 py-0.5 rounded text-xs mr-1">${formatarNumeroLotomania(n[0])}</span>`
         ).join('');
         
         document.getElementById('numeros-secos').innerHTML = numerosSecos.map(n => 
-          `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+          `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${formatarNumeroLotomania(n[0])}</span>`
         ).join('');
       }
     }

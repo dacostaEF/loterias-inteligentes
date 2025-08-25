@@ -1007,9 +1007,10 @@
   </div>
 
   <!-- Conteúdo Principal -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Título da Página -->
-    <div class="text-center mb-8">
+  <!-- Header padronizado com logo - FORA do container restrito -->
+  <header class="flex justify-between items-center mb-8 px-4 sm:px-6 lg:px-8">
+    <!-- Título deslocado para a esquerda -->
+    <div class="flex-1 text-center lotofacil-logo-container">
       <h1 class="lab-title">
         🧪 Laboratório de Simulação Lotofácil
       </h1>
@@ -1017,6 +1018,14 @@
         Análise avançada de padrões matemáticos e estatísticas para otimizar suas apostas
       </p>
     </div>
+    
+    <!-- Logo no lado direito -->
+    <div class="flex justify-end items-center">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     <!-- Grade Principal -->
     <div class="lab-card" style="border: 2px solid #930089; box-shadow: 0 0 8px rgba(147,0,137,0.85), 0 0 16px rgba(147,0,137,0.55), 0 0 24px rgba(147,0,137,0.35), 0 12px 28px rgba(0,0,0,0.6);">
