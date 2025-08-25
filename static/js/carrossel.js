@@ -89,16 +89,104 @@ class CarrosselLoterias {
         const texto_destaque = (item.texto_destaque ?? '').toString();
         const loteria = (item.loteria ?? '').toString();
         
+        // Verifica se é a Loteca para aplicar cores especiais
+        const isLoteca = loteria.toLowerCase().includes('loteca');
+        
+        // Verifica se é o Dia de Sorte para aplicar cores especiais
+        const isDiaDeSorte = loteria.toLowerCase().includes('dia de sorte');
+        
+        // Verifica se é o Super Sete para aplicar cores especiais
+        const isSuperSete = loteria.toLowerCase().includes('super sete');
+        
+        // Verifica se é Lotofácil para aplicar cores especiais
+        const isLotofacil = loteria.toLowerCase().includes('lotofacil');
+        
+        // Verifica se é Lotomania para aplicar cores especiais
+        const isLotomania = loteria.toLowerCase().includes('lotomania');
+        
+        // Verifica se é Mega Sena para aplicar cores especiais
+        const isMegaSena = loteria.toLowerCase().includes('mega-sena');
+        
+        // Verifica se é Quina para aplicar cores especiais
+        const isQuina = loteria.toLowerCase().includes('quina');
+        
+        // Verifica se é +Milionária para aplicar cores especiais
+        const isMilionaria = loteria.toLowerCase().includes('milionaria') || loteria.toLowerCase().includes('+milionaria');
+        
+        // Verifica se é Timemania para aplicar cores especiais
+        const isTimemania = loteria.toLowerCase().includes('timemania');
+        
+        // Verifica se é Dupla Sena para aplicar cores especiais
+        const isDuplaSena = loteria.toLowerCase().includes('dupla sena');
+        
+        // Cores especiais para Loteca (50% de transparência) - Rosa/Magenta
+        let labelBg = isLoteca ? 'rgba(255, 0, 255, 0.5)' : 'rgba(255, 255, 255, 0.15)';
+        let nameBg = isLoteca ? 'rgba(255, 0, 255, 0.5)' : 'rgba(255, 255, 255, 0.15)';
+        
+        // Cores especiais para Dia de Sorte (50% de transparência) - Dourado
+        if (isDiaDeSorte) {
+            labelBg = 'rgba(255, 215, 0, 0.5)';
+            nameBg = 'rgba(255, 215, 0, 0.5)';
+        }
+        
+        // Cores especiais para Super Sete (50% de transparência) - RGB correto
+        if (isSuperSete) {
+            labelBg = 'rgba(168, 207, 69, 0.5)'; // RGB(168, 207, 69) com 50% de transparência
+            nameBg = 'rgba(168, 207, 69, 0.5)'; // RGB(168, 207, 69) com 50% de transparência
+        }
+        
+        // Cores especiais para Lotofácil (50% de transparência) - Roxo #930089
+        if (isLotofacil) {
+            labelBg = 'rgba(147, 0, 137, 0.5)'; // #930089 com 50% de transparência
+            nameBg = 'rgba(147, 0, 137, 0.5)'; // #930089 com 50% de transparência
+        }
+        
+        // Cores especiais para Lotomania (50% de transparência) - Laranja #FF8C00
+        if (isLotomania) {
+            labelBg = 'rgba(255, 140, 0, 0.5)'; // #FF8C00 com 50% de transparência
+            nameBg = 'rgba(255, 140, 0, 0.5)'; // #FF8C00 com 50% de transparência
+        }
+        
+        // Cores especiais para Mega Sena (50% de transparência) - Verde #9ACD32
+        if (isMegaSena) {
+            labelBg = 'rgba(154, 205, 50, 0.5)'; // #9ACD32 com 50% de transparência
+            nameBg = 'rgba(154, 205, 50, 0.5)'; // #9ACD32 com 50% de transparência
+        }
+        
+        // Cores especiais para Quina (50% de transparência) - Verde-azulado #008B8B
+        if (isQuina) {
+            labelBg = 'rgba(0, 139, 139, 0.5)'; // #008B8B com 50% de transparência
+            nameBg = 'rgba(0, 139, 139, 0.5)'; // #008B8B com 50% de transparência
+        }
+        
+        // Cores especiais para +Milionária (50% de transparência) - Azul #3B82F6
+        if (isMilionaria) {
+            labelBg = 'rgba(59, 130, 246, 0.5)'; // #3B82F6 com 50% de transparência
+            nameBg = 'rgba(59, 130, 246, 0.5)'; // #3B82F6 com 50% de transparência
+        }
+        
+        // Cores especiais para Timemania (50% de transparência) - Verde-limão RGB(0, 255, 72)
+        if (isTimemania) {
+            labelBg = 'rgba(0, 255, 72, 0.5)'; // RGB(0, 255, 72) com 50% de transparência
+            nameBg = 'rgba(0, 255, 72, 0.5)'; // RGB(0, 255, 72) com 50% de transparência
+        }
+        
+        // Cores especiais para Dupla Sena (50% de transparência) - Vermelho RGB(166, 19, 36)
+        if (isDuplaSena) {
+            labelBg = 'rgba(166, 19, 36, 0.5)'; // RGB(166, 19, 36) com 50% de transparência
+            nameBg = 'rgba(166, 19, 36, 0.5)'; // RGB(166, 19, 36) com 50% de transparência
+        }
+        
         slide.innerHTML = `
             <div class="slide-content">
-                <div class="slide-label" style="background-color: rgba(255, 255, 255, 0.15); color: ${item.cor_texto};">
+                <div class="slide-label" style="background-color: ${labelBg}; color: ${item.cor_texto};">
                     ${texto_destaque}
                 </div>
                 <div class="slide-value">
                     <span class="main-value">${valor}</span>
                     <span class="unit">${unidade}</span>
                 </div>
-                <div class="slide-name">${loteria}</div>
+                <div class="slide-name" style="background-color: ${nameBg};">${loteria}</div>
             </div>
         `;
         

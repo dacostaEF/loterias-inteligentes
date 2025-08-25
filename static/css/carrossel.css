@@ -104,7 +104,7 @@
 .main-value {
     display: inline; /* MUDADO para inline para ficar na mesma linha */
     font-size: 10px; /* REDUZIDO 1px: 11px → 10px */
-    font-weight: normal; /* REMOVIDO bold - texto normal */
+    font-weight: bold; /* ADICIONADO: valor em negrito para destaque */
     line-height: 1;
     text-shadow: 0.6px 0.6px 1.2px rgba(0, 0, 0, 0.3);
 }
@@ -112,7 +112,7 @@
 .unit {
     display: inline; /* MUDADO para inline para ficar na mesma linha */
     font-size: 5px; /* REDUZIDO 0.5px: 5.5px → 5px */
-    font-weight: normal; /* REMOVIDO bold - texto normal */
+    font-weight: bold; /* ADICIONADO: unidade também em negrito para destaque */
     opacity: 0.9;
     margin-top: 0; /* REMOVIDO margin-top para ficar na mesma linha */
 }

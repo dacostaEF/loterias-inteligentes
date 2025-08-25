@@ -1,11 +1,11 @@
 loteria,texto_destaque,subtitulo,cor_fundo,cor_borda,cor_texto,valor,unidade,status,data_sorteio,link
 Lotofacil da Independencia,30/08,220 Milhoes,#930089,#00E38C,#FFFFFF,220,Milhoes,Proximo Sorteio,45817,/lotofacil
-Dupla Sena,ACUMULADA AMANHA,4.7 Milhoes,#FF6B6B,#FF6B6B,#FFFFFF,4.7,Milhoes,Acumulado,AMANHA,/dupla-sena
+Lotofacil,AMANHA,1.8 Milhao,#930089,#00E38C,#FFFFFF,1.8,Milhao,Proximo Sorteio,AMANHA,/lotofacil
 Lotomania,ACUMULADA AMANHA,1 Milhao,#FF8C00,#FF8C00,#FFFFFF,1,Milhao,Acumulado,AMANHA,/lotomania
 Quina,ACUMULADA AMANHA,12.5 Milhoes,#008B8B,#00E38C,#FFFFFF,12.5,Milhoes,Acumulado,AMANHA,/quina
-Lotofacil,AMANHA,1.8 Milhao,#930089,#00E38C,#FFFFFF,1.8,Milhao,Proximo Sorteio,AMANHA,/lotofacil
 Super Sete,ACUMULADA AMANHA,250 Mil,#32CD32,#32CD32,#FFFFFF,250,Mil,Acumulado,AMANHA,/super-sete
 Mega-Sena,ACUMULADA 26/08,35 Milhoes,#9ACD32,#00E38C,#FFFFFF,35,Milhoes,Acumulado,26/08,/megasena
+Dupla Sena,ACUMULADA AMANHA,4.7 Milhoes,#FF6B6B,#FF6B6B,#FFFFFF,4.7,Milhoes,Acumulado,AMANHA,/dupla-sena
 Loteria Federal,27/08,500 Mil,#4169E1,#4169E1,#FFFFFF,500,Mil,Proximo Sorteio,27/08,/loteria-federal
 Loteca,30/08,A Definir,#FF69B4,#FF69B4,#FFFFFF,A Definir,Proximo Sorteio,30/08,/loteca,
 Timemania,ACUMULADA 26/08,18.2 Milhoes,#FFD700,#FFD700,#FFFFFF,18.2,Milhoes,Acumulado,26/08,/timemania
