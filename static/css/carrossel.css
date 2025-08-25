@@ -6,14 +6,14 @@
 /* Container principal do carrossel */
 .carousel-wrapper {
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: none; /* REMOVIDO LIMITE DE LARGURA */
+    margin: 0; /* SEM CENTRALIZAÇÃO */
     padding: 0; /* PADDING ZERO - sem espaços vazios */
-    background: linear-gradient(135deg, rgba(26, 29, 37, 0.95) 0%, rgba(46, 48, 58, 0.95) 100%);
+    background: transparent; /* 100% TRANSPARENTE */
     border-radius: 0; /* SEM BORDAS ARREDONDADAS - ajuste perfeito */
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: none; /* SEM SOMBRA */
+    backdrop-filter: none; /* SEM DESFOQUE */
+    border: none; /* SEM BORDA */
     /* POSICIONAMENTO COMO HEADER DA PÁGINA */
     position: relative;
     z-index: 999; /* Abaixo do menu (que tem z-index: 1000) */
