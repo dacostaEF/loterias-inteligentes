@@ -86,7 +86,7 @@
     /* CARROSSEL NO TOPO - SEM FOLGA PARA MENU */
     .carousel-section-top {
       position: relative;
-      z-index: 1;
+      z-index: 999; /* CORRIGIDO: era 1, agora 999 - VISÍVEL */
       margin: 0 auto;
       width: 100%;
       max-width: 1200px;
@@ -100,13 +100,13 @@
       align-items: center;
       justify-content: flex-start;
       min-height: 100vh;
-      padding-top: 0; /* PADDING ZERO - carrossel já é o header */
+      padding-top: 30px; /* REDUZIDO AINDA MAIS: era 55px, agora 30px - SUPER CENTRALIZADO */
       position: relative; /* Necessário para posicionar o menu */
       z-index: 1; /* Para garantir que o conteúdo fique abaixo do menu */
     }
 
     .logo-container {
-      margin-bottom: 1rem;
+      margin-bottom: 0.25rem; /* REDUZIDO AINDA MAIS: era 0.5rem, agora 0.25rem - MEGA COMPACTO */
       margin-top: 0 !important;
       text-align: center;
     }
@@ -116,20 +116,12 @@
       height: auto;
     }
 
-    /* Estilos específicos para o carrossel como HEADER da landing page */
-    .carousel-section-header {
-      position: relative;
-      z-index: 999; /* ABAIXO do menu que tem z-index: 1000 */
-      margin: 0 auto;
-      width: 100%;
-      max-width: 1200px;
-      padding: 80px 20px 1rem 20px; /* 80px de padding-top para ficar ABAIXO do menu fixo */
-    }
+    /* Estilos específicos para o carrossel como HEADER da landing page - REMOVIDO DUPLICATA */
 
     h1 {
       font-size: 1.75rem;
       margin-bottom: 0.5rem;
-      margin-top: 0.5rem;
+      margin-top: 0.1rem; /* REDUZIDO AINDA MAIS: era 0.25rem, agora 0.1rem - MEGA COMPACTO */
       color: #ffffff;
       font-weight: 700;
     }
@@ -161,8 +153,8 @@
     .credentials {
       background: #2E303A; /* Padronizado com Dashboard e Premium */
       border-radius: 12px;
-      padding: 1rem;
-      margin: 1rem 0;
+      padding: 0.5rem; /* REDUZIDO: era 1rem, agora 0.5rem - MEGA COMPACTO */
+      margin: 0.25rem 0; /* REDUZIDO: era 1rem 0, agora 0.25rem 0 - MEGA COMPACTO */
       max-width: 600px;
     }
 
@@ -217,16 +209,16 @@
     .diferencial {
       background: #2E303A; /* Padronizado com Dashboard e Premium */
       border-radius: 8px;
-      padding: 1rem;
-      margin: 1rem 0;
+      padding: 0.5rem; /* REDUZIDO: era 1rem, agora 0.5rem - MEGA COMPACTO */
+      margin: 0.25rem 0; /* REDUZIDO: era 1rem 0, agora 0.25rem 0 - MEGA COMPACTO */
       max-width: 600px;
     }
 
     .selo-confianca {
       background: #2E303A; /* Padronizado com Dashboard e Premium */
       border-radius: 12px;
-      padding: 1rem;
-      margin: 1rem 0;
+      padding: 0.5rem; /* REDUZIDO: era 1rem, agora 0.5rem - MEGA COMPACTO */
+      margin: 0.25rem 0; /* REDUZIDO: era 1rem 0, agora 0.25rem 0 - MEGA COMPACTO */
       max-width: 600px;
     }
 
@@ -239,9 +231,9 @@
     .nota {
       font-size: 0.8rem;
       color: #888;
-      margin-top: 2rem;
+      margin-top: 1rem; /* REDUZIDO: era 2rem, agora 1rem - MEGA COMPACTO */
       max-width: 600px;
-      padding: 1rem;
+      padding: 0.5rem; /* REDUZIDO: era 1rem, agora 0.5rem - MEGA COMPACTO */
       background: #2E303A; /* Padronizado com Dashboard e Premium */
       border-radius: 8px;
     }
@@ -531,13 +523,13 @@
 
     /* Estilos para Breadcrumbs */
     .breadcrumbs-container {
-      background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(0, 227, 140, 0.05) 100%);
-      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
-      padding: 4px 0; /* REDUZIDO: era 8px 0, agora 4px 0 - mais compacto */
-      margin-bottom: 20px;
+      background: transparent; /* REMOVIDO: sem background verde - MÍNIMO */
+      border-bottom: 1px solid rgba(168, 85, 247, 0.1); /* REDUZIDO: borda mais sutil */
+      padding: 0px 0; /* REDUZIDO AO MÍNIMO: era 1px 0, agora 0px 0 - MEGA COMPACTO */
+      margin-bottom: 2px; /* REDUZIDO AO MÍNIMO: era 5px, agora 2px - MEGA COMPACTO */
       position: relative;
       z-index: 998;
-      margin-top: 5px; /* REDUZIDO: era 80px, agora 5px - QUASE COLADO AO MENU */
+      margin-top: 0px; /* REDUZIDO AO MÍNIMO: era 1px, agora 0px - MEGA COMPACTO */
     }
     
     .breadcrumbs {

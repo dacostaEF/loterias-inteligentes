@@ -97,17 +97,15 @@ def landing_page():
 
 @app.route('/api/carousel_data')
 def get_carousel_data():
-    """API para obter dados do carrossel de loterias."""
+    """API para fornecer dados do carrossel de loterias."""
     try:
-        # Ajuste o caminho se necessário
-        csv_path = os.path.join(os.path.dirname(__file__), 'LoteriasExcel', 'carrossel_Dados.csv')
+        # Caminho para o arquivo CSV do carrossel
+        csv_path = os.path.join(os.path.dirname(__file__), "LoteriasExcel", "carrossel_Dados.csv")
         
-        logger.info(f"Tentando carregar CSV de: {csv_path}")
-        logger.info(f"Arquivo existe: {os.path.exists(csv_path)}")
-        
+        # Verifica se o arquivo existe
         if not os.path.exists(csv_path):
-            # Fallback simples se der erro ao ler o CSV
-            logger.warning("CSV não encontrado, retornando dados padrão")
+            logger.warning(f"Arquivo CSV não encontrado: {csv_path}")
+            # Retorna dados de fallback
             return jsonify([{
                 "loteria": "+Milionária",
                 "texto_destaque": "Hoje",
@@ -118,22 +116,17 @@ def get_carousel_data():
                 "unidade": "",
                 "link": "/"
             }]), 200
-
-        # Lê o CSV normalmente
-        try:
-            df = pd.read_csv(csv_path, encoding='utf-8')
-        except UnicodeDecodeError:
-            df = pd.read_csv(csv_path, encoding='latin-1')
         
-        # 1) Converte NaN do pandas para null (JSON válido)
-        #    -> usamos to_json para garantir null em vez de NaN
+        # Lê o CSV
+        df = pd.read_csv(csv_path, encoding='utf-8')
+        
+        # Converte para JSON com tratamento de NaN
         records = json.loads(df.to_json(orient="records"))
         
-        # 2) Normaliza campos esperados pelo front
+        # Função para normalizar valores
         def to_str(v):
             if v is None:
                 return ""
-            # se vier número float 35.0 -> "35"
             if isinstance(v, (int, float)) and not isinstance(v, bool):
                 if isinstance(v, float) and math.isnan(v):
                     return ""
@@ -142,24 +135,24 @@ def get_carousel_data():
                 return str(v)
             s = str(v).strip()
             return "" if s.lower() == "nan" else s
-
+        
+        # Normaliza todos os campos
         for item in records:
-            # garanta as chaves mesmo se não existirem no CSV
             item["loteria"] = to_str(item.get("loteria", ""))
             item["texto_destaque"] = to_str(item.get("texto_destaque", ""))
             item["cor_fundo"] = to_str(item.get("cor_fundo", "#1f2937"))
             item["cor_borda"] = to_str(item.get("cor_borda", "#374151"))
             item["cor_texto"] = to_str(item.get("cor_texto", "#ffffff"))
             item["valor"] = to_str(item.get("valor", ""))
-            item["unidade"] = to_str(item.get("unidade", ""))  # <— sem NaN!
+            item["unidade"] = to_str(item.get("unidade", ""))
             item["link"] = to_str(item.get("link", "#"))
         
-        logger.info(f"Dados carregados com sucesso: {len(records)} loterias")
+        logger.info(f"Carrossel: {len(records)} itens carregados com sucesso")
         return jsonify(records), 200
         
     except Exception as e:
-        logger.error(f"Erro ao carregar dados do carrossel: {str(e)}")
-        # Fallback simples se der erro ao ler o CSV
+        logger.error(f"Erro ao carregar dados do carrossel: {e}")
+        # Retorna dados de fallback em caso de erro
         return jsonify([{
             "loteria": "+Milionária",
             "texto_destaque": "Hoje",
