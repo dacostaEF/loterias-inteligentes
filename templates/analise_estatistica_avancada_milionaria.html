@@ -885,6 +885,74 @@
         height: 115px;
       }
     }
+
+    /* MOBILE: tira o excesso no topo */
+    @media (max-width: 768px){
+      body { padding-top: 0 !important; }
+      .breadcrumbs-container { margin-top: 6px; }
+    }
+
+    /* GRID responsivo para Top 15 afinidades */
+    .afinidades-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap:12px;
+    }
+
+    @media (max-width: 768px){
+      .afinidades-grid{ grid-template-columns: repeat(2, 1fr); gap:10px; }
+    }
+    @media (max-width: 420px){
+      .afinidades-grid{ gap:8px; }
+    }
+
+    /* CARD compacto */
+    .afinidade-card{
+      background: linear-gradient(180deg, #0c3b2e, #0f5132);
+      border:1px solid #27c499;
+      color:#e8fff6;
+      border-radius:14px;
+      display:grid;
+      grid-template-columns: 1fr auto; /* info | score */
+      align-items:center;
+      gap:8px;
+      padding:12px 12px;
+      -webkit-tap-highlight-color:transparent;
+      will-change:transform;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .afinidade-card:active{ transform: scale(.98); }
+
+    .afinidade-card .info{ min-width:0; display:grid; gap:2px; }
+    .afinidade-card .par{ font-weight:800; letter-spacing:.2px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .afinidade-card .sub{ color:#c5f6e5; opacity:.85; }
+
+    .afinidade-card .score{ font-weight:800; text-align:right; padding-left:8px; }
+
+    .afinidade-card .chips{ display:inline-flex; gap:6px; }
+    .afinidade-card .chip{
+      width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center;
+      border-radius:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); font-weight:700;
+    }
+
+    /* Tipografia responsiva */
+    .afinidade-card .par   { font-size: clamp(14px, 3.2vw, 18px); }
+    .afinidade-card .score { font-size: clamp(13px, 3.0vw, 16px); }
+    .afinidade-card .sub   { font-size: clamp(11px, 2.7vw, 13px); }
+
+    @media (max-width: 768px){
+      .afinidade-card{ padding:10px 10px; border-radius:12px; }
+    }
+    @media (max-width: 420px){
+      .afinidade-card{ padding:9px 10px; }
+      .afinidade-card .chip{ width:26px; height:26px; }
+    }
+
+    /* Segurança extra: nada estoura altura por texto longo */
+    .afinidade-card .par,
+    .afinidade-card .sub{
+      min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
@@ -2904,11 +2972,14 @@
             <!-- Top 15 Pares com Maior Afinidade -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">🔗 Pares com Maior Afinidade (Top 15)</h3>
-              <div class="grid grid-cols-5 gap-2">
+              <div class="afinidades-grid">
                 ${afinidades.pares_com_maior_afinidade.slice(0, 15).map(par => 
-                  `<div class="bg-[#00E38C] text-black p-3 rounded text-center font-semibold">
-                    <div class="text-lg">${par[0][0]} ↔ ${par[0][1]}</div>
-                    <div class="text-xs">${par[1]} vezes</div>
+                  `<div class="afinidade-card">
+                    <div class="info">
+                      <div class="par">${par[0][0]} • ${par[0][1]}</div>
+                      <div class="sub">Top 15 • co-ocorrência</div>
+                    </div>
+                    <div class="score">${par[1]}x</div>
                   </div>`
                 ).join('')}
               </div>
@@ -2917,11 +2988,14 @@
             <!-- Top 15 Números com Maior Afinidade Geral -->
             <div class="chart-container">
               <h3 class="text-lg font-semibold mb-4">⭐ Números com Maior Afinidade Geral (Top 15)</h3>
-              <div class="grid grid-cols-5 gap-2">
+              <div class="afinidades-grid">
                 ${afinidades.numeros_com_maior_afinidade_geral.slice(0, 15).map(num => 
-                  `<div class="bg-[#8B5CF6] text-white p-3 rounded text-center font-semibold">
-                    <div class="text-lg">${num[0]}</div>
-                    <div class="text-xs">${num[1]} pts</div>
+                  `<div class="afinidade-card" style="background: linear-gradient(180deg, #4c1d95, #6d28d9); border-color: #a855f7;">
+                    <div class="info">
+                      <div class="par">${num[0]}</div>
+                      <div class="sub">Top 15 • pontos</div>
+                    </div>
+                    <div class="score">${num[1]} pts</div>
                   </div>`
                 ).join('')}
               </div>
@@ -3074,8 +3148,16 @@
             paper_bgcolor: '#1a1a1a',
             plot_bgcolor: '#1a1a1a',
             font: { color: 'white' },
-            xaxis: { automargin: true },
-            yaxis: { automargin: true },
+            xaxis: { 
+              automargin: true,
+              title: 'Pares (Número-Número)',
+              tickformat: ',d'
+            },
+            yaxis: { 
+              automargin: true,
+              title: 'Frequência (x)',
+              tickformat: ',d'
+            },
             showlegend: false,
             autosize: true,
             responsive: true,

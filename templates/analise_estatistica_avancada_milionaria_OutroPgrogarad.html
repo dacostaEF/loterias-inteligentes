@@ -828,6 +828,74 @@
         padding-top: 1rem !important;
       }
     }
+
+    /* MOBILE: tira o excesso no topo */
+    @media (max-width: 768px){
+      body { padding-top: 0 !important; }
+      .breadcrumbs-container { margin-top: 6px; }
+    }
+
+    /* GRID responsivo para Top 15 afinidades */
+    .afinidades-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap:12px;
+    }
+
+    @media (max-width: 768px){
+      .afinidades-grid{ grid-template-columns: repeat(2, 1fr); gap:10px; }
+    }
+    @media (max-width: 420px){
+      .afinidades-grid{ gap:8px; }
+    }
+
+    /* CARD compacto */
+    .afinidade-card{
+      background: linear-gradient(180deg, #0c3b2e, #0f5132);
+      border:1px solid #27c499;
+      color:#e8fff6;
+      border-radius:14px;
+      display:grid;
+      grid-template-columns: 1fr auto; /* info | score */
+      align-items:center;
+      gap:8px;
+      padding:12px 12px;
+      -webkit-tap-highlight-color:transparent;
+      will-change:transform;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .afinidade-card:active{ transform: scale(.98); }
+
+    .afinidade-card .info{ min-width:0; display:grid; gap:2px; }
+    .afinidade-card .par{ font-weight:800; letter-spacing:.2px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .afinidade-card .sub{ color:#c5f6e5; opacity:.85; }
+
+    .afinidade-card .score{ font-weight:800; text-align:right; padding-left:8px; }
+
+    .afinidade-card .chips{ display:inline-flex; gap:6px; }
+    .afinidade-card .chip{
+      width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center;
+      border-radius:8px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14); font-weight:700;
+    }
+
+    /* Tipografia responsiva */
+    .afinidade-card .par   { font-size: clamp(14px, 3.2vw, 18px); }
+    .afinidade-card .score { font-size: clamp(13px, 3.0vw, 16px); }
+    .afinidade-card .sub   { font-size: clamp(11px, 2.7vw, 13px); }
+
+    @media (max-width: 768px){
+      .afinidade-card{ padding:10px 10px; border-radius:12px; }
+    }
+    @media (max-width: 420px){
+      .afinidade-card{ padding:9px 10px; }
+      .afinidade-card .chip{ width:26px; height:26px; }
+    }
+
+    /* Segurança extra: nada estoura altura por texto longo */
+    .afinidade-card .par,
+    .afinidade-card .sub{
+      min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
@@ -2892,8 +2960,16 @@
             paper_bgcolor: '#1a1a1a',
             plot_bgcolor: '#1a1a1a',
             font: { color: 'white' },
-            xaxis: { automargin: true },
-            yaxis: { automargin: true },
+            xaxis: { 
+              automargin: true,
+              title: 'Pares (Número-Número)',
+              tickformat: ',d'
+            },
+            yaxis: { 
+              automargin: true,
+              title: 'Frequência (x)',
+              tickformat: ',d'
+            },
             showlegend: false,
             autosize: true,
             responsive: true,
