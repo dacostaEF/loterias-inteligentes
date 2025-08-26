@@ -1,0 +1,141 @@
+/**
+ * 🎯 CSS OTIMIZADO PARA MOBILE - Modais de Distribuição
+ * ======================================================
+ * 
+ * Ajusta os modais de distribuição para mobile: elementos quebram em linha
+ */
+
+/* ⚡ AJUSTES MOBILE PARA MODAIS DE DISTRIBUIÇÃO */
+
+/* Media Query para Tablets e Mobile */
+@media (max-width: 768px) {
+    /* ⚡ AJUSTADO: Container das sugestões para aposta inteligente */
+    .space-y-3 {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+    }
+    
+    /* ⚡ AJUSTADO: Cada opção de sugestão quebra em linha */
+    .space-y-3 > div {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        width: 100% !important;
+        align-items: flex-start !important;
+    }
+    
+    /* ⚡ AJUSTADO: Checkbox e label ficam na mesma linha */
+    .space-y-3 > div:has(input[type="checkbox"]) {
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+    
+    /* ⚡ AJUSTADO: Dropdown fica em linha separada */
+    .space-y-3 > div:has(select) {
+        flex-direction: column !important;
+        width: 100% !important;
+        margin-top: 8px !important;
+        margin-left: 0 !important;
+    }
+    
+    /* ⚡ AJUSTADO: Select ocupa largura total */
+    .space-y-3 select {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+    }
+    
+    /* ⚡ AJUSTADO: Inputs de soma ficam em linha separada */
+    .space-y-3 > div:has(input[type="number"]) {
+        flex-direction: column !important;
+        gap: 8px !important;
+        width: 100% !important;
+        margin-top: 8px !important;
+        margin-left: 0 !important;
+    }
+    
+    /* ⚡ AJUSTADO: Cada input de soma ocupa linha inteira */
+    .space-y-3 input[type="number"] {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    
+    /* ⚡ AJUSTADO: Labels dos inputs ficam acima */
+    .space-y-3 label {
+        display: block !important;
+        margin-bottom: 4px !important;
+        font-weight: 500 !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+    
+    /* ⚡ AJUSTADO: Remove margens automáticas que causam sobreposição */
+    .ml-auto {
+        margin-left: 0 !important;
+    }
+}
+
+/* Media Query para Mobile Pequeno */
+@media (max-width: 480px) {
+    /* ⚡ AJUSTADO: Espaçamento reduzido para mobile pequeno */
+    .space-y-3 > div {
+        gap: 6px !important;
+    }
+    
+    .space-y-3 > div:has(input[type="checkbox"]) {
+        gap: 6px !important;
+    }
+    
+    .space-y-3 > div:has(select) {
+        margin-top: 6px !important;
+    }
+    
+    .space-y-3 > div:has(input[type="number"]) {
+        margin-top: 6px !important;
+        gap: 6px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Dropdown ocupa largura total */
+    .space-y-3 select {
+        width: 100% !important;
+        max-width: none !important;
+    }
+}
+
+/* Media Query para Mobile Muito Pequeno */
+@media (max-width: 360px) {
+    /* ⚡ AJUSTADO: Espaçamento ainda mais reduzido */
+    .space-y-3 > div {
+        gap: 4px !important;
+    }
+    
+    .space-y-3 > div:has(input[type="checkbox"]) {
+        gap: 4px !important;
+    }
+    
+    .space-y-3 > div:has(select) {
+        margin-top: 4px !important;
+    }
+    
+    .space-y-3 > div:has(input[type="number"]) {
+        margin-top: 4px !important;
+        gap: 4px !important;
+    }
+}
+
+/* ⚡ IMPORTANTE: Desktop permanece inalterado */
+@media (min-width: 769px) {
+    .space-y-3,
+    .space-y-3 > div,
+    .space-y-3 select,
+    .space-y-3 input[type="number"],
+    .space-y-3 label,
+    .ml-auto {
+        /* ⚡ DESKTOP: sem alterações - mantém layout original */
+        all: unset !important;
+    }
+}

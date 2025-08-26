@@ -1,0 +1,73 @@
+/**
+ * 🎯 CSS PARA DESABILITAR ZOOM/PAN EM GRÁFICOS
+ * ==============================================
+ * 
+ * Remove funcionalidades de zoom e pan de todos os gráficos Plotly
+ */
+
+/* ⚡ DESABILITA ZOOM/PAN EM TODOS OS GRÁFICOS */
+
+/* Remove botões de zoom/pan */
+.js-plotly-plot .plotly .modebar {
+    display: none !important;
+}
+
+/* Remove botões específicos de zoom */
+.js-plotly-plot .plotly .modebar-btn[data-attr="zoom"],
+.js-plotly-plot .plotly .modebar-btn[data-attr="pan"],
+.js-plotly-plot .plotly .modebar-btn[data-attr="zoomIn"],
+.js-plotly-plot .plotly .modebar-btn[data-attr="zoomOut"],
+.js-plotly-plot .plotly .modebar-btn[data-attr="reset"],
+.js-plotly-plot .plotly .modebar-btn[data-attr="autoScale"] {
+    display: none !important;
+}
+
+/* Remove toda a barra de ferramentas */
+.js-plotly-plot .plotly .modebar-container {
+    display: none !important;
+}
+
+/* Desabilita interações de toque para zoom */
+.js-plotly-plot .plotly .plot-container {
+    touch-action: none !important;
+}
+
+/* Remove seleção de área para zoom */
+.js-plotly-plot .plotly .select-outline {
+    display: none !important;
+}
+
+/* Remove indicadores de zoom ativo */
+.js-plotly-plot .plotly .zoomlayer {
+    display: none !important;
+}
+
+/* Desabilita eventos de mouse para zoom */
+.js-plotly-plot .plotly .plot-container {
+    pointer-events: none !important;
+}
+
+/* Permite apenas visualização, sem interação */
+.js-plotly-plot .plotly .plot-container {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}
+
+/* Remove qualquer overlay de zoom */
+.js-plotly-plot .plotly .zoomlayer,
+.js-plotly-plot .plotly .panlayer {
+    display: none !important;
+}
+
+/* Garante que os gráficos sejam apenas para visualização */
+.js-plotly-plot .plotly {
+    pointer-events: none !important;
+}
+
+/* Permite apenas scroll da página, não dos gráficos */
+.js-plotly-plot .plotly .plot-container {
+    overflow: hidden !important;
+}
+

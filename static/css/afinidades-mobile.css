@@ -1,0 +1,215 @@
+/**
+ * 🎯 CSS OTIMIZADO PARA MOBILE - Caixas de Afinidade
+ * ===================================================
+ * 
+ * Ajusta as caixas de afinidade para mobile: reduz fontes e melhora layout
+ */
+
+/* ⚡ AJUSTES MOBILE PARA CAIXAS DE AFINIDADE */
+
+/* Media Query para Tablets e Mobile */
+@media (max-width: 768px) {
+    /* ⚡ AJUSTADO: Container das caixas de afinidade */
+    .afinidade-container {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+        gap: 8px !important;
+        padding: 10px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Caixas individuais de afinidade */
+    .afinidade-box {
+        min-width: 140px !important;
+        max-width: 160px !important;
+        height: auto !important;
+        padding: 8px !important;
+        border-radius: 8px !important;
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    
+    /* ⚡ AJUSTADO: Texto dos pares de números */
+    .afinidade-pair {
+        font-size: 12px !important; /* ⚡ REDUZIDO: de ~14px para 12px */
+        font-weight: 600 !important;
+        line-height: 1.2 !important;
+        margin-bottom: 4px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Texto da frequência */
+    .afinidade-frequency {
+        font-size: 10px !important; /* ⚡ REDUZIDO: de ~12px para 10px */
+        font-weight: 500 !important;
+        line-height: 1.1 !important;
+        opacity: 0.9 !important;
+    }
+    
+    /* ⚡ AJUSTADO: Caixas roxas de números individuais */
+    .numero-afinidade-box {
+        min-width: 120px !important;
+        max-width: 140px !important;
+        height: auto !important;
+        padding: 8px !important;
+        border-radius: 8px !important;
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    
+    /* ⚡ AJUSTADO: Número individual */
+    .numero-afinidade {
+        font-size: 14px !important; /* ⚡ REDUZIDO: de ~16px para 14px */
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+        margin-bottom: 2px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Pontuação */
+    .numero-pontos {
+        font-size: 10px !important; /* ⚡ REDUZIDO: de ~12px para 10px */
+        font-weight: 500 !important;
+        line-height: 1.1 !important;
+        opacity: 0.9 !important;
+    }
+    
+    /* ⚡ AJUSTADO: Tabela de afinidade */
+    .afinidade-table {
+        font-size: 11px !important; /* ⚡ REDUZIDO: de ~13px para 11px */
+        overflow-x: auto !important;
+    }
+    
+    .afinidade-table th,
+    .afinidade-table td {
+        padding: 6px 8px !important; /* ⚡ REDUZIDO: padding da tabela */
+        font-size: 11px !important;
+    }
+}
+
+/* Media Query para Mobile Pequeno */
+@media (max-width: 480px) {
+    /* ⚡ AJUSTADO: Grid mais compacto para mobile pequeno */
+    .afinidade-container {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+        gap: 6px !important;
+        padding: 8px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Caixas menores */
+    .afinidade-box {
+        min-width: 120px !important;
+        max-width: 140px !important;
+        padding: 6px !important;
+        border-radius: 6px !important;
+    }
+    
+    .numero-afinidade-box {
+        min-width: 100px !important;
+        max-width: 120px !important;
+        padding: 6px !important;
+        border-radius: 6px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Fontes ainda menores */
+    .afinidade-pair {
+        font-size: 11px !important; /* ⚡ REDUZIDO: 12px → 11px */
+    }
+    
+    .afinidade-frequency {
+        font-size: 9px !important; /* ⚡ REDUZIDO: 10px → 9px */
+    }
+    
+    .numero-afinidade {
+        font-size: 13px !important; /* ⚡ REDUZIDO: 14px → 13px */
+    }
+    
+    .numero-pontos {
+        font-size: 9px !important; /* ⚡ REDUZIDO: 10px → 9px */
+    }
+    
+    /* ⚡ AJUSTADO: Tabela mais compacta */
+    .afinidade-table {
+        font-size: 10px !important; /* ⚡ REDUZIDO: 11px → 10px */
+    }
+    
+    .afinidade-table th,
+    .afinidade-table td {
+        padding: 4px 6px !important;
+        font-size: 10px !important;
+    }
+}
+
+/* Media Query para Mobile Muito Pequeno */
+@media (max-width: 360px) {
+    /* ⚡ AJUSTADO: Grid ainda mais compacto */
+    .afinidade-container {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)) !important;
+        gap: 4px !important;
+        padding: 6px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Caixas muito compactas */
+    .afinidade-box {
+        min-width: 100px !important;
+        max-width: 120px !important;
+        padding: 5px !important;
+        border-radius: 5px !important;
+    }
+    
+    .numero-afinidade-box {
+        min-width: 80px !important;
+        max-width: 100px !important;
+        padding: 5px !important;
+        border-radius: 5px !important;
+    }
+    
+    /* ⚡ AJUSTADO: Fontes mínimas */
+    .afinidade-pair {
+        font-size: 10px !important; /* ⚡ REDUZIDO: 11px → 10px */
+    }
+    
+    .afinidade-frequency {
+        font-size: 8px !important; /* ⚡ REDUZIDO: 9px → 8px */
+    }
+    
+    .numero-afinidade {
+        font-size: 12px !important; /* ⚡ REDUZIDO: 13px → 12px */
+    }
+    
+    .numero-pontos {
+        font-size: 8px !important; /* ⚡ REDUZIDO: 9px → 8px */
+    }
+    
+    /* ⚡ AJUSTADO: Tabela muito compacta */
+    .afinidade-table {
+        font-size: 9px !important; /* ⚡ REDUZIDO: 10px → 9px */
+    }
+    
+    .afinidade-table th,
+    .afinidade-table td {
+        padding: 3px 4px !important;
+        font-size: 9px !important;
+    }
+}
+
+/* ⚡ IMPORTANTE: Desktop permanece inalterado */
+@media (min-width: 769px) {
+    .afinidade-container,
+    .afinidade-box,
+    .numero-afinidade-box,
+    .afinidade-pair,
+    .afinidade-frequency,
+    .numero-afinidade,
+    .numero-pontos,
+    .afinidade-table,
+    .afinidade-table th,
+    .afinidade-table td {
+        /* ⚡ DESKTOP: sem alterações - mantém layout original */
+        all: unset !important;
+    }
+}
+

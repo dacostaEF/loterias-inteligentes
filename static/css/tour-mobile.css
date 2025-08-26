@@ -1,0 +1,99 @@
+/**
+ * 🎯 CSS OTIMIZADO PARA MOBILE - Tour Guiado
+ * ===========================================
+ * 
+ * Ajusta o Tour Guiado para mobile: reduz tamanho e centraliza
+ */
+
+/* ⚡ AJUSTES MOBILE PARA TOUR GUIADO */
+
+/* Media Query para Tablets e Mobile */
+@media (max-width: 768px) {
+    /* ⚡ REDUZIDO: Tamanho da caixa do tour em 20% */
+    #tour-tip {
+        transform: scale(0.8); /* ⚡ REDUZIDO: 100% → 80% (redução de 20%) */
+        transform-origin: center top; /* ⚡ CENTRALIZA a redução no topo */
+        max-width: 320px; /* ⚡ AJUSTADO: largura máxima para mobile */
+    }
+    
+    /* ⚡ CENTRALIZADO: Posicionamento na parte superior */
+    #tour-tip {
+        top: 20px !important; /* ⚡ POSICIONADO: no topo da página */
+        left: 50% !important; /* ⚡ CENTRALIZADO: horizontalmente */
+        transform: translateX(-50%) scale(0.8) !important; /* ⚡ CENTRALIZADO + REDUZIDO */
+        right: auto !important; /* ⚡ REMOVIDO: posicionamento à direita */
+    }
+    
+    /* ⚡ AJUSTADO: Botão de ativação do tour */
+    #tour-activate {
+        top: 10px !important; /* ⚡ POSICIONADO: mais no topo */
+        right: 10px !important; /* ⚡ AJUSTADO: margem direita */
+        font-size: 14px !important; /* ⚡ REDUZIDO: tamanho da fonte */
+        padding: 8px 12px !important; /* ⚡ AJUSTADO: padding */
+    }
+}
+
+/* Media Query para Mobile Pequeno */
+@media (max-width: 480px) {
+    /* ⚡ REDUZIDO: Tamanho da caixa do tour em 20% */
+    #tour-tip {
+        transform: scale(0.75) !important; /* ⚡ REDUZIDO: 80% → 75% */
+        max-width: 280px; /* ⚡ AJUSTADO: largura máxima para mobile pequeno */
+    }
+    
+    /* ⚡ CENTRALIZADO: Posicionamento na parte superior */
+    #tour-tip {
+        top: 15px !important; /* ⚡ POSICIONADO: ainda mais no topo */
+        left: 50% !important; /* ⚡ CENTRALIZADO: horizontalmente */
+        transform: translateX(-50%) scale(0.75) !important; /* ⚡ CENTRALIZADO + REDUZIDO */
+    }
+    
+    /* ⚡ AJUSTADO: Botão de ativação do tour */
+    #tour-activate {
+        top: 8px !important; /* ⚡ POSICIONADO: mais no topo */
+        right: 8px !important; /* ⚡ AJUSTADO: margem direita */
+        font-size: 12px !important; /* ⚡ REDUZIDO: tamanho da fonte */
+        padding: 6px 10px !important; /* ⚡ AJUSTADO: padding */
+    }
+}
+
+/* Media Query para Mobile Muito Pequeno */
+@media (max-width: 360px) {
+    /* ⚡ REDUZIDO: Tamanho da caixa do tour em 20% */
+    #tour-tip {
+        transform: scale(0.7) !important; /* ⚡ REDUZIDO: 75% → 70% */
+        max-width: 260px; /* ⚡ AJUSTADO: largura máxima para mobile muito pequeno */
+    }
+    
+    /* ⚡ CENTRALIZADO: Posicionamento na parte superior */
+    #tour-tip {
+        top: 10px !important; /* ⚡ POSICIONADO: no topo */
+        left: 50% !important; /* ⚡ CENTRALIZADO: horizontalmente */
+        transform: translateX(-50%) scale(0.7) !important; /* ⚡ CENTRALIZADO + REDUZIDO */
+    }
+    
+    /* ⚡ AJUSTADO: Botão de ativação do tour */
+    #tour-activate {
+        top: 5px !important; /* ⚡ POSICIONADO: no topo */
+        right: 5px !important; /* ⚡ AJUSTADO: margem direita */
+        font-size: 11px !important; /* ⚡ REDUZIDO: tamanho da fonte */
+        padding: 5px 8px !important; /* ⚡ AJUSTADO: padding */
+    }
+}
+
+/* ⚡ IMPORTANTE: Desktop permanece inalterado */
+@media (min-width: 769px) {
+    #tour-tip {
+        transform: none !important; /* ⚡ DESKTOP: sem alterações */
+        left: auto !important; /* ⚡ DESKTOP: posicionamento original */
+        right: auto !important; /* ⚡ DESKTOP: posicionamento original */
+    }
+    
+    #tour-activate {
+        top: 20px !important; /* ⚡ DESKTOP: posicionamento original */
+        right: 4px !important; /* ⚡ DESKTOP: posicionamento original */
+        font-size: inherit !important; /* ⚡ DESKTOP: tamanho original */
+        padding: inherit !important; /* ⚡ DESKTOP: padding original */
+    }
+}
+
