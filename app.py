@@ -2223,7 +2223,7 @@ def gerar_aposta_premium_milionaria():
     except Exception as e:
         print(f"❌ Erro ao gerar aposta premium (+Milionária): {e}")
         import traceback
-        traceback.print_exc()
+        traceback.print_exc()t
         return jsonify({
             'success': False,
             'error': f'Erro interno: {str(e)}'

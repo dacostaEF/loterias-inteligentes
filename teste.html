@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Responsividade</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s;
+        }
+        .button:hover {
+            transform: scale(1.05);
+        }
+        .test-area {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .responsive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .grid-item {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🎯 Teste de Responsividade</h1>
+            <p>Se você está vendo esta página no celular, a conectividade está funcionando!</p>
+        </div>
+
+        <div class="card">
+            <h2>📱 Teste de Botões</h2>
+            <button class="button" onclick="alert('Botão funcionando!')">Botão 1</button>
+            <button class="button" onclick="alert('Botão funcionando!')">Botão 2</button>
+            <button class="button" onclick="alert('Botão funcionando!')">Botão 3</button>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Teste de Formulário</h2>
+            <div class="test-area">
+                <input type="text" placeholder="Digite algo aqui..." style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
+                <input type="email" placeholder="Email..." style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none;">
+                <button class="button" style="width: 100%;">Enviar</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Grid Responsivo</h2>
+            <div class="responsive-grid">
+                <div class="grid-item">Item 1</div>
+                <div class="grid-item">Item 2</div>
+                <div class="grid-item">Item 3</div>
+                <div class="grid-item">Item 4</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📏 Teste de Orientação</h2>
+            <p>Gire o celular para testar a responsividade!</p>
+            <p><strong>Status:</strong> <span id="orientation">Verificando...</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Teste de orientação
+        function updateOrientation() {
+            const orientation = window.innerWidth > window.innerHeight ? 'Landscape' : 'Portrait';
+            document.getElementById('orientation').textContent = orientation;
+        }
+        
+        window.addEventListener('resize', updateOrientation);
+        updateOrientation();
+        
+        // Teste de toque
+        document.addEventListener('touchstart', function() {
+            console.log('Toque detectado!');
+        });
+    </script>
+</body>
+</html>
