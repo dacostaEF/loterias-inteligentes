@@ -4,6 +4,20 @@
  */
 
 /* Container principal do carrossel */
+#carousel-container {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    /* ⚡ NOVO: Eliminar espaço vazio entre container e wrapper */
+    height: auto !important; /* ⚡ AJUSTA automaticamente à altura do conteúdo */
+    min-height: 0 !important; /* ⚡ SEM altura mínima */
+    display: flex !important; /* ⚡ FLEX para ajustar altura */
+    flex-direction: column !important; /* ⚡ COLUNA para empilhar */
+}
+
 .carousel-wrapper {
     width: 100%;
     max-width: none; /* REMOVIDO LIMITE DE LARGURA */
@@ -22,7 +36,7 @@
 /* Container dos slides */
 .carousel-slides {
     display: flex;
-    gap: 20px; /* Mantido */
+    gap: 10px; /* ⚡ REDUZIDO AO MÁXIMO: 20px → 10px */
     overflow-x: auto;
     scroll-behavior: smooth;
     padding: 0; /* PADDING ZERO - sem espaços vazios */
@@ -39,7 +53,7 @@
     width: 127px; /* AUMENTADO +10%: 115px → 127px */
     height: 105px; /* AUMENTADO +10%: 95px → 105px */
     border-radius: 15px; /* Ajustado proporcionalmente */
-    padding: 15px 22px 22px 22px; /* Ajustado proporcionalmente para a nova altura */
+    padding: 8px 12px 4px 12px; /* ⚡ REDUZIDO AO MÁXIMO: 15px → 8px, 22px → 12px, base 8px → 4px */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -175,20 +189,41 @@
 
 /* Responsividade */
 @media (max-width: 768px) {
+  /* ⚡ NOVO: Regra GLOBAL para eliminar altura excessiva */
+  #carousel-container,
+  .carousel-wrapper,
+  .carousel-slides {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+  /* ⚡ NOVO: Eliminar espaçamento entre carrossel e breadcrumb */
+  #carousel-container {
+    margin-bottom: -25px !important; /* ⚡ NEGATIVO MAIOR: puxa MUITO o breadcrumb para cima */
+    padding-bottom: 0 !important;
+    height: auto !important; /* ⚡ FORÇA altura automática */
+    min-height: 0 !important; /* ⚡ SEM altura mínima */
+  }
+
+  /* ⚡ NOVO: Eliminar espaçamento do breadcrumb */
+  .breadcrumbs-container {
+    margin-top: -25px !important; /* ⚡ NEGATIVO MAIOR: puxa MUITO o breadcrumb para cima */
+    padding-top: 0 !important;
+  }
     .carousel-wrapper {
-        padding: 15px;
-        margin: 10px;
+        padding: 2px; /* ⚡ REDUZIDO AO MÁXIMO: 15px → 2px */
+        margin: 2px; /* ⚡ REDUZIDO AO MÁXIMO: 10px → 2px */
     }
     
     .carousel-slides {
-        gap: 15px;
-        padding: 15px 0;
+        gap: 8px; /* ⚡ REDUZIDO AO MÁXIMO: 15px → 8px */
+        padding: 2px 0; /* ⚡ REDUZIDO AO MÁXIMO: 15px → 2px */
     }
     
     .carousel-slide {
         min-width: 160px;
-        height: 240px;
-        padding: 15px;
+        height: 70px; /* ⚡ REDUZIDO AO MÁXIMO: 100px → 70px para eliminar espaço */
+        padding: 6px 6px 3px 6px; /* ⚡ REDUZIDO AO MÁXIMO: 8px → 6px, base 4px → 3px */
     }
     
     .main-value {
@@ -217,10 +252,33 @@
 }
 
 @media (max-width: 480px) {
+  /* ⚡ NOVO: Regra GLOBAL para eliminar altura excessiva */
+  #carousel-container,
+  .carousel-wrapper,
+  .carousel-slides {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+  }
+
+  /* ⚡ NOVO: Eliminar espaçamento entre carrossel e breadcrumb */
+  #carousel-container {
+    margin-bottom: -35px !important; /* ⚡ NEGATIVO MÁXIMO: puxa AO MÁXIMO o breadcrumb para cima */
+    padding-bottom: 0 !important;
+    height: auto !important; /* ⚡ FORÇA altura automática */
+    min-height: 0 !important; /* ⚡ SEM altura mínima */
+  }
+
+  /* ⚡ NOVO: Eliminar espaçamento do breadcrumb */
+  .breadcrumbs-container {
+    margin-top: -35px !important; /* ⚡ NEGATIVO MÁXIMO: puxa AO MÁXIMO o breadcrumb para cima */
+    padding-top: 0 !important;
+  }
+
     .carousel-slide {
         min-width: 140px;
-        height: 220px;
-        padding: 12px;
+        height: 60px; /* ⚡ REDUZIDO AO MÁXIMO: 80px → 60px para eliminar espaço */
+        padding: 4px 4px 2px 4px; /* ⚡ REDUZIDO AO MÁXIMO: 6px → 4px, base 3px → 2px */
     }
     
     .main-value {

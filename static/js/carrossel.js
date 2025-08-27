@@ -74,9 +74,25 @@ class CarrosselLoterias {
         this.container.appendChild(carouselWrapper);
     }
 
-    createSlide(item, index) {
-        const slide = document.createElement('div');
-        slide.className = 'carousel-slide';
+            createSlide(item, index) {
+            const slide = document.createElement('div');
+            slide.className = 'carousel-slide';
+            
+            // ⚡ NOVO: Dimensões responsivas baseadas no tamanho da tela
+            const isMobile = window.innerWidth <= 768;
+            const isSmallMobile = window.innerWidth <= 480;
+            
+            if (isSmallMobile) {
+                slide.style.width = '140px';
+                slide.style.height = '60px'; /* ⚡ REDUZIDO: 140px → 60px para eliminar espaço */
+            } else if (isMobile) {
+                slide.style.width = '160px';
+                slide.style.height = '70px'; /* ⚡ REDUZIDO: 160px → 70px para eliminar espaço */
+            } else {
+                slide.style.width = '127px';
+                slide.style.height = '105px';
+            }
+        
         // TRANSPARÊNCIA TOTAL - sem cores de fundo
         slide.style.borderColor = 'rgba(255, 255, 255, 0.2)';
         slide.style.backgroundColor = 'transparent';
@@ -212,9 +228,31 @@ class CarrosselLoterias {
     }
 
     setupEventListeners() {
-        // Sem controles manuais - apenas movimento automático contínuo
-        // A animação CSS cuida de tudo
+        // ⚡ NOVO: Listener para redimensionamento da janela
+        window.addEventListener('resize', () => {
+            this.updateSlideDimensions();
+        });
     }
+    
+    // ⚡ NOVO: Método para atualizar dimensões dos slides
+            updateSlideDimensions() {
+            const slides = this.container.querySelectorAll('.carousel-slide');
+            const isMobile = window.innerWidth <= 768;
+            const isSmallMobile = window.innerWidth <= 480;
+            
+            slides.forEach(slide => {
+                if (isSmallMobile) {
+                    slide.style.width = '140px';
+                    slide.style.height = '60px'; /* ⚡ REDUZIDO: 140px → 60px para eliminar espaço */
+                } else if (isMobile) {
+                    slide.style.width = '160px';
+                    slide.style.height = '70px'; /* ⚡ REDUZIDO: 160px → 70px para eliminar espaço */
+                } else {
+                    slide.style.width = '127px';
+                    slide.style.height = '105px';
+                }
+            });
+        }
 
     showError() {
         if (this.container) {
