@@ -139,6 +139,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/distribuicao-mobile.css') }}">
   <!-- CSS para Desabilitar Zoom/Pan em Gráficos -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos-sem-zoom.css') }}">
+  <!-- CSS para Corrigir Submenus Mobile -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-dropdown-fix.css') }}">
   <!-- CSS Mobile Otimizado para Caixas de Afinidade -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/afinidades-mobile.css') }}">
 
@@ -1106,7 +1108,6 @@
         </div>
       </div>
       <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
-      <a href="#"><i class="fa fa-phone"></i> Contato</a>
     </div>
   </nav>
 
@@ -1165,8 +1166,7 @@
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
       </li>
-      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-      <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+              <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
     </ul>
   </nav>
 
@@ -6120,6 +6120,64 @@
     }
     window.addEventListener('load', fixPlotlyMobile);
     window.addEventListener('resize', fixPlotlyMobile);
+  </script>
+
+  <!-- JavaScript para controlar o menu hambúrguer -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+
+      if (hamburgerIcon && navPanel && navOverlay) {
+        hamburgerIcon.addEventListener('click', () => {
+          hamburgerIcon.classList.toggle('open');
+          navPanel.classList.toggle('open');
+          navOverlay.classList.toggle('open');
+          
+          // Previne scroll do body quando menu está aberto
+          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
+        });
+
+        // Controle do submenu mobile
+        const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+        mobileDropdownToggles.forEach(toggle => {
+          toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            const dropdown = toggle.nextElementSibling;
+            dropdown.classList.toggle('show');
+          });
+        });
+
+        // Fechar o menu ao clicar em um link (exceto dropdown toggles)
+        navPanel.querySelectorAll('a:not(.mobile-dropdown-toggle)').forEach(link => {
+          link.addEventListener('click', () => {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Fechar o menu ao clicar no overlay
+        navOverlay.addEventListener('click', () => {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        });
+
+        // Fechar o menu com tecla ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+    });
   </script>
 </body>
 </html>

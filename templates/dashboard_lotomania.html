@@ -660,7 +660,6 @@
         </div>
       </div>
       <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
-      <a href="#"><i class="fa fa-phone"></i> Contato</a>
     </div>
   </nav>
 
@@ -719,8 +718,7 @@
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
       </li>
-      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-      <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+                    <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
     </ul>
   </nav>
 
@@ -1654,5 +1652,50 @@
       }, 10000);
     }
   </script>
+
+  <!-- CSS para submenus mobile -->
+  <style>
+    /* Submenu para mobile */
+    .mobile-dropdown {
+      display: none;
+      background: rgba(168, 85, 247, 0.05);
+      border-left: 3px solid rgba(168, 85, 247, 0.3);
+      margin-left: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-dropdown.show {
+      display: block !important;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .mobile-dropdown a {
+      padding: 10px 20px 10px 40px;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    .mobile-dropdown a:hover {
+      color: #A855F7;
+      background: rgba(168, 85, 247, 0.1);
+    }
+
+    .mobile-dropdown a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+    }
+  </style>
 </body>
 </html>

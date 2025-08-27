@@ -740,10 +740,24 @@
       background: rgba(168, 85, 247, 0.05);
       border-left: 3px solid rgba(168, 85, 247, 0.3);
       margin-left: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
     }
 
     .mobile-dropdown.show {
-      display: block;
+      display: block !important;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .mobile-dropdown a {
@@ -1076,7 +1090,6 @@
         </div>
       </div>
       <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
-      <a href="#"><i class="fa fa-phone"></i> Contato</a>
     </div>
   </nav>
 
@@ -1135,8 +1148,7 @@
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
         </li>
-        <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-        <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+                      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
     </ul>
   </nav>
 
@@ -6067,7 +6079,7 @@
       hamburgerIcon.addEventListener('click', function() {
         hamburgerIcon.classList.toggle('open');
         navPanel.classList.toggle('open');
-        navOverlay.classList.toggle('active');
+        navOverlay.classList.toggle('open');
         document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : 'auto';
       });
 
@@ -6075,7 +6087,7 @@
       navOverlay.addEventListener('click', function() {
         hamburgerIcon.classList.remove('open');
         navPanel.classList.remove('open');
-        navOverlay.classList.remove('active');
+        navOverlay.classList.remove('open');
         document.body.style.overflow = 'auto';
       });
 
@@ -6084,16 +6096,16 @@
         toggle.addEventListener('click', function(e) {
           e.preventDefault();
           const dropdown = this.nextElementSibling;
-          const isActive = dropdown.classList.contains('active');
+          const isActive = dropdown.classList.contains('show');
           
           // Fecha todos os outros dropdowns
           document.querySelectorAll('.mobile-dropdown').forEach(dd => {
-            dd.classList.remove('active');
+            dd.classList.remove('show');
           });
           
           // Toggle do dropdown atual
           if (!isActive) {
-            dropdown.classList.add('active');
+            dropdown.classList.add('show');
           }
         });
       });
@@ -6103,9 +6115,29 @@
         if (window.innerWidth > 768) {
           hamburgerIcon.classList.remove('open');
           navPanel.classList.remove('open');
-          navOverlay.classList.remove('active');
+          navOverlay.classList.remove('open');
           document.body.style.overflow = 'auto';
         }
+      });
+
+      // Fechar menu com tecla ESC
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = 'auto';
+        }
+      });
+
+      // Fechar menu ao clicar em links (exceto dropdown toggles)
+      navPanel.querySelectorAll('a:not(.mobile-dropdown-toggle)').forEach(link => {
+        link.addEventListener('click', function() {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = 'auto';
+        });
       });
     });
   </script>

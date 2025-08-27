@@ -544,10 +544,24 @@
       background: rgba(168, 85, 247, 0.05);
       border-left: 3px solid rgba(168, 85, 247, 0.3);
       margin-left: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
     }
 
     .mobile-dropdown.show {
-      display: block;
+      display: block !important;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .mobile-dropdown a {
@@ -1010,7 +1024,6 @@
         </div>
       </div>
       <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
-      <a href="#"><i class="fa fa-phone"></i> Contato</a>
     </div>
   </nav>
 
@@ -1069,8 +1082,7 @@
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
         </li>
-        <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-        <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+                      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
     </ul>
   </nav>
 
@@ -5796,40 +5808,8 @@
 
   <!-- Script para controlar os menus responsivos -->
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // MELHORIA DOS DROPDOWNS DESKTOP
-      const dropdowns = document.querySelectorAll('.dropdown');
-      let timeoutId;
-
-      dropdowns.forEach(dropdown => {
-        const dropdownContent = dropdown.querySelector('.dropdown-content');
-        
-        // Mostrar dropdown no hover
-        dropdown.addEventListener('mouseenter', () => {
-          clearTimeout(timeoutId);
-          dropdownContent.classList.add('show');
-        });
-        
-        // Esconder dropdown com delay
-        dropdown.addEventListener('mouseleave', () => {
-          timeoutId = setTimeout(() => {
-            dropdownContent.classList.remove('show');
-          }, 300); // 300ms de delay
-        });
-        
-        // Manter dropdown aberto se o mouse estiver sobre ele
-        dropdownContent.addEventListener('mouseenter', () => {
-          clearTimeout(timeoutId);
-        });
-        
-        // Fechar dropdown quando sair do conteúdo
-        dropdownContent.addEventListener('mouseleave', () => {
-          timeoutId = setTimeout(() => {
-            dropdownContent.classList.remove('show');
-          }, 300);
-        });
-      });
-
+    // Função para inicializar o menu hambúrguer
+    function inicializarMenuHamburguer() {
       const hamburgerIcon = document.getElementById('hamburgerIcon');
       const navPanel = document.getElementById('navPanel');
       const navOverlay = document.getElementById('navOverlay');
@@ -5846,11 +5826,18 @@
 
         // Controle do submenu mobile
         const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
-        mobileDropdownToggles.forEach(toggle => {
+        console.log('Encontrados', mobileDropdownToggles.length, 'toggles de submenu mobile');
+        
+        mobileDropdownToggles.forEach((toggle, index) => {
           toggle.addEventListener('click', (e) => {
             e.preventDefault();
+            console.log('Toggle clicado:', index);
             const dropdown = toggle.nextElementSibling;
-            dropdown.classList.toggle('show');
+            console.log('Dropdown encontrado:', dropdown);
+            if (dropdown && dropdown.classList.contains('mobile-dropdown')) {
+              dropdown.classList.toggle('show');
+              console.log('Classe show aplicada:', dropdown.classList.contains('show'));
+            }
           });
         });
 
@@ -5882,6 +5869,47 @@
           }
         });
       }
+    }
+
+    // Função para inicializar dropdowns desktop
+    function inicializarDropdownsDesktop() {
+      const dropdowns = document.querySelectorAll('.dropdown');
+      let timeoutId;
+
+      dropdowns.forEach(dropdown => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        
+        // Mostrar dropdown no hover
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+          dropdownContent.classList.add('show');
+        });
+        
+        // Esconder dropdown com delay
+        dropdown.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300); // 300ms de delay
+        });
+        
+        // Manter dropdown aberto se o mouse estiver sobre ele
+        dropdownContent.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+        });
+        
+        // Fechar dropdown quando sair do conteúdo
+        dropdownContent.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300);
+        });
+      });
+    }
+
+    // Inicializar tudo quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      inicializarMenuHamburguer();
+      inicializarDropdownsDesktop();
     });
   </script>
 

@@ -766,10 +766,24 @@
       background: rgba(168, 85, 247, 0.05);
       border-left: 3px solid rgba(168, 85, 247, 0.3);
       margin-left: 20px;
+      overflow: hidden;
+      transition: all 0.3s ease;
     }
 
     .mobile-dropdown.show {
-      display: block;
+      display: block !important;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .mobile-dropdown a {
@@ -1046,7 +1060,6 @@
         </div>
       </div>
       <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
-      <a href="#"><i class="fa fa-phone"></i> Contato</a>
     </div>
   </nav>
 
@@ -1105,8 +1118,7 @@
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
       </li>
-      <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
-      <li><a href="#"><i class="fa fa-phone"></i> Contato</a></li>
+                    <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
     </ul>
   </nav>
 
@@ -5988,6 +6000,122 @@
     }
     window.addEventListener('load', fixPlotlyMobile);
     window.addEventListener('resize', fixPlotlyMobile);
+  </script>
+
+  <!-- Script para controlar o menu hambúrguer -->
+  <script>
+    // Função para inicializar o menu hambúrguer
+    function inicializarMenuHamburguer() {
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+
+      if (hamburgerIcon && navPanel && navOverlay) {
+        console.log('Inicializando menu hambúrguer da Quina Premium');
+        
+        hamburgerIcon.addEventListener('click', () => {
+          hamburgerIcon.classList.toggle('open');
+          navPanel.classList.toggle('open');
+          navOverlay.classList.toggle('open');
+          
+          // Previne scroll do body quando menu está aberto
+          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
+        });
+
+        // Controle do submenu mobile
+        const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+        console.log('Encontrados', mobileDropdownToggles.length, 'toggles de submenu mobile');
+        
+        mobileDropdownToggles.forEach((toggle, index) => {
+          toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('Toggle clicado:', index);
+            const dropdown = toggle.nextElementSibling;
+            console.log('Dropdown encontrado:', dropdown);
+            if (dropdown && dropdown.classList.contains('mobile-dropdown')) {
+              dropdown.classList.toggle('show');
+              console.log('Classe show aplicada:', dropdown.classList.contains('show'));
+            }
+          });
+        });
+
+        // Fechar o menu ao clicar em um link (exceto dropdown toggles)
+        navPanel.querySelectorAll('a:not(.mobile-dropdown-toggle)').forEach(link => {
+          link.addEventListener('click', () => {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Fechar o menu ao clicar no overlay
+        navOverlay.addEventListener('click', () => {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        });
+
+        // Fechar o menu com tecla ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
+        });
+      } else {
+        console.error('Elementos do menu hambúrguer não encontrados:', {
+          hamburgerIcon: !!hamburgerIcon,
+          navPanel: !!navPanel,
+          navOverlay: !!navOverlay
+        });
+      }
+    }
+
+    // Função para inicializar dropdowns desktop
+    function inicializarDropdownsDesktop() {
+      const dropdowns = document.querySelectorAll('.dropdown');
+      let timeoutId;
+
+      dropdowns.forEach(dropdown => {
+        const dropdownContent = dropdown.querySelector('.dropdown-content');
+        
+        // Mostrar dropdown no hover
+        dropdown.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+          dropdownContent.classList.add('show');
+        });
+        
+        // Esconder dropdown com delay
+        dropdown.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300); // 300ms de delay
+        });
+        
+        // Manter dropdown aberto se o mouse estiver sobre ele
+        dropdownContent.addEventListener('mouseenter', () => {
+          clearTimeout(timeoutId);
+        });
+        
+        // Fechar dropdown quando sair do conteúdo
+        dropdownContent.addEventListener('mouseleave', () => {
+          timeoutId = setTimeout(() => {
+            dropdownContent.classList.remove('show');
+          }, 300);
+        });
+      });
+    }
+
+    // Inicializar tudo quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM carregado - inicializando menu da Quina Premium');
+      inicializarMenuHamburguer();
+      inicializarDropdownsDesktop();
+    });
   </script>
 </body>
 </html> 
