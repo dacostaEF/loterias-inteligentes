@@ -70,9 +70,11 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
   <!-- CSS Mobile Otimizado para Tour Guiado -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tour-mobile.css') }}">
+  
   <!-- CSS Mobile Otimizado para Modais de Distribuição -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/distribuicao-mobile.css') }}">
+  <!-- CSS para Ajustar Posição do Tour Guiado no Mobile -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tour-position-mobile.css') }}">
   <!-- CSS para Desabilitar Zoom/Pan em Gráficos -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos-sem-zoom.css') }}">
   <!-- CSS Mobile Otimizado para Caixas de Afinidade -->
@@ -96,6 +98,120 @@
     @media (max-width: 768px) {
       html::before {
         box-shadow: inset 0 0 0 2px #3B82F6, 0 0 8px #3B82F6, 0 0 15px #3B82F6;
+      }
+    }
+
+    /* --- AJUSTES APENAS PARA TELAS MENORES QUE 768px (CELULARES E TABLETS) --- */
+    @media (max-width: 768px) {
+      /* 1. TÍTULOS DOS GRÁFICOS PLOTLY (quebra de linha inteligente) */
+      .js-plotly-plot .g-gtitle {
+        font-size: 12px !important; /* Reduz ainda mais para 12px */
+        text-align: left !important; /* Força alinhamento à esquerda */
+        margin: 0 10px 10px !important; /* Adiciona margem lateral */
+        white-space: normal !important; /* Permite quebra de linha */
+        word-wrap: break-word !important; /* Quebra palavras longas */
+        hyphens: auto !important; /* Hífens automáticos */
+        max-width: 100% !important; /* Força largura máxima */
+        overflow: visible !important; /* Evita truncamento */
+        line-height: 1.2 !important; /* Altura de linha otimizada */
+        padding: 5px 0 !important; /* Espaçamento vertical */
+      }
+      
+      /* 1.1 REFORÇO PARA TÍTULOS PLOTLY */
+      .g-gtitle {
+        font-size: 12px !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+        white-space: normal !important;
+        word-wrap: break-word !important;
+        line-height: 1.2 !important;
+      }
+
+      /* 2. TÍTULOS HTML DAS SEÇÕES (para ficarem similares) */
+      .chart-container h3 {
+        font-size: 16px !important; /* Reduz de 18px para 16px */
+        text-align: left !important; /* Força alinhamento à esquerda */
+        margin: 0 10px 10px !important; /* Adiciona margem lateral */
+      }
+
+      /* 3. AJUSTE DE ALINHAMENTO E MARGEM DOS GRÁFICOS */
+      .js-plotly-plot {
+        margin: 0 auto !important; /* Centraliza o gráfico dentro do modal */
+      }
+
+      /* 4. AJUSTE PARA AS CAIXAS DE SELEÇÃO */
+      .container-opcoes-aposta {
+        display: flex;
+        flex-wrap: wrap; /* Permite que os itens quebrem para a próxima linha */
+        justify-content: flex-start; /* Alinha os itens à esquerda */
+        gap: 10px; /* Adiciona um espaçamento entre as caixas */
+      }
+
+      /* Ajuste para as caixas de seleção individuais */
+      .container-opcoes-aposta .flex {
+        flex-shrink: 0; /* Impede que os itens diminuam de tamanho */
+      }
+      
+      /* 5. CONTAINER ESPECÍFICO PARA OPÇÕES DE SOMA */
+      .soma-opcoes-container {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 8px;
+        margin-left: 24px; /* Indenta para alinhar com o checkbox */
+      }
+      
+      .soma-opcoes-container .flex {
+        flex-shrink: 0;
+      }
+      
+      /* 6. RESPONSIVIDADE PARA TELAS MUITO PEQUENAS */
+      @media (max-width: 480px) {
+        .soma-opcoes-container {
+          margin-left: 16px; /* Reduz indentação em telas muito pequenas */
+        }
+        
+        .soma-opcoes-container input[type="number"] {
+          width: 60px !important; /* Reduz largura dos inputs em mobile */
+        }
+      }
+      
+      /* 7. LOGO DA MEGA SENA - AUMENTAR APENAS NO MOBILE */
+      @media (max-width: 768px) {
+        /* Aumenta APENAS a logo da Mega Sena */
+        .logo-mega-sena,
+        .logo-megasena,
+        .mega-sena-logo,
+        .megasena-logo,
+        img[src*="mega"],
+        img[src*="Mega"],
+        img[src*="MEGASENA"],
+        img[src*="megasena"] {
+          transform: scale(1.3) !important; /* Aumenta 30% */
+          transform-origin: center !important;
+        }
+        
+        /* Ajusta posicionamento se necessário */
+        .logo-mega-sena img,
+        .logo-megasena img,
+        .mega-sena-logo img,
+        .megasena-logo img {
+          margin: 0 auto !important;
+        }
+      }
+      
+      /* 8. LOGO DA MEGA SENA - AUMENTAR AINDA MAIS EM TELAS PEQUENAS */
+      @media (max-width: 480px) {
+        .logo-mega-sena,
+        .logo-megasena,
+        .mega-sena-logo,
+        .megasena-logo,
+        img[src*="mega"],
+        img[src*="Mega"],
+        img[src*="MEGASENA"],
+        img[src*="megasena"] {
+          transform: scale(1.5) !important; /* Aumenta 50% em telas muito pequenas */
+        }
       }
     }
 
@@ -2631,7 +2747,7 @@
             <!-- SUGESTÕES PARA APOSTA PREMIUM -->
             <div class="mt-8 bg-[#2E303A] p-4 rounded-lg shadow-md">
               <h4 class="text-[#00E38C] text-xl font-semibold mb-4">🎯 Sugestões para Aposta Inteligente</h4>
-              <div class="space-y-3">
+              <div class="container-opcoes-aposta space-y-3">
                 <div class="flex items-center">
                   <input type="checkbox" id="dist-priorizar-pares-impares" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="distribuicao" data-pref-name="priorizarParesImpares">
                   <label for="dist-priorizar-pares-impares" class="text-white">Priorizar Paridade (Pares/Ímpares)</label>
@@ -2645,11 +2761,15 @@
                   <input type="checkbox" id="dist-priorizar-soma" class="checkbox-premium-pref form-checkbox h-5 w-5 text-[#00E38C] rounded mr-2" data-pref-type="distribuicao" data-pref-name="priorizarSoma">
                   <label for="dist-priorizar-soma" class="text-white">Priorizar Soma dos Números</label>
                 </div>
-                <div class="flex items-center ml-auto">
-                  <label for="dist-soma-min" class="text-gray-300 text-sm mr-2">Soma Min:</label>
-                  <input type="number" id="dist-soma-min" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="100" min="21" max="285">
-                  <label for="dist-soma-max" class="text-gray-300 text-sm ml-4 mr-2">Soma Max:</label>
-                  <input type="number" id="dist-soma-max" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="200" min="21" max="285">
+                <div class="soma-opcoes-container">
+                  <div class="flex items-center mb-2">
+                    <label for="dist-soma-min" class="text-gray-300 text-sm mr-2">Soma Min:</label>
+                    <input type="number" id="dist-soma-min" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="100" min="21" max="285">
+                  </div>
+                  <div class="flex items-center">
+                    <label for="dist-soma-max" class="text-gray-300 text-sm mr-2">Soma Max:</label>
+                    <input type="number" id="dist-soma-max" class="w-20 bg-[#1A1D25] border border-[#3E404A] text-white rounded px-2 py-1 text-sm" value="200" min="21" max="285">
+                  </div>
                 </div>
               </div>
               <div class="mt-4 p-3 bg-[#1A1D25] rounded border-l-4 border-[#00E38C]">
@@ -6333,8 +6453,33 @@
         }
       });
     });
+
+    // ==== FUNÇÃO PARA CORRIGIR GRÁFICOS PLOTLY NO MOBILE ====
+    function fixPlotlyMobile() {
+      if (window.innerWidth <= 768) { // Mudou para 768px para combinar com CSS
+        console.log('fixPlotlyMobile executando...'); // Debug
+        document.querySelectorAll('.js-plotly-plot').forEach((el) => {
+          console.log('Aplicando relayout em:', el); // Debug
+          Plotly.relayout(el, {
+            margin: { l: 42, r: 18, t: 60, b: 32 }, // Aumenta top para títulos quebrados
+            'title.x': 0,                            // ancora título à esquerda
+            'title.xanchor': 'left',
+            'title.yanchor': 'top',                   // ancora título ao topo
+            'title.y': 0.98                          // posiciona título no topo
+          });
+        });
+      }
+    }
+    
+    // Executa imediatamente e em eventos
+    fixPlotlyMobile(); // Executa imediatamente
+    window.addEventListener('load', fixPlotlyMobile);
+    window.addEventListener('resize', fixPlotlyMobile);
+    
+    // Executa também após um delay para garantir que Plotly carregou
+    setTimeout(fixPlotlyMobile, 1000);
+    setTimeout(fixPlotlyMobile, 2000);
   })();
   </script>
 </body>
-</html> 
 </html> 

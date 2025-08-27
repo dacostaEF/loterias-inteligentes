@@ -70,7 +70,7 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
   <!-- CSS Mobile Otimizado para Tour Guiado -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tour-mobile.css') }}">
+  
   <!-- CSS para Desabilitar Zoom/Pan em Gráficos -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos-sem-zoom.css') }}">
 
@@ -1306,10 +1306,15 @@
               .join('');
 
           // Números secos (top 20)
-          document.getElementById('numeros-secos').innerHTML = 
-            numerosSecos.slice(0, 20)
-              .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
-              .join('');
+          if (numerosSecos.length > 0) {
+            document.getElementById('numeros-secos').innerHTML = 
+              numerosSecos.slice(0, 20)
+                .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
+                .join('');
+          } else {
+            document.getElementById('numeros-secos').innerHTML = 
+              '<div class="text-center py-2"><span class="text-green-400 text-sm">🎉 Todos os números apareceram recentemente!</span><br><span class="text-gray-400 text-xs">Loteria bem distribuída nos últimos 25 concursos</span></div>';
+          }
         }
       } catch (error) {
         console.error('Erro ao carregar estatísticas:', error);
@@ -1326,9 +1331,14 @@
           `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
         ).join('');
         
-        document.getElementById('numeros-secos').innerHTML = numerosSecos.map(n => 
-          `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
-        ).join('');
+        if (numerosSecos.length > 0) {
+          document.getElementById('numeros-secos').innerHTML = numerosSecos.map(n => 
+            `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+          ).join('');
+        } else {
+          document.getElementById('numeros-secos').innerHTML = 
+            '<div class="text-center py-2"><span class="text-green-400 text-sm">🎉 Todos os números apareceram recentemente!</span><br><span class="text-gray-400 text-xs">Loteria bem distribuída nos últimos 25 concursos</span></div>';
+        }
       }
     }
 
@@ -1854,6 +1864,14 @@
         
         tip.style.left = left + 'px';
         tip.style.top = top + 'px';
+        
+        // Aplicar tamanho compacto apenas no desktop (sem quebrar posicionamento)
+        if (window.innerWidth >= 769) {
+          tip.style.padding = '8px 12px';
+          tip.style.maxWidth = 'none';
+          tip.style.width = 'auto';
+          tip.style.whiteSpace = 'nowrap';
+        }
       }
       
       // Atualizar botões
@@ -1950,5 +1968,19 @@
       }, 10000);
     }
   </script>
+
+  <!-- CSS para botão Tour Guiado compacto no desktop -->
+  <style id="tour-button-desktop">
+    /* Desktop: botão compacto (sem interferir no posicionamento do tip) */
+    @media (min-width: 769px){
+      html body #tour-activate {
+        font-size: 14px !important;
+        line-height: 1 !important;
+        padding: 6px 10px !important;
+        white-space: nowrap !important;
+        border-radius: 10px !important;
+      }
+    }
+  </style>
 </body>
 </html>

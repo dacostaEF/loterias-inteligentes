@@ -1,0 +1,44 @@
+/**
+ * 🎯 CSS PARA AJUSTAR POSIÇÃO DO TOUR GUIADO NO MOBILE
+ * ======================================================
+ * 
+ * Apenas ajusta a posição vertical da caixa Tour Guiado no mobile
+ * Desktop permanece completamente inalterado
+ */
+
+/* ⚡ AJUSTE APENAS PARA MOBILE - Posição mais alta */
+
+/* Media Query para Tablets e Mobile */
+@media (max-width: 768px) {
+    /* ⚡ MOBILE: Move a caixa Tour Guiado mais para cima */
+    #tour-activate {
+        top: 5px !important; /* ⚡ REDUZIDO: de 20px para 5px */
+        right: 10px !important; /* ⚡ MANTIDO: posição horizontal */
+    }
+}
+
+/* Media Query para Mobile Pequeno */
+@media (max-width: 480px) {
+    /* ⚡ MOBILE PEQUENO: Ainda mais para cima */
+    #tour-activate {
+        top: 3px !important; /* ⚡ REDUZIDO: de 5px para 3px */
+        right: 8px !important; /* ⚡ AJUSTADO: margem direita menor */
+    }
+}
+
+/* Media Query para Mobile Muito Pequeno */
+@media (max-width: 360px) {
+    /* ⚡ MOBILE MUITO PEQUENO: Máximo para cima */
+    #tour-activate {
+        top: 2px !important; /* ⚡ REDUZIDO: de 3px para 2px */
+        right: 6px !important; /* ⚡ AJUSTADO: margem direita menor */
+    }
+}
+
+/* ⚡ IMPORTANTE: Desktop permanece 100% inalterado */
+@media (min-width: 769px) {
+    #tour-activate {
+        /* ⚡ DESKTOP: sem alterações - mantém posição original */
+        /* NÃO ALTERAR NADA - manter comportamento original */
+    }
+}

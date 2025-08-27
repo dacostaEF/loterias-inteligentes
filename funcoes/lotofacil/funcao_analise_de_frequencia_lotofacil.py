@@ -32,7 +32,7 @@ def analisar_frequencia_lotofacil(qtd_concursos=50):
             logger.error("Não foi possível carregar os dados da Lotofácil")
             return None
         
-        logger.info(f"Analisando frequência dos últimos {qtd_concursos} concursos da Lotofácil")
+        # logger.info(f"Analisando frequência dos últimos {qtd_concursos} concursos da Lotofácil")
         
         # Lista para armazenar todos os números sorteados
         todos_numeros = []
@@ -67,10 +67,10 @@ def analisar_frequencia_lotofacil(qtd_concursos=50):
         # Define números secos (não sorteados)
         numeros_secos = [num for num, freq in frequencias.items() if freq == 0]
         
-        # Log dos resultados
-        logger.info(f"Números quentes: {numeros_quentes}")
-        logger.info(f"Números frios: {numeros_frios}")
-        logger.info(f"Números secos: {numeros_secos}")
+        # Log dos resultados (comentado para reduzir poluição no terminal)
+        # logger.info(f"Números quentes: {numeros_quentes}")
+        # logger.info(f"Números frios: {numeros_frios}")
+        # logger.info(f"Números secos: {numeros_secos}")
         
         return {
             'numeros_quentes': numeros_quentes,
@@ -121,21 +121,23 @@ def obter_estatisticas_rapidas_lotofacil():
         }
 
 if __name__ == "__main__":
-    # Teste das funções
-    print("🧪 Testando análise de frequência da Lotofácil...")
+    # Teste das funções (comentado para reduzir poluição no terminal)
+    # print("🧪 Testando análise de frequência da Lotofácil...")
     
     resultado = analisar_frequencia_lotofacil(10)
     if resultado:
-        print("✅ Análise realizada com sucesso!")
-        print(f"Números quentes: {resultado['numeros_quentes']}")
-        print(f"Números frios: {resultado['numeros_frios']}")
-        print(f"Números secos: {resultado['numeros_secos']}")
+        # print("✅ Análise realizada com sucesso!")
+        # print(f"Números quentes: {resultado['numeros_quentes']}")
+        # print(f"Números frios: {resultado['numeros_frios']}")
+        # print(f"Números secos: {resultado['numeros_secos']}")
+        pass
     else:
-        print("❌ Erro na análise")
+        # print("❌ Erro na análise")
+        pass
     
-    print("\n🧪 Testando estatísticas rápidas...")
+    # print("\n🧪 Testando estatísticas rápidas...")
     stats = obter_estatisticas_rapidas_lotofacil()
-    print(f"Status: {stats['status']}")
-    print(f"Números quentes: {stats['numeros_quentes']}")
-    print(f"Números frios: {stats['numeros_frios']}")
-    print(f"Números secos: {stats['numeros_secos']}")
+    # print(f"Status: {stats['status']}")
+    # print(f"Números quentes: {stats['numeros_quentes']}")
+    # print(f"Números frios: {stats['numeros_frios']}")
+    # print(f"Números secos: {stats['numeros_secos']}")

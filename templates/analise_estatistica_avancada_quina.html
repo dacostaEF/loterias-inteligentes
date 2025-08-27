@@ -75,7 +75,7 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
   <!-- CSS Mobile Otimizado para Tour Guiado -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tour-mobile.css') }}">
+  
   <!-- CSS Mobile Otimizado para Modais de Distribuição -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/distribuicao-mobile.css') }}">
   <!-- CSS para Desabilitar Zoom/Pan em Gráficos -->
@@ -966,6 +966,40 @@
     .afinidade-card .par,
     .afinidade-card .sub{
       min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+    }
+
+    /* ==== MOBILE (até 640px) ==== */
+    @media (max-width: 640px) {
+      /* Títulos dos gráficos um pouco menores para caber sem cortar */
+      .js-plotly-plot .g-gtitle { 
+        font-size: 12px !important;     /* era 14px */
+      }
+
+      /* Garante respiro lateral IGUAL dentro do modal dos gráficos */
+      .chart-container {
+        padding-left: 12px !important;   /* novo */
+        padding-right: 12px !important;  /* novo */
+      }
+
+      /* Evita "encostar" na borda direita */
+      .js-plotly-plot .plotly {
+        margin-left: 24px !important;    /* +4px que o atual */
+        margin-right: 16px !important;   /* um pouco menor à direita */
+      }
+
+      /* Linha do "Priorizar Paridade …" com select responsivo */
+      .form-row-mobile {                   /* adicione essa classe no wrapper do label+select */
+        display: grid;
+        grid-template-columns: 1fr auto;   /* label cresce, select só o necessário */
+        gap: 8px;
+        align-items: center;
+      }
+      .form-row-mobile select { min-width: 160px; }
+      /* Empilha em telas muito estreitas */
+      @media (max-width: 420px) {
+        .form-row-mobile { grid-template-columns: 1fr; }
+        .form-row-mobile select { width: 100%; }
+      }
     }
   </style>
 
@@ -5932,12 +5966,28 @@
       <div id="modal-numeros-cluster-conteudo" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2 text-center text-lg font-bold">
       </div>
       <button id="fechar-modal-numeros-cluster" class="absolute top-4 right-4 text-textSecondary hover:text-primary transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
   </div>
+
+  <!-- JavaScript para otimização mobile dos gráficos Plotly -->
+  <script>
+    function fixPlotlyMobile() {
+      if (window.innerWidth <= 640) {
+        document.querySelectorAll('.js-plotly-plot').forEach((el) => {
+          Plotly.relayout(el, {
+            margin: { l: 42, r: 18, t: 42, b: 32 }, // puxa ligeiro à esquerda
+            'title.x': 0,                            // ancora título à esquerda
+            'title.xanchor': 'left'
+          });
+        });
+      }
+    }
+    window.addEventListener('load', fixPlotlyMobile);
+    window.addEventListener('resize', fixPlotlyMobile);
+  </script>
 </body>
-</html> 
 </html> 

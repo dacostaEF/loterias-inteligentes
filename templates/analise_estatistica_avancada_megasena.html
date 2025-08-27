@@ -70,7 +70,7 @@
 
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
   <!-- CSS Mobile Otimizado para Tour Guiado -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/tour-mobile.css') }}">
+  
   <!-- CSS Mobile Otimizado para Modais de Distribuição -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/distribuicao-mobile.css') }}">
   <!-- CSS para Desabilitar Zoom/Pan em Gráficos -->
@@ -96,6 +96,41 @@
     @media (max-width: 768px) {
       html::before {
         box-shadow: inset 0 0 0 2px #9ACD32, 0 0 8px #9ACD32, 0 0 15px #9ACD32;
+      }
+      
+      /* LOGO DA MEGA SENA - AUMENTAR APENAS NO MOBILE */
+      .logo-mega-sena,
+      .logo-megasena,
+      .mega-sena-logo,
+      .megasena-logo,
+      img[src*="mega"],
+      img[src*="Mega"],
+      img[src*="MEGASENA"],
+      img[src*="megasena"] {
+        transform: scale(1.3) !important; /* Aumenta 30% */
+        transform-origin: center !important;
+      }
+      
+      /* Ajusta posicionamento se necessário */
+      .logo-mega-sena img,
+      .logo-megasena img,
+      .mega-sena-logo img,
+      .megasena-logo img {
+        margin: 0 auto !important;
+      }
+    }
+    
+    /* LOGO DA MEGA SENA - AUMENTAR AINDA MAIS EM TELAS PEQUENAS */
+    @media (max-width: 480px) {
+      .logo-mega-sena,
+      .logo-megasena,
+      .mega-sena-logo,
+      .megasena-logo,
+      img[src*="mega"],
+      img[src*="Mega"],
+      img[src*="MEGASENA"],
+      img[src*="megasena"] {
+        transform: scale(1.5) !important; /* Aumenta 50% em telas muito pequenas */
       }
     }
 
@@ -961,6 +996,40 @@
     .afinidade-card .par,
     .afinidade-card .sub{
       min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+    }
+
+    /* ==== MOBILE (até 640px) ==== */
+    @media (max-width: 640px) {
+      /* Títulos dos gráficos um pouco menores para caber sem cortar */
+      .js-plotly-plot .g-gtitle { 
+        font-size: 12px !important;     /* era 14px */
+      }
+
+      /* Garante respiro lateral IGUAL dentro do modal dos gráficos */
+      .chart-container {
+        padding-left: 12px !important;   /* novo */
+        padding-right: 12px !important;  /* novo */
+      }
+
+      /* Evita "encostar" na borda direita */
+      .js-plotly-plot .plotly {
+        margin-left: 24px !important;    /* +4px que o atual */
+        margin-right: 16px !important;   /* um pouco menor à direita */
+      }
+
+      /* Linha do "Priorizar Paridade …" com select responsivo */
+      .form-row-mobile {                   /* adicione essa classe no wrapper do label+select */
+        display: grid;
+        grid-template-columns: 1fr auto;   /* label cresce, select só o necessário */
+        gap: 8px;
+        align-items: center;
+      }
+      .form-row-mobile select { min-width: 160px; }
+      /* Empilha em telas muito estreitas */
+      @media (max-width: 420px) {
+        .form-row-mobile { grid-template-columns: 1fr; }
+        .form-row-mobile select { width: 100%; }
+      }
     }
   </style>
 
@@ -5968,6 +6037,77 @@
       </button>
     </div>
   </div>
+
+  <!-- JavaScript para otimização mobile dos gráficos Plotly -->
+  <script>
+    function fixPlotlyMobile() {
+      if (window.innerWidth <= 640) {
+        document.querySelectorAll('.js-plotly-plot').forEach((el) => {
+          Plotly.relayout(el, {
+            margin: { l: 42, r: 18, t: 42, b: 32 }, // puxa ligeiro à esquerda
+            'title.x': 0,                            // ancora título à esquerda
+            'title.xanchor': 'left'
+          });
+        });
+      }
+    }
+    window.addEventListener('load', fixPlotlyMobile);
+    window.addEventListener('resize', fixPlotlyMobile);
+  </script>
+
+  <!-- JavaScript para o Menu Hambúrguer -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+      const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+
+      // Toggle do menu hambúrguer
+      hamburgerIcon.addEventListener('click', function() {
+        hamburgerIcon.classList.toggle('open');
+        navPanel.classList.toggle('open');
+        navOverlay.classList.toggle('active');
+        document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : 'auto';
+      });
+
+      // Fechar menu ao clicar no overlay
+      navOverlay.addEventListener('click', function() {
+        hamburgerIcon.classList.remove('open');
+        navPanel.classList.remove('open');
+        navOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+      });
+
+      // Toggle dos dropdowns mobile
+      mobileDropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          const dropdown = this.nextElementSibling;
+          const isActive = dropdown.classList.contains('active');
+          
+          // Fecha todos os outros dropdowns
+          document.querySelectorAll('.mobile-dropdown').forEach(dd => {
+            dd.classList.remove('active');
+          });
+          
+          // Toggle do dropdown atual
+          if (!isActive) {
+            dropdown.classList.add('active');
+          }
+        });
+      });
+
+      // Fechar menu ao redimensionar para desktop
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('active');
+          document.body.style.overflow = 'auto';
+        }
+      });
+    });
+  </script>
 </body>
-</html> 
 </html> 

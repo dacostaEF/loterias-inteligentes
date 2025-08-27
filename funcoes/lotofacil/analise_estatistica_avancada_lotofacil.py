@@ -59,7 +59,14 @@ class AnaliseEstatisticaAvancadaLotofacil:
         """
         self.df = df_lotofacil
         self.colunas_bolas = [f'Bola{i}' for i in range(1, 16)]
-        self._preparar_dados()
+        # Preparar dados para análise
+        self.df_validos = self.preparar_dados_para_analise()
+        
+        if self.df_validos is None or len(self.df_validos) == 0:
+            logger.error("❌ Nenhum dado válido encontrado para análise")
+            return None
+            
+        # logger.info(f"Dados preparados: {len(self.df_validos)} concursos válidos")
     
     def _preparar_dados(self):
         """Prepara e valida os dados para análise"""
@@ -523,7 +530,7 @@ class AnaliseEstatisticaAvancadaLotofacil:
                     'frequencia': contagem_numeros.get(num, 0)
                 })
             
-            logger.info(f"Distribuição calculada para {len(df_filtrado)} concursos")
+            # logger.info(f"Distribuição calculada para {len(df_filtrado)} concursos")
             return distribuicao
             
         except Exception as e:
@@ -540,13 +547,13 @@ class AnaliseEstatisticaAvancadaLotofacil:
         Returns:
             dict: Resultados completos de todas as análises
         """
-        logger.info(f"Iniciando análise estatística avançada completa... (qtd_concursos: {qtd_concursos})")
+        # logger.info(f"Iniciando análise estatística avançada completa... (qtd_concursos: {qtd_concursos})")
         
         # Filtrar dados por período se especificado
         df_analise = self.df_validos
         if qtd_concursos and qtd_concursos > 0:
             df_analise = self.df_validos.tail(qtd_concursos)
-            logger.info(f"Analisando últimos {qtd_concursos} concursos ({len(df_analise)} encontrados)")
+            # logger.info(f"Analisando últimos {qtd_concursos} concursos ({len(df_analise)} encontrados)")
         
         # Criar instância com dados filtrados (Lotofácil)
         analise_temp = AnaliseEstatisticaAvancadaLotofacil(df_analise)
@@ -566,22 +573,19 @@ class AnaliseEstatisticaAvancadaLotofacil:
         # Limpar valores NaN antes de retornar
         resultados = limpar_nan_do_dict(resultados)
         
-        logger.info("✅ Análise estatística avançada concluída!")
-        logger.info(f"📊 Resultados gerados:")
-        logger.info(f"   - Desvio padrão: {'✅' if resultados.get('desvio_padrao_distribuicao') else '❌'}")
-        logger.info(f"   - Teste aleatoriedade: {'✅' if resultados.get('teste_aleatoriedade') else '❌'}")
-        logger.info(f"   - Análise clusters: {'✅' if resultados.get('analise_clusters') else '❌'}")
-        logger.info(f"   - Correlação números: {'✅' if resultados.get('analise_correlacao_numeros') else '❌'}")
-        logger.info(f"   - Probabilidades condicionais: {'✅' if resultados.get('probabilidades_condicionais') else '❌'}")
-        logger.info(f"   - Distribuição números: {'✅' if resultados.get('distribuicao_numeros') else '❌'}")
+        # logger.info("✅ Análise estatística avançada concluída!")
+        # logger.info(f"📊 Resultados gerados:")
+        # logger.info(f"   - Desvio padrão: {'✅' if resultados.get('desvio_padrao_distribuicao') else '❌'}")
+        # logger.info(f"   - Probabilidades condicionais: {'✅' if resultados.get('probabilidades_condicionais') else '❌'}")
+        # logger.info(f"   - Distribuição números: {'✅' if resultados.get('distribuicao_numeros') else '❌'}")
         
-        # Log específico para correlação
-        if resultados.get('analise_correlacao_numeros'):
-            correlacao = resultados['analise_correlacao_numeros']
-            logger.info(f"🔍 Dados de correlação detalhados:")
-            logger.info(f"   - Correlações positivas: {len(correlacao.get('correlacoes_positivas', []))}")
-            logger.info(f"   - Correlações negativas: {len(correlacao.get('correlacoes_negativas', []))}")
-            logger.info(f"   - Correlação média: {correlacao.get('correlacao_media', 0.0):.4f}")
+        # Log específico para correlação (comentado para reduzir poluição no terminal)
+        # if resultados.get('analise_correlacao_numeros'):
+        #     correlacao = resultados['analise_correlacao_numeros']
+        #     logger.info(f"🔍 Dados de correlação detalhados:")
+        #     logger.info(f"   - Correlações positivas: {len(correlacao.get('correlacoes_positivas', []))}")
+        #     logger.info(f"   - Correlações negativas: {len(correlacao.get('correlacoes_negativas', []))}")
+        #     logger.info(f"   - Correlação média: {correlacao.get('correlacao_media', 0.0):.4f}")
         
         return resultados
 
