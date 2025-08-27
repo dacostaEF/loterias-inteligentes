@@ -49,11 +49,15 @@
         onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}"></noscript>
   
-  <!-- Carrossel CSS e JS -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/carrossel.css') }}">
-  <!-- CSS Mobile Otimizado para Carrossel -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/carrossel-mobile.css') }}">
-  <script src="{{ url_for('static', filename='js/carrossel.js') }}" defer></script>
+     <!-- Carrossel CSS e JS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/carrossel.css') }}">
+   <!-- CSS Mobile Otimizado para Carrossel -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/carrossel-mobile.css') }}">
+   <!-- Modal Login/Cadastro CSS -->
+   <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-login-cadastro.css') }}">
+   <script src="{{ url_for('static', filename='js/carrossel.js') }}" defer></script>
+   <!-- Modal Login/Cadastro JS -->
+   <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
   <style>
     /* Moldura Neon Lilás - Desktop */
     html::before {
@@ -85,16 +89,23 @@
       background-color: #000000; /* Padronizado com Dashboard e Premium */
     }
 
-    /* CARROSSEL NO TOPO - SEM FOLGA PARA MENU */
-    .carousel-section-top {
-      position: relative;
-      z-index: 999; /* CORRIGIDO: era 1, agora 999 - VISÍVEL */
-      margin: 0 auto;
-      width: 100%;
-      max-width: 1200px;
-      padding: 0; /* PADDING ZERO - ajuste perfeito */
-      background: transparent;
-    }
+         /* CARROSSEL NO TOPO - SEM FOLGA PARA MENU */
+     .carousel-section-top {
+       position: relative;
+       z-index: 999; /* CORRIGIDO: era 1, agora 999 - VISÍVEL */
+       margin: 0 auto;
+       width: 100%;
+       max-width: 1200px;
+       padding: 0; /* PADDING ZERO - ajuste perfeito */
+       background: transparent;
+     }
+     
+     /* ⚡ NOVO: Reduzir espaçamento do carrossel no mobile */
+     @media (max-width: 768px) {
+       .carousel-section-top {
+         margin-bottom: 5px; /* ⚡ REDUZIDO: menos espaço entre carrossel e breadcrumb */
+       }
+     }
 
     .main-container {
       display: flex;
@@ -245,21 +256,95 @@
       font-weight: 600;
     }
 
-    /* Menu Desktop */
-    .desktop-nav {
-      position: sticky; /* MUDADO: era fixed, agora sticky */
-      top: 0;
-      left: 0;
-      right: 0;
-      background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      z-index: 1000;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-    }
+         /* Menu Desktop */
+     .desktop-nav {
+       position: sticky;
+       top: 0;
+       left: 0;
+       right: 0;
+       background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
+       backdrop-filter: blur(10px);
+       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+       z-index: 1000;
+       padding: 1rem 2rem;
+     }
+
+           .nav-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+     /* Botões de Autenticação - ABAIXO DO MENU */
+     .auth-section {
+       background: rgba(30, 27, 41, 0.8);
+       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+       padding: 0.75rem 2rem;
+       display: flex;
+       justify-content: flex-end;
+       align-items: center;
+     }
+
+     .auth-container {
+       max-width: 1200px;
+       margin: 0 auto;
+       width: 100%;
+       display: flex;
+       justify-content: flex-end;
+       gap: 1rem;
+     }
+
+     .auth-btn {
+       padding: 0.75rem 1.5rem;
+       border: none;
+       border-radius: 8px;
+       font-size: 0.9rem;
+       font-weight: 600;
+       cursor: pointer;
+       transition: all 0.3s ease;
+       text-decoration: none;
+       display: inline-flex;
+       align-items: center;
+       gap: 0.5rem;
+     }
+
+     .auth-btn-cadastrar {
+       background: #10b981;
+       color: white;
+     }
+
+     .auth-btn-cadastrar:hover {
+       background: #059669;
+       transform: translateY(-2px);
+       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+     }
+
+     .auth-btn-entrar {
+       background: transparent;
+       color: #10b981;
+       border: 2px solid #10b981;
+     }
+
+     .auth-btn-entrar:hover {
+       background: #10b981;
+       color: white;
+       transform: translateY(-2px);
+       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+     }
+
+     /* Responsividade para botões de auth */
+     @media (max-width: 768px) {
+       .auth-buttons {
+         gap: 0.75rem;
+       }
+       
+       .auth-btn {
+         padding: 0.6rem 1.2rem;
+         font-size: 0.85rem;
+       }
+     }
 
     .desktop-nav .logo {
       max-width: 180px;
@@ -268,11 +353,18 @@
       object-fit: contain;
     }
 
-    .desktop-nav-links {
-      display: flex;
-      gap: clamp(0.5rem, 2vw, 2rem); /* Flexível: mínimo 8px, máximo 32px, adapta-se à largura da tela */
-      align-items: center;
-    }
+         .desktop-nav-links {
+       display: flex;
+       gap: clamp(0.5rem, 2vw, 2rem); /* Flexível: mínimo 8px, máximo 32px, adapta-se à largura da tela */
+       align-items: center;
+       list-style: none;
+       margin: 0;
+       padding: 0;
+     }
+
+     .desktop-nav-links li {
+       margin: 0;
+     }
 
     .desktop-nav-links a {
       color: #ffffff;
@@ -548,23 +640,29 @@
       background: rgba(0, 227, 140, 0.15) !important;
     }
 
-    /* Estilos para Breadcrumbs */
-    .breadcrumbs-container {
-      background: transparent; /* REMOVIDO: sem background verde - MÍNIMO */
-      border-bottom: 1px solid rgba(168, 85, 247, 0.1); /* REDUZIDO: borda mais sutil */
-      padding: 0px 0; /* REDUZIDO AO MÍNIMO: era 1px 0, agora 0px 0 - MEGA COMPACTO */
-      margin-bottom: 2px; /* REDUZIDO AO MÍNIMO: era 5px, agora 2px - MEGA COMPACTO */
-      position: relative;
-      z-index: 998;
-      margin-top: 0px; /* REDUZIDO AO MÍNIMO: era 1px, agora 0px - MEGA COMPACTO */
-    }
-    
-    .breadcrumbs {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 20px;
-      text-align: left;
-    }
+         /* Estilos para Breadcrumbs com Botões de Auth na mesma linha */
+     .breadcrumbs-container {
+       background: transparent;
+       border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+       padding: 8px 0;
+       margin-bottom: 2px;
+       position: relative;
+       z-index: 998;
+       margin-top: 0px;
+     }
+     
+     .breadcrumbs-content {
+       max-width: 1200px;
+       margin: 0 auto;
+       padding: 0 20px;
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+     }
+     
+     .breadcrumbs {
+       text-align: left;
+     }
     
     .breadcrumb-list {
       display: flex;
@@ -602,24 +700,80 @@
       background: rgba(168, 85, 247, 0.1);
     }
     
-    .breadcrumb-item.active .breadcrumb-link {
-      color: #00E38C;
-      font-weight: 600;
-    }
+         .breadcrumb-item.active .breadcrumb-link {
+       color: #00E38C;
+       font-weight: 600;
+     }
+     
+     /* Botões de Auth inline na mesma linha do breadcrumb */
+     .auth-buttons-inline {
+       display: flex;
+       gap: 0.75rem;
+       align-items: center;
+     }
+     
+     .auth-buttons-inline .auth-btn {
+       padding: 0.5rem 1rem;
+       font-size: 0.85rem;
+       border-radius: 6px;
+       transition: all 0.3s ease;
+       text-decoration: none;
+       display: inline-flex;
+       align-items: center;
+       gap: 0.4rem;
+     }
+     
+     .auth-buttons-inline .auth-btn-cadastrar {
+       background: #10b981;
+       color: white;
+     }
+     
+     .auth-buttons-inline .auth-btn-cadastrar:hover {
+       background: #059669;
+       transform: translateY(-1px);
+       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+     }
+     
+     .auth-buttons-inline .auth-btn-entrar {
+       background: transparent;
+       color: #10b981;
+       border: 1.5px solid #10b981;
+     }
+     
+     .auth-buttons-inline .auth-btn-entrar:hover {
+       background: #10b981;
+       color: white;
+       transform: translateY(-1px);
+       box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+     }
     
-    /* Responsividade para breadcrumbs */
-    @media (max-width: 768px) {
-      .breadcrumbs-container {
-        padding: 6px 0;
-        margin-bottom: 15px;
-        margin-top: 0;
-      }
-      
-      .breadcrumbs {
-        padding: 0 15px 0 60px;
-        margin: 0 auto;
-        text-align: left;
-      }
+         /* Responsividade para breadcrumbs */
+     @media (max-width: 768px) {
+       .breadcrumbs-container {
+         padding: 3px 0; /* ⚡ REDUZIDO: 6px → 3px */
+         margin-bottom: 8px; /* ⚡ REDUZIDO: 15px → 8px */
+         margin-top: 0;
+       }
+       
+       .breadcrumbs-content {
+         padding: 0 15px 0 60px;
+         flex-direction: column;
+         gap: 0.75rem;
+         align-items: flex-start;
+       }
+       
+       .breadcrumbs {
+         text-align: left;
+       }
+       
+       .auth-buttons-inline {
+         gap: 0.5rem;
+       }
+       
+       .auth-buttons-inline .auth-btn {
+         padding: 0.4rem 0.8rem;
+         font-size: 0.8rem;
+       }
       
       .breadcrumb-list {
         font-size: 0.85rem;
@@ -817,59 +971,83 @@
     <div id="carousel-container"></div>
   </header>
 
-  <!-- MENU (vem depois do carrossel) -->
-  <nav class="desktop-nav">
-    <div class="desktop-nav-links">
-      <a href="/" class="active"><i class="fa fa-home"></i> Início</a>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-        </div>
-      </div>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-        </div>
-      </div>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-        </div>
-      </div>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-        </div>
-      </div>
-      <div class="dropdown">
-        <a href="#" class="dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
-        <div class="dropdown-content">
-          <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-          <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
-          <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
-        </div>
-      </div>
-      <a href="/boloes"><i class="fa fa-users"></i> Bolões</a>
-    </div>
-  </nav>
+         <!-- MENU DE NAVEGAÇÃO (vem depois do carrossel) -->
+    <nav class="desktop-nav">
+      <div class="nav-content">
+        <ul class="desktop-nav-links">
+         <li><a href="/" class="active"><i class="fa fa-home"></i> Início</a></li>
+         <li>
+           <div class="dropdown">
+             <a href="#" class="dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+             <div class="dropdown-content">
+               <a href="/dashboard"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+               <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+             </div>
+           </div>
+         </li>
+         <li>
+           <div class="dropdown">
+             <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+             <div class="dropdown-content">
+               <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+               <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+             </div>
+           </div>
+         </li>
+         <li>
+           <div class="dropdown">
+             <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
+             <div class="dropdown-content">
+               <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+               <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+             </div>
+           </div>
+         </li>
+         <li>
+           <div class="dropdown">
+             <a href="#" class="dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
+             <div class="dropdown-content">
+               <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+             </div>
+           </div>
+         </li>
+         <li>
+           <div class="dropdown">
+             <a href="#" class="dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
+             <div class="dropdown-content">
+               <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+               <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+               <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
+             </div>
+           </div>
+         </li>
+         <li><a href="/boloes"><i class="fa fa-users"></i> Bolões</a></li>
+       </ul>
+     </div>
+   </nav>
 
-  <!-- Breadcrumbs -->
-  <div class="breadcrumbs-container">
-      <nav class="breadcrumbs" aria-label="Breadcrumb">
-          <ol class="breadcrumb-list">
-              <li class="breadcrumb-item active">
-                  <span class="breadcrumb-link">🏠 Início</span>
-              </li>
-          </ol>
-      </nav>
-  </div>
+   
+
+     <!-- Breadcrumbs com Botões de Auth na mesma linha -->
+   <div class="breadcrumbs-container">
+       <div class="breadcrumbs-content">
+           <nav class="breadcrumbs" aria-label="Breadcrumb">
+               <ol class="breadcrumb-list">
+                   <li class="breadcrumb-item active">
+                       <span class="breadcrumb-link">🏠 Início</span>
+                   </li>
+               </ol>
+           </nav>
+           <div class="auth-buttons-inline">
+               <a href="#" class="auth-btn auth-btn-entrar" onclick="openModalLogin('login'); return false;">
+                   <i class="fa fa-sign-in-alt"></i> Entrar
+               </a>
+               <a href="#" class="auth-btn auth-btn-cadastrar" onclick="openModalLogin('cadastro'); return false;">
+                   <i class="fa fa-user-plus"></i> Cadastrar-se
+               </a>
+           </div>
+       </div>
+   </div>
 
   <div class="main-container">
     <div class="hamburger-menu">
