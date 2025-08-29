@@ -110,76 +110,155 @@ class User(UserMixin):
         return "Desconhecido"
 
 # ============================================================================
-# 🗄️ BANCO DE DADOS SIMULADO (IN-MEMORY)
+# 🗄️ BANCO DE DADOS REAL (SQLITE)
 # ============================================================================
 
-# Simulação de banco de dados em memória
-users_db = {}
-user_counter = 1
+# Importar configuração do banco
+import sys
+sys.path.append('database')
+from db_config import get_db_connection
+import bcrypt
 
-def create_user(email, password, level=UserLevel.FREE):
-    """Cria um novo usuário no sistema."""
-    global user_counter
-    
-    if email in [user.email for user in users_db.values()]:
-        return None  # Email já existe
-    
-    user_id = user_counter
-    user_counter += 1
-    
-    # Definir data de expiração baseada no nível
-    subscription_expiry = None
-    if level == UserLevel.PREMIUM_MONTHLY:
-        subscription_expiry = datetime.now() + timedelta(days=30)
-    elif level == UserLevel.PREMIUM_SEMESTRAL:
-        subscription_expiry = datetime.now() + timedelta(days=180)
-    elif level == UserLevel.PREMIUM_ANNUAL:
-        subscription_expiry = datetime.now() + timedelta(days=365)
-    
-    user = User(user_id, email, level, subscription_expiry)
-    users_db[user_id] = user
-    
-    # Em produção, aqui você salvaria no banco real
-    logger.info(f"Usuário criado: {email} - Nível: {level}")
-    
-    return user
+def create_user(nome_completo, email, senha, telefone=None, data_nascimento=None, cpf=None, receber_emails=True, receber_sms=True, aceitou_termos=False):
+    """Cria um novo usuário no banco SQLite."""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return None
+        
+        cursor = conn.cursor()
+        
+        # Verificar se email já existe
+        cursor.execute("SELECT id FROM usuarios WHERE email = ?", (email,))
+        if cursor.fetchone():
+            conn.close()
+            return None  # Email já existe
+        
+        # Criptografar senha
+        senha_hash = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
+        
+        # Inserir usuário
+        cursor.execute("""
+            INSERT INTO usuarios (nome_completo, email, senha_hash, telefone_celular, data_nascimento, cpf, receber_emails, receber_sms, aceitou_termos)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (nome_completo, email, senha_hash.decode('utf-8'), telefone, data_nascimento, cpf, receber_emails, receber_sms, aceitou_termos))
+        
+        user_id = cursor.lastrowid
+        
+        # Criar assinatura FREE por padrão
+        cursor.execute("SELECT id FROM planos WHERE nome = 'Free'")
+        plano_free = cursor.fetchone()
+        if plano_free:
+            cursor.execute("""
+                INSERT INTO assinaturas (usuario_id, plano_id, status, data_inicio)
+                VALUES (?, ?, 'ativa', CURRENT_TIMESTAMP)
+            """, (user_id, plano_free[0]))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Usuário criado: {email} - ID: {user_id}")
+        
+        # Retornar objeto User
+        return User(user_id, email, UserLevel.FREE)
+        
+    except Exception as e:
+        logger.error(f"Erro ao criar usuário: {e}")
+        return None
 
 def get_user_by_id(user_id):
-    """Recupera usuário por ID."""
-    return users_db.get(int(user_id))
+    """Recupera usuário por ID do banco SQLite."""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return None
+        
+        cursor = conn.cursor()
+        
+        # Buscar usuário
+        cursor.execute("""
+            SELECT u.id, u.nome_completo, u.email, u.status, a.status as assinatura_status, p.nome as plano_nome
+            FROM usuarios u
+            LEFT JOIN assinaturas a ON u.id = a.usuario_id AND a.status = 'ativa'
+            LEFT JOIN planos p ON a.plano_id = p.id
+            WHERE u.id = ?
+        """, (user_id,))
+        
+        user_data = cursor.fetchone()
+        conn.close()
+        
+        if user_data:
+            # Mapear plano para UserLevel
+            plano_nome = user_data['plano_nome'] if user_data['plano_nome'] else 'Free'
+            level_mapping = {
+                'Free': UserLevel.FREE,
+                'Mensal': UserLevel.PREMIUM_MONTHLY,
+                'Semestral': UserLevel.PREMIUM_SEMESTRAL,
+                'Anual': UserLevel.PREMIUM_ANNUAL,
+                'Vitalício': UserLevel.LIFETIME
+            }
+            level = level_mapping.get(plano_nome, UserLevel.FREE)
+            
+            return User(user_data['id'], user_data['email'], level)
+        
+        return None
+        
+    except Exception as e:
+        logger.error(f"Erro ao buscar usuário por ID: {e}")
+        return None
 
 def get_user_by_email(email):
-    """Recupera usuário por email."""
-    for user in users_db.values():
-        if user.email == email:
+    """Recupera usuário por email do banco SQLite."""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return None
+        
+        cursor = conn.cursor()
+        
+        # Buscar usuário
+        cursor.execute("""
+            SELECT u.id, u.nome_completo, u.email, u.senha_hash, u.status, a.status as assinatura_status, p.nome as plano_nome
+            FROM usuarios u
+            LEFT JOIN assinaturas a ON u.id = a.usuario_id AND a.status = 'ativa'
+            LEFT JOIN planos p ON a.plano_id = p.id
+            WHERE u.email = ?
+        """, (email,))
+        
+        user_data = cursor.fetchone()
+        conn.close()
+        
+        if user_data:
+            # Mapear plano para UserLevel
+            plano_nome = user_data['plano_nome'] if user_data['plano_nome'] else 'Free'
+            level_mapping = {
+                'Free': UserLevel.FREE,
+                'Mensal': UserLevel.PREMIUM_MONTHLY,
+                'Semestral': UserLevel.PREMIUM_SEMESTRAL,
+                'Anual': UserLevel.PREMIUM_ANNUAL,
+                'Vitalício': UserLevel.LIFETIME
+            }
+            level = level_mapping.get(plano_nome, UserLevel.FREE)
+            
+            user = User(user_data['id'], user_data['email'], level)
+            user.senha_hash = user_data['senha_hash']  # Para verificação de senha
             return user
-    return None
+        
+        return None
+        
+    except Exception as e:
+        logger.error(f"Erro ao buscar usuário por email: {e}")
+        return None
 
-# ============================================================================
-# 🔒 MIDDLEWARE DE CONTROLE DE ACESSO
-# ============================================================================
+def verify_password(user, password):
+    """Verifica se a senha está correta."""
+    try:
+        return bcrypt.checkpw(password.encode('utf-8'), user.senha_hash.encode('utf-8'))
+    except Exception as e:
+        logger.error(f"Erro ao verificar senha: {e}")
+        return False
 
-def require_free_or_premium(f):
-    """Decorator para controlar acesso baseado no nível do usuário."""
-    from functools import wraps
-    
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        current_route = request.path
-        
-        # Se for rota freemium, sempre permitir
-        if UserPermissions.is_free_route(current_route):
-            return f(*args, **kwargs)
-        
-        # Se for rota premium, verificar se usuário está logado e tem assinatura
-        if UserPermissions.is_premium_route(current_route):
-            # Por enquanto, sempre redirecionar para premium_required
-            # TODO: Implementar verificação de usuário quando o sistema estiver estável
-            return redirect('/premium_required')
-        
-        return f(*args, **kwargs)
-    
-    return decorated_function
+
 
 # ============================================================================
 # 🔧 CONFIGURAÇÃO DO FLASK-LOGIN
@@ -207,6 +286,35 @@ login_manager.login_view = 'login'
 login_manager.user_loader(load_user)
 
 # ============================================================================
+# 🔒 MIDDLEWARE DE CONTROLE DE ACESSO (APÓS CONFIGURAÇÃO DO FLASK-LOGIN)
+# ============================================================================
+
+def require_free_or_premium(f):
+    """Decorator para controlar acesso baseado no nível do usuário."""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        current_route = request.path
+        
+        # Se for rota freemium, sempre permitir
+        if UserPermissions.is_free_route(current_route):
+            return f(*args, **kwargs)
+        
+        # Se for rota premium, verificar se usuário está logado e tem assinatura
+        if UserPermissions.is_premium_route(current_route):
+            if not current_user.is_authenticated:
+                return redirect('/premium_required')
+            
+            # Verificar se usuário tem acesso premium
+            if not current_user.is_premium:
+                return redirect('/premium_required')
+        
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+# ============================================================================
 # 👥 ROTAS DE AUTENTICAÇÃO
 # ============================================================================
 
@@ -218,10 +326,10 @@ def login():
         email = data.get('email')
         password = data.get('password')
         
-        # Em produção, você verificaria a senha com hash
+        # Buscar usuário no banco
         user = get_user_by_email(email)
         
-        if user and password:  # Simplificado para demo
+        if user and verify_password(user, password):
             login_user(user)
             return jsonify({'success': True, 'redirect': url_for('landing_page')})
         else:
@@ -241,14 +349,31 @@ def register():
     """Página de cadastro."""
     if request.method == 'POST':
         data = request.get_json()
-        name = data.get('name')
+        nome_completo = data.get('name')
         email = data.get('email')
         password = data.get('password')
+        telefone = data.get('telefone', '')
+        data_nascimento = data.get('data_nascimento', '')
+        cpf = data.get('cpf', '')
+        receber_emails = data.get('receber_emails', True)
+        receber_sms = data.get('receber_sms', True)
+        aceitou_termos = data.get('aceitou_termos', False)
         
         if get_user_by_email(email):
             return jsonify({'success': False, 'error': 'Email já cadastrado'}), 400
         
-        user = create_user(email, password, UserLevel.FREE)
+        user = create_user(
+            nome_completo=nome_completo,
+            email=email,
+            senha=password,
+            telefone=telefone,
+            data_nascimento=data_nascimento,
+            cpf=cpf,
+            receber_emails=receber_emails,
+            receber_sms=receber_sms,
+            aceitou_termos=aceitou_termos
+        )
+        
         if user:
             login_user(user)
             return jsonify({'success': True, 'redirect': url_for('landing_page')})
@@ -420,8 +545,7 @@ from funcoes.lotofacil.funcao_analise_de_padroes_sequencia_lotofacil import anal
 from funcoes.lotofacil.analise_estatistica_avancada_lotofacil import AnaliseEstatisticaAvancadaLotofacil, realizar_analise_estatistica_avancada_lotofacil
 from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosL_lotofacil import gerar_aposta_personalizada_lotofacil, gerar_aposta_aleatoria_lotofacil
 
-
-app = Flask(__name__, static_folder='static') # Mantém a pasta 'static' para CSS/JS
+# Funções de carregamento movidas para services/data_loader.py
 
 # Funções de carregamento movidas para services/data_loader.py
 from services.data_loader import carregar_dados_milionaria, carregar_dados_megasena_app, carregar_dados_quina_app
@@ -1917,20 +2041,20 @@ def bolao_interesse():
     return jsonify({"message": "Interesse registrado com sucesso! Entraremos em contato."}), 200
 
 @app.route('/boloes')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
     return render_template('boloes_loterias.html')
 
 # --- Rotas da Mega Sena ---
 @app.route('/dashboard_MS')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def dashboard_megasena():
     """Renderiza a página principal do dashboard da Mega Sena."""
     return render_template('dashboard_megasena.html')
 
 @app.route('/aposta_inteligente_premium_MS')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def aposta_inteligente_premium_megasena():
     """Renderiza a página de Aposta Inteligente Premium da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
@@ -1942,26 +2066,26 @@ def dashboard_quina():
     return render_template('dashboard_quina.html')
 
 @app.route('/aposta_inteligente_premium_quina')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def aposta_inteligente_premium_quina():
     """Renderiza a página de Aposta Inteligente Premium da Quina."""
     return render_template('analise_estatistica_avancada_quina.html')
 
 # --- Rotas da Lotofácil ---
 @app.route('/dashboard_lotofacil')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def dashboard_lotofacil():
     """Renderiza a página principal do dashboard da Lotofácil."""
     return render_template('dashboard_lotofacil.html')
 
 @app.route('/aposta_inteligente_premium_lotofacil')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html')
 
 @app.route('/lotofacil_laboratorio')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
     return render_template('lotofacil_laboratorio.html')
@@ -1974,7 +2098,7 @@ def teste_api():
 # --- Rotas da Milionária ---
 
 @app.route('/aposta_inteligente_premium')
-# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
+@require_free_or_premium
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
     return render_template('analise_estatistica_avancada_milionaria.html')
