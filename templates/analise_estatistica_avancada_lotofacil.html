@@ -17,6 +17,9 @@
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-login-cadastro.css') }}">>
 
   <!-- Favicons otimizados para todos os dispositivos -->
   <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
@@ -6185,6 +6188,12 @@
       }
     });
   </script>
+  
+  <!-- 🔐 SCRIPT DO MODAL DE ACESSO PREMIUM -->
+  <script src="/static/js/premium_access_modal.js"></script>
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO JAVASCRIPT -->
+  <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
 </body>
 </html>
 

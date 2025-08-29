@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planos Premium - Loterias Inteligentes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 20px;
+        }
+
+        .plans-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .plan-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-10px);
+            border-color: #A855F7;
+            box-shadow: 0 20px 40px rgba(168, 85, 247, 0.3);
+        }
+
+        .plan-card.featured {
+            border-color: #A855F7;
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .plan-card.featured::before {
+            content: '⭐ MAIS POPULAR';
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: #A855F7;
+            color: white;
+            padding: 8px 40px;
+            font-size: 12px;
+            font-weight: 600;
+            transform: rotate(45deg);
+        }
+
+        .plan-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #A855F7;
+        }
+
+        .plan-price {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .plan-period {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 20px;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .plan-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-features li::before {
+            content: '✅';
+            margin-right: 10px;
+            color: #10B981;
+        }
+
+        .btn-select {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #A855F7, #8B5CF6);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-select:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(168, 85, 247, 0.4);
+        }
+
+        .guarantee-section {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .guarantee-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #A855F7;
+        }
+
+        .guarantee-text {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .payment-section {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .payment-title {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: #A855F7;
+        }
+
+        .payment-methods {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .payment-method {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: #A855F7;
+            transform: translateY(-5px);
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .payment-name {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        .back-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 10px 20px;
+            background: rgba(168, 85, 247, 0.3);
+            border-radius: 25px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(168, 85, 247, 0.5);
+        }
+
+        .back-home:hover {
+            background: rgba(168, 85, 247, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            margin: 5% auto;
+            padding: 30px;
+            border: 2px solid #A855F7;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #A855F7;
+        }
+
+        .close:hover {
+            color: #8B5CF6;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #A855F7;
+        }
+
+        .modal-message {
+            margin-bottom: 20px;
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .plans-container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            .plan-card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .back-home {
+                top: 10px;
+                left: 10px;
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-home">← Voltar ao Início</a>
+    
+    <div class="header">
+        <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="logo">
+        <h1>Planos Premium</h1>
+        <p class="subtitle">Desbloqueie todo o potencial das Loterias Inteligentes</p>
+    </div>
+
+    <div class="plans-container">
+        <div class="plan-card">
+            <h3 class="plan-name">Mensal</h3>
+            <div class="plan-price">R$ 29,90</div>
+            <div class="plan-period">por mês</div>
+            <ul class="plan-features">
+                <li>Acesso a todas as loterias</li>
+                <li>Análises estatísticas avançadas</li>
+                <li>Geração de apostas inteligentes</li>
+                <li>Laboratório de simulações</li>
+                <li>Participação em bolões</li>
+                <li>Suporte prioritário</li>
+            </ul>
+            <button class="btn-select" onclick="selectPlan('monthly')">Escolher Plano</button>
+        </div>
+
+        <div class="plan-card featured">
+            <h3 class="plan-name">Semestral</h3>
+            <div class="plan-price">R$ 149,90</div>
+            <div class="plan-period">por 6 meses</div>
+            <div style="color: #10B981; font-weight: 600; margin-bottom: 20px;">💰 Economia de R$ 29,40</div>
+            <ul class="plan-features">
+                <li>Acesso a todas as loterias</li>
+                <li>Análises estatísticas avançadas</li>
+                <li>Geração de apostas inteligentes</li>
+                <li>Laboratório de simulações</li>
+                <li>Participação em bolões</li>
+                <li>Suporte prioritário</li>
+                <li>Relatórios personalizados</li>
+            </ul>
+            <button class="btn-select" onclick="selectPlan('semestral')">Escolher Plano</button>
+        </div>
+
+        <div class="plan-card">
+            <h3 class="plan-name">Anual</h3>
+            <div class="plan-price">R$ 269,90</div>
+            <div class="plan-period">por ano</div>
+            <div style="color: #10B981; font-weight: 600; margin-bottom: 20px;">💰 Economia de R$ 88,90</div>
+            <ul class="plan-features">
+                <li>Acesso a todas as loterias</li>
+                <li>Análises estatísticas avançadas</li>
+                <li>Geração de apostas inteligentes</li>
+                <li>Laboratório de simulações</li>
+                <li>Participação em bolões</li>
+                <li>Suporte prioritário</li>
+                <li>Relatórios personalizados</li>
+                <li>Consultoria exclusiva</li>
+            </ul>
+            <button class="btn-select" onclick="selectPlan('annual')">Escolher Plano</button>
+        </div>
+
+        <div class="plan-card">
+            <h3 class="plan-name">Vitalício</h3>
+            <div class="plan-price">R$ 997,00</div>
+            <div class="plan-period">pagamento único</div>
+            <div style="color: #10B981; font-weight: 600; margin-bottom: 20px;">🎯 Melhor custo-benefício</div>
+            <ul class="plan-features">
+                <li>Acesso a todas as loterias</li>
+                <li>Análises estatísticas avançadas</li>
+                <li>Geração de apostas inteligentes</li>
+                <li>Laboratório de simulações</li>
+                <li>Participação em bolões</li>
+                <li>Suporte prioritário</li>
+                <li>Relatórios personalizados</li>
+                <li>Consultoria exclusiva</li>
+                <li>Atualizações futuras incluídas</li>
+                <li>Sem renovação</li>
+            </ul>
+            <button class="btn-select" onclick="selectPlan('lifetime')">Escolher Plano</button>
+        </div>
+    </div>
+
+    <div class="guarantee-section">
+        <h2 class="guarantee-title">💯 Garantia de 30 Dias</h2>
+        <p class="guarantee-text">
+            Se você não ficar satisfeito com nossos serviços nos primeiros 30 dias, 
+            devolvemos 100% do seu dinheiro. Sem perguntas, sem complicações. 
+            Queremos que você tenha certeza de que fez a escolha certa.
+        </p>
+    </div>
+
+    <div class="payment-section">
+        <h2 class="payment-title">💳 Formas de Pagamento</h2>
+        <div class="payment-methods">
+            <div class="payment-method">
+                <div class="payment-icon">💳</div>
+                <div class="payment-name">Cartão de Crédito</div>
+            </div>
+            <div class="payment-method">
+                <div class="payment-icon">📱</div>
+                <div class="payment-name">PIX</div>
+            </div>
+            <div class="payment-method">
+                <div class="payment-icon">📄</div>
+                <div class="payment-name">Boleto</div>
+            </div>
+            <div class="payment-method">
+                <div class="payment-icon">🔒</div>
+                <div class="payment-name">PagSeguro</div>
+            </div>
+        </div>
+        <p style="color: #94a3b8; font-size: 0.9rem;">
+            Todos os pagamentos são processados de forma segura e criptografada
+        </p>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3 class="modal-title">Plano Selecionado</h3>
+            <p class="modal-message" id="modalMessage"></p>
+            <button class="btn-select" onclick="confirmUpgrade()">Confirmar Upgrade</button>
+        </div>
+    </div>
+
+    <script>
+        let selectedPlan = null;
+
+        function selectPlan(plan) {
+            selectedPlan = plan;
+            
+            const planNames = {
+                'monthly': 'Mensal - R$ 29,90/mês',
+                'semestral': 'Semestral - R$ 149,90/6 meses',
+                'annual': 'Anual - R$ 269,90/ano',
+                'lifetime': 'Vitalício - R$ 997,00 (pagamento único)'
+            };
+            
+            document.getElementById('modalMessage').textContent = 
+                `Você selecionou o plano ${planNames[plan]}. Deseja confirmar o upgrade?`;
+            
+            document.getElementById('confirmationModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('confirmationModal').style.display = 'none';
+        }
+
+        function confirmUpgrade() {
+            if (!selectedPlan) {
+                alert('Nenhum plano foi selecionado');
+                return;
+            }
+
+            // Verificar se o usuário está logado
+            fetch('/check_access/upgrade_plan')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.has_access) {
+                        // Usuário logado, processar upgrade
+                        processUpgrade(selectedPlan);
+                    } else {
+                        // Usuário não logado, redirecionar para login
+                        if (data.reason === 'not_logged_in') {
+                            window.location.href = '/login';
+                        } else {
+                            alert('Erro de acesso: ' + data.message);
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    alert('Erro ao verificar acesso. Tente novamente.');
+                });
+        }
+
+        function processUpgrade(plan) {
+            fetch('/upgrade_plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ plan: plan })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`✅ ${data.message}\n\nSeu plano foi atualizado com sucesso!`);
+                    closeModal();
+                    // Redirecionar para a página principal
+                    window.location.href = '/';
+                } else {
+                    alert(`❌ Erro: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                alert('Erro ao processar upgrade. Tente novamente.');
+            });
+        }
+
+        // Fechar modal ao clicar fora dele
+        window.onclick = function(event) {
+            const modal = document.getElementById('confirmationModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

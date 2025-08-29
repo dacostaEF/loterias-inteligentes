@@ -47,6 +47,10 @@
   <link rel="preload" href="{{ url_for('static', filename='css/estilo.css') }}" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}"></noscript>
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-login-cadastro.css') }}">
+  
   <style>
     /* Moldura Neon Lilás - Desktop */
     html::before {
@@ -1045,5 +1049,11 @@
       }
     });
   </script>
+  
+  <!-- 🔐 SCRIPT DO MODAL DE ACESSO PREMIUM -->
+  <script src="/static/js/premium_access_modal.js"></script>
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO JAVASCRIPT -->
+  <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
 </body>
 </html>

@@ -73,6 +73,9 @@
   
   <!-- CSS para Desabilitar Zoom/Pan em Gráficos -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/graficos-sem-zoom.css') }}">
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-login-cadastro.css') }}">
 
   <style>
               /* Moldura Neon Verde - Desktop */
@@ -5932,4 +5935,10 @@
       </button>
     </div>
   </div>
+  
+  <!-- 🔐 SCRIPT DO MODAL DE ACESSO PREMIUM -->
+  <script src="/static/js/premium_access_modal.js"></script>
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO JAVASCRIPT -->
+  <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
 </body>

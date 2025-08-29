@@ -6,13 +6,362 @@ import pandas as pd
 import os
 import math
 import numpy as np
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import json
 import logging
+
+# ============================================================================
+# 🔐 SISTEMA DE CONTROLE DE ACESSO E AUTENTICAÇÃO
+# ============================================================================
+
+# Importações para Flask-Login
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 # Configuração do logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# ============================================================================
+# 📊 CLASSES DE USUÁRIO E PERMISSÕES
+# ============================================================================
+
+class UserLevel:
+    """Níveis de usuário disponíveis no sistema."""
+    FREE = "FREE"
+    PREMIUM_MONTHLY = "PREMIUM_MONTHLY"
+    PREMIUM_SEMESTRAL = "PREMIUM_SEMESTRAL"
+    PREMIUM_ANNUAL = "PREMIUM_ANNUAL"
+    LIFETIME = "LIFETIME"
+
+class UserPermissions:
+    """Define quais rotas são freemium vs premium."""
+    
+    # Rotas FREEMIUM (acesso gratuito)
+    FREE_ROUTES = {
+        '/',  # Landing page
+        '/dashboard_milionaria',  # +Milionária
+        '/dashboard_quina',  # Quina
+        '/dashboard_lotomania',  # Lotomania
+        '/login',
+        '/register',
+        '/upgrade_plans'
+    }
+    
+    # Rotas PREMIUM (requer assinatura)
+    PREMIUM_ROUTES = {
+        '/aposta_inteligente_premium',
+        '/aposta_inteligente_premium_MS',
+        '/aposta_inteligente_premium_quina',
+        '/aposta_inteligente_premium_lotofacil',
+        '/lotofacil_laboratorio',
+        '/boloes_loterias',
+        '/boloes',
+        '/dashboard_MS',
+        '/dashboard_megasena',
+        '/dashboard_lotofacil',
+        '/analise_estatistica_avancada_milionaria',
+        '/analise_estatistica_avancada_megasena',
+        '/analise_estatistica_avancada_quina',
+        '/analise_estatistica_avancada_lotofacil',
+        '/analise_estatistica_avancada_milionaria_OutroPgrogarad'
+    }
+    
+    @classmethod
+    def is_free_route(cls, route):
+        """Verifica se uma rota é de acesso gratuito."""
+        return route in cls.FREE_ROUTES
+    
+    @classmethod
+    def is_premium_route(cls, route):
+        """Verifica se uma rota requer assinatura premium."""
+        return route in cls.PREMIUM_ROUTES
+
+class User(UserMixin):
+    """Modelo de usuário com Flask-Login."""
+    
+    def __init__(self, user_id, email, level, subscription_expiry=None):
+        self.id = user_id
+        self.email = email
+        self.level = level
+        self.subscription_expiry = subscription_expiry
+    
+    @property
+    def is_premium(self):
+        """Verifica se o usuário tem acesso premium ativo."""
+        if self.level == UserLevel.LIFETIME:
+            return True
+        if self.subscription_expiry:
+            return datetime.now() < self.subscription_expiry
+        return False
+    
+    @property
+    def subscription_status(self):
+        """Retorna o status da assinatura."""
+        if self.level == UserLevel.FREE:
+            return "Gratuito"
+        elif self.level == UserLevel.LIFETIME:
+            return "Vitalício"
+        elif self.subscription_expiry:
+            if datetime.now() < self.subscription_expiry:
+                dias_restantes = (self.subscription_expiry - datetime.now()).days
+                return f"Ativo ({dias_restantes} dias restantes)"
+            else:
+                return "Expirado"
+        return "Desconhecido"
+
+# ============================================================================
+# 🗄️ BANCO DE DADOS SIMULADO (IN-MEMORY)
+# ============================================================================
+
+# Simulação de banco de dados em memória
+users_db = {}
+user_counter = 1
+
+def create_user(email, password, level=UserLevel.FREE):
+    """Cria um novo usuário no sistema."""
+    global user_counter
+    
+    if email in [user.email for user in users_db.values()]:
+        return None  # Email já existe
+    
+    user_id = user_counter
+    user_counter += 1
+    
+    # Definir data de expiração baseada no nível
+    subscription_expiry = None
+    if level == UserLevel.PREMIUM_MONTHLY:
+        subscription_expiry = datetime.now() + timedelta(days=30)
+    elif level == UserLevel.PREMIUM_SEMESTRAL:
+        subscription_expiry = datetime.now() + timedelta(days=180)
+    elif level == UserLevel.PREMIUM_ANNUAL:
+        subscription_expiry = datetime.now() + timedelta(days=365)
+    
+    user = User(user_id, email, level, subscription_expiry)
+    users_db[user_id] = user
+    
+    # Em produção, aqui você salvaria no banco real
+    logger.info(f"Usuário criado: {email} - Nível: {level}")
+    
+    return user
+
+def get_user_by_id(user_id):
+    """Recupera usuário por ID."""
+    return users_db.get(int(user_id))
+
+def get_user_by_email(email):
+    """Recupera usuário por email."""
+    for user in users_db.values():
+        if user.email == email:
+            return user
+    return None
+
+# ============================================================================
+# 🔒 MIDDLEWARE DE CONTROLE DE ACESSO
+# ============================================================================
+
+def require_free_or_premium(f):
+    """Decorator para controlar acesso baseado no nível do usuário."""
+    from functools import wraps
+    
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        current_route = request.path
+        
+        # Se for rota freemium, sempre permitir
+        if UserPermissions.is_free_route(current_route):
+            return f(*args, **kwargs)
+        
+        # Se for rota premium, verificar se usuário está logado e tem assinatura
+        if UserPermissions.is_premium_route(current_route):
+            # Por enquanto, sempre redirecionar para premium_required
+            # TODO: Implementar verificação de usuário quando o sistema estiver estável
+            return redirect('/premium_required')
+        
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+# ============================================================================
+# 🔧 CONFIGURAÇÃO DO FLASK-LOGIN
+# ============================================================================
+
+def load_user(user_id):
+    """Função para carregar usuário (requerida pelo Flask-Login)."""
+    return get_user_by_id(user_id)
+
+# ============================================================================
+# 🚀 INICIALIZAÇÃO DO FLASK
+# ============================================================================
+
+app = Flask(__name__, static_folder='static')
+app.secret_key = 'sua_chave_secreta_aqui_mude_em_producao'  # IMPORTANTE: Mude em produção!
+
+# ============================================================================
+# 🔧 CONFIGURAÇÃO DO FLASK-LOGIN (APÓS CRIAÇÃO DO APP)
+# ============================================================================
+
+# Configurar Flask-Login APÓS a criação da instância do Flask
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.user_loader(load_user)
+
+# ============================================================================
+# 👥 ROTAS DE AUTENTICAÇÃO
+# ============================================================================
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Página de login."""
+    if request.method == 'POST':
+        data = request.get_json()
+        email = data.get('email')
+        password = data.get('password')
+        
+        # Em produção, você verificaria a senha com hash
+        user = get_user_by_email(email)
+        
+        if user and password:  # Simplificado para demo
+            login_user(user)
+            return jsonify({'success': True, 'redirect': url_for('landing_page')})
+        else:
+            return jsonify({'success': False, 'error': 'Email ou senha inválidos'}), 401
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    """Logout do usuário."""
+    logout_user()
+    return redirect(url_for('landing_page'))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    """Página de cadastro."""
+    if request.method == 'POST':
+        data = request.get_json()
+        name = data.get('name')
+        email = data.get('email')
+        password = data.get('password')
+        
+        if get_user_by_email(email):
+            return jsonify({'success': False, 'error': 'Email já cadastrado'}), 400
+        
+        user = create_user(email, password, UserLevel.FREE)
+        if user:
+            login_user(user)
+            return jsonify({'success': True, 'redirect': url_for('landing_page')})
+        else:
+            return jsonify({'success': False, 'error': 'Erro ao criar usuário'}), 500
+    
+    return render_template('register.html')
+
+@app.route('/upgrade_plans')
+def upgrade_plans():
+    """Página de planos premium."""
+    return render_template('upgrade_plans.html')
+
+@app.route('/premium_required')
+def premium_required():
+    """Página de erro para acesso premium."""
+    return render_template('premium_required.html')
+
+@app.route('/upgrade_plan', methods=['POST'])
+@login_required
+def upgrade_plan():
+    """Processa upgrade de plano."""
+    data = request.get_json()
+    plan = data.get('plan')
+    
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'error': 'Usuário não autenticado'}), 401
+    
+    # Mapear plano para nível
+    plan_mapping = {
+        'monthly': UserLevel.PREMIUM_MONTHLY,
+        'semestral': UserLevel.PREMIUM_SEMESTRAL,
+        'annual': UserLevel.PREMIUM_ANNUAL,
+        'lifetime': UserLevel.LIFETIME
+    }
+    
+    if plan not in plan_mapping:
+        return jsonify({'success': False, 'error': 'Plano inválido'}), 400
+    
+    # Atualizar usuário
+    current_user.level = plan_mapping[plan]
+    
+    # Definir data de expiração
+    if plan == 'monthly':
+        current_user.subscription_expiry = datetime.now() + timedelta(days=30)
+    elif plan == 'semestral':
+        current_user.subscription_expiry = datetime.now() + timedelta(days=180)
+    elif plan == 'annual':
+        current_user.subscription_expiry = datetime.now() + timedelta(days=365)
+    elif plan == 'lifetime':
+        current_user.subscription_expiry = None
+    
+    # Em produção, você salvaria no banco real
+    users_db[current_user.id] = current_user
+    
+    return jsonify({
+        'success': True, 
+        'message': f'Plano atualizado para {plan}',
+        'level': current_user.level,
+        'status': current_user.subscription_status
+    })
+
+@app.route('/check_access/<route_name>')
+def check_access(route_name):
+    """API para verificar acesso a uma rota específica."""
+    if not current_user.is_authenticated:
+        return jsonify({
+            'has_access': False,
+            'reason': 'not_logged_in',
+            'message': 'Usuário não está logado'
+        })
+    
+    # Verificar se é rota premium
+    if UserPermissions.is_premium_route(f'/{route_name}'):
+        if not current_user.is_premium:
+            return jsonify({
+                'has_access': False,
+                'reason': 'premium_required',
+                'message': 'Assinatura premium necessária',
+                'upgrade_url': url_for('upgrade_plans')
+            })
+    
+    return jsonify({
+        'has_access': True,
+        'reason': 'access_granted',
+        'message': 'Acesso permitido'
+    })
+
+@app.route('/test_user/<level>')
+def create_test_user(level):
+    """Cria usuário de teste para desenvolvimento."""
+    if level not in [UserLevel.FREE, UserLevel.PREMIUM_MONTHLY, UserLevel.PREMIUM_SEMESTRAL, UserLevel.PREMIUM_ANNUAL, UserLevel.LIFETIME]:
+        return jsonify({'error': 'Nível inválido'}), 400
+    
+    test_email = f"test_{level.lower()}@example.com"
+    user = create_user(test_email, "test123", level)
+    
+    if user:
+        return jsonify({
+            'success': True,
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'level': user.level,
+                'status': user.subscription_status
+            }
+        })
+    else:
+        return jsonify({'error': 'Erro ao criar usuário de teste'}), 500
+
+# ============================================================================
+# 📊 FUNÇÕES UTILITÁRIAS
+# ============================================================================
 
 # Funções utilitárias movidas para utils/data_helpers.py
 from utils.data_helpers import _to_native, limpar_valores_problematicos
@@ -1568,17 +1917,20 @@ def bolao_interesse():
     return jsonify({"message": "Interesse registrado com sucesso! Entraremos em contato."}), 200
 
 @app.route('/boloes')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
     return render_template('boloes_loterias.html')
 
 # --- Rotas da Mega Sena ---
 @app.route('/dashboard_MS')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def dashboard_megasena():
     """Renderiza a página principal do dashboard da Mega Sena."""
     return render_template('dashboard_megasena.html')
 
 @app.route('/aposta_inteligente_premium_MS')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def aposta_inteligente_premium_megasena():
     """Renderiza a página de Aposta Inteligente Premium da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
@@ -1590,22 +1942,26 @@ def dashboard_quina():
     return render_template('dashboard_quina.html')
 
 @app.route('/aposta_inteligente_premium_quina')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def aposta_inteligente_premium_quina():
     """Renderiza a página de Aposta Inteligente Premium da Quina."""
     return render_template('analise_estatistica_avancada_quina.html')
 
 # --- Rotas da Lotofácil ---
 @app.route('/dashboard_lotofacil')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def dashboard_lotofacil():
     """Renderiza a página principal do dashboard da Lotofácil."""
     return render_template('dashboard_lotofacil.html')
 
 @app.route('/aposta_inteligente_premium_lotofacil')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html')
 
 @app.route('/lotofacil_laboratorio')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
     return render_template('lotofacil_laboratorio.html')
@@ -1618,6 +1974,7 @@ def teste_api():
 # --- Rotas da Milionária ---
 
 @app.route('/aposta_inteligente_premium')
+# @require_free_or_premium  # TEMPORARIAMENTE DESABILITADO PARA TESTE DO MODAL FRONTEND
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
     return render_template('analise_estatistica_avancada_milionaria.html')
@@ -2231,12 +2588,19 @@ def gerar_aposta_premium_milionaria():
 
 
 if __name__ == '__main__':
+    print("🚀 Iniciando Loterias Inteligentes...")
+    print("📱 Servidor rodando em: http://localhost:5000")
+    print("🔐 Sistema de controle de acesso ativo")
+    print("💎 Páginas Freemium: Landing, +Milionária, Quina, Lotomania")
+    print("⭐ Páginas Premium: Todas as outras (requer assinatura)")
+    print("=" * 60)
+    
     # Configurações otimizadas para melhor performance
     port = int(os.environ.get('PORT', 5000))
     app.run(
-        debug=False,  # Desabilita debug para melhor performance
+        debug=True,  # Mantém debug para desenvolvimento
         host='0.0.0.0', 
         port=port,
         threaded=True,  # Habilita threading
-        use_reloader=False  # Desabilita reloader automático
+        use_reloader=True  # Mantém reloader para desenvolvimento
     ) 

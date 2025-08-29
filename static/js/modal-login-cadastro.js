@@ -250,6 +250,50 @@ class ModalLoginCadastro {
         this.modal.classList.remove('show');
         document.body.style.overflow = '';
         this.clearErrors();
+        
+        // 🔒 PROTEÇÃO: Se o usuário fechar sem fazer login, redireciona para landing page
+        // Verifica se estamos em uma página premium e se o usuário não está autenticado
+        if (this.isPremiumPage() && !this.isUserAuthenticated()) {
+            this.redirectToLanding();
+        }
+    }
+    
+    /**
+     * Verifica se a página atual é premium
+     */
+    isPremiumPage() {
+        const premiumRoutes = [
+            '/aposta_inteligente_premium',
+            '/aposta_inteligente_premium_MS',
+            '/aposta_inteligente_premium_quina',
+            '/aposta_inteligente_premium_lotofacil',
+            '/lotofacil_laboratorio',
+            '/boloes',
+            '/dashboard_MS',
+            '/dashboard_lotofacil'
+        ];
+        
+        const currentPath = window.location.pathname;
+        return premiumRoutes.some(route => currentPath.includes(route));
+    }
+    
+    /**
+     * Verifica se o usuário está autenticado
+     * Por enquanto, sempre retorna false (usuário não autenticado)
+     */
+    isUserAuthenticated() {
+        // TODO: Implementar verificação real de autenticação
+        return false;
+    }
+    
+    /**
+     * Redireciona para a landing page
+     */
+    redirectToLanding() {
+        console.log('🔒 Usuário fechou modal sem autenticação. Redirecionando para landing page...');
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 300); // Pequeno delay para suavizar a transição
     }
 
     isOpen() {

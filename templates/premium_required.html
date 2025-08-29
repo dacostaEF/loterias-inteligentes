@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso Premium Necessário - Loterias Inteligentes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .error-container {
+            text-align: center;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid #A855F7;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(168, 85, 247, 0.3);
+        }
+
+        .error-icon {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .error-title {
+            font-size: 2.5rem;
+            color: #A855F7;
+            margin-bottom: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #A855F7, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .error-message {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .premium-features {
+            background: rgba(168, 85, 247, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .premium-features h3 {
+            color: #A855F7;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            color: #cbd5e1;
+            font-size: 1rem;
+        }
+
+        .feature-item::before {
+            content: '✅';
+            margin-right: 10px;
+            color: #10B981;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 180px;
+            justify-content: center;
+        }
+
+        .btn-premium {
+            background: linear-gradient(135deg, #A855F7, #8B5CF6);
+            color: white;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #10B981, #059669);
+            color: white;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-login {
+            background: transparent;
+            color: #A855F7;
+            border: 2px solid #A855F7;
+        }
+
+        .btn-login:hover {
+            background: #A855F7;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .btn-home {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-home:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+
+        .guarantee {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .guarantee p {
+            color: #10B981;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+
+        .back-home {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            .error-title {
+                font-size: 2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .features-list {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-icon">🔒</div>
+        <h1 class="error-title">Acesso Premium Necessário</h1>
+        
+        <p class="error-message">
+            Esta funcionalidade é exclusiva para assinantes premium!<br>
+            Desbloqueie todo o potencial das Loterias Inteligentes.
+        </p>
+
+        <div class="premium-features">
+            <h3>🌟 O que você ganha com o Premium:</h3>
+            <div class="features-list">
+                <div class="feature-item">Apostas Inteligentes com IA</div>
+                <div class="feature-item">Análises Estatísticas Avançadas</div>
+                <div class="feature-item">Laboratório de Simulações</div>
+                <div class="feature-item">Participação em Bolões</div>
+                <div class="feature-item">Dashboard Mega Sena</div>
+                <div class="feature-item">Dashboard Lotofácil</div>
+                <div class="feature-item">Suporte Prioritário</div>
+                <div class="feature-item">Relatórios Personalizados</div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/upgrade_plans" class="btn btn-premium">
+                <span>⭐</span>
+                Ver Planos Premium
+            </a>
+            <a href="/register" class="btn btn-register">
+                <span>📝</span>
+                Criar Conta Grátis
+            </a>
+            <a href="/login" class="btn btn-login">
+                <span>🔑</span>
+                Já Tenho Conta
+            </a>
+        </div>
+
+        <div class="guarantee">
+            <p>💯 Garantia de 30 dias ou seu dinheiro de volta!</p>
+            <p>🔒 Pagamento 100% seguro via PIX, cartão, boleto ou PagSeguro</p>
+        </div>
+
+        <div class="back-home">
+            <a href="/" class="btn btn-home">
+                <span>🏠</span>
+                Voltar ao Início
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Redirecionar automaticamente para a landing page após 10 segundos
+        setTimeout(() => {
+            window.location.href = '/';
+        }, 10000);
+
+        // Contador regressivo
+        let countdown = 10;
+        const countdownElement = document.createElement('div');
+        countdownElement.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(168, 85, 247, 0.9);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            z-index: 1000;
+        `;
+        document.body.appendChild(countdownElement);
+
+        const timer = setInterval(() => {
+            countdown--;
+            countdownElement.textContent = `Redirecionando em ${countdown}s...`;
+            
+            if (countdown <= 0) {
+                clearInterval(timer);
+                countdownElement.remove();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
+

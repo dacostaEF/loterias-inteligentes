@@ -73,6 +73,9 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/estilo.css') }}">
   <!-- CSS para Corrigir Submenus Mobile -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-dropdown-fix.css') }}">
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-login-cadastro.css') }}">
 
   <style>
     /* Variáveis CSS */
@@ -1449,6 +1452,12 @@
       }
     });
   </script>
+  
+  <!-- 🔐 SCRIPT DO MODAL DE ACESSO PREMIUM -->
+  <script src="/static/js/premium_access_modal.js"></script>
+  
+  <!-- 🔐 MODAL LOGIN/CADASTRO JAVASCRIPT -->
+  <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
 </body>
 </html>
 
