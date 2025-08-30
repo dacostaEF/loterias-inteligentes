@@ -315,7 +315,17 @@
 
         // 🆓 FUNÇÃO PARA EXPERIMENTAR FREEMIUM
         function experimentarFreemium() {
-            window.location.href = '/';
+            // Fecha o modal de boas-vindas (se estiver dentro de um iframe)
+            if (window.parent && window.parent !== window) {
+                // Está dentro de um iframe - fecha o modal pai
+                const modal = window.parent.document.getElementById('welcomePlansModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            } else {
+                // Está na página direta - vai para home
+                window.location.href = '/';
+            }
         }
 
         // 🔗 ADICIONAR EVENTOS AOS BOTÕES
