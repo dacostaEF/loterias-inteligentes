@@ -2715,10 +2715,176 @@ def gerar_aposta_premium_milionaria():
         }), 500
 
 
+# ============================================================================
+# 🔗 GOOGLE OAUTH - LOGIN SOCIAL
+# ============================================================================
+
+import requests
+import urllib.parse
+from config.google_oauth import GOOGLE_OAUTH_CONFIG, GOOGLE_AUTH_URL, GOOGLE_TOKEN_URL, GOOGLE_USERINFO_URL
+
+@app.route('/auth/google')
+def google_login():
+    """Inicia o processo de login com Google."""
+    try:
+        # Parâmetros para autorização OAuth
+        params = {
+            'client_id': GOOGLE_OAUTH_CONFIG['client_id'],
+            'redirect_uri': GOOGLE_OAUTH_CONFIG['redirect_uri'],
+            'scope': ' '.join(GOOGLE_OAUTH_CONFIG['scope']),
+            'response_type': 'code',
+            'access_type': 'offline',
+            'prompt': 'consent'
+        }
+        
+        # Construir URL de autorização
+        auth_url = f"{GOOGLE_AUTH_URL}?{urllib.parse.urlencode(params)}"
+        
+        logger.info(f"Redirecionando para Google OAuth: {auth_url}")
+        return redirect(auth_url)
+        
+    except Exception as e:
+        logger.error(f"Erro ao iniciar login Google: {e}")
+        return redirect('/login?error=google_oauth_error')
+
+@app.route('/auth/google/callback')
+def google_callback():
+    """Callback do Google OAuth após autorização."""
+    try:
+        # Obter código de autorização
+        code = request.args.get('code')
+        if not code:
+            logger.error("Código de autorização não recebido")
+            return redirect('/login?error=no_auth_code')
+        
+        # Trocar código por token de acesso
+        token_data = {
+            'client_id': GOOGLE_OAUTH_CONFIG['client_id'],
+            'client_secret': GOOGLE_OAUTH_CONFIG['client_secret'],
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': GOOGLE_OAUTH_CONFIG['redirect_uri']
+        }
+        
+        token_response = requests.post(GOOGLE_TOKEN_URL, data=token_data)
+        token_response.raise_for_status()
+        
+        access_token = token_response.json().get('access_token')
+        if not access_token:
+            logger.error("Token de acesso não recebido")
+            return redirect('/login?error=no_access_token')
+        
+        # Obter informações do usuário
+        headers = {'Authorization': f'Bearer {access_token}'}
+        userinfo_response = requests.get(GOOGLE_USERINFO_URL, headers=headers)
+        userinfo_response.raise_for_status()
+        
+        user_data = userinfo_response.json()
+        google_id = user_data.get('id')
+        email = user_data.get('email')
+        nome_completo = user_data.get('name')
+        foto_url = user_data.get('picture')
+        
+        if not email:
+            logger.error("Email não recebido do Google")
+            return redirect('/login?error=no_email')
+        
+        logger.info(f"Usuário Google autenticado: {email}")
+        
+        # Verificar se usuário já existe no banco
+        conn = get_db_connection()
+        if not conn:
+            return redirect('/login?error=db_connection_error')
+        
+        cursor = conn.cursor()
+        
+        # Buscar usuário por email
+        cursor.execute("SELECT id, nome_completo, status FROM usuarios WHERE email = ?", (email,))
+        existing_user = cursor.fetchone()
+        
+        if existing_user:
+            # Usuário já existe - fazer login
+            user_id = existing_user[0]
+            logger.info(f"Usuário existente fazendo login: {email}")
+            
+            # Atualizar informações se necessário
+            if existing_user[1] != nome_completo:
+                cursor.execute("UPDATE usuarios SET nome_completo = ? WHERE id = ?", (nome_completo, user_id))
+                conn.commit()
+            
+            # Buscar plano atual
+            cursor.execute("""
+                SELECT p.nome FROM planos p
+                JOIN assinaturas a ON p.id = a.plano_id
+                WHERE a.usuario_id = ? AND a.status = 'ativa'
+                ORDER BY a.data_inicio DESC LIMIT 1
+            """, (user_id,))
+            
+            plano_result = cursor.fetchone()
+            plano_nome = plano_result[0] if plano_result else 'Free'
+            
+            # Mapear plano para UserLevel
+            level_mapping = {
+                'Free': UserLevel.FREE,
+                'Diário': UserLevel.PREMIUM_DAILY,
+                'Mensal': UserLevel.PREMIUM_MONTHLY,
+                'Semestral': UserLevel.PREMIUM_SEMESTRAL,
+                'Anual': UserLevel.PREMIUM_ANNUAL,
+                'Vitalício': UserLevel.LIFETIME
+            }
+            
+            user_level = level_mapping.get(plano_nome, UserLevel.FREE)
+            
+        else:
+            # Usuário novo - criar no banco
+            logger.info(f"Criando novo usuário Google: {email}")
+            
+            # Inserir usuário
+            cursor.execute("""
+                INSERT INTO usuarios (nome_completo, email, status, receber_emails, receber_sms, aceitou_termos)
+                VALUES (?, ?, 'ativo', 1, 1, 1)
+            """, (nome_completo, email))
+            
+            user_id = cursor.lastrowid
+            
+            # Criar assinatura FREE por padrão
+            cursor.execute("SELECT id FROM planos WHERE nome = 'Free'")
+            plano_free = cursor.fetchone()
+            if plano_free:
+                cursor.execute("""
+                    INSERT INTO assinaturas (usuario_id, plano_id, status, data_inicio)
+                    VALUES (?, ?, 'ativa', CURRENT_TIMESTAMP)
+                """, (user_id, plano_free[0]))
+            
+            user_level = UserLevel.FREE
+            
+            conn.commit()
+            logger.info(f"Novo usuário Google criado: {email} - ID: {user_id}")
+        
+        conn.close()
+        
+        # Criar objeto User e fazer login
+        user = User(user_id, email, user_level)
+        login_user(user)
+        
+        logger.info(f"Login Google bem-sucedido: {email}")
+        
+        # Redirecionar para página inicial
+        return redirect('/?login_success=google')
+        
+    except Exception as e:
+        logger.error(f"Erro no callback Google OAuth: {e}")
+        return redirect('/login?error=google_oauth_error')
+
+# ============================================================================
+# 🚀 INICIALIZAÇÃO DO APLICATIVO
+# ============================================================================
+
 if __name__ == '__main__':
     print("🚀 Iniciando Loterias Inteligentes...")
     print("📱 Servidor rodando em: http://localhost:5000")
     print("🔐 Sistema de controle de acesso ativo")
+    print("🔗 Google OAuth configurado")
     print("💎 Páginas Freemium: Landing, +Milionária, Quina, Lotomania")
     print("⭐ Páginas Premium: Todas as outras (requer assinatura)")
     print("=" * 60)

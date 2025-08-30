@@ -461,15 +461,27 @@ class ModalLoginCadastro {
     }
 
     handleGoogleLogin() {
-        // Implementar login com Google
-        console.log('Login com Google');
-        alert('Funcionalidade de login com Google será implementada em breve!');
+        // 🔗 Redirecionar para Google OAuth
+        console.log('🔗 Iniciando login com Google...');
+        try {
+            // Redirecionar para rota de autenticação Google
+            window.location.href = '/auth/google';
+        } catch (error) {
+            console.error('❌ Erro ao iniciar login Google:', error);
+            alert('Erro ao conectar com Google. Tente novamente.');
+        }
     }
 
     handleGoogleCadastro() {
-        // Implementar cadastro com Google
-        console.log('Cadastro com Google');
-        alert('Funcionalidade de cadastro com Google será implementada em breve!');
+        // 🔗 Redirecionar para Google OAuth (mesmo processo para login e cadastro)
+        console.log('🔗 Iniciando cadastro com Google...');
+        try {
+            // Redirecionar para rota de autenticação Google
+            window.location.href = '/auth/google';
+        } catch (error) {
+            console.error('❌ Erro ao iniciar cadastro Google:', error);
+            alert('Erro ao conectar com Google. Tente novamente.');
+        }
     }
 
     handleEsqueceuSenha() {
