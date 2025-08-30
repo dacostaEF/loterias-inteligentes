@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 class UserLevel:
     """Níveis de usuário disponíveis no sistema."""
     FREE = "FREE"
+    PREMIUM_DAILY = "PREMIUM_DAILY"
     PREMIUM_MONTHLY = "PREMIUM_MONTHLY"
     PREMIUM_SEMESTRAL = "PREMIUM_SEMESTRAL"
     PREMIUM_ANNUAL = "PREMIUM_ANNUAL"
@@ -404,6 +405,7 @@ def upgrade_plan():
     
     # Mapear plano para nível
     plan_mapping = {
+        'daily': UserLevel.PREMIUM_DAILY,  # Novo plano diário
         'monthly': UserLevel.PREMIUM_MONTHLY,
         'semestral': UserLevel.PREMIUM_SEMESTRAL,
         'annual': UserLevel.PREMIUM_ANNUAL,
@@ -417,7 +419,9 @@ def upgrade_plan():
     current_user.level = plan_mapping[plan]
     
     # Definir data de expiração
-    if plan == 'monthly':
+    if plan == 'daily':
+        current_user.subscription_expiry = datetime.now() + timedelta(days=1)
+    elif plan == 'monthly':
         current_user.subscription_expiry = datetime.now() + timedelta(days=30)
     elif plan == 'semestral':
         current_user.subscription_expiry = datetime.now() + timedelta(days=180)
@@ -465,7 +469,7 @@ def check_access(route_name):
 @app.route('/test_user/<level>')
 def create_test_user(level):
     """Cria usuário de teste para desenvolvimento."""
-    if level not in [UserLevel.FREE, UserLevel.PREMIUM_MONTHLY, UserLevel.PREMIUM_SEMESTRAL, UserLevel.PREMIUM_ANNUAL, UserLevel.LIFETIME]:
+    if level not in [UserLevel.FREE, UserLevel.PREMIUM_DAILY, UserLevel.PREMIUM_MONTHLY, UserLevel.PREMIUM_SEMESTRAL, UserLevel.PREMIUM_ANNUAL, UserLevel.LIFETIME]:
         return jsonify({'error': 'Nível inválido'}), 400
     
     test_email = f"test_{level.lower()}@example.com"

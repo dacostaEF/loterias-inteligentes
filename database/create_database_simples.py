@@ -107,6 +107,7 @@ def insert_planos(conn):
             
             planos = [
                 ("Free", 0.00, 99999, "Acesso básico: +Milionária, Quina, Lotomania"),
+                ("Diário", 5.00, 1, "Acesso completo por 1 dia - Ideal para testar"),
                 ("Mensal", 19.90, 30, "Acesso completo por 1 mês"),
                 ("Semestral", 99.90, 180, "Acesso completo por 6 meses"),
                 ("Anual", 179.90, 365, "Acesso completo por 1 ano"),

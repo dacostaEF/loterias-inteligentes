@@ -48,3 +48,4 @@ if __name__ == '__main__':
         print(f"📁 Banco localizado em: {DATABASE_PATH}")
     else:
         print("❌ Erro na conexão com banco")
+
