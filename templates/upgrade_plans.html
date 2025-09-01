@@ -49,7 +49,36 @@
         .plans-grid {
             display: grid;
             gap: 1.5rem;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* Responsividade para mobile */
+        @media (max-width: 768px) {
+            .plans-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 1rem;
+                margin: 1rem;
+            }
+            
+            .plan-card {
+                padding: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .plan-title {
+                font-size: 1.3rem;
+            }
+            
+            .plan-price {
+                font-size: 2rem;
+            }
         }
 
         .plan-card {
@@ -164,30 +193,34 @@
                         Análises básicas
                     </li>
                 </ul>
-                <a href="#" class="cta-button bg-green-600 hover:bg-green-700">Continuar Grátis</a>
+                                 <div class="space-y-2">
+                     <a href="/dashboard_milionaria" class="cta-button bg-green-600 hover:bg-green-700">Acessar +Milionária</a>
+                     <a href="/dashboard_quina" class="cta-button bg-blue-600 hover:bg-blue-700">Acessar Quina</a>
+                     <a href="/dashboard_lotomania" class="cta-button bg-purple-600 hover:bg-purple-700">Acessar Lotomania</a>
+                 </div>
             </div>
 
-            <!-- Plano Diário -->
-            <div class="plan-card">
-                <div class="plan-title">Plano Diário</div>
-                <div class="plan-price">R$ 5,00</div>
-                <div class="plan-price-details">/dia</div>
-                <ul class="plan-features">
-                    <li>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        Acesso a todas as loterias
-                    </li>
-                    <li>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                        </svg>
-                        Funcionalidades premium
-                    </li>
-                </ul>
-                <a href="#" class="cta-button">Escolher Plano</a>
-            </div>
+                         <!-- Plano Diário -->
+             <div class="plan-card">
+                 <div class="plan-title">Plano Diário</div>
+                 <div class="plan-price">R$ 5,00</div>
+                 <div class="plan-price-details">/dia</div>
+                 <ul class="plan-features">
+                     <li>
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                         </svg>
+                         Acesso a todas as loterias
+                     </li>
+                     <li>
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                         </svg>
+                         Funcionalidades premium
+                     </li>
+                 </ul>
+                 <a href="#" class="cta-button" onclick="selectPlan('daily')">Escolher Plano</a>
+             </div>
 
             <!-- Plano Mensal -->
             <div class="plan-card">
@@ -208,10 +241,10 @@
                         Funcionalidades premium
                     </li>
                 </ul>
-                <a href="#" class="cta-button">Escolher Plano</a>
-            </div>
-            
-            <!-- Plano Semestral -->
+                                 <a href="#" class="cta-button" onclick="selectPlan('monthly')">Escolher Plano</a>
+             </div>
+             
+             <!-- Plano Semestral -->
             <div class="plan-card">
                 <div class="plan-title">Plano Semestral</div>
                 <div class="plan-price">R$ 149,90</div>
@@ -236,10 +269,10 @@
                         Economia de R$ 29,40
                     </li>
                 </ul>
-                <a href="#" class="cta-button">Escolher Plano</a>
-            </div>
-
-            <!-- Plano Anual (Destaque) -->
+                                 <a href="#" class="cta-button" onclick="selectPlan('semestral')">Escolher Plano</a>
+             </div>
+             
+             <!-- Plano Anual (Destaque) -->
             <div class="plan-card highlight">
                 <div class="plan-title">Plano Anual</div>
                 <div class="plan-price">R$ 269,90</div>
@@ -264,7 +297,7 @@
                         Economia de R$ 88,90
                     </li>
                 </ul>
-                <a href="#" class="cta-button bg-yellow-500 hover:bg-yellow-600 text-purple-900">Escolher Plano</a>
+                                 <a href="#" class="cta-button bg-yellow-500 hover:bg-yellow-600 text-purple-900" onclick="selectPlan('annual')">Escolher Plano</a>
             </div>
 
             <!-- Plano Vitalício -->
@@ -292,16 +325,17 @@
                         Prioridade em bolões especiais
                     </li>
                 </ul>
-                <a href="#" class="cta-button">Escolher Plano</a>
-            </div>
-        </div>
+                                 <a href="#" class="cta-button" onclick="selectPlan('lifetime')">Escolher Plano</a>
+             </div>
+         </div>
     </div>
 
     <script>
         // 🎯 FUNÇÕES PARA OS PLANOS
         function selectPlan(plan) {
+            console.log('🎯 selectPlan chamado com:', plan);
+            
             const planNames = {
-                'free': 'Plano FREE - Grátis',
                 'daily': 'Plano Diário - R$ 5,00/dia',
                 'monthly': 'Plano Mensal - R$ 29,90/mês',
                 'semestral': 'Plano Semestral - R$ 149,90/6 meses',
@@ -310,40 +344,31 @@
             };
             
             const planName = planNames[plan] || 'Plano selecionado';
-            alert(`Plano selecionado: ${planName}\n\nEm breve implementaremos o sistema de pagamento!`);
+            console.log('📝 Nome do plano:', planName);
+            
+            // Redirecionar para página de cadastro com o plano selecionado
+            const planData = encodeURIComponent(JSON.stringify({
+                plan: plan,
+                planName: planName
+            }));
+            
+            console.log('🚀 Redirecionando para:', `/cadastro_completo?plan=${planData}`);
+            window.location.href = `/cadastro_completo?plan=${planData}`;
         }
 
-        // 🆓 FUNÇÃO PARA EXPERIMENTAR FREEMIUM
-        function experimentarFreemium() {
-            // Fecha o modal de boas-vindas (se estiver dentro de um iframe)
-            if (window.parent && window.parent !== window) {
-                // Está dentro de um iframe - fecha o modal pai
-                const modal = window.parent.document.getElementById('welcomePlansModal');
-                if (modal) {
-                    modal.style.display = 'none';
-                }
-            } else {
-                // Está na página direta - vai para home
-                window.location.href = '/';
-            }
-        }
+        // 🆓 FUNÇÃO PARA EXPERIMENTAR FREEMIUM (REMOVIDA - não é mais necessária)
 
         // 🔗 ADICIONAR EVENTOS AOS BOTÕES
         document.addEventListener('DOMContentLoaded', () => {
-            // Botão FREE
-            const btnFree = document.querySelector('.freemium-highlight .cta-button');
-            if (btnFree) {
-                btnFree.onclick = () => experimentarFreemium();
-            }
-
-            // Botões dos outros planos
-            const planCards = document.querySelectorAll('.plan-card:not(.freemium-highlight)');
-            planCards.forEach((card, index) => {
-                const btn = card.querySelector('.cta-button');
-                if (btn) {
-                    const plans = ['daily', 'monthly', 'semestral', 'annual', 'lifetime'];
-                    btn.onclick = () => selectPlan(plans[index]);
-                }
+            console.log('📄 DOM carregado em upgrade_plans.html');
+            
+            // Botão Experimentar do Freemium (REMOVIDO - não é mais necessário)
+            
+            // Verificar se há scripts conflitantes
+            const scripts = document.querySelectorAll('script');
+            console.log('📜 Scripts carregados:', scripts.length);
+            scripts.forEach((script, index) => {
+                console.log(`📜 Script ${index}:`, script.src || 'inline');
             });
         });
     </script>

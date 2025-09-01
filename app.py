@@ -11,8 +11,8 @@ import json
 import logging
 
 # ============================================================================
-# 🔐 SISTEMA DE CONTROLE DE ACESSO E AUTENTICAÇÃO
-# ============================================================================
+# 🔐 SISTEMA SIMPLES DE AUTENTICAÇÃO
+# ===========================================================================
 
 # Importações para Flask-Login
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
@@ -117,55 +117,13 @@ class User(UserMixin):
 # Importar configuração do banco
 import sys
 sys.path.append('database')
-from db_config import get_db_connection
+from database.db_config import get_db_connection, create_user_simple
 import bcrypt
+import random
+import string
+from datetime import datetime, timedelta
 
-def create_user(nome_completo, email, senha, telefone=None, data_nascimento=None, cpf=None, receber_emails=True, receber_sms=True, aceitou_termos=False):
-    """Cria um novo usuário no banco SQLite."""
-    try:
-        conn = get_db_connection()
-        if not conn:
-            return None
-        
-        cursor = conn.cursor()
-        
-        # Verificar se email já existe
-        cursor.execute("SELECT id FROM usuarios WHERE email = ?", (email,))
-        if cursor.fetchone():
-            conn.close()
-            return None  # Email já existe
-        
-        # Criptografar senha
-        senha_hash = bcrypt.hashpw(senha.encode('utf-8'), bcrypt.gensalt())
-        
-        # Inserir usuário
-        cursor.execute("""
-            INSERT INTO usuarios (nome_completo, email, senha_hash, telefone_celular, data_nascimento, cpf, receber_emails, receber_sms, aceitou_termos)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (nome_completo, email, senha_hash.decode('utf-8'), telefone, data_nascimento, cpf, receber_emails, receber_sms, aceitou_termos))
-        
-        user_id = cursor.lastrowid
-        
-        # Criar assinatura FREE por padrão
-        cursor.execute("SELECT id FROM planos WHERE nome = 'Free'")
-        plano_free = cursor.fetchone()
-        if plano_free:
-            cursor.execute("""
-                INSERT INTO assinaturas (usuario_id, plano_id, status, data_inicio)
-                VALUES (?, ?, 'ativa', CURRENT_TIMESTAMP)
-            """, (user_id, plano_free[0]))
-        
-        conn.commit()
-        conn.close()
-        
-        logger.info(f"Usuário criado: {email} - ID: {user_id}")
-        
-        # Retornar objeto User
-        return User(user_id, email, UserLevel.FREE)
-        
-    except Exception as e:
-        logger.error(f"Erro ao criar usuário: {e}")
-        return None
+# Função create_user movida para db_config.py
 
 def get_user_by_id(user_id):
     """Recupera usuário por ID do banco SQLite."""
@@ -259,6 +217,138 @@ def verify_password(user, password):
         logger.error(f"Erro ao verificar senha: {e}")
         return False
 
+# ============================================================================
+# ✅ FUNÇÕES DE VALIDAÇÃO POR CÓDIGO
+# ============================================================================
+
+def gerar_codigo_validacao():
+    """Gera um código de 6 dígitos aleatório."""
+    return ''.join(random.choices(string.digits, k=6))
+
+def criar_codigo_validacao(usuario_id, tipo):
+    """Cria um código de validação para o usuário."""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return None
+        
+        cursor = conn.cursor()
+        
+        # Limpar códigos anteriores do usuário
+        cursor.execute("DELETE FROM codigos_validacao WHERE usuario_id = ? AND tipo = ?", (usuario_id, tipo))
+        
+        # Gerar novo código
+        codigo = gerar_codigo_validacao()
+        data_expiracao = datetime.now() + timedelta(minutes=15)  # 15 minutos para expirar
+        
+        # Inserir código
+        cursor.execute("""
+            INSERT INTO codigos_validacao (usuario_id, codigo, tipo, data_expiracao)
+            VALUES (?, ?, ?, ?)
+        """, (usuario_id, codigo, tipo, data_expiracao))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Código de validação criado: {codigo} para usuário {usuario_id}")
+        return codigo
+        
+    except Exception as e:
+        logger.error(f"Erro ao criar código de validação: {e}")
+        if conn:
+            conn.close()
+        return None
+
+def validar_codigo(usuario_id, codigo, tipo):
+    """Valida o código de verificação do usuário."""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return False
+        
+        cursor = conn.cursor()
+        
+        # Buscar código válido
+        cursor.execute("""
+            SELECT id, status, tentativas, data_expiracao 
+            FROM codigos_validacao 
+            WHERE usuario_id = ? AND codigo = ? AND tipo = ? AND status = 'pendente'
+        """, (usuario_id, codigo, tipo))
+        
+        codigo_data = cursor.fetchone()
+        if not codigo_data:
+            return False
+        
+        codigo_id, status, tentativas, data_expiracao = codigo_data
+        
+        # Verificar se expirou
+        if datetime.now() > datetime.fromisoformat(data_expiracao):
+            cursor.execute("UPDATE codigos_validacao SET status = 'expirado' WHERE id = ?", (codigo_id,))
+            conn.commit()
+            conn.close()
+            return False
+        
+        # Verificar tentativas (máximo 3)
+        if tentativas >= 3:
+            cursor.execute("UPDATE codigos_validacao SET status = 'expirado' WHERE id = ?", (codigo_id,))
+            conn.commit()
+            conn.close()
+            return False
+        
+        # Marcar como validado
+        cursor.execute("UPDATE codigos_validacao SET status = 'validado' WHERE id = ?", (codigo_id,))
+        
+        # Atualizar status do usuário
+        cursor.execute("UPDATE usuarios SET status = 'ativo' WHERE id = ?", (usuario_id,))
+        
+        # Marcar email/telefone como verificado
+        if tipo == 'email':
+            cursor.execute("""
+                INSERT OR REPLACE INTO emails_usuarios (usuario_id, email, verificado, data_verificacao)
+                SELECT id, email, 1, CURRENT_TIMESTAMP FROM usuarios WHERE id = ?
+            """, (usuario_id,))
+        elif tipo == 'sms':
+            cursor.execute("""
+                INSERT OR REPLACE INTO telefones_usuarios (usuario_id, telefone, verificado, data_verificacao)
+                SELECT id, telefone, 1, CURRENT_TIMESTAMP FROM usuarios WHERE id = ?
+            """, (usuario_id,))
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Código validado com sucesso para usuário {usuario_id}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Erro ao validar código: {e}")
+        if conn:
+            conn.close()
+        return False
+
+def incrementar_tentativas_codigo(usuario_id, codigo, tipo):
+    """Incrementa o contador de tentativas de um código."""
+    try:
+        conn = get_db_connection()
+        if not conn:
+            return False
+        
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE codigos_validacao 
+            SET tentativas = tentativas + 1 
+            WHERE usuario_id = ? AND codigo = ? AND tipo = ?
+        """, (usuario_id, codigo, tipo))
+        
+        conn.commit()
+        conn.close()
+        return True
+        
+    except Exception as e:
+        logger.error(f"Erro ao incrementar tentativas: {e}")
+        if conn:
+            conn.close()
+        return False
+
 
 
 # ============================================================================
@@ -283,8 +373,16 @@ app.secret_key = 'sua_chave_secreta_aqui_mude_em_producao'  # IMPORTANTE: Mude e
 # Configurar Flask-Login APÓS a criação da instância do Flask
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+# Removido login_view para não redirecionar automaticamente
+# login_manager.login_view = 'login'
 login_manager.user_loader(load_user)
+
+# Handler para requisições não autorizadas
+@login_manager.unauthorized_handler
+def handle_unauthorized():
+    """Handler customizado para usuários não autorizados."""
+    # Não redireciona automaticamente - retorna erro 401
+    return jsonify({'error': 'Acesso não autorizado'}), 401
 
 # ============================================================================
 # 🔒 MIDDLEWARE DE CONTROLE DE ACESSO (APÓS CONFIGURAÇÃO DO FLASK-LOGIN)
@@ -436,9 +534,224 @@ def upgrade_plan():
     return jsonify({
         'success': True, 
         'message': f'Plano atualizado para {plan}',
-        'level': current_user.level,
         'status': current_user.subscription_status
     })
+
+# ============================================================================
+# ✅ ROTAS DE VALIDAÇÃO POR CÓDIGO
+# ============================================================================
+
+@app.route('/enviar_codigo_validacao', methods=['POST'])
+def enviar_codigo_validacao():
+    """Envia código de validação por email ou SMS."""
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        tipo = data.get('tipo')  # 'email' ou 'sms'
+        
+        if not email or tipo not in ['email', 'sms']:
+            return jsonify({'success': False, 'error': 'Dados inválidos'}), 400
+        
+        # Buscar usuário
+        user = get_user_by_email(email)
+        if not user:
+            return jsonify({'success': False, 'error': 'Usuário não encontrado'}), 404
+        
+        # Criar código de validação
+        codigo = criar_codigo_validacao(user.id, tipo)
+        if not codigo:
+            return jsonify({'success': False, 'error': 'Erro ao gerar código'}), 500
+        
+        # TODO: Em produção, enviar código por email/SMS
+        # Por enquanto, apenas retornar o código para teste
+        if tipo == 'email':
+            mensagem = f"Código de validação enviado para {email}: {codigo}"
+        else:
+            mensagem = f"Código de validação enviado por SMS: {codigo}"
+        
+        logger.info(f"Código de validação criado: {codigo} para {email}")
+        
+        return jsonify({
+            'success': True,
+            'message': mensagem,
+            'codigo': codigo,  # Remover em produção!
+            'tipo': tipo
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro ao enviar código: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno'}), 500
+
+@app.route('/validar_codigo', methods=['POST'])
+def validar_codigo_rota():
+    """Valida o código de verificação do usuário."""
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        codigo = data.get('codigo')
+        tipo = data.get('tipo')
+        
+        if not all([email, codigo, tipo]):
+            return jsonify({'success': False, 'error': 'Dados incompletos'}), 400
+        
+        # Buscar usuário
+        user = get_user_by_email(email)
+        if not user:
+            return jsonify({'success': False, 'error': 'Usuário não encontrado'}), 404
+        
+        # Validar código
+        if validar_codigo(user.id, codigo, tipo):
+            # Ativar assinatura FREE
+            try:
+                conn = get_db_connection()
+                if conn:
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        UPDATE assinaturas 
+                        SET status = 'ativa' 
+                        WHERE usuario_id = ? AND status = 'pendente'
+                    """, (user.id,))
+                    conn.commit()
+                    conn.close()
+            except Exception as e:
+                logger.error(f"Erro ao ativar assinatura: {e}")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Cadastro validado com sucesso! Acesso liberado.',
+                'redirect': '/'
+            })
+        else:
+            # Incrementar tentativas
+            incrementar_tentativas_codigo(user.id, codigo, tipo)
+            return jsonify({'success': False, 'error': 'Código inválido ou expirado'}), 400
+        
+    except Exception as e:
+        logger.error(f"Erro ao validar código: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno'}), 500
+
+
+
+@app.route('/salvar_cadastro', methods=['POST'])
+def salvar_cadastro():
+    """Salva o cadastro do usuário no banco SIMPLES."""
+    try:
+        print("🔍 ROTA /salvar_cadastro CHAMADA!")
+        data = request.get_json()
+        print(f"📊 Dados recebidos: {data}")
+        
+        # Extrair dados do formulário
+        nome_completo = data.get('nome_completo')
+        data_nascimento = data.get('data_nascimento')
+        cpf = data.get('cpf')
+        telefone = data.get('telefone')
+        email = data.get('email')
+        senha = data.get('senha')
+        receber_emails = data.get('receber_emails', True)
+        receber_sms = data.get('receber_sms', True)
+        aceitou_termos = data.get('aceitou_termos', True)
+        plano = data.get('plano', 'Free')
+        
+        print(f"📝 Dados extraídos: nome={nome_completo}, email={email}, senha={'*' * len(senha) if senha else 'None'}")
+        
+        # Validar dados obrigatórios
+        if not all([nome_completo, email, senha]):
+            print("❌ Dados obrigatórios não preenchidos")
+            return jsonify({'success': False, 'error': 'Dados obrigatórios não preenchidos'}), 400
+        
+        print("✅ Dados válidos, criando usuário...")
+        
+        # Criar usuário no banco SIMPLES com TODOS os campos
+        user_id = create_user_simple(
+            nome_completo, email, senha, data_nascimento, cpf, telefone,
+            receber_emails, receber_sms, aceitou_termos, plano
+        )
+        
+        print(f"🎯 Resultado create_user_simple: {user_id}")
+        
+        if user_id:
+            print(f"✅ Usuário criado com sucesso: {email} (ID: {user_id})")
+            return jsonify({
+                'success': True,
+                'message': 'Cadastro salvo com sucesso!',
+                'user_id': user_id,
+                'email': email
+            })
+        else:
+            print("❌ Erro ao criar usuário")
+            return jsonify({'success': False, 'error': 'Erro ao criar usuário'}), 500
+        
+    except Exception as e:
+        print(f"💥 ERRO na rota /salvar_cadastro: {e}")
+        logger.error(f"Erro ao salvar cadastro: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+@app.route('/enviar_codigo_confirmacao', methods=['POST'])
+def enviar_codigo_confirmacao():
+    """Envia código de confirmação por email ou SMS."""
+    try:
+        data = request.get_json()
+        usuario_id = data.get('usuario_id')
+        tipo = data.get('tipo')  # 'email' ou 'sms'
+        destinatario = data.get('destinatario')
+        
+        print(f"🔐 Enviando código de confirmação: usuário={usuario_id}, tipo={tipo}, destinatario={destinatario}")
+        
+        # Gerar código
+        from database.db_config import gerar_codigo_confirmacao
+        codigo = gerar_codigo_confirmacao(usuario_id, tipo)
+        
+        if not codigo:
+            return jsonify({'success': False, 'error': 'Erro ao gerar código'}), 500
+        
+        # Enviar código (simulado por enquanto)
+        if tipo == 'email':
+            print(f"📧 Código enviado por EMAIL para {destinatario}: {codigo}")
+            # TODO: Implementar envio real por email
+        else:
+            print(f"📱 Código enviado por SMS para {destinatario}: {codigo}")
+            # TODO: Implementar envio real por SMS
+        
+        return jsonify({
+            'success': True,
+            'message': f'Código enviado com sucesso por {tipo}',
+            'codigo': codigo  # Para testes - remover em produção
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao enviar código: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+@app.route('/validar_codigo_confirmacao', methods=['POST'])
+def validar_codigo_confirmacao():
+    """Valida código de confirmação."""
+    try:
+        data = request.get_json()
+        usuario_id = data.get('usuario_id')
+        codigo = data.get('codigo')
+        
+        print(f"🔍 Validando código: usuário={usuario_id}, código={codigo}")
+        
+        # Validar código
+        from database.db_config import validar_codigo_confirmacao
+        valido = validar_codigo_confirmacao(usuario_id, codigo)
+        
+        if valido:
+            print(f"✅ Código validado com sucesso para usuário {usuario_id}")
+            return jsonify({
+                'success': True,
+                'message': 'Código validado com sucesso!'
+            })
+        else:
+            print(f"❌ Código inválido para usuário {usuario_id}")
+            return jsonify({
+                'success': False,
+                'error': 'Código inválido ou expirado'
+            })
+        
+    except Exception as e:
+        print(f"❌ Erro ao validar código: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
 
 @app.route('/check_access/<route_name>')
 def check_access(route_name):
@@ -569,8 +882,13 @@ with app.app_context():
 
 @app.route('/')
 def landing_page():
-    """Renderiza a landing page principal."""
+    """Renderiza a página landing como página inicial."""
     return render_template('landing.html')
+
+@app.route('/planos')
+def planos_page():
+    """Renderiza a página de planos premium."""
+    return render_template('upgrade_plans.html')
 
 @app.route('/api/carousel_data')
 def get_carousel_data():
@@ -580,6 +898,7 @@ def get_carousel_data():
         csv_path = os.path.join(os.path.dirname(__file__), "LoteriasExcel", "carrossel_Dados.csv")
         
         # Verifica se o arquivo existe
+        logger.info(f"Verificando arquivo CSV: {csv_path}")
         if not os.path.exists(csv_path):
             logger.warning(f"Arquivo CSV não encontrado: {csv_path}")
             # Retorna dados de fallback
@@ -593,12 +912,17 @@ def get_carousel_data():
                 "unidade": "",
                 "link": "/"
             }]), 200
+        else:
+            logger.info(f"Arquivo CSV encontrado: {csv_path}")
         
         # Lê o CSV
         df = pd.read_csv(csv_path, encoding='utf-8')
+        logger.info(f"CSV lido com sucesso. Colunas: {list(df.columns)}")
+        logger.info(f"Total de linhas: {len(df)}")
         
         # Converte para JSON com tratamento de NaN
         records = json.loads(df.to_json(orient="records"))
+        logger.info(f"Records convertidos: {len(records)}")
         
         # Função para normalizar valores
         def to_str(v):
@@ -2792,15 +3116,24 @@ def google_callback():
         logger.info(f"Usuário Google autenticado: {email}")
         
         # Verificar se usuário já existe no banco
+        logger.info(f"Conectando ao banco de dados...")
         conn = get_db_connection()
         if not conn:
+            logger.error("Falha na conexão com banco de dados")
             return redirect('/login?error=db_connection_error')
         
+        logger.info(f"Banco conectado com sucesso")
         cursor = conn.cursor()
         
         # Buscar usuário por email
+        logger.info(f"Buscando usuário por email: {email}")
         cursor.execute("SELECT id, nome_completo, status FROM usuarios WHERE email = ?", (email,))
         existing_user = cursor.fetchone()
+        
+        if existing_user:
+            logger.info(f"Usuário encontrado: ID={existing_user[0]}, Nome={existing_user[1]}")
+        else:
+            logger.info(f"Usuário não encontrado, será criado novo")
         
         if existing_user:
             # Usuário já existe - fazer login
@@ -2840,21 +3173,28 @@ def google_callback():
             logger.info(f"Criando novo usuário Google: {email}")
             
             # Inserir usuário
+            logger.info(f"Inserindo usuário no banco: {nome_completo}, {email}")
             cursor.execute("""
                 INSERT INTO usuarios (nome_completo, email, status, receber_emails, receber_sms, aceitou_termos)
                 VALUES (?, ?, 'ativo', 1, 1, 1)
             """, (nome_completo, email))
             
             user_id = cursor.lastrowid
+            logger.info(f"Usuário inserido com ID: {user_id}")
             
             # Criar assinatura FREE por padrão
+            logger.info(f"Buscando plano Free...")
             cursor.execute("SELECT id FROM planos WHERE nome = 'Free'")
             plano_free = cursor.fetchone()
             if plano_free:
+                logger.info(f"Plano Free encontrado: ID={plano_free[0]}")
                 cursor.execute("""
                     INSERT INTO assinaturas (usuario_id, plano_id, status, data_inicio)
                     VALUES (?, ?, 'ativa', CURRENT_TIMESTAMP)
                 """, (user_id, plano_free[0]))
+                logger.info(f"Assinatura Free criada para usuário {user_id}")
+            else:
+                logger.warning(f"Plano Free não encontrado!")
             
             user_level = UserLevel.FREE
             
@@ -2864,13 +3204,17 @@ def google_callback():
         conn.close()
         
         # Criar objeto User e fazer login
+        logger.info(f"Criando objeto User: ID={user_id}, Email={email}, Level={user_level}")
         user = User(user_id, email, user_level)
+        
+        logger.info(f"Fazendo login do usuário...")
         login_user(user)
         
         logger.info(f"Login Google bem-sucedido: {email}")
+        logger.info(f"Redirecionando para página inicial...")
         
-        # Redirecionar para página inicial
-        return redirect('/?login_success=google')
+        # Redirecionar para página inicial (sem parâmetros que possam ativar modais)
+        return redirect('/')
         
     except Exception as e:
         logger.error(f"Erro no callback Google OAuth: {e}")

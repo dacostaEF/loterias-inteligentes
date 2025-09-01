@@ -265,6 +265,52 @@
     </div>
 
     <script>
+        // Verificar parâmetros da URL para mensagens de erro
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (error) {
+                let message = '';
+                let isError = true;
+                
+                switch (error) {
+                    case 'google_oauth_not_configured':
+                        message = '🔧 Google OAuth não configurado. Entre em contato com o administrador.';
+                        break;
+                    case 'google_oauth_error':
+                        message = '❌ Erro no login com Google. Tente novamente.';
+                        break;
+                    case 'no_auth_code':
+                        message = '❌ Código de autorização não recebido. Tente novamente.';
+                        break;
+                    case 'no_access_token':
+                        message = '❌ Token de acesso não recebido. Tente novamente.';
+                        break;
+                    case 'no_email':
+                        message = '❌ Email não recebido do Google. Tente novamente.';
+                        break;
+                    case 'db_connection_error':
+                        message = '❌ Erro de conexão com banco de dados. Tente novamente.';
+                        break;
+                    default:
+                        message = '❌ Erro desconhecido. Tente novamente.';
+                }
+                
+                if (message) {
+                    errorMessage.textContent = message;
+                    errorMessage.style.display = 'block';
+                    
+                    // Limpar parâmetro da URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        }
+        
+        // Executar verificação quando a página carregar
+        document.addEventListener('DOMContentLoaded', checkUrlParams);
+        
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             

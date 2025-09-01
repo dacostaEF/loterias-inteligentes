@@ -438,26 +438,47 @@ class ModalLoginCadastro {
         this.closeModal();
     }
 
-    handleCadastro() {
+    async handleCadastro() {
         if (!this.validateCadastro()) return;
 
         const formData = {
-            nome: document.getElementById('cadastro-nome').value.trim(),
-            nascimento: document.getElementById('cadastro-nascimento').value,
+            nome_completo: document.getElementById('cadastro-nome').value.trim(),
+            data_nascimento: document.getElementById('cadastro-nascimento').value,
             cpf: document.getElementById('cadastro-cpf').value.trim(),
             telefone: document.getElementById('cadastro-telefone').value.trim(),
             email: document.getElementById('cadastro-email').value.trim(),
             senha: document.getElementById('cadastro-senha').value,
-            receberEmail: document.getElementById('receber-email').checked,
-            receberSMS: document.getElementById('receber-sms').checked
+            receber_emails: document.getElementById('receber-email').checked,
+            receber_sms: document.getElementById('receber-sms').checked,
+            aceitou_termos: true
         };
 
-        // Aqui você implementaria a lógica de cadastro
         console.log('Dados de cadastro:', formData);
         
-        // Simular cadastro bem-sucedido
-        alert('Cadastro realizado com sucesso!');
-        this.closeModal();
+        try {
+            // Enviar dados para a nova rota de cadastro
+            const response = await fetch('/salvar_cadastro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // ✅ Cadastro realizado com sucesso - abrir modal de confirmação
+                this.closeModal();
+                formData.usuario_id = data.user_id; // Adicionar ID do usuário
+                this.openModalConfirmacao(formData);
+            } else {
+                alert('Erro ao realizar cadastro: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Erro ao enviar cadastro:', error);
+            alert('Erro ao realizar cadastro. Tente novamente.');
+        }
     }
 
     handleGoogleLogin() {
@@ -472,14 +493,26 @@ class ModalLoginCadastro {
         }
     }
 
+    // 🔐 Login com Google via OAuth Direto (SOLUÇÃO DEFINITIVA)
     handleGoogleCadastro() {
-        // 🔗 Redirecionar para Google OAuth (mesmo processo para login e cadastro)
-        console.log('🔗 Iniciando cadastro com Google...');
+        console.log('🔐 Iniciando login Google com OAuth Direto...');
+        
         try {
-            // Redirecionar para rota de autenticação Google
-            window.location.href = '/auth/google';
+            // Configurações OAuth corretas do Google Cloud Console
+            const clientId = '109705001662-2pshc4dargmtf3chn9c9r31lfk607mr8.apps.googleusercontent.com';
+            const redirectUri = 'http://localhost:5000/auth/google/callback';
+            const scope = 'email profile';
+            
+            // Construir URL de autorização OAuth
+            const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=code&access_type=offline&prompt=consent`;
+            
+            console.log('🔗 Redirecionando para Google OAuth:', authUrl);
+            
+            // Redirecionar para Google OAuth
+            window.location.href = authUrl;
+            
         } catch (error) {
-            console.error('❌ Erro ao iniciar cadastro Google:', error);
+            console.error('❌ Erro ao iniciar login Google:', error);
             alert('Erro ao conectar com Google. Tente novamente.');
         }
     }
@@ -488,6 +521,189 @@ class ModalLoginCadastro {
         // Implementar recuperação de senha
         console.log('Esqueceu senha');
         alert('Funcionalidade de recuperação de senha será implementada em breve!');
+    }
+
+    // 🎯 Abrir modal de confirmação de cadastro
+    openModalConfirmacao(formData) {
+        console.log('🎯 Abrindo modal de confirmação...');
+        
+        // Preencher dados no modal
+        document.getElementById('confirmacao-email').textContent = formData.email;
+        document.getElementById('confirmacao-telefone').textContent = formData.telefone;
+        
+        // Mostrar modal
+        document.getElementById('modal-confirmacao').style.display = 'flex';
+        
+        // Configurar botão de envio
+        this.setupEnvioCodigo(formData);
+        
+        // Configurar inputs do código (inicialmente ocultos)
+        this.setupCodigoInputs();
+        
+        // Configurar botões de confirmação (inicialmente ocultos)
+        this.setupConfirmacaoButtons(formData);
+    }
+
+    // 🔧 Configurar inputs do código de confirmação
+    setupCodigoInputs() {
+        const inputs = document.querySelectorAll('.codigo-input');
+        
+        inputs.forEach((input, index) => {
+            // Limpar valor
+            input.value = '';
+            
+            // Evento de digitação
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                
+                // Só aceita números
+                if (!/^\d*$/.test(value)) {
+                    e.target.value = '';
+                    return;
+                }
+                
+                // Marcar como preenchido
+                if (value) {
+                    input.classList.add('filled');
+                    
+                    // Ir para próximo input
+                    if (index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                } else {
+                    input.classList.remove('filled');
+                }
+            });
+            
+            // Evento de backspace
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !input.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+    }
+
+    // 🔧 Configurar envio de código
+    setupEnvioCodigo(formData) {
+        const btnEnviar = document.getElementById('btn-enviar-codigo');
+        
+        btnEnviar.addEventListener('click', () => {
+            const tipoEnvio = document.querySelector('input[name="tipo-envio"]:checked').value;
+            this.enviarCodigo(formData, tipoEnvio);
+        });
+    }
+
+    // 🔧 Configurar botões do modal de confirmação
+    setupConfirmacaoButtons(formData) {
+        const btnConfirmar = document.getElementById('btn-confirmar-codigo');
+        const btnReenviar = document.getElementById('btn-reenviar-codigo');
+        
+        // Botão confirmar código
+        btnConfirmar.addEventListener('click', () => {
+            this.validarCodigo(formData);
+        });
+        
+        // Botão reenviar código
+        btnReenviar.addEventListener('click', () => {
+            const tipoEnvio = document.querySelector('input[name="tipo-envio"]:checked').value;
+            this.enviarCodigo(formData, tipoEnvio);
+        });
+    }
+
+    // ✅ Validar código de confirmação
+    async validarCodigo(formData) {
+        const inputs = document.querySelectorAll('.codigo-input');
+        const codigo = Array.from(inputs).map(input => input.value).join('');
+        
+        if (codigo.length !== 6) {
+            this.showConfirmacaoMessage('Por favor, insira o código completo de 6 dígitos.', 'error');
+            return;
+        }
+        
+        try {
+            console.log('🎯 Validando código:', codigo);
+            
+            const response = await fetch('/validar_codigo_confirmacao', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usuario_id: formData.usuario_id,
+                    codigo: codigo
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showConfirmacaoMessage('✅ Cadastro confirmado com sucesso! Bem-vindo ao Loterias Inteligentes!', 'success');
+                
+                // Fechar modal após 3 segundos
+                setTimeout(() => {
+                    this.closeModalConfirmacao();
+                    // TODO: Redirecionar para dashboard ou página de boas-vindas
+                }, 3000);
+                
+            } else {
+                this.showConfirmacaoMessage('❌ Código inválido ou expirado. Tente novamente.', 'error');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao validar código:', error);
+            this.showConfirmacaoMessage('Erro ao validar código. Tente novamente.', 'error');
+        }
+    }
+
+    // 📧 Enviar código de confirmação
+    async enviarCodigo(formData, tipo) {
+        try {
+            console.log(`📧 Enviando código por ${tipo} para:`, formData[tipo === 'email' ? 'email' : 'telefone']);
+            
+            const response = await fetch('/enviar_codigo_confirmacao', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usuario_id: formData.usuario_id,
+                    tipo: tipo,
+                    destinatario: formData[tipo === 'email' ? 'email' : 'telefone']
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.showConfirmacaoMessage(`✅ Código enviado com sucesso por ${tipo}! Verifique sua caixa de entrada.`, 'success');
+                
+                // Mostrar campos de código e botões de confirmação
+                document.querySelector('.codigo-container').style.display = 'block';
+                document.querySelector('.confirmacao-actions').style.display = 'block';
+                document.querySelector('.escolha-envio').style.display = 'none';
+                
+            } else {
+                this.showConfirmacaoMessage('❌ Erro ao enviar código. Tente novamente.', 'error');
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao enviar código:', error);
+            this.showConfirmacaoMessage('Erro ao enviar código. Tente novamente.', 'error');
+        }
+    }
+
+    // 💬 Mostrar mensagem no modal de confirmação
+    showConfirmacaoMessage(message, type = 'info') {
+        const messageBox = document.getElementById('confirmacao-message');
+        messageBox.textContent = message;
+        messageBox.className = `message-box ${type}`;
+        messageBox.style.display = 'block';
+        
+        // Auto-hide após 5 segundos
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 5000);
     }
 }
 
@@ -501,4 +717,17 @@ function openModalLogin(tab = 'login') {
     if (window.modalLoginCadastro) {
         window.modalLoginCadastro.openModal(tab);
     }
+}
+
+// 🎯 Funções globais para o modal de confirmação
+function closeModalConfirmacao() {
+    document.getElementById('modal-confirmacao').style.display = 'none';
+}
+
+function alterarDadosCadastro() {
+    // Fechar modal de confirmação
+    closeModalConfirmacao();
+    
+    // Abrir modal de cadastro novamente
+    openModalLogin('cadastro');
 }

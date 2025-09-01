@@ -1333,5 +1333,65 @@
       };
     });
   </script>
+
+  <!-- Modal de Confirmação de Cadastro -->
+  <div id="modal-confirmacao" class="modal-overlay" style="display: none;">
+    <div class="modal-content confirmacao-modal">
+      <div class="modal-header">
+        <h2>Confirmação de Cadastro</h2>
+        <button class="modal-close" onclick="closeModalConfirmacao()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="confirmacao-message">
+          <p>Escolha como deseja receber o código de confirmação:</p>
+          <p><strong>E-mail:</strong> <span id="confirmacao-email"></span></p>
+          <p><strong>Celular:</strong> <span id="confirmacao-telefone"></span></p>
+        </div>
+        
+        <div class="escolha-envio">
+          <label class="escolha-label">Como deseja receber o código?</label>
+          <div class="escolha-opcoes">
+            <label class="radio-option">
+              <input type="radio" name="tipo-envio" value="email" checked>
+              <span class="radio-custom"></span>
+              <span class="radio-text">📧 E-mail</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="tipo-envio" value="sms">
+              <span class="radio-custom"></span>
+              <span class="radio-text">📱 SMS</span>
+            </label>
+          </div>
+          <button id="btn-enviar-codigo" class="btn-enviar">Enviar Código</button>
+        </div>
+        
+        <div class="codigo-container" style="display: none;">
+          <label for="codigo-confirmacao">Código de Confirmação:</label>
+          <div class="codigo-inputs">
+            <input type="text" class="codigo-input" maxlength="1" data-index="0" />
+            <input type="text" class="codigo-input" maxlength="1" data-index="1" />
+            <input type="text" class="codigo-input" maxlength="1" data-index="2" />
+            <input type="text" class="codigo-input" maxlength="1" data-index="3" />
+            <input type="text" class="codigo-input" maxlength="1" data-index="4" />
+            <input type="text" class="codigo-input" maxlength="1" data-index="5" />
+          </div>
+        </div>
+        
+        <div class="confirmacao-actions" style="display: none;">
+          <button id="btn-confirmar-codigo" class="btn-primary">Confirmar Código</button>
+          <button id="btn-reenviar-codigo" class="btn-secondary">Reenviar Código</button>
+        </div>
+        
+        <div class="confirmacao-links">
+          <a href="#" onclick="alterarDadosCadastro()">Alterar e-mail/telefone</a>
+        </div>
+        
+        <div id="confirmacao-message" class="message-box" style="display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Login/Cadastro -->
 </body>
 </html>
