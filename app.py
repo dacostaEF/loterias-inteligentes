@@ -486,6 +486,8 @@ def upgrade_plans():
     """Página de planos premium."""
     return render_template('upgrade_plans.html')
 
+
+
 @app.route('/premium_required')
 def premium_required():
     """Página de erro para acesso premium."""
@@ -3379,14 +3381,130 @@ def pagamento_sucesso():
         # TODO: Redirecionar para dashboard
         
         return f"""
-        <html>
-        <head><title>Pagamento Aprovado</title></head>
-        <body style="font-family: Arial; text-align: center; padding: 50px;">
-            <h1>✅ Pagamento Aprovado!</h1>
-            <p>Seu plano foi ativado com sucesso!</p>
-            <p>Session ID: {session_id}</p>
-            <p>Payment ID: {payment_id}</p>
-            <a href="/">Voltar ao início</a>
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Pagamento Aprovado - Loterias Inteligentes</title>
+            <style>
+                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+                
+                body {{
+                    font-family: 'Inter', sans-serif;
+                    background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+                    color: #ffffff;
+                    min-height: 100vh;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }}
+                
+                .container {{
+                    background: linear-gradient(135deg, #1a1a2e, #16213e);
+                    border: 3px solid #00ff88;
+                    border-radius: 25px;
+                    padding: 3rem;
+                    text-align: center;
+                    max-width: 600px;
+                    width: 90%;
+                    box-shadow: 0 20px 60px rgba(0, 255, 136, 0.5);
+                }}
+                
+                .title {{
+                    font-size: 2.5rem;
+                    font-weight: 900;
+                    margin-bottom: 1rem;
+                    color: #00ff88;
+                    text-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+                }}
+                
+                .subtitle {{
+                    font-size: 1.2rem;
+                    color: #00ffff;
+                    margin-bottom: 2rem;
+                    text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+                }}
+                
+                .success-message {{
+                    background: rgba(0, 255, 136, 0.1);
+                    border: 2px solid #00ff88;
+                    border-radius: 15px;
+                    padding: 1.5rem;
+                    margin: 2rem 0;
+                }}
+                
+                .success-text {{
+                    color: #00ff88;
+                    font-size: 1.1rem;
+                    font-weight: 600;
+                    text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+                }}
+                
+                .info-box {{
+                    background: rgba(168, 85, 247, 0.1);
+                    border: 2px solid #A855F7;
+                    border-radius: 15px;
+                    padding: 1rem;
+                    margin: 1rem 0;
+                }}
+                
+                .info-text {{
+                    color: #A855F7;
+                    font-size: 0.9rem;
+                    text-shadow: 0 0 6px rgba(168, 85, 247, 0.3);
+                }}
+                
+                .btn {{
+                    display: inline-block;
+                    padding: 1rem 2rem;
+                    border-radius: 12px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                    background: linear-gradient(135deg, #A855F7, #8B5CF6);
+                    color: #fff;
+                    border: 2px solid #A855F7;
+                    margin-top: 2rem;
+                }}
+                
+                .btn:hover {{
+                    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+                }}
+                
+                @media (max-width: 768px) {{
+                    .container {{
+                        padding: 2rem;
+                        margin: 1rem;
+                    }}
+                    
+                    .title {{
+                        font-size: 2rem;
+                    }}
+                }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1 class="title">✅ Pagamento Aprovado!</h1>
+                <p class="subtitle">Parabéns! Seu plano foi ativado</p>
+                
+                <div class="success-message">
+                    <p class="success-text">🎉 Seu plano foi ativado com sucesso!</p>
+                </div>
+                
+                <div class="info-box">
+                    <p class="info-text">📋 Session ID: {session_id or 'N/A'}</p>
+                    <p class="info-text">💳 Payment ID: {payment_id or 'N/A'}</p>
+                </div>
+                
+                <a href="/" class="btn">🏠 Voltar ao Início</a>
+            </div>
         </body>
         </html>
         """
@@ -3399,12 +3517,162 @@ def pagamento_sucesso():
 def pagamento_cancelado():
     """Página de cancelamento do pagamento."""
     return """
-    <html>
-    <head><title>Pagamento Cancelado</title></head>
-    <body style="font-family: Arial; text-align: center; padding: 50px;">
-        <h1>❌ Pagamento Cancelado</h1>
-        <p>Você cancelou o pagamento.</p>
-        <a href="/planos">Voltar aos planos</a>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pagamento Cancelado - Loterias Inteligentes</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+            
+            body {
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+                color: #ffffff;
+                min-height: 100vh;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .container {
+                background: linear-gradient(135deg, #1a1a2e, #16213e);
+                border: 3px solid #ff6b6b;
+                border-radius: 25px;
+                padding: 3rem;
+                text-align: center;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(255, 107, 107, 0.5);
+            }
+            
+            .title {
+                font-size: 2.5rem;
+                font-weight: 900;
+                margin-bottom: 1rem;
+                color: #ff6b6b;
+                text-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+                color: #00ffff;
+                margin-bottom: 2rem;
+                text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+            }
+            
+            .cancel-message {
+                background: rgba(255, 107, 107, 0.1);
+                border: 2px solid #ff6b6b;
+                border-radius: 15px;
+                padding: 1.5rem;
+                margin: 2rem 0;
+            }
+            
+            .cancel-text {
+                color: #ff6b6b;
+                font-size: 1.1rem;
+                font-weight: 600;
+                text-shadow: 0 0 8px rgba(255, 107, 107, 0.4);
+            }
+            
+            .info-message {
+                color: #A855F7;
+                font-size: 1rem;
+                margin: 1.5rem 0;
+                text-shadow: 0 0 6px rgba(168, 85, 247, 0.3);
+            }
+            
+            .btn-container {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+            
+            .btn {
+                display: inline-block;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 1rem;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+            }
+            
+            .btn-primary {
+                background: linear-gradient(135deg, #A855F7, #8B5CF6);
+                color: #fff;
+                border-color: #A855F7;
+            }
+            
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+            }
+            
+            .btn-secondary {
+                background: linear-gradient(135deg, #00ff88, #00cc6a);
+                color: #000;
+                border-color: #00ff88;
+                text-shadow: none;
+            }
+            
+            .btn-secondary:hover {
+                background: linear-gradient(135deg, #00cc6a, #00aa55);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+            }
+            
+            .icon {
+                font-size: 1.2rem;
+                margin-right: 0.5rem;
+            }
+            
+            @media (max-width: 768px) {
+                .container {
+                    padding: 2rem;
+                    margin: 1rem;
+                }
+                
+                .title {
+                    font-size: 2rem;
+                }
+                
+                .btn-container {
+                    flex-direction: column;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="title">❌ Pagamento Cancelado</h1>
+            <p class="subtitle">Operação interrompida</p>
+            
+            <div class="cancel-message">
+                <p class="cancel-text">🚫 Você cancelou o pagamento</p>
+            </div>
+            
+            <p class="info-message">Não se preocupe! Você pode tentar novamente a qualquer momento.</p>
+            
+            <div class="btn-container">
+                <a href="/planos" class="btn btn-primary">
+                    <span class="icon">💎</span>
+                    Voltar aos Planos
+                </a>
+                
+                <a href="/" class="btn btn-secondary">
+                    <span class="icon">🏠</span>
+                    Voltar ao Início
+                </a>
+            </div>
+        </div>
     </body>
     </html>
     """
@@ -3414,15 +3682,165 @@ def pagamento_teste():
     """Página de teste para simular pagamento."""
     plano_id = request.args.get('plano')
     return f"""
-    <html>
-    <head><title>Teste de Pagamento</title></head>
-    <body style="font-family: Arial; text-align: center; padding: 50px;">
-        <h1>🧪 Teste de Pagamento</h1>
-        <p>Plano: {plano_id}</p>
-        <p>Este é um pagamento de teste!</p>
-        <a href="/pagamento/sucesso?session_id=test_123&payment_id=test_456">Simular Pagamento Aprovado</a>
-        <br><br>
-        <a href="/pagamento/cancelado">Simular Pagamento Cancelado</a>
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Teste de Pagamento - Loterias Inteligentes</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+            
+            body {{
+                font-family: 'Inter', sans-serif;
+                background: linear-gradient(135deg, #0f0f23, #1a1a2e);
+                color: #ffffff;
+                min-height: 100vh;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }}
+            
+            .container {{
+                background: linear-gradient(135deg, #1a1a2e, #16213e);
+                border: 3px solid #A855F7;
+                border-radius: 25px;
+                padding: 3rem;
+                text-align: center;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5);
+            }}
+            
+            .title {{
+                font-size: 2.5rem;
+                font-weight: 900;
+                margin-bottom: 1rem;
+                background: linear-gradient(135deg, #A855F7, #8B5CF6);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+            }}
+            
+            .subtitle {{
+                font-size: 1.2rem;
+                color: #00ffff;
+                margin-bottom: 2rem;
+                text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+            }}
+            
+            .plano-info {{
+                background: rgba(0, 255, 136, 0.1);
+                border: 2px solid #00ff88;
+                border-radius: 15px;
+                padding: 1.5rem;
+                margin: 2rem 0;
+            }}
+            
+            .plano-text {{
+                color: #00ff88;
+                font-size: 1.1rem;
+                font-weight: 600;
+                text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+            }}
+            
+            .test-message {{
+                color: #A855F7;
+                font-size: 1rem;
+                margin: 1.5rem 0;
+                text-shadow: 0 0 6px rgba(168, 85, 247, 0.3);
+            }}
+            
+            .btn-container {{
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                margin-top: 2rem;
+            }}
+            
+            .btn {{
+                display: inline-block;
+                padding: 1rem 2rem;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 1rem;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                border: 2px solid transparent;
+            }}
+            
+            .btn-success {{
+                background: linear-gradient(135deg, #00ff88, #00cc6a);
+                color: #000;
+                border-color: #00ff88;
+                text-shadow: none;
+            }}
+            
+            .btn-success:hover {{
+                background: linear-gradient(135deg, #00cc6a, #00aa55);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(0, 255, 136, 0.4);
+            }}
+            
+            .btn-danger {{
+                background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+                color: #fff;
+                border-color: #ff6b6b;
+            }}
+            
+            .btn-danger:hover {{
+                background: linear-gradient(135deg, #ee5a52, #e74c3c);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+            }}
+            
+            .icon {{
+                font-size: 1.2rem;
+                margin-right: 0.5rem;
+            }}
+            
+            @media (max-width: 768px) {{
+                .container {{
+                    padding: 2rem;
+                    margin: 1rem;
+                }}
+                
+                .title {{
+                    font-size: 2rem;
+                }}
+                
+                .btn-container {{
+                    flex-direction: column;
+                }}
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="title">🧪 Teste de Pagamento</h1>
+            <p class="subtitle">Simulação de Processamento</p>
+            
+            <div class="plano-info">
+                <p class="plano-text">📋 Plano: {plano_id or 'Não especificado'}</p>
+            </div>
+            
+            <p class="test-message">Este é um pagamento de teste para desenvolvimento!</p>
+            
+            <div class="btn-container">
+                <a href="/pagamento/sucesso?session_id=test_123&payment_id=test_456" class="btn btn-success">
+                    <span class="icon">✅</span>
+                    Simular Pagamento Aprovado
+                </a>
+                
+                <a href="/pagamento/cancelado" class="btn btn-danger">
+                    <span class="icon">❌</span>
+                    Simular Pagamento Cancelado
+                </a>
+            </div>
+        </div>
     </body>
     </html>
     """

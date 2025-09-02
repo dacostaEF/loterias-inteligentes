@@ -45,7 +45,7 @@ PAGSEGURO_CANCEL_URL = "http://localhost:5000/pagamento/cancelado"
 PLANOS = {
     'daily': {
         'nome': 'Diário',
-        'preco': 9.90,
+        'preco': 5.00,
         'periodo': 'dia',
         'stripe_price_id': 'price_daily_test',
         'pagseguro_id': 'daily_plan'
@@ -66,14 +66,14 @@ PLANOS = {
     },
     'annual': {
         'nome': 'Anual',
-        'preco': 299.90,
+        'preco': 269.90,
         'periodo': 'ano',
         'stripe_price_id': 'price_annual_test',
         'pagseguro_id': 'annual_plan'
     },
     'lifetime': {
         'nome': 'Vitalício',
-        'preco': 999.90,
+        'preco': 997.00,
         'periodo': 'vitalício',
         'stripe_price_id': 'price_lifetime_test',
         'pagseguro_id': 'lifetime_plan'
