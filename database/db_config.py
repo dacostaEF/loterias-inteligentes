@@ -166,6 +166,57 @@ def validar_codigo_confirmacao(usuario_id, codigo, tipo='email'):
         if conn: conn.close()
         return False
 
+def atualizar_plano_usuario(usuario_id, plano_id, data_inicio=None, data_fim=None):
+    """Atualiza o plano do usuário com datas de início e fim."""
+    try:
+        import datetime
+        
+        conn = get_db_connection()
+        if not conn: return False
+        cursor = conn.cursor()
+        
+        # Se não foi fornecida data de início, usar agora
+        if not data_inicio:
+            data_inicio = datetime.datetime.now()
+        
+        # Se não foi fornecida data de fim, calcular baseado no plano
+        if not data_fim:
+            # Mapear planos para duração em dias
+            duracao_planos = {
+                'daily': 1,
+                'monthly': 30,
+                'semestral': 180,
+                'annual': 365,
+                'lifetime': None  # Vitalício não expira
+            }
+            
+            duracao_dias = duracao_planos.get(plano_id, 30)  # Default 30 dias
+            
+            if duracao_dias:
+                data_fim = data_inicio + datetime.timedelta(days=duracao_dias)
+            else:
+                data_fim = None  # Vitalício
+        
+        # Atualizar usuário
+        cursor.execute("""
+            UPDATE usuarios 
+            SET tipo_plano = ?, data_abertura = ?, data_encerramento = ?
+            WHERE id = ?
+        """, (plano_id, data_inicio, data_fim, usuario_id))
+        
+        conn.commit()
+        conn.close()
+        
+        print(f"✅ Plano atualizado para usuário {usuario_id}: {plano_id}")
+        print(f"📅 Data início: {data_inicio}")
+        print(f"📅 Data fim: {data_fim}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Erro ao atualizar plano: {e}")
+        if conn: conn.close()
+        return False
+
 def obter_configuracao_envio(tipo):
     """Obtém a configuração de envio para email ou SMS."""
     try:

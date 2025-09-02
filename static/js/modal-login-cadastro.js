@@ -640,11 +640,17 @@ class ModalLoginCadastro {
             if (data.success) {
                 this.showConfirmacaoMessage('✅ Cadastro confirmado com sucesso! Bem-vindo ao Loterias Inteligentes!', 'success');
                 
-                // Fechar modal após 3 segundos
+                console.log('🎯 Código confirmado com sucesso! Iniciando sequência...');
+                
+                // Fechar modal após 2 segundos e abrir modal de planos
                 setTimeout(() => {
-                    this.closeModalConfirmacao();
-                    // TODO: Redirecionar para dashboard ou página de boas-vindas
-                }, 3000);
+                    console.log('🔄 Fechando modal de confirmação...');
+                    closeModalConfirmacao(); // Função global
+                    
+                    console.log('💎 Abrindo modal de planos...');
+                    // Abrir modal de planos automaticamente
+                    this.abrirModalPlanos();
+                }, 2000);
                 
             } else {
                 this.showConfirmacaoMessage('❌ Código inválido ou expirado. Tente novamente.', 'error');
@@ -704,6 +710,20 @@ class ModalLoginCadastro {
         setTimeout(() => {
             messageBox.style.display = 'none';
         }, 5000);
+    }
+
+    // 💎 Abrir modal de planos após confirmação
+    abrirModalPlanos() {
+        // Abrir modal de planos
+        const modal = document.getElementById('welcomePlansModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            console.log('✅ Modal de planos aberto');
+        } else {
+            console.error('❌ Modal de planos não encontrado');
+            // Fallback: redirecionar para página
+            window.location.href = '/upgrade_plans';
+        }
     }
 }
 

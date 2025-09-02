@@ -697,26 +697,26 @@ def enviar_codigo_confirmacao():
         
         print(f"🔐 Enviando código de confirmação: usuário={usuario_id}, tipo={tipo}, destinatario={destinatario}")
         
-        # Gerar código
-        from database.db_config import gerar_codigo_confirmacao
-        codigo = gerar_codigo_confirmacao(usuario_id, tipo)
+        # Usar serviço real de envio (que já gera o código internamente)
+        from services.envio_service import envio_service
         
-        if not codigo:
-            return jsonify({'success': False, 'error': 'Erro ao gerar código'}), 500
+        nome_usuario = data.get('nome_usuario', 'Usuário')
         
-        # Enviar código (simulado por enquanto)
-        if tipo == 'email':
-            print(f"📧 Código enviado por EMAIL para {destinatario}: {codigo}")
-            # TODO: Implementar envio real por email
+        resultado = envio_service.enviar_codigo_confirmacao(
+            usuario_id, tipo, destinatario, nome_usuario
+        )
+        
+        if resultado.get('success'):
+            return jsonify({
+                'success': True,
+                'message': resultado.get('message'),
+                'codigo': resultado.get('codigo') if resultado.get('modo') == 'teste' else None
+            })
         else:
-            print(f"📱 Código enviado por SMS para {destinatario}: {codigo}")
-            # TODO: Implementar envio real por SMS
-        
-        return jsonify({
-            'success': True,
-            'message': f'Código enviado com sucesso por {tipo}',
-            'codigo': codigo  # Para testes - remover em produção
-        })
+            return jsonify({
+                'success': False,
+                'error': resultado.get('error', 'Erro ao enviar código')
+            }), 500
         
     except Exception as e:
         print(f"❌ Erro ao enviar código: {e}")
@@ -3232,7 +3232,206 @@ if __name__ == '__main__':
     print("💎 Páginas Freemium: Landing, +Milionária, Quina, Lotomania")
     print("⭐ Páginas Premium: Todas as outras (requer assinatura)")
     print("=" * 60)
-    
+
+# ============================================================================
+# 💳 SISTEMA DE PAGAMENTO
+# ============================================================================
+
+@app.route('/api/plano/<plano_id>')
+def get_plano(plano_id):
+    """Retorna dados de um plano específico."""
+    try:
+        from config.payment_config import PLANOS
+        
+        plano = PLANOS.get(plano_id)
+        if not plano:
+            return jsonify({'success': False, 'error': 'Plano não encontrado'}), 404
+        
+        return jsonify({
+            'success': True,
+            'plano': plano
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao buscar plano: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+@app.route('/selecionar_plano', methods=['POST'])
+def selecionar_plano():
+    """Processa a seleção de um plano pelo usuário."""
+    try:
+        data = request.get_json()
+        plano_id = data.get('plano_id')
+        usuario_id = data.get('usuario_id')
+        
+        print(f"💎 Selecionando plano: {plano_id} para usuário {usuario_id}")
+        
+        # Atualizar plano do usuário
+        from database.db_config import atualizar_plano_usuario
+        
+        sucesso = atualizar_plano_usuario(usuario_id, plano_id)
+        
+        if sucesso:
+            return jsonify({
+                'success': True,
+                'message': 'Plano selecionado com sucesso!',
+                'plano_id': plano_id
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Erro ao selecionar plano'
+            }), 500
+            
+    except Exception as e:
+        print(f"❌ Erro ao selecionar plano: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+@app.route('/criar_sessao_pagamento', methods=['POST'])
+def criar_sessao_pagamento():
+    """Cria uma sessão de pagamento no Stripe."""
+    try:
+        data = request.get_json()
+        plano_id = data.get('plano_id')
+        gateway = data.get('gateway', 'stripe')
+        
+        print(f"💳 Criando sessão de pagamento: plano={plano_id}, gateway={gateway}")
+        
+        # Simular dados do usuário (em produção, viria da sessão)
+        usuario_id = 1  # TODO: Obter da sessão
+        usuario_email = "teste@exemplo.com"  # TODO: Obter da sessão
+        
+        from services.payment_service import payment_service
+        
+        if gateway == 'stripe':
+            resultado = payment_service.criar_sessao_stripe(plano_id, usuario_id, usuario_email)
+        else:
+            return jsonify({'success': False, 'error': 'Gateway não suportado'}), 400
+        
+        if resultado.get('success'):
+            return jsonify({
+                'success': True,
+                'url': resultado.get('url'),
+                'session_id': resultado.get('session_id')
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': resultado.get('error', 'Erro ao criar sessão de pagamento')
+            }), 500
+        
+    except Exception as e:
+        print(f"❌ Erro ao criar sessão de pagamento: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+@app.route('/criar_pagamento_pagseguro', methods=['POST'])
+def criar_pagamento_pagseguro():
+    """Cria um pagamento no PagSeguro."""
+    try:
+        data = request.get_json()
+        plano_id = data.get('plano_id')
+        gateway = data.get('gateway', 'pagseguro')
+        
+        print(f"🏦 Criando pagamento PagSeguro: plano={plano_id}")
+        
+        # Simular dados do usuário (em produção, viria da sessão)
+        usuario_id = 1  # TODO: Obter da sessão
+        usuario_dados = {
+            'nome': 'João Silva',
+            'email': 'teste@exemplo.com',
+            'telefone': '21999999999',
+            'cpf': '12345678901'
+        }
+        
+        from services.payment_service import payment_service
+        
+        if gateway == 'pagseguro':
+            resultado = payment_service.criar_pagamento_pagseguro(plano_id, usuario_id, usuario_dados)
+        else:
+            return jsonify({'success': False, 'error': 'Gateway não suportado'}), 400
+        
+        if resultado.get('success'):
+            return jsonify({
+                'success': True,
+                'url': resultado.get('url'),
+                'payment_id': resultado.get('payment_id')
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': resultado.get('error', 'Erro ao criar pagamento')
+            }), 500
+        
+    except Exception as e:
+        print(f"❌ Erro ao criar pagamento PagSeguro: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+
+@app.route('/pagamento/sucesso')
+def pagamento_sucesso():
+    """Página de sucesso do pagamento."""
+    try:
+        session_id = request.args.get('session_id')
+        payment_id = request.args.get('payment_id')
+        
+        print(f"✅ Pagamento aprovado: session_id={session_id}, payment_id={payment_id}")
+        
+        # TODO: Validar pagamento e ativar plano
+        # TODO: Redirecionar para dashboard
+        
+        return f"""
+        <html>
+        <head><title>Pagamento Aprovado</title></head>
+        <body style="font-family: Arial; text-align: center; padding: 50px;">
+            <h1>✅ Pagamento Aprovado!</h1>
+            <p>Seu plano foi ativado com sucesso!</p>
+            <p>Session ID: {session_id}</p>
+            <p>Payment ID: {payment_id}</p>
+            <a href="/">Voltar ao início</a>
+        </body>
+        </html>
+        """
+        
+    except Exception as e:
+        print(f"❌ Erro na página de sucesso: {e}")
+        return "Erro ao processar pagamento"
+
+@app.route('/pagamento/cancelado')
+def pagamento_cancelado():
+    """Página de cancelamento do pagamento."""
+    return """
+    <html>
+    <head><title>Pagamento Cancelado</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 50px;">
+        <h1>❌ Pagamento Cancelado</h1>
+        <p>Você cancelou o pagamento.</p>
+        <a href="/planos">Voltar aos planos</a>
+    </body>
+    </html>
+    """
+
+@app.route('/pagamento/teste')
+def pagamento_teste():
+    """Página de teste para simular pagamento."""
+    plano_id = request.args.get('plano')
+    return f"""
+    <html>
+    <head><title>Teste de Pagamento</title></head>
+    <body style="font-family: Arial; text-align: center; padding: 50px;">
+        <h1>🧪 Teste de Pagamento</h1>
+        <p>Plano: {plano_id}</p>
+        <p>Este é um pagamento de teste!</p>
+        <a href="/pagamento/sucesso?session_id=test_123&payment_id=test_456">Simular Pagamento Aprovado</a>
+        <br><br>
+        <a href="/pagamento/cancelado">Simular Pagamento Cancelado</a>
+    </body>
+    </html>
+    """
+
+# ============================================================================
+# 🚀 INICIALIZAÇÃO DO SERVIDOR
+# ============================================================================
+
+if __name__ == '__main__':
     # Configurações otimizadas para melhor performance
     port = int(os.environ.get('PORT', 5000))
     app.run(
