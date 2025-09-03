@@ -43,9 +43,8 @@ class UserPermissions:
         '/dashboard_milionaria',  # +Milionária
         '/dashboard_quina',  # Quina
         '/dashboard_lotomania',  # Lotomania
-        '/login',
-        '/register',
-        '/upgrade_plans'
+        '/upgrade_plans',
+        '/checkout'
     }
     
     # Rotas PREMIUM (requer assinatura)
@@ -417,24 +416,7 @@ def require_free_or_premium(f):
 # 👥 ROTAS DE AUTENTICAÇÃO
 # ============================================================================
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """Página de login."""
-    if request.method == 'POST':
-        data = request.get_json()
-        email = data.get('email')
-        password = data.get('password')
-        
-        # Buscar usuário no banco
-        user = get_user_by_email(email)
-        
-        if user and verify_password(user, password):
-            login_user(user)
-            return jsonify({'success': True, 'redirect': url_for('landing_page')})
-        else:
-            return jsonify({'success': False, 'error': 'Email ou senha inválidos'}), 401
-    
-    return render_template('login.html')
+
 
 @app.route('/logout')
 @login_required
@@ -443,49 +425,229 @@ def logout():
     logout_user()
     return redirect(url_for('landing_page'))
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """Página de cadastro."""
-    if request.method == 'POST':
-        data = request.get_json()
-        nome_completo = data.get('name')
-        email = data.get('email')
-        password = data.get('password')
-        telefone = data.get('telefone', '')
-        data_nascimento = data.get('data_nascimento', '')
-        cpf = data.get('cpf', '')
-        receber_emails = data.get('receber_emails', True)
-        receber_sms = data.get('receber_sms', True)
-        aceitou_termos = data.get('aceitou_termos', False)
-        
-        if get_user_by_email(email):
-            return jsonify({'success': False, 'error': 'Email já cadastrado'}), 400
-        
-        user = create_user(
-            nome_completo=nome_completo,
-            email=email,
-            senha=password,
-            telefone=telefone,
-            data_nascimento=data_nascimento,
-            cpf=cpf,
-            receber_emails=receber_emails,
-            receber_sms=receber_sms,
-            aceitou_termos=aceitou_termos
-        )
-        
-        if user:
-            login_user(user)
-            return jsonify({'success': True, 'redirect': url_for('landing_page')})
-        else:
-            return jsonify({'success': False, 'error': 'Erro ao criar usuário'}), 500
-    
-    return render_template('register.html')
+
 
 @app.route('/upgrade_plans')
 def upgrade_plans():
     """Página de planos premium."""
     return render_template('upgrade_plans.html')
 
+@app.route('/checkout')
+def checkout():
+    """Página de checkout/pagamento."""
+    return render_template('checkout.html')
+
+@app.route('/checkout-transparente/<plano_id>')
+def checkout_transparente(plano_id):
+    """Página de checkout transparente."""
+    from config.mercadopago_config import PLANOS_MERCADOPAGO
+    
+    plano = PLANOS_MERCADOPAGO.get(plano_id)
+    if not plano:
+        return "Plano não encontrado", 404
+    
+    return render_template('checkout_transparente.html', 
+                         plano_id=plano_id,
+                         plano_nome=plano['nome'],
+                         plano_valor=plano['preco'])
+
+# ============================================================================
+# 💳 ROTAS MERCADO PAGO
+# ============================================================================
+
+@app.route('/api/mercadopago/criar-pagamento', methods=['POST'])
+def criar_pagamento_mercadopago():
+    """Criar pagamento via Mercado Pago."""
+    try:
+        from services.mercadopago_service import mercadopago_service
+        
+        data = request.get_json()
+        plano_id = data.get('plano_id')
+        usuario_id = data.get('usuario_id', 1)  # Em produção, viria da sessão
+        
+        # Dados do usuário
+        dados_usuario = {
+            'nome': data.get('nome'),
+            'email': data.get('email'),
+            'cpf': data.get('cpf'),
+            'telefone': data.get('telefone')
+        }
+        
+        # Criar preferência de pagamento
+        result = mercadopago_service.criar_preferencia_pagamento(
+            plano_id, usuario_id, dados_usuario
+        )
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro ao criar pagamento: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
+@app.route('/webhook/mercadopago', methods=['POST'])
+def webhook_mercadopago():
+    """Webhook para notificações do Mercado Pago."""
+    try:
+        from services.mercadopago_service import mercadopago_service
+        
+        webhook_data = request.get_json()
+        result = mercadopago_service.processar_webhook(webhook_data)
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro no webhook: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/mercadopago/verificar-pagamento/<payment_id>')
+def verificar_pagamento_mercadopago(payment_id):
+    """Verificar status de um pagamento."""
+    try:
+        from services.mercadopago_service import mercadopago_service
+        
+        result = mercadopago_service.verificar_pagamento(payment_id)
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro ao verificar pagamento: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
+@app.route('/api/mercadopago/metodos-pagamento')
+def metodos_pagamento_mercadopago():
+    """Listar métodos de pagamento disponíveis."""
+    try:
+        from services.mercadopago_service import mercadopago_service
+        
+        metodos = mercadopago_service.get_metodos_pagamento()
+        config_parcelamento = mercadopago_service.get_configuracao_parcelamento()
+        
+        return jsonify({
+            "success": True,
+            "metodos": metodos,
+            "parcelamento": config_parcelamento
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Erro ao listar métodos de pagamento: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
+@app.route('/api/mercadopago/calcular-parcelas/<plano_id>')
+def calcular_parcelas_mercadopago(plano_id):
+    """Calcular opções de parcelamento para um plano."""
+    try:
+        from services.mercadopago_service import mercadopago_service
+        from config.mercadopago_config import PLANOS_MERCADOPAGO
+        
+        # Buscar dados do plano
+        plano = PLANOS_MERCADOPAGO.get(plano_id)
+        if not plano:
+            return jsonify({
+                "success": False,
+                "error": "Plano não encontrado"
+            }), 404
+        
+        # Calcular parcelas
+        parcelas = mercadopago_service.calcular_parcelas(plano['preco'], plano_id)
+        
+        return jsonify({
+            "success": True,
+            "plano": plano,
+            "parcelas": parcelas
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Erro ao calcular parcelas: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
+# ============================================================================
+# 💳 ROTAS CHECKOUT TRANSPARENTE
+# ============================================================================
+
+@app.route('/api/checkout/cartao', methods=['POST'])
+def checkout_cartao():
+    """Processar pagamento com cartão."""
+    try:
+        from services.checkout_transparente import checkout_transparente
+        
+        data = request.get_json()
+        
+        # Validar dados obrigatórios
+        campos_obrigatorios = ['valor', 'descricao', 'email', 'cpf', 'token', 'metodo_pagamento']
+        for campo in campos_obrigatorios:
+            if not data.get(campo):
+                return jsonify({
+                    "success": False,
+                    "error": f"Campo obrigatório: {campo}"
+                }), 400
+        
+        # Criar pagamento
+        result = checkout_transparente.criar_pagamento_cartao(data)
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro no checkout cartão: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
+@app.route('/api/checkout/pix', methods=['POST'])
+def checkout_pix():
+    """Processar pagamento via PIX."""
+    try:
+        from services.checkout_transparente import checkout_transparente
+        
+        data = request.get_json()
+        
+        # Validar dados obrigatórios
+        campos_obrigatorios = ['valor', 'descricao', 'email', 'cpf']
+        for campo in campos_obrigatorios:
+            if not data.get(campo):
+                return jsonify({
+                    "success": False,
+                    "error": f"Campo obrigatório: {campo}"
+                }), 400
+        
+        # Criar pagamento PIX
+        result = checkout_transparente.criar_pagamento_pix(data)
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro no checkout PIX: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
+
+@app.route('/api/checkout/public-key')
+def checkout_public_key():
+    """Retornar chave pública para o frontend."""
+    try:
+        from services.checkout_transparente import checkout_transparente
+        
+        return jsonify({
+            "success": True,
+            "public_key": checkout_transparente.public_key
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ Erro ao obter chave pública: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": "Erro interno do servidor"
+        }), 500
 
 
 @app.route('/premium_required')
@@ -531,7 +693,7 @@ def upgrade_plan():
         current_user.subscription_expiry = None
     
     # Em produção, você salvaria no banco real
-    users_db[current_user.id] = current_user
+    # users_db[current_user.id] = current_user  # Comentado temporariamente
     
     return jsonify({
         'success': True, 
@@ -788,7 +950,8 @@ def create_test_user(level):
         return jsonify({'error': 'Nível inválido'}), 400
     
     test_email = f"test_{level.lower()}@example.com"
-    user = create_user(test_email, "test123", level)
+    # user = create_user(test_email, "test123", level)  # Comentado temporariamente
+    user = None  # Simulação temporária
     
     if user:
         return jsonify({

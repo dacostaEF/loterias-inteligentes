@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Loterias Inteligentes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .checkout-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        /* COLUNA ESQUERDA - FORMULÁRIO */
+        .checkout-form {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .product-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #A855F7, #8B5CF6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .product-details h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .product-details .plan-type {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .product-details .price {
+            font-size: 18px;
+            font-weight: 700;
+            color: #A855F7;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #A855F7;
+        }
+
+        .phone-group {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 10px;
+        }
+
+        .privacy-notice {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        /* MÉTODOS DE PAGAMENTO */
+        .payment-methods {
+            margin-bottom: 30px;
+        }
+
+        .payment-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .payment-option {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .payment-option.selected {
+            border-color: #A855F7;
+            background: #f8f5ff;
+        }
+
+        .payment-option i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .payment-option .method-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* DETALHES DO CARTÃO */
+        .card-details {
+            display: none;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .card-details.active {
+            display: block;
+        }
+
+        .card-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* RESUMO E FINALIZAÇÃO */
+        .order-summary {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .summary-row.total {
+            font-weight: 600;
+            font-size: 16px;
+            padding-top: 10px;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-top: 3px;
+        }
+
+        .checkbox-group label {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .required-field {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .checkout-button {
+            width: 100%;
+            padding: 15px;
+            background: #A855F7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkout-button:hover {
+            background: #9333EA;
+        }
+
+        .checkout-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* SELOS DE SEGURANÇA */
+        .security-badges {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .security-badge {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .security-badge i {
+            font-size: 20px;
+            color: #28a745;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        /* COLUNA DIREITA - BENEFÍCIOS */
+        .benefits-sidebar {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 12px;
+            padding: 30px;
+            color: white;
+            height: fit-content;
+        }
+
+        .benefits-section {
+            margin-bottom: 30px;
+        }
+
+        .benefits-section h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #A855F7;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .benefit-item i {
+            color: #10B981;
+            font-size: 16px;
+        }
+
+        .security-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .security-info i {
+            font-size: 32px;
+            color: #10B981;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .guarantee-badge {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .guarantee-badge .days {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .card-row {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-options {
+                flex-direction: column;
+            }
+
+            .security-badges {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="checkout-container">
+        <!-- COLUNA ESQUERDA - FORMULÁRIO -->
+        <div class="checkout-form">
+            <!-- INFORMAÇÕES DO PRODUTO -->
+            <div class="product-info">
+                <div class="product-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="product-details">
+                    <h2 id="plan-name">Plano Mensal</h2>
+                    <div class="plan-type">ASSINATURA</div>
+                    <div class="price" id="plan-price">R$ 29,90</div>
+                </div>
+            </div>
+
+            <!-- DADOS PESSOAIS -->
+            <div class="form-section">
+                <h3>Informações Pessoais</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nome">Nome Completo *</label>
+                        <input type="text" id="nome" name="nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cpf">CPF ou CNPJ *</label>
+                        <input type="text" id="cpf" name="cpf" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefone">Celular *</label>
+                    <div class="phone-group">
+                        <select id="ddi" name="ddi">
+                            <option value="+55">+55</option>
+                        </select>
+                        <input type="tel" id="telefone" name="telefone" placeholder="(11) 99999-9999" required>
+                    </div>
+                </div>
+                <div class="privacy-notice">
+                    <i class="fas fa-shield-alt"></i> Seus dados serão mantidos em sigilo
+                </div>
+            </div>
+
+            <!-- MÉTODOS DE PAGAMENTO -->
+            <div class="form-section">
+                <h3>SELECIONE UM MÉTODO DE PAGAMENTO</h3>
+                <div class="payment-options">
+                    <div class="payment-option selected" data-method="card">
+                        <i class="fas fa-credit-card"></i>
+                        <div class="method-name">Cartão de Crédito</div>
+                    </div>
+                    <div class="payment-option" data-method="pix">
+                        <i class="fas fa-qrcode"></i>
+                        <div class="method-name">PIX</div>
+                    </div>
+                    <div class="payment-option" data-method="boleto">
+                        <i class="fas fa-barcode"></i>
+                        <div class="method-name">Boleto</div>
+                    </div>
+                </div>
+
+                <!-- DETALHES DO CARTÃO -->
+                <div class="card-details active" id="card-details">
+                    <div class="form-group">
+                        <label for="card-number">Número do Cartão *</label>
+                        <input type="text" id="card-number" name="card-number" placeholder="0000 0000 0000 0000" required>
+                    </div>
+                    <div class="card-row">
+                        <div class="form-group">
+                            <label for="card-expiry">Validade (MM/AA) *</label>
+                            <input type="text" id="card-expiry" name="card-expiry" placeholder="12/25" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="card-cvv">Código de Segurança *</label>
+                            <input type="text" id="card-cvv" name="card-cvv" placeholder="123" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="card-name">Nome no Cartão *</label>
+                            <input type="text" id="card-name" name="card-name" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="card-cpf">CPF do Titular *</label>
+                        <input type="text" id="card-cpf" name="card-cpf" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESUMO DO PEDIDO -->
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span id="summary-plan">Plano Mensal</span>
+                    <span id="summary-price">R$ 29,90</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span id="total-price">R$ 29,90</span>
+                </div>
+            </div>
+
+            <!-- TERMOS E CONDIÇÕES -->
+            <div class="checkbox-group">
+                <input type="checkbox" id="save-data" name="save-data">
+                <label for="save-data">Usar esses dados nas próximas compras</label>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">Concordo que li e aceito os <a href="#" style="color: #A855F7;">TERMOS DE ASSINATURA E CANCELAMENTO</a></label>
+            </div>
+            <div class="required-field" id="terms-error" style="display: none;">Este campo é obrigatório</div>
+
+            <!-- BOTÃO DE FINALIZAÇÃO -->
+            <button class="checkout-button" id="checkout-btn" disabled>
+                <i class="fas fa-lock"></i> Pagar e Assinar Agora
+            </button>
+
+            <!-- SELOS DE SEGURANÇA -->
+            <div class="security-badges">
+                <div class="security-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <div>COMPRA 100% SEGURA</div>
+                </div>
+                <div class="security-badge">
+                    <i class="fas fa-user-shield"></i>
+                    <div>PRIVACIDADE PROTEGIDA</div>
+                </div>
+                <div class="security-badge">
+                    <i class="fas fa-certificate"></i>
+                    <div>SSL VERIFICADO</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUNA DIREITA - BENEFÍCIOS -->
+        <div class="benefits-sidebar">
+            <div class="benefits-section">
+                <h3>VOCÊ VAI RECEBER:</h3>
+                <div class="benefit-item">
+                    <i class="fas fa-check"></i>
+                    <span>Acesso a todas as modalidades de loteria</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check"></i>
+                    <span>Análises estatísticas avançadas</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check"></i>
+                    <span>Laboratório de simulações</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check"></i>
+                    <span>Suporte prioritário</span>
+                </div>
+                <div class="benefit-item">
+                    <i class="fas fa-check"></i>
+                    <span>Atualizações automáticas</span>
+                </div>
+            </div>
+
+            <div class="security-info">
+                <i class="fas fa-shield-alt"></i>
+                <h4>SITE SEGURO</h4>
+                <p>PRIVACIDADE</p>
+                <small>Suas informações estão 100% seguras</small>
+            </div>
+
+            <div class="benefits-section">
+                <h3>ENTREGA VIA E-MAIL:</h3>
+                <div class="benefit-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Acesso ao produto entregue por e-mail</span>
+                </div>
+            </div>
+
+            <div class="guarantee-badge">
+                <div class="days">7 DIAS</div>
+                <div>GARANTIA</div>
+                <div style="font-size: 12px; margin-top: 5px;">OU SEU DINHEIRO DE VOLTA</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Controle dos métodos de pagamento
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remover seleção anterior
+                document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+                
+                // Adicionar seleção atual
+                this.classList.add('selected');
+                
+                // Mostrar/ocultar detalhes do cartão
+                const cardDetails = document.getElementById('card-details');
+                if (this.dataset.method === 'card') {
+                    cardDetails.classList.add('active');
+                } else {
+                    cardDetails.classList.remove('active');
+                }
+            });
+        });
+
+        // Validação do formulário
+        function validateForm() {
+            const nome = document.getElementById('nome').value.trim();
+            const cpf = document.getElementById('cpf').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const telefone = document.getElementById('telefone').value.trim();
+            const terms = document.getElementById('terms').checked;
+            
+            const isValid = nome && cpf && email && telefone && terms;
+            
+            document.getElementById('checkout-btn').disabled = !isValid;
+            
+            // Mostrar erro dos termos se necessário
+            const termsError = document.getElementById('terms-error');
+            if (!terms && (nome || cpf || email || telefone)) {
+                termsError.style.display = 'block';
+            } else {
+                termsError.style.display = 'none';
+            }
+        }
+
+        // Adicionar listeners para validação
+        document.getElementById('nome').addEventListener('input', validateForm);
+        document.getElementById('cpf').addEventListener('input', validateForm);
+        document.getElementById('email').addEventListener('input', validateForm);
+        document.getElementById('telefone').addEventListener('input', validateForm);
+        document.getElementById('terms').addEventListener('change', validateForm);
+
+        // Processar pagamento
+        document.getElementById('checkout-btn').addEventListener('click', function() {
+            if (this.disabled) return;
+            
+            // Aqui será implementada a lógica de pagamento
+            console.log('Processando pagamento...');
+            
+            // Simular processamento
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                alert('Pagamento processado com sucesso!');
+                // Redirecionar para página de sucesso
+                window.location.href = '/pagamento/sucesso';
+            }, 2000);
+        });
+
+        // Carregar dados do plano da URL
+        function loadPlanData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const planId = urlParams.get('plano');
+            
+            // Aqui será feita a requisição para buscar os dados do plano
+            // Por enquanto, vamos usar dados padrão
+            const plans = {
+                'daily': { name: 'Plano Diário', price: 'R$ 5,00' },
+                'monthly': { name: 'Plano Mensal', price: 'R$ 29,90' },
+                'semiannual': { name: 'Plano Semestral', price: 'R$ 149,90' },
+                'annual': { name: 'Plano Anual', price: 'R$ 269,90' },
+                'lifetime': { name: 'Plano Vitalício', price: 'R$ 997,00' }
+            };
+            
+            const plan = plans[planId] || plans['monthly'];
+            
+            document.getElementById('plan-name').textContent = plan.name;
+            document.getElementById('plan-price').textContent = plan.price;
+            document.getElementById('summary-plan').textContent = plan.name;
+            document.getElementById('summary-price').textContent = plan.price;
+            document.getElementById('total-price').textContent = plan.price;
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', loadPlanData);
+    </script>
+</body>
+</html>

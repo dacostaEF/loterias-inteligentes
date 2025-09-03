@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Loterias Inteligentes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/checkout.css') }}">
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+</head>
+<body>
+    <div class="checkout-container">
+        <div class="checkout-header">
+            <h1>💳 Finalizar Pagamento</h1>
+            <p>Plano: <strong id="plano-nome">{{ plano_nome }}</strong></p>
+            <p>Valor: <strong id="plano-valor">R$ {{ plano_valor }}</strong></p>
+        </div>
+
+        <div class="checkout-content">
+            <!-- Seleção de Método de Pagamento -->
+            <div class="payment-methods">
+                <h3>Escolha a forma de pagamento:</h3>
+                
+                <div class="method-option" data-method="pix">
+                    <input type="radio" id="pix" name="payment-method" value="pix">
+                    <label for="pix">🏦 PIX - Pagamento instantâneo</label>
+                </div>
+                
+                <div class="method-option" data-method="cartao">
+                    <input type="radio" id="cartao" name="payment-method" value="cartao">
+                    <label for="cartao">💳 Cartão de Crédito/Débito</label>
+                </div>
+            </div>
+
+            <!-- Formulário PIX -->
+            <div id="pix-form" class="payment-form" style="display: none;">
+                <h3>Pagamento via PIX</h3>
+                <p>Após confirmar, você receberá o QR Code para pagamento.</p>
+                <button id="btn-pix" class="btn-payment">Gerar PIX</button>
+            </div>
+
+            <!-- Formulário Cartão -->
+            <div id="cartao-form" class="payment-form" style="display: none;">
+                <h3>Dados do Cartão</h3>
+                
+                <div class="form-group">
+                    <label>Número do Cartão</label>
+                    <input type="text" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Validade</label>
+                        <input type="text" id="expiration-date" placeholder="MM/AA" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" id="security-code" placeholder="123" maxlength="4">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nome no Cartão</label>
+                    <input type="text" id="cardholder-name" placeholder="Nome como está no cartão">
+                </div>
+                
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="seu@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label>Parcelas</label>
+                    <select id="installments">
+                        <option value="1">1x de R$ {{ plano_valor }} (sem juros)</option>
+                    </select>
+                </div>
+                
+                <button id="btn-cartao" class="btn-payment">Pagar com Cartão</button>
+            </div>
+
+            <!-- QR Code PIX -->
+            <div id="pix-qr" class="pix-qr" style="display: none;">
+                <h3>Escaneie o QR Code com seu app do banco:</h3>
+                <div id="qr-code-container"></div>
+                <p>Ou copie o código PIX:</p>
+                <input type="text" id="pix-code" readonly>
+                <button id="copy-pix">Copiar Código</button>
+            </div>
+
+            <!-- Status do Pagamento -->
+            <div id="payment-status" class="payment-status" style="display: none;">
+                <div class="status-content">
+                    <div class="status-icon">⏳</div>
+                    <h3>Processando pagamento...</h3>
+                    <p>Aguarde enquanto processamos seu pagamento.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configurações
+        const PLANO_ID = '{{ plano_id }}';
+        const PLANO_VALOR = {{ plano_valor }};
+        const PLANO_NOME = '{{ plano_nome }}';
+        
+        let mercadopago;
+        let publicKey;
+
+        // Inicializar Mercado Pago
+        async function initMercadoPago() {
+            try {
+                const response = await fetch('/api/checkout/public-key');
+                const data = await response.json();
+                
+                if (data.success) {
+                    publicKey = data.public_key;
+                    mercadopago = new MercadoPago(publicKey);
+                    console.log('✅ Mercado Pago inicializado');
+                } else {
+                    console.error('❌ Erro ao obter chave pública');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao inicializar Mercado Pago:', error);
+            }
+        }
+
+        // Seleção de método de pagamento
+        document.querySelectorAll('input[name="payment-method"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const method = this.value;
+                
+                // Esconder todos os formulários
+                document.querySelectorAll('.payment-form').forEach(form => {
+                    form.style.display = 'none';
+                });
+                
+                // Mostrar formulário selecionado
+                if (method === 'pix') {
+                    document.getElementById('pix-form').style.display = 'block';
+                } else if (method === 'cartao') {
+                    document.getElementById('cartao-form').style.display = 'block';
+                }
+            });
+        });
+
+        // Processar PIX
+        document.getElementById('btn-pix').addEventListener('click', async function() {
+            try {
+                showPaymentStatus('Processando PIX...');
+                
+                const response = await fetch('/api/checkout/pix', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        valor: PLANO_VALOR,
+                        descricao: PLANO_NOME,
+                        email: 'dacosta_ef@hotmail.com', // Em produção, viria do formulário
+                        cpf: '12345678901', // Em produção, viria do formulário
+                        external_reference: `plano_${PLANO_ID}_${Date.now()}`
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showPixQR(result.qr_code_base64, result.qr_code, result.comprovante);
+                } else {
+                    alert('Erro ao gerar PIX: ' + result.error);
+                }
+            } catch (error) {
+                console.error('❌ Erro no PIX:', error);
+                alert('Erro ao processar PIX');
+            }
+        });
+
+        // Processar Cartão
+        document.getElementById('btn-cartao').addEventListener('click', async function() {
+            try {
+                showPaymentStatus('Processando cartão...');
+                
+                // Criar token do cartão
+                const token = await mercadopago.fields.createToken({
+                    cardNumber: document.getElementById('card-number').value,
+                    securityCode: document.getElementById('security-code').value,
+                    expirationMonth: document.getElementById('expiration-date').value.split('/')[0],
+                    expirationYear: '20' + document.getElementById('expiration-date').value.split('/')[1],
+                    cardholderName: document.getElementById('cardholder-name').value
+                });
+                
+                if (token.status === 'approved') {
+                    const response = await fetch('/api/checkout/cartao', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            valor: PLANO_VALOR,
+                            descricao: PLANO_NOME,
+                            email: document.getElementById('email').value,
+                            cpf: document.getElementById('cpf').value,
+                            token: token.id,
+                            metodo_pagamento: 'credit_card',
+                            parcelas: parseInt(document.getElementById('installments').value),
+                            external_reference: `plano_${PLANO_ID}_${Date.now()}`
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        if (result.status === 'approved') {
+                            showPaymentSuccess(result.comprovante);
+                        } else {
+                            showPaymentStatus('Pagamento pendente de aprovação');
+                        }
+                    } else {
+                        alert('Erro no pagamento: ' + result.error);
+                    }
+                } else {
+                    alert('Erro ao validar cartão: ' + token.message);
+                }
+            } catch (error) {
+                console.error('❌ Erro no cartão:', error);
+                alert('Erro ao processar cartão');
+            }
+        });
+
+        // Mostrar QR Code PIX
+        function showPixQR(qrCodeBase64, qrCode, comprovante) {
+            document.getElementById('pix-form').style.display = 'none';
+            document.getElementById('pix-qr').style.display = 'block';
+            
+            // Mostrar QR Code
+            const qrContainer = document.getElementById('qr-code-container');
+            qrContainer.innerHTML = `<img src="data:image/png;base64,${qrCodeBase64}" alt="QR Code PIX">`;
+            
+            // Mostrar código PIX
+            document.getElementById('pix-code').value = qrCode;
+            
+            // Mostrar comprovante
+            showComprovante(comprovante);
+        }
+
+        // Mostrar status do pagamento
+        function showPaymentStatus(message) {
+            document.querySelectorAll('.payment-form, .pix-qr').forEach(form => {
+                form.style.display = 'none';
+            });
+            
+            const statusDiv = document.getElementById('payment-status');
+            statusDiv.style.display = 'block';
+            statusDiv.querySelector('h3').textContent = message;
+        }
+
+        // Mostrar sucesso
+        function showPaymentSuccess(comprovante) {
+            const statusDiv = document.getElementById('payment-status');
+            statusDiv.innerHTML = `
+                <div class="status-content">
+                    <div class="status-icon">✅</div>
+                    <h3>Pagamento Aprovado!</h3>
+                    <p>Seu plano foi ativado com sucesso!</p>
+                    <button onclick="window.location.href='/'" class="btn-success">Continuar</button>
+                </div>
+            `;
+            
+            // Mostrar comprovante
+            if (comprovante) {
+                showComprovante(comprovante);
+            }
+        }
+        
+        // Mostrar comprovante
+        function showComprovante(comprovante) {
+            // Criar modal de comprovante
+            const modal = document.createElement('div');
+            modal.className = 'comprovante-modal';
+            modal.innerHTML = `
+                <div class="comprovante-content">
+                    <div class="comprovante-header">
+                        <h2>📄 Comprovante de Pagamento</h2>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="close-btn">×</button>
+                    </div>
+                    <div class="comprovante-body">
+                        <div class="comprovante-info">
+                            <p><strong>Tipo:</strong> ${comprovante.tipo}</p>
+                            <p><strong>Status:</strong> ${comprovante.status}</p>
+                            <p><strong>ID:</strong> ${comprovante.payment_id}</p>
+                            <p><strong>Valor:</strong> R$ ${comprovante.valor.toFixed(2)}</p>
+                            <p><strong>Descrição:</strong> ${comprovante.descricao}</p>
+                            <p><strong>Cliente:</strong> ${comprovante.cliente.nome}</p>
+                            <p><strong>Email:</strong> ${comprovante.cliente.email}</p>
+                            <p><strong>CPF:</strong> ${comprovante.cliente.cpf}</p>
+                            ${comprovante.data_criacao ? `<p><strong>Data:</strong> ${comprovante.data_criacao}</p>` : ''}
+                            ${comprovante.data_vencimento ? `<p><strong>Vencimento:</strong> ${comprovante.data_vencimento}</p>` : ''}
+                        </div>
+                        <div class="comprovante-instructions">
+                            <h3>Instruções:</h3>
+                            <ul>
+                                ${comprovante.instrucoes.map(inst => `<li>${inst}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ${comprovante.observacoes ? `
+                        <div class="comprovante-notes">
+                            <h3>Observações:</h3>
+                            <ul>
+                                ${comprovante.observacoes.map(obs => `<li>${obs}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                    </div>
+                    <div class="comprovante-footer">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="btn-close">Fechar</button>
+                        <button onclick="window.print()" class="btn-print">Imprimir</button>
+                    </div>
+                </div>
+            `;
+            
+            // Adicionar estilos
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Copiar código PIX
+        document.getElementById('copy-pix').addEventListener('click', function() {
+            const pixCode = document.getElementById('pix-code');
+            pixCode.select();
+            document.execCommand('copy');
+            alert('Código PIX copiado!');
+        });
+
+        // Inicializar quando carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            initMercadoPago();
+        });
+    </script>
+</body>
+</html>

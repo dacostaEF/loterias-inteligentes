@@ -516,8 +516,8 @@
             // Primeiro salvar o plano selecionado
             salvarPlanoSelecionado(plan);
             
-            // Depois abrir modal de pagamento
-            openModalPagamento(plan);
+            // Redirecionar para checkout
+            window.location.href = '/checkout?plano=' + plan;
         }
         
         // 💾 Salvar plano selecionado

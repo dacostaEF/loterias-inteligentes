@@ -231,11 +231,7 @@
                 <span>⭐</span>
                 Ver Planos Premium
             </a>
-            <a href="/register" class="btn btn-register">
-                <span>📝</span>
-                Criar Conta Grátis
-            </a>
-            <a href="/login" class="btn btn-login">
+            <a href="#" onclick="openModalLogin('login'); return false;" class="btn btn-register">
                 <span>🔑</span>
                 Já Tenho Conta
             </a>
@@ -254,37 +250,90 @@
         </div>
     </div>
 
+    <!-- Modal Login/Cadastro CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-login-cadastro.css') }}">
+    <!-- Modal Login/Cadastro JS -->
+    <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
+
     <script>
-        // Redirecionar automaticamente para a landing page após 10 segundos
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 10000);
-
-        // Contador regressivo
+        // Timer de redirecionamento (desabilitado quando modal está aberto)
+        let redirectTimer = null;
+        let countdownTimer = null;
         let countdown = 10;
-        const countdownElement = document.createElement('div');
-        countdownElement.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(168, 85, 247, 0.9);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            z-index: 1000;
-        `;
-        document.body.appendChild(countdownElement);
+        let countdownElement = null;
 
-        const timer = setInterval(() => {
-            countdown--;
-            countdownElement.textContent = `Redirecionando em ${countdown}s...`;
-            
-            if (countdown <= 0) {
-                clearInterval(timer);
-                countdownElement.remove();
+        function startRedirectTimer() {
+            // Redirecionar automaticamente para a landing page após 10 segundos
+            redirectTimer = setTimeout(() => {
+                window.location.href = '/';
+            }, 10000);
+
+            // Contador regressivo
+            countdown = 10;
+            countdownElement = document.createElement('div');
+            countdownElement.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(168, 85, 247, 0.9);
+                color: white;
+                padding: 10px 15px;
+                border-radius: 20px;
+                font-weight: 600;
+                z-index: 1000;
+            `;
+            document.body.appendChild(countdownElement);
+
+            countdownTimer = setInterval(() => {
+                countdown--;
+                countdownElement.textContent = `Redirecionando em ${countdown}s...`;
+                
+                if (countdown <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownElement.remove();
+                }
+            }, 1000);
+        }
+
+        function stopRedirectTimer() {
+            if (redirectTimer) {
+                clearTimeout(redirectTimer);
+                redirectTimer = null;
             }
-        }, 1000);
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            if (countdownElement) {
+                countdownElement.remove();
+                countdownElement = null;
+            }
+        }
+
+        // Iniciar timer quando a página carrega
+        startRedirectTimer();
+
+        // Parar timer quando modal de login/cadastro abrir
+        document.addEventListener('DOMContentLoaded', function() {
+            // Observar quando o modal de login/cadastro é aberto
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        const modal = document.getElementById('modal-login-cadastro');
+                        if (modal && modal.style.display !== 'none') {
+                            stopRedirectTimer();
+                        } else if (modal && modal.style.display === 'none') {
+                            startRedirectTimer();
+                        }
+                    }
+                });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
     </script>
 </body>
 </html>
