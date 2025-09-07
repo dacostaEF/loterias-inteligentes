@@ -16,8 +16,8 @@ load_dotenv()
 # ============================================================================
 
 # Credenciais do Mercado Pago
-MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN', 'dev_24c65fb163bf11ea96500242ac130004')
-MERCADOPAGO_PUBLIC_KEY = os.getenv('MERCADOPAGO_PUBLIC_KEY', 'dev_24c65fb163bf11ea96500242ac130004')
+MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN', 'TEST-12345678901234567890123456789012-12345678-abcdefgh-12345678-abcdefgh')
+MERCADOPAGO_PUBLIC_KEY = os.getenv('MERCADOPAGO_PUBLIC_KEY', 'TEST-12345678901234567890123456789012-12345678-abcdefgh-12345678-abcdefgh')
 
 # Modo de operação (sandbox para testes, production para produção)
 MERCADOPAGO_SANDBOX = os.getenv('MERCADOPAGO_SANDBOX', 'true').lower() == 'true'

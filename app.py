@@ -607,7 +607,7 @@ def checkout_cartao():
 def checkout_pix():
     """Processar pagamento via PIX."""
     try:
-        from services.checkout_transparente import checkout_transparente
+        from services.pix_simulator import pix_simulator
         
         data = request.get_json()
         
@@ -620,8 +620,8 @@ def checkout_pix():
                     "error": f"Campo obrigatório: {campo}"
                 }), 400
         
-        # Criar pagamento PIX
-        result = checkout_transparente.criar_pagamento_pix(data)
+        # Criar pagamento PIX simulado
+        result = pix_simulator.gerar_pix(data)
         return jsonify(result)
         
     except Exception as e:
@@ -3384,6 +3384,66 @@ def google_callback():
     except Exception as e:
         logger.error(f"Erro no callback Google OAuth: {e}")
         return redirect('/login?error=google_oauth_error')
+
+@app.route('/api/checkout/pix/status/<payment_id>', methods=['GET'])
+def checkout_pix_status(payment_id):
+    """Verificar status do pagamento PIX."""
+    try:
+        from services.pix_simulator import pix_simulator
+        
+        result = pix_simulator.verificar_pagamento(payment_id)
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro ao verificar status PIX: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+@app.route('/api/checkout/boleto', methods=['POST'])
+def checkout_boleto():
+    """Processar pagamento via Boleto."""
+    try:
+        from services.boleto_simulator import boleto_simulator
+        
+        data = request.get_json()
+        
+        # Validar dados obrigatórios
+        campos_obrigatorios = ['valor', 'descricao', 'email', 'cpf']
+        for campo in campos_obrigatorios:
+            if not data.get(campo):
+                return jsonify({
+                    "success": False,
+                    "error": f"Campo obrigatório: {campo}"
+                }), 400
+        
+        # Criar boleto simulado
+        result = boleto_simulator.gerar_boleto(data)
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro no checkout boleto: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+@app.route('/api/checkout/boleto/status/<boleto_id>', methods=['GET'])
+def checkout_boleto_status(boleto_id):
+    """Verificar status do boleto."""
+    try:
+        from services.boleto_simulator import boleto_simulator
+        
+        result = boleto_simulator.verificar_boleto(boleto_id)
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"❌ Erro ao verificar status boleto: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 # ============================================================================
 # 🚀 INICIALIZAÇÃO DO APLICATIVO

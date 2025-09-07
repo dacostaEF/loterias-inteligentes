@@ -29,6 +29,11 @@
                     <input type="radio" id="cartao" name="payment-method" value="cartao">
                     <label for="cartao">💳 Cartão de Crédito/Débito</label>
                 </div>
+                
+                <div class="method-option" data-method="boleto">
+                    <input type="radio" id="boleto" name="payment-method" value="boleto">
+                    <label for="boleto">📄 Boleto Bancário</label>
+                </div>
             </div>
 
             <!-- Formulário PIX -->
@@ -83,6 +88,13 @@
                 <button id="btn-cartao" class="btn-payment">Pagar com Cartão</button>
             </div>
 
+            <!-- Formulário Boleto -->
+            <div id="boleto-form" class="payment-form" style="display: none;">
+                <h3>Pagamento via Boleto</h3>
+                <p>Após confirmar, você receberá o boleto para pagamento.</p>
+                <button id="btn-boleto" class="btn-payment">Gerar Boleto</button>
+            </div>
+
             <!-- QR Code PIX -->
             <div id="pix-qr" class="pix-qr" style="display: none;">
                 <h3>Escaneie o QR Code com seu app do banco:</h3>
@@ -90,6 +102,20 @@
                 <p>Ou copie o código PIX:</p>
                 <input type="text" id="pix-code" readonly>
                 <button id="copy-pix">Copiar Código</button>
+            </div>
+
+            <!-- Boleto -->
+            <div id="boleto-info" class="boleto-info" style="display: none;">
+                <h3>Boleto Bancário Gerado:</h3>
+                <div class="boleto-details">
+                    <p><strong>Código de Barras:</strong></p>
+                    <input type="text" id="codigo-barras" readonly>
+                    <button id="copy-barras">Copiar Código de Barras</button>
+                    
+                    <p><strong>Linha Digitável:</strong></p>
+                    <input type="text" id="linha-digitavel" readonly>
+                    <button id="copy-linha">Copiar Linha Digitável</button>
+                </div>
             </div>
 
             <!-- Status do Pagamento -->
@@ -145,6 +171,8 @@
                     document.getElementById('pix-form').style.display = 'block';
                 } else if (method === 'cartao') {
                     document.getElementById('cartao-form').style.display = 'block';
+                } else if (method === 'boleto') {
+                    document.getElementById('boleto-form').style.display = 'block';
                 }
             });
         });
@@ -169,15 +197,53 @@
                 });
                 
                 const result = await response.json();
+                console.log('🔍 Resposta do PIX:', result);
                 
                 if (result.success) {
+                    console.log('✅ PIX gerado com sucesso');
                     showPixQR(result.qr_code_base64, result.qr_code, result.comprovante);
                 } else {
+                    console.log('❌ Erro no PIX:', result.error);
                     alert('Erro ao gerar PIX: ' + result.error);
                 }
             } catch (error) {
                 console.error('❌ Erro no PIX:', error);
                 alert('Erro ao processar PIX');
+            }
+        });
+
+        // Processar Boleto
+        document.getElementById('btn-boleto').addEventListener('click', async function() {
+            try {
+                showPaymentStatus('Gerando boleto...');
+                
+                const response = await fetch('/api/checkout/boleto', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        valor: PLANO_VALOR,
+                        descricao: PLANO_NOME,
+                        email: 'dacosta_ef@hotmail.com', // Em produção, viria do formulário
+                        cpf: '12345678901', // Em produção, viria do formulário
+                        nome: 'Cliente Teste'
+                    })
+                });
+                
+                const result = await response.json();
+                console.log('🔍 Resposta do Boleto:', result);
+                
+                if (result.success) {
+                    console.log('✅ Boleto gerado com sucesso');
+                    showBoletoInfo(result.codigo_barras, result.linha_digitavel, result.comprovante);
+                } else {
+                    console.log('❌ Erro no boleto:', result.error);
+                    alert('Erro ao gerar boleto: ' + result.error);
+                }
+            } catch (error) {
+                console.error('❌ Erro no boleto:', error);
+                alert('Erro ao processar boleto');
             }
         });
 
@@ -235,15 +301,46 @@
 
         // Mostrar QR Code PIX
         function showPixQR(qrCodeBase64, qrCode, comprovante) {
+            console.log('🔍 showPixQR chamada');
+            console.log('QR Code Base64:', qrCodeBase64 ? 'Presente' : 'Ausente');
+            console.log('QR Code:', qrCode ? 'Presente' : 'Ausente');
+            
             document.getElementById('pix-form').style.display = 'none';
             document.getElementById('pix-qr').style.display = 'block';
             
             // Mostrar QR Code
             const qrContainer = document.getElementById('qr-code-container');
-            qrContainer.innerHTML = `<img src="data:image/png;base64,${qrCodeBase64}" alt="QR Code PIX">`;
+            console.log('Container QR encontrado:', qrContainer ? 'SIM' : 'NÃO');
+            
+            if (qrCodeBase64) {
+                qrContainer.innerHTML = `<img src="data:image/png;base64,${qrCodeBase64}" alt="QR Code PIX" style="max-width: 300px; height: auto;">`;
+                console.log('✅ QR Code inserido no HTML');
+            } else {
+                qrContainer.innerHTML = '<p style="color: red;">❌ Erro: QR Code não foi gerado</p>';
+                console.log('❌ QR Code não foi gerado');
+            }
             
             // Mostrar código PIX
             document.getElementById('pix-code').value = qrCode;
+            
+            // Mostrar comprovante
+            showComprovante(comprovante);
+        }
+
+        // Mostrar informações do boleto
+        function showBoletoInfo(codigoBarras, linhaDigitavel, comprovante) {
+            console.log('🔍 showBoletoInfo chamada');
+            console.log('Código de Barras:', codigoBarras ? 'Presente' : 'Ausente');
+            console.log('Linha Digitável:', linhaDigitavel ? 'Presente' : 'Ausente');
+            
+            document.getElementById('boleto-form').style.display = 'none';
+            document.getElementById('boleto-info').style.display = 'block';
+            
+            // Mostrar código de barras
+            document.getElementById('codigo-barras').value = codigoBarras;
+            
+            // Mostrar linha digitável
+            document.getElementById('linha-digitavel').value = linhaDigitavel;
             
             // Mostrar comprovante
             showComprovante(comprovante);
@@ -347,6 +444,22 @@
             pixCode.select();
             document.execCommand('copy');
             alert('Código PIX copiado!');
+        });
+
+        // Copiar código de barras
+        document.getElementById('copy-barras').addEventListener('click', function() {
+            const codigoBarras = document.getElementById('codigo-barras');
+            codigoBarras.select();
+            document.execCommand('copy');
+            alert('Código de barras copiado!');
+        });
+
+        // Copiar linha digitável
+        document.getElementById('copy-linha').addEventListener('click', function() {
+            const linhaDigitavel = document.getElementById('linha-digitavel');
+            linhaDigitavel.select();
+            document.execCommand('copy');
+            alert('Linha digitável copiada!');
         });
 
         // Inicializar quando carregar a página
