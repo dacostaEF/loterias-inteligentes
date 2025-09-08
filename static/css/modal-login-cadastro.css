@@ -134,6 +134,47 @@
     box-sizing: border-box;
 }
 
+/* Container para input com ícone de olho */
+.password-input-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-input-container .form-input {
+    padding-right: 50px; /* Espaço para o ícone */
+}
+
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 1.2rem;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+}
+
+.password-toggle:hover {
+    color: #374151;
+    background: #f3f4f6;
+}
+
+.password-toggle:focus {
+    outline: none;
+    color: #10b981;
+    background: #f0fdf4;
+}
+
 .form-input:focus {
     outline: none;
     border-color: #10b981;

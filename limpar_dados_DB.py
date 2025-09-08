@@ -40,6 +40,42 @@ def limpar_dados_teste():
     cursor.execute("DELETE FROM pagamentos")
     print("✅ Pagamentos removidos")
     
+    # RECRIAR usuários master fixos (sempre disponíveis)
+    print("👥 Recriando usuários master fixos...")
+    
+    import hashlib
+    
+    # Usuários master fixos - SEMPRE recriados
+    usuarios_master = [
+        ('Master_EF', '01/01/1990', '000.000.000-01', '(11) 99999-0001', 'master_ef@loterias.com', 'Tete&2602'),
+        ('Master_SF', '01/01/1990', '000.000.000-02', '(11) 99999-0002', 'master_sf@loterias.com', 'Tete&2602'),
+        ('Master_SM', '01/01/1990', '000.000.000-03', '(11) 99999-0003', 'master_sm@loterias.com', 'Tete&2602'),
+        ('Master_JJ', '01/01/1990', '000.000.000-04', '(11) 99999-0004', 'master_jj@loterias.com', 'Tete&2602'),
+        ('Master_FC', '01/01/1990', '000.000.000-05', '(11) 99999-0005', 'master_fc@loterias.com', 'Tete&2602'),
+        ('Master_DC', '01/01/1990', '000.000.000-06', '(11) 99999-0006', 'master_dc@loterias.com', 'Tete&2602')
+    ]
+    
+    for usuario in usuarios_master:
+        nome, data_nasc, cpf, telefone, email, senha = usuario
+        senha_hash = hashlib.sha256(senha.encode()).hexdigest()
+        
+        # Remover se já existir
+        cursor.execute("DELETE FROM usuarios WHERE email = ?", (email,))
+        
+        # Inserir/recriar usuário master
+        cursor.execute('''
+            INSERT INTO usuarios (nome_completo, data_nascimento, cpf, telefone, email, senha_hash, tipo_plano)
+            VALUES (?, ?, ?, ?, ?, ?, 'Vitalício')
+        ''', (nome, data_nasc, cpf, telefone, email, senha_hash))
+    
+    print("✅ Usuários master fixos recriados")
+    print("👤 Master_EF (master_ef@loterias.com): Tete&2602")
+    print("👤 Master_SF (master_sf@loterias.com): Tete&2602")
+    print("👤 Master_SM (master_sm@loterias.com): Tete&2602")
+    print("👤 Master_JJ (master_jj@loterias.com): Tete&2602")
+    print("👤 Master_FC (master_fc@loterias.com): Tete&2602")
+    print("👤 Master_DC (master_dc@loterias.com): Tete&2602")
+    
     # Resetar auto-increment
     print("🔄 Resetando contadores...")
     cursor.execute("DELETE FROM sqlite_sequence WHERE name IN ('usuarios', 'codigos_confirmacao', 'logs_envio', 'pagamentos')")
@@ -61,6 +97,7 @@ def limpar_dados_teste():
     print("📧 Configurações de email mantidas")
     print("📱 Configurações de SMS mantidas")
     print("💎 Planos mantidos")
+    print("👤 6 Usuários master recriados")
     print("=" * 50)
     print("🎯 Pronto para novos testes!")
     print("=" * 50)
@@ -80,7 +117,7 @@ def mostrar_status():
     print("=" * 40)
     
     # Contar registros
-    tabelas = ['usuarios', 'planos', 'codigos_confirmacao', 'configuracoes_envio', 'logs_envio', 'pagamentos']
+    tabelas = ['usuarios', 'planos', 'codigos_confirmacao', 'configuracoes_envio', 'logs_envio']
     
     for tabela in tabelas:
         try:

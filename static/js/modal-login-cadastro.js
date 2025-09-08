@@ -37,7 +37,12 @@ class ModalLoginCadastro {
                         
                         <div class="form-group">
                             <label class="form-label" for="login-senha">Senha</label>
-                            <input type="password" class="form-input" id="login-senha" placeholder="Digite sua senha">
+                            <div class="password-input-container">
+                                <input type="password" class="form-input" id="login-senha" placeholder="Digite sua senha">
+                                <button type="button" class="password-toggle" id="toggle-login-senha" title="Mostrar/ocultar senha">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                             <div class="error-message" id="login-senha-error"></div>
                         </div>
                         
@@ -118,7 +123,12 @@ class ModalLoginCadastro {
                         
                         <div class="form-group">
                             <label class="form-label" for="cadastro-senha">Escolha uma senha</label>
-                            <input type="password" class="form-input" id="cadastro-senha" placeholder="Digite uma senha forte">
+                            <div class="password-input-container">
+                                <input type="password" class="form-input" id="cadastro-senha" placeholder="Digite uma senha forte">
+                                <button type="button" class="password-toggle" id="toggle-cadastro-senha" title="Mostrar/ocultar senha">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
                             <div class="error-message" id="cadastro-senha-error"></div>
                         </div>
                         
@@ -213,6 +223,9 @@ class ModalLoginCadastro {
             e.preventDefault();
             this.handleEsqueceuSenha();
         });
+
+        // Configurar ícones de olho para senhas
+        this.setupPasswordToggles();
     }
 
     setupValidation() {
@@ -237,6 +250,46 @@ class ModalLoginCadastro {
                 value = value.replace(/(\d)(\d{4})$/, '$1-$2');
                 e.target.value = value;
             });
+        }
+    }
+
+    setupPasswordToggles() {
+        // Configurar toggle para senha de login
+        const loginToggle = document.getElementById('toggle-login-senha');
+        const loginInput = document.getElementById('login-senha');
+        
+        if (loginToggle && loginInput) {
+            loginToggle.addEventListener('click', () => {
+                this.togglePasswordVisibility(loginInput, loginToggle);
+            });
+        }
+
+        // Configurar toggle para senha de cadastro
+        const cadastroToggle = document.getElementById('toggle-cadastro-senha');
+        const cadastroInput = document.getElementById('cadastro-senha');
+        
+        if (cadastroToggle && cadastroInput) {
+            cadastroToggle.addEventListener('click', () => {
+                this.togglePasswordVisibility(cadastroInput, cadastroToggle);
+            });
+        }
+    }
+
+    togglePasswordVisibility(input, toggle) {
+        const icon = toggle.querySelector('i');
+        
+        if (input.type === 'password') {
+            // Mostrar senha
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            toggle.title = 'Ocultar senha';
+        } else {
+            // Ocultar senha
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            toggle.title = 'Mostrar senha';
         }
     }
 

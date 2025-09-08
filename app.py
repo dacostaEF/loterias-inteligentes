@@ -22,8 +22,29 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ============================================================================
+
+
+
+
+# ============================================================================
 # 📊 CLASSES DE USUÁRIO E PERMISSÕES
 # ============================================================================
+
+# Lista global de emails master
+MASTER_EMAILS = {
+    'master_ef@loterias.com',
+    'master_sf@loterias.com',
+    'master_sm@loterias.com',
+    'master_jj@loterias.com',
+    'master_fc@loterias.com',
+    'master_dc@loterias.com',
+}
+
+def _attach_master_flag(user):
+    """Anexa flag nivel_master ao usuário baseado no email."""
+    if user:
+        user.nivel_master = (user.email in MASTER_EMAILS)
+    return user
 
 class UserLevel:
     """Níveis de usuário disponíveis no sistema."""
@@ -75,6 +96,24 @@ class UserPermissions:
     def is_premium_route(cls, route):
         """Verifica se uma rota requer assinatura premium."""
         return route in cls.PREMIUM_ROUTES
+    
+    @classmethod
+    def has_access(cls, route, user):
+        """Verifica se o usuário tem acesso à rota."""
+        # Se é rota gratuita, sempre tem acesso
+        if cls.is_free_route(route):
+            return True
+        
+        # Se é rota premium, verificar se é premium ou master
+        if cls.is_premium_route(route):
+            # Verificar se é usuário master
+            if hasattr(user, 'nivel_master') and user.nivel_master:
+                return True
+            
+            # Verificar se é premium normal
+            return user.is_premium
+        
+        return False
 
 class User(UserMixin):
     """Modelo de usuário com Flask-Login."""
@@ -88,6 +127,9 @@ class User(UserMixin):
     @property
     def is_premium(self):
         """Verifica se o usuário tem acesso premium ativo."""
+        # Master sempre tem acesso premium
+        if getattr(self, 'nivel_master', False):
+            return True
         if self.level == UserLevel.LIFETIME:
             return True
         if self.subscription_expiry:
@@ -157,7 +199,8 @@ def get_user_by_id(user_id):
             }
             level = level_mapping.get(plano_nome, UserLevel.FREE)
             
-            return User(user_data['id'], user_data['email'], level)
+            user = User(user_data['id'], user_data['email'], level)
+            return _attach_master_flag(user)
         
         return None
         
@@ -176,11 +219,9 @@ def get_user_by_email(email):
         
         # Buscar usuário
         cursor.execute("""
-            SELECT u.id, u.nome_completo, u.email, u.senha_hash, u.status, a.status as assinatura_status, p.nome as plano_nome
-            FROM usuarios u
-            LEFT JOIN assinaturas a ON u.id = a.usuario_id AND a.status = 'ativa'
-            LEFT JOIN planos p ON a.plano_id = p.id
-            WHERE u.email = ?
+            SELECT id, nome_completo, email, senha_hash, tipo_plano
+            FROM usuarios
+            WHERE email = ?
         """, (email,))
         
         user_data = cursor.fetchone()
@@ -188,7 +229,7 @@ def get_user_by_email(email):
         
         if user_data:
             # Mapear plano para UserLevel
-            plano_nome = user_data['plano_nome'] if user_data['plano_nome'] else 'Free'
+            plano_nome = user_data[4] if user_data[4] else 'Free'
             level_mapping = {
                 'Free': UserLevel.FREE,
                 'Mensal': UserLevel.PREMIUM_MONTHLY,
@@ -198,9 +239,9 @@ def get_user_by_email(email):
             }
             level = level_mapping.get(plano_nome, UserLevel.FREE)
             
-            user = User(user_data['id'], user_data['email'], level)
-            user.senha_hash = user_data['senha_hash']  # Para verificação de senha
-            return user
+            user = User(user_data[0], user_data[2], level)  # id, email, level
+            user.senha_hash = user_data[3]  # senha_hash
+            return _attach_master_flag(user)
         
         return None
         
@@ -211,7 +252,9 @@ def get_user_by_email(email):
 def verify_password(user, password):
     """Verifica se a senha está correta."""
     try:
-        return bcrypt.checkpw(password.encode('utf-8'), user.senha_hash.encode('utf-8'))
+        import hashlib
+        password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        return password_hash == user.senha_hash
     except Exception as e:
         logger.error(f"Erro ao verificar senha: {e}")
         return False
@@ -363,7 +406,7 @@ def load_user(user_id):
 # ============================================================================
 
 app = Flask(__name__, static_folder='static')
-app.secret_key = 'sua_chave_secreta_aqui_mude_em_producao'  # IMPORTANTE: Mude em produção!
+app.secret_key = 'loterias_inteligentes_2024_secret_key_secure'  # Chave secreta para sessões
 
 # ============================================================================
 # 🔧 CONFIGURAÇÃO DO FLASK-LOGIN (APÓS CRIAÇÃO DO APP)
@@ -372,9 +415,9 @@ app.secret_key = 'sua_chave_secreta_aqui_mude_em_producao'  # IMPORTANTE: Mude e
 # Configurar Flask-Login APÓS a criação da instância do Flask
 login_manager = LoginManager()
 login_manager.init_app(app)
-# Removido login_view para não redirecionar automaticamente
-# login_manager.login_view = 'login'
+login_manager.login_view = 'login'  # Rota de login
 login_manager.user_loader(load_user)
+login_manager.session_protection = "strong"  # Proteção de sessão
 
 # Handler para requisições não autorizadas
 @login_manager.unauthorized_handler
@@ -395,17 +438,17 @@ def require_free_or_premium(f):
     def decorated_function(*args, **kwargs):
         current_route = request.path
         
-        # Se for rota freemium, sempre permitir
+        # Rotas free: sempre libera
         if UserPermissions.is_free_route(current_route):
             return f(*args, **kwargs)
         
-        # Se for rota premium, verificar se usuário está logado e tem assinatura
+        # Rotas premium: exige login e passa pela checagem centralizada
         if UserPermissions.is_premium_route(current_route):
             if not current_user.is_authenticated:
                 return redirect('/premium_required')
             
-            # Verificar se usuário tem acesso premium
-            if not current_user.is_premium:
+            # Usa a lógica única (que já sabe tratar master e premium)
+            if not UserPermissions.has_access(current_route, current_user):
                 return redirect('/premium_required')
         
         return f(*args, **kwargs)
@@ -417,6 +460,42 @@ def require_free_or_premium(f):
 # ============================================================================
 
 
+
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    """Login com email e senha."""
+    try:
+        data = request.get_json()
+        email = data.get('email')
+        senha = data.get('senha')
+        
+        if not email or not senha:
+            return jsonify({'success': False, 'error': 'Email e senha são obrigatórios'}), 400
+        
+        # Buscar usuário no banco
+        user = get_user_by_email(email)
+        if not user:
+            return jsonify({'success': False, 'error': 'Usuário não encontrado'}), 404
+        
+        # Verificar senha
+        if not verify_password(user, senha):
+            return jsonify({'success': False, 'error': 'Senha incorreta'}), 401
+        
+        # Fazer login
+        login_user(user)
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Login realizado com sucesso!',
+            'user_level': user.level,
+            'is_premium': user.is_premium
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro no login: {e}")
+        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
 
 @app.route('/logout')
 @login_required
@@ -431,6 +510,12 @@ def logout():
 def upgrade_plans():
     """Página de planos premium."""
     return render_template('upgrade_plans.html')
+
+@app.route('/politica_cookies')
+def politica_cookies():
+    """Renderiza a página de política de cookies."""
+    from datetime import datetime
+    return render_template('politica_cookies.html', data_atual=datetime.now().strftime('%d/%m/%Y'))
 
 @app.route('/checkout')
 def checkout():
@@ -607,7 +692,7 @@ def checkout_cartao():
 def checkout_pix():
     """Processar pagamento via PIX."""
     try:
-        from services.pix_simulator import pix_simulator
+        from services.checkout_transparente import checkout_transparente
         
         data = request.get_json()
         
@@ -620,8 +705,8 @@ def checkout_pix():
                     "error": f"Campo obrigatório: {campo}"
                 }), 400
         
-        # Criar pagamento PIX simulado
-        result = pix_simulator.gerar_pix(data)
+        # Criar pagamento PIX
+        result = checkout_transparente.criar_pagamento_pix(data)
         return jsonify(result)
         
     except Exception as e:
@@ -929,6 +1014,23 @@ def check_access(route_name):
     
     # Verificar se é rota premium
     if UserPermissions.is_premium_route(f'/{route_name}'):
+        # Verificar se é usuário master (emails master)
+        master_emails = [
+            'master_ef@loterias.com',
+            'master_sf@loterias.com',
+            'master_sm@loterias.com',
+            'master_jj@loterias.com',
+            'master_fc@loterias.com',
+            'master_dc@loterias.com'
+        ]
+        
+        if current_user.email in master_emails:
+            return jsonify({
+                'has_access': True,
+                'reason': 'master_access',
+                'message': 'Acesso master liberado'
+            })
+        
         if not current_user.is_premium:
             return jsonify({
                 'has_access': False,
@@ -1048,7 +1150,7 @@ with app.app_context():
 @app.route('/')
 def landing_page():
     """Renderiza a página landing como página inicial."""
-    return render_template('landing.html')
+    return render_template('landing.html', modo_desenvolvimento=MODO_DESENVOLVIMENTO)
 
 @app.route('/planos')
 def planos_page():
@@ -3385,66 +3487,6 @@ def google_callback():
         logger.error(f"Erro no callback Google OAuth: {e}")
         return redirect('/login?error=google_oauth_error')
 
-@app.route('/api/checkout/pix/status/<payment_id>', methods=['GET'])
-def checkout_pix_status(payment_id):
-    """Verificar status do pagamento PIX."""
-    try:
-        from services.pix_simulator import pix_simulator
-        
-        result = pix_simulator.verificar_pagamento(payment_id)
-        return jsonify(result)
-        
-    except Exception as e:
-        logger.error(f"❌ Erro ao verificar status PIX: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-@app.route('/api/checkout/boleto', methods=['POST'])
-def checkout_boleto():
-    """Processar pagamento via Boleto."""
-    try:
-        from services.boleto_simulator import boleto_simulator
-        
-        data = request.get_json()
-        
-        # Validar dados obrigatórios
-        campos_obrigatorios = ['valor', 'descricao', 'email', 'cpf']
-        for campo in campos_obrigatorios:
-            if not data.get(campo):
-                return jsonify({
-                    "success": False,
-                    "error": f"Campo obrigatório: {campo}"
-                }), 400
-        
-        # Criar boleto simulado
-        result = boleto_simulator.gerar_boleto(data)
-        return jsonify(result)
-        
-    except Exception as e:
-        logger.error(f"❌ Erro no checkout boleto: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
-@app.route('/api/checkout/boleto/status/<boleto_id>', methods=['GET'])
-def checkout_boleto_status(boleto_id):
-    """Verificar status do boleto."""
-    try:
-        from services.boleto_simulator import boleto_simulator
-        
-        result = boleto_simulator.verificar_boleto(boleto_id)
-        return jsonify(result)
-        
-    except Exception as e:
-        logger.error(f"❌ Erro ao verificar status boleto: {str(e)}")
-        return jsonify({
-            "success": False,
-            "error": str(e)
-        }), 500
-
 # ============================================================================
 # 🚀 INICIALIZAÇÃO DO APLICATIVO
 # ============================================================================
@@ -4072,13 +4114,16 @@ def pagamento_teste():
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================
 
+# Variável global para modo de desenvolvimento
+MODO_DESENVOLVIMENTO = os.environ.get('FLASK_ENV') != 'production'
+
 if __name__ == '__main__':
     # Configurações otimizadas para melhor performance
     port = int(os.environ.get('PORT', 5000))
     app.run(
-        debug=True,  # Mantém debug para desenvolvimento
+        debug=MODO_DESENVOLVIMENTO,  # Debug apenas em desenvolvimento
         host='0.0.0.0', 
         port=port,
         threaded=True,  # Habilita threading
-        use_reloader=True  # Mantém reloader para desenvolvimento
+        use_reloader=MODO_DESENVOLVIMENTO  # Reloader apenas em desenvolvimento
     ) 

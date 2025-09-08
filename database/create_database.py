@@ -107,6 +107,7 @@ def create_simple_database():
     ''')
     print("✅ Tabela 'logs_envio' criada")
     
+    
     # ============================================================================
     # 📊 INSERIR PLANOS PADRÃO
     # ============================================================================
@@ -172,6 +173,46 @@ def create_simple_database():
         print("✅ Configurações de envio inseridas")
     
     # ============================================================================
+    # 👥 INSERIR/RECRIAR USUÁRIOS MASTER FIXOS
+    # ============================================================================
+    
+    print("👥 Garantindo usuários master fixos...")
+    
+    import hashlib
+    
+    # Usuários master fixos - SEMPRE recriados
+    usuarios_master = [
+        ('Master_EF', '01/01/1990', '000.000.000-01', '(11) 99999-0001', 'master_ef@loterias.com', 'Tete&2602'),
+        ('Master_SF', '01/01/1990', '000.000.000-02', '(11) 99999-0002', 'master_sf@loterias.com', 'Tete&2602'),
+        ('Master_SM', '01/01/1990', '000.000.000-03', '(11) 99999-0003', 'master_sm@loterias.com', 'Tete&2602'),
+        ('Master_JJ', '01/01/1990', '000.000.000-04', '(11) 99999-0004', 'master_jj@loterias.com', 'Tete&2602'),
+        ('Master_FC', '01/01/1990', '000.000.000-05', '(11) 99999-0005', 'master_fc@loterias.com', 'Tete&2602'),
+        ('Master_DC', '01/01/1990', '000.000.000-06', '(11) 99999-0006', 'master_dc@loterias.com', 'Tete&2602')
+    ]
+    
+    for usuario in usuarios_master:
+        nome, data_nasc, cpf, telefone, email, senha = usuario
+        senha_hash = hashlib.sha256(senha.encode()).hexdigest()
+        
+        # Remover se já existir
+        cursor.execute("DELETE FROM usuarios WHERE email = ?", (email,))
+        
+        # Inserir/recriar usuário master
+        cursor.execute('''
+            INSERT INTO usuarios (nome_completo, data_nascimento, cpf, telefone, email, senha_hash, tipo_plano)
+            VALUES (?, ?, ?, ?, ?, ?, 'Vitalício')
+        ''', (nome, data_nasc, cpf, telefone, email, senha_hash))
+    
+    print("✅ Usuários master garantidos")
+    print("👤 Master_EF (master_ef@loterias.com): Tete&2602")
+    print("👤 Master_SF (master_sf@loterias.com): Tete&2602")
+    print("👤 Master_SM (master_sm@loterias.com): Tete&2602")
+    print("👤 Master_JJ (master_jj@loterias.com): Tete&2602")
+    print("👤 Master_FC (master_fc@loterias.com): Tete&2602")
+    print("👤 Master_DC (master_dc@loterias.com): Tete&2602")
+    
+    
+    # ============================================================================
     # 🔍 CRIAR ÍNDICES ESSENCIAIS
     # ============================================================================
     print("🚀 Criando índices essenciais...")
@@ -190,6 +231,7 @@ def create_simple_database():
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_logs_usuario ON logs_envio (usuario_id)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_logs_tipo ON logs_envio (tipo)')
     cursor.execute('CREATE INDEX IF NOT EXISTS idx_logs_data ON logs_envio (data_envio)')
+    
     
     print("✅ Índices criados")
     
@@ -212,7 +254,7 @@ def create_simple_database():
     print("\n" + "="*60)
     print("🎉 BANCO DE DADOS COMPLETO CRIADO COM SUCESSO!")
     print("="*60)
-    print(f"👥 Usuários: {usuarios_count}")
+    print(f"👥 Usuários: {usuarios_count} (incluindo 6 usuários master)")
     print(f"💎 Planos: {planos_count}")
     print(f"🔐 Códigos: {codigos_count}")
     print(f"📧 Configurações: {configs_count}")
@@ -221,6 +263,7 @@ def create_simple_database():
     print("✅ Estrutura COMPLETA para cadastro e confirmação!")
     print("📧 Email configurado: dacosta_ef@hotmail.com")
     print("📱 SMS configurado: 21981651234")
+    print("👤 6 Usuários Master configurados para testes!")
     print("="*60)
     
     conn.close()

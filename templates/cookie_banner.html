@@ -1,0 +1,341 @@
+<!-- 🍪 BANNER DE COOKIES -->
+<div id="cookie-banner" class="cookie-banner" style="display: none;">
+    <div class="cookie-content">
+        <div class="cookie-icon">🍪</div>
+        <div class="cookie-text">
+            <h3>Política de Cookies</h3>
+            <p>Este site utiliza cookies para melhorar sua experiência de navegação, manter você logado e personalizar o conteúdo. Ao continuar navegando, você concorda com o uso de cookies. <a href="/politica_cookies" style="color: #FFD700; text-decoration: underline;">Saiba mais</a></p>
+            <div class="cookie-buttons">
+                <button id="aceitar-cookies" class="btn-aceitar">Aceitar Todos</button>
+                <button id="recusar-cookies" class="btn-recusar">Recusar</button>
+                <button id="configurar-cookies" class="btn-configurar">Configurar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 🍪 MODAL DE CONFIGURAÇÃO DE COOKIES -->
+<div id="cookie-modal" class="cookie-modal" style="display: none;">
+    <div class="cookie-modal-content">
+        <h3>Configurações de Cookies</h3>
+        <div class="cookie-options">
+            <div class="cookie-option">
+                <label>
+                    <input type="checkbox" id="cookies-essenciais" checked disabled>
+                    <strong>Cookies Essenciais</strong>
+                    <span>Necessários para o funcionamento básico do site (obrigatórios)</span>
+                </label>
+            </div>
+            <div class="cookie-option">
+                <label>
+                    <input type="checkbox" id="cookies-sessao" checked>
+                    <strong>Cookies de Sessão</strong>
+                    <span>Mantêm você logado durante a navegação</span>
+                </label>
+            </div>
+            <div class="cookie-option">
+                <label>
+                    <input type="checkbox" id="cookies-preferences" checked>
+                    <strong>Cookies de Preferências</strong>
+                    <span>Lembram suas configurações e preferências</span>
+                </label>
+            </div>
+        </div>
+        <div class="cookie-modal-buttons">
+            <button id="salvar-configuracoes" class="btn-salvar">Salvar Configurações</button>
+            <button id="aceitar-todos-modal" class="btn-aceitar">Aceitar Todos</button>
+            <button id="cancelar-modal" class="btn-cancelar">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 🍪 ESTILOS DO BANNER DE COOKIES - ELEGANTE E HARMONIOSO */
+.cookie-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 15px;
+    padding: 20px;
+    z-index: 10000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.5s ease-out;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@keyframes slideUp {
+    from { 
+        transform: translateY(100%); 
+        opacity: 0;
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1;
+    }
+}
+
+.cookie-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.cookie-icon {
+    font-size: 1.5rem;
+    margin-top: 5px;
+    opacity: 0.8;
+}
+
+.cookie-text {
+    flex: 1;
+}
+
+.cookie-text h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2D3748;
+}
+
+.cookie-text p {
+    margin: 0 0 15px 0;
+    line-height: 1.4;
+    color: #4A5568;
+    font-size: 0.9rem;
+}
+
+.cookie-text a {
+    color: #7C3AED;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.cookie-text a:hover {
+    text-decoration: underline;
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.cookie-buttons button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    min-width: 80px;
+}
+
+.btn-aceitar {
+    background: #7C3AED;
+    color: white;
+}
+
+.btn-aceitar:hover {
+    background: #6B46C1;
+    transform: translateY(-1px);
+}
+
+.btn-recusar {
+    background: #E2E8F0;
+    color: #4A5568;
+    border: 1px solid #CBD5E0;
+}
+
+.btn-recusar:hover {
+    background: #CBD5E0;
+    transform: translateY(-1px);
+}
+
+.btn-configurar {
+    background: #F7FAFC;
+    color: #7C3AED;
+    border: 1px solid #7C3AED;
+}
+
+.btn-configurar:hover {
+    background: #7C3AED;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* 🍪 ESTILOS DO MODAL DE CONFIGURAÇÃO - ELEGANTE */
+.cookie-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.cookie-modal-content {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    max-width: 450px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    color: #2D3748;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+}
+
+.cookie-modal-content h3 {
+    margin: 0 0 20px 0;
+    color: #2D3748;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.cookie-options {
+    margin-bottom: 25px;
+}
+
+.cookie-option {
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    background: #F7FAFC;
+    transition: all 0.2s ease;
+}
+
+.cookie-option:hover {
+    border-color: #7C3AED;
+    background: #F0F4FF;
+}
+
+.cookie-option label {
+    display: block;
+    cursor: pointer;
+}
+
+.cookie-option input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.1);
+    accent-color: #7C3AED;
+}
+
+.cookie-option strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #2D3748;
+    font-size: 0.9rem;
+}
+
+.cookie-option span {
+    display: block;
+    font-size: 0.8rem;
+    color: #4A5568;
+    line-height: 1.3;
+}
+
+.cookie-modal-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cookie-modal-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+    min-width: 100px;
+}
+
+.btn-salvar {
+    background: #7C3AED;
+    color: white;
+}
+
+.btn-salvar:hover {
+    background: #6B46C1;
+    transform: translateY(-1px);
+}
+
+.btn-aceitar {
+    background: #4A5568;
+    color: white;
+}
+
+.btn-aceitar:hover {
+    background: #2D3748;
+    transform: translateY(-1px);
+}
+
+.btn-cancelar {
+    background: #E2E8F0;
+    color: #4A5568;
+    border: 1px solid #CBD5E0;
+}
+
+.btn-cancelar:hover {
+    background: #CBD5E0;
+    transform: translateY(-1px);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .cookie-banner {
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+        padding: 15px;
+    }
+    
+    .cookie-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .cookie-buttons {
+        justify-content: center;
+        margin-top: 15px;
+    }
+    
+    .cookie-buttons button {
+        flex: 1;
+        min-width: 70px;
+    }
+    
+    .cookie-modal-content {
+        padding: 20px;
+        margin: 10px;
+    }
+    
+    .cookie-modal-buttons {
+        flex-direction: column;
+    }
+    
+    .cookie-modal-buttons button {
+        width: 100%;
+    }
+}
+</style>
