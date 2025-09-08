@@ -6148,8 +6148,87 @@
     });
   </script>
 
-  <!-- Scripts de verificação de acesso -->
-  <script src="/static/js/premium_access_modal.js"></script>
-  <script src="/static/js/access_checker.js"></script>
+  <!-- Script de verificação de acesso ANTES de qualquer modal -->
+  <script>
+    // Verificar acesso IMEDIATAMENTE ao carregar a página
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('🔍 Verificando acesso ao carregar página...');
+      
+      try {
+        const resp = await fetch('/check_access/analise_estatistica_avancada_megasena', { 
+          credentials: 'include' 
+        });
+        const data = await resp.json();
+        
+        console.log('📊 Resposta do servidor:', data);
+        
+        if (!data.has_access) {
+          console.log('🚫 Acesso negado:', data.reason);
+          
+          if (data.reason === 'not_logged_in') {
+            // Usuário não logado -> redireciona para login
+            console.log('🔐 Redirecionando para login...');
+            window.location.href = '/login';
+            return;
+          } else if (data.reason === 'premium_required') {
+            // Precisa de plano premium -> redireciona para planos
+            console.log('💎 Redirecionando para planos...');
+            window.location.href = data.upgrade_url || '/upgrade_plans';
+            return;
+          }
+        } else {
+          console.log('✅ Acesso liberado:', data.reason);
+        }
+      } catch (err) {
+        console.error('❌ Erro ao verificar acesso:', err);
+        // Em caso de erro, permite acesso (fallback)
+        console.log('⚠️ Permitindo acesso por fallback');
+      }
+    });
+
+    // Função para verificar acesso em botões premium
+    async function checkAndProceed(routeName, onAllowed) {
+      try {
+        const resp = await fetch(`/check_access/${routeName}`, { credentials: 'include' });
+        const data = await resp.json();
+
+        if (data.has_access) {
+          onAllowed && onAllowed();
+          return;
+        }
+        if (data.reason === 'not_logged_in') {
+          window.location.href = '/login';
+          return;
+        }
+        if (data.reason === 'premium_required') {
+          window.location.href = data.upgrade_url || '/upgrade_plans';
+          return;
+        }
+        alert(data.message || 'Acesso negado.');
+      } catch (err) {
+        console.error('Falha ao checar acesso:', err);
+        alert('Não foi possível verificar o acesso agora.');
+      }
+    }
+
+    // Configurar botão premium
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('abrir-modal-premium');
+      if (!btn) return;
+
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        checkAndProceed('analise_estatistica_avancada_megasena', () => {
+          // Executar ação premium
+          const mp = document.getElementById('modal-premium');
+          if (mp) {
+            mp.classList.remove('hidden');
+          } else if (typeof abrirModal === 'function') {
+            abrirModal('frequencia');
+          }
+        });
+      });
+    });
+  </script>
 </body>
 </html> 
