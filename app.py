@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for
+from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, session
 import pandas as pd
 import os
 import math
@@ -100,19 +100,27 @@ class UserPermissions:
     @classmethod
     def has_access(cls, route, user):
         """Verifica se o usuário tem acesso à rota."""
+        print(f"🔍 HAS_ACCESS: Verificando rota '{route}' para usuário {user.email if user else 'None'}")
+        
         # Se é rota gratuita, sempre tem acesso
         if cls.is_free_route(route):
+            print(f"🔍 HAS_ACCESS: Rota gratuita - acesso liberado")
             return True
         
         # Se é rota premium, verificar se é premium ou master
         if cls.is_premium_route(route):
+            print(f"🔍 HAS_ACCESS: Rota premium detectada")
             # Verificar se é usuário master
             if hasattr(user, 'nivel_master') and user.nivel_master:
+                print(f"🔍 HAS_ACCESS: Usuário master - acesso liberado")
                 return True
             
             # Verificar se é premium normal
-            return user.is_premium
+            is_premium = user.is_premium
+            print(f"🔍 HAS_ACCESS: is_premium = {is_premium}")
+            return is_premium
         
+        print(f"🔍 HAS_ACCESS: Rota não reconhecida - acesso negado")
         return False
 
 class User(UserMixin):
@@ -167,42 +175,48 @@ from datetime import datetime, timedelta
 # Função create_user movida para db_config.py
 
 def get_user_by_id(user_id):
-    """Recupera usuário por ID do banco SQLite."""
+    """Recupera usuário por ID do banco SQLite - apenas para verificar acesso."""
     try:
         conn = get_db_connection()
-        if not conn:
+        if not conn: 
             return None
+        cur = conn.cursor()
         
-        cursor = conn.cursor()
-        
-        # Buscar usuário
-        cursor.execute("""
-            SELECT u.id, u.nome_completo, u.email, u.status, a.status as assinatura_status, p.nome as plano_nome
-            FROM usuarios u
-            LEFT JOIN assinaturas a ON u.id = a.usuario_id AND a.status = 'ativa'
-            LEFT JOIN planos p ON a.plano_id = p.id
-            WHERE u.id = ?
+        # Busca apenas ID, email e tipo_plano (não precisa da senha)
+        cur.execute("""
+            SELECT id, email, tipo_plano
+            FROM usuarios
+            WHERE id = ?
         """, (user_id,))
-        
-        user_data = cursor.fetchone()
+        row = cur.fetchone()
         conn.close()
         
-        if user_data:
-            # Mapear plano para UserLevel
-            plano_nome = user_data['plano_nome'] if user_data['plano_nome'] else 'Free'
-            level_mapping = {
-                'Free': UserLevel.FREE,
-                'Mensal': UserLevel.PREMIUM_MONTHLY,
-                'Semestral': UserLevel.PREMIUM_SEMESTRAL,
-                'Anual': UserLevel.PREMIUM_ANNUAL,
-                'Vitalício': UserLevel.LIFETIME
-            }
-            level = level_mapping.get(plano_nome, UserLevel.FREE)
-            
-            user = User(user_data['id'], user_data['email'], level)
-            return _attach_master_flag(user)
-        
-        return None
+        if not row:
+            return None
+
+        # row = (id, email, tipo_plano)
+        plano = row[2] if row[2] else 'Free'
+        level_map = {
+            'Free': UserLevel.FREE,
+            'Mensal': UserLevel.PREMIUM_MONTHLY,
+            'Semestral': UserLevel.PREMIUM_SEMESTRAL,
+            'Anual': UserLevel.PREMIUM_ANNUAL,
+            'Vitalício': UserLevel.LIFETIME
+        }
+        level = level_map.get(plano, UserLevel.FREE)
+
+        user = User(row[0], row[1], level)  # id, email, level
+        # Master por email
+        MASTER_EMAILS = {
+            'master_ef@loterias.com',
+            'master_sf@loterias.com',
+            'master_sm@loterias.com',
+            'master_jj@loterias.com',
+            'master_fc@loterias.com',
+            'master_dc@loterias.com'
+        }
+        user.nivel_master = (user.email in MASTER_EMAILS)
+        return user
         
     except Exception as e:
         logger.error(f"Erro ao buscar usuário por ID: {e}")
@@ -394,66 +408,69 @@ def incrementar_tentativas_codigo(usuario_id, codigo, tipo):
 
 
 # ============================================================================
-# 🔧 CONFIGURAÇÃO DO FLASK-LOGIN
-# ============================================================================
-
-def load_user(user_id):
-    """Função para carregar usuário (requerida pelo Flask-Login)."""
-    return get_user_by_id(user_id)
-
-# ============================================================================
 # 🚀 INICIALIZAÇÃO DO FLASK
 # ============================================================================
 
 app = Flask(__name__, static_folder='static')
-app.secret_key = 'loterias_inteligentes_2024_secret_key_secure'  # Chave secreta para sessões
+
+# Configuração unificada de sessão
+app.config.update(
+    SECRET_KEY='loterias_inteligentes_2024_secret_key_secure',
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SECURE=False,        # dev local
+    SESSION_COOKIE_SAMESITE='Lax',
+    REMEMBER_COOKIE_DURATION=timedelta(days=30),
+    REMEMBER_COOKIE_HTTPONLY=True,
+    REMEMBER_COOKIE_SAMESITE='Lax',
+    PERMANENT_SESSION_LIFETIME=timedelta(days=7),
+)
 
 # ============================================================================
-# 🔧 CONFIGURAÇÃO DO FLASK-LOGIN (APÓS CRIAÇÃO DO APP)
+# 🔧 CONFIGURAÇÃO DO FLASK-LOGIN (ÚNICA VERSÃO)
 # ============================================================================
 
-# Configurar Flask-Login APÓS a criação da instância do Flask
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'  # Rota de login
-login_manager.user_loader(load_user)
-login_manager.session_protection = "strong"  # Proteção de sessão
+login_manager.login_view = 'landing_page'
 
-# Handler para requisições não autorizadas
-@login_manager.unauthorized_handler
-def handle_unauthorized():
-    """Handler customizado para usuários não autorizados."""
-    # Não redireciona automaticamente - retorna erro 401
-    return jsonify({'error': 'Acesso não autorizado'}), 401
+@login_manager.user_loader
+def load_user(user_id):
+    print(f"🔍 LOAD_USER: Tentando carregar ID={user_id}")
+    try:
+        user = get_user_by_id(int(user_id))
+        if user:
+            print(f"✅ LOAD_USER: Usuário carregado - Email={user.email}, Level={user.level}, Premium={user.is_premium}")
+        else:
+            print(f"❌ LOAD_USER: Usuário não encontrado para ID={user_id}")
+        return user
+    except Exception as e:
+        print(f"❌ LOAD_USER erro: {e}")
+        return None
 
 # ============================================================================
 # 🔒 MIDDLEWARE DE CONTROLE DE ACESSO (APÓS CONFIGURAÇÃO DO FLASK-LOGIN)
 # ============================================================================
 
 def require_free_or_premium(f):
-    """Decorator para controlar acesso baseado no nível do usuário."""
     from functools import wraps
-    
     @wraps(f)
-    def decorated_function(*args, **kwargs):
+    def decorated(*args, **kwargs):
         current_route = request.path
+        print(f"🔍 ACESSO: Rota={current_route}, Auth={current_user.is_authenticated}, Cookie={request.headers.get('Cookie')}")
+        print(f"🔍 ACESSO: current_user = {current_user}")
+        print(f"🔍 ACESSO: session.get('_user_id') = {session.get('_user_id')}")
         
-        # Rotas free: sempre libera
         if UserPermissions.is_free_route(current_route):
             return f(*args, **kwargs)
-        
-        # Rotas premium: exige login e passa pela checagem centralizada
         if UserPermissions.is_premium_route(current_route):
             if not current_user.is_authenticated:
+                print("🔍 ACESSO: Usuário não autenticado - redirecionando")
                 return redirect('/premium_required')
-            
-            # Usa a lógica única (que já sabe tratar master e premium)
             if not UserPermissions.has_access(current_route, current_user):
+                print("🔍 ACESSO: Usuário não tem acesso - redirecionando")
                 return redirect('/premium_required')
-        
         return f(*args, **kwargs)
-    
-    return decorated_function
+    return decorated
 
 # ============================================================================
 # 👥 ROTAS DE AUTENTICAÇÃO
@@ -466,36 +483,37 @@ def require_free_or_premium(f):
 @app.route('/login', methods=['POST'])
 def login():
     """Login com email e senha."""
-    try:
-        data = request.get_json()
-        email = data.get('email')
-        senha = data.get('senha')
-        
-        if not email or not senha:
-            return jsonify({'success': False, 'error': 'Email e senha são obrigatórios'}), 400
-        
-        # Buscar usuário no banco
-        user = get_user_by_email(email)
-        if not user:
-            return jsonify({'success': False, 'error': 'Usuário não encontrado'}), 404
-        
-        # Verificar senha
-        if not verify_password(user, senha):
-            return jsonify({'success': False, 'error': 'Senha incorreta'}), 401
-        
-        # Fazer login
-        login_user(user)
-        
-        return jsonify({
-            'success': True, 
-            'message': 'Login realizado com sucesso!',
-            'user_level': user.level,
-            'is_premium': user.is_premium
-        })
-        
-    except Exception as e:
-        logger.error(f"Erro no login: {e}")
-        return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
+    data = request.get_json()
+    email = data.get('email')
+    senha = data.get('senha')
+    
+    if not email or not senha:
+        return jsonify({'success': False, 'error': 'Email e senha são obrigatórios'}), 400
+
+    print(f"🔍 LOGIN DEBUG: Tentando login com email='{email}'")
+    user = get_user_by_email(email)
+    print(f"🔍 LOGIN DEBUG: get_user_by_email retornou: {user}")
+    if not user:
+        print(f"🔍 LOGIN DEBUG: Usuário não encontrado para email='{email}'")
+        return jsonify({'success': False, 'error': 'Usuário não encontrado'}), 404
+
+    print(f"🔍 LOGIN DEBUG: Verificando senha para usuário {user.email}")
+    if not verify_password(user, senha):
+        print(f"🔍 LOGIN DEBUG: Senha incorreta para usuário {user.email}")
+        return jsonify({'success': False, 'error': 'Senha incorreta'}), 401
+
+    # 🔑 fixa a sessão
+    login_user(user, remember=True, force=True, fresh=True)
+    session.permanent = True
+    
+    # Debug da sessão
+    print(f"✅ LOGIN: id={user.id}, premium={user.is_premium}, master={getattr(user, 'nivel_master', False)}")
+    print(f"🔍 LOGIN: Sessão criada - user_id na sessão: {session.get('_user_id')}")
+    print(f"🔍 LOGIN: current_user.is_authenticated = {current_user.is_authenticated}")
+
+    return jsonify({'success': True, 'message': 'Login realizado com sucesso!',
+                    'user_level': user.level, 'is_premium': user.is_premium,
+                    'nivel_master': getattr(user, 'nivel_master', False)})
 
 @app.route('/logout')
 @login_required
@@ -3987,7 +4005,15 @@ def pagamento_teste():
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
-                text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
+                text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); 
+
+
+
+
+
+
+
+                
             }}
             
             .subtitle {{

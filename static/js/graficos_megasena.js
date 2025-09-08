@@ -610,61 +610,125 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (abrirModalPremiumBtn) {
         console.log("✅ Event listener adicionado ao botão abrir modal premium");
-        abrirModalPremiumBtn.addEventListener('click', () => {
+        abrirModalPremiumBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             console.log("🎯 Botão abrir modal premium clicado!");
-            modalPremium.classList.remove('hidden');
-            resultadoSugestaoDiv.classList.add('hidden');
+            
+            // Verificar acesso antes de abrir o modal
+            if (typeof checkAndProceed === 'function') {
+                checkAndProceed('analise_estatistica_avancada_megasena', () => {
+                    console.log('✅ Acesso permitido para Mega-Sena. Abrindo modal premium.');
+                    modalPremium.classList.remove('hidden');
+                    resultadoSugestaoDiv.classList.add('hidden');
+                    
+                    // Recuperar dados das análises do localStorage
+                    const analisesRecuperadas = recuperarAnalises();
+                    console.log("📊 Análises recuperadas do localStorage:", analisesRecuperadas);
 
-            // Recuperar dados das análises do localStorage
-            const analisesRecuperadas = recuperarAnalises();
-            console.log("📊 Análises recuperadas do localStorage:", analisesRecuperadas);
+                    // Atualizar as preferências com os dados das análises
+                    if (analisesRecuperadas.frequencia) {
+                        userPremiumPreferencesMS.frequencia = {
+                            ...userPremiumPreferencesMS.frequencia,
+                            ...analisesRecuperadas.frequencia
+                        };
+                    }
+                    if (analisesRecuperadas.distribuicao) {
+                        userPremiumPreferencesMS.distribuicao = {
+                            ...userPremiumPreferencesMS.distribuicao,
+                            ...analisesRecuperadas.distribuicao
+                        };
+                    }
+                    if (analisesRecuperadas.afinidades) {
+                        userPremiumPreferencesMS.afinidades = {
+                            ...userPremiumPreferencesMS.afinidades,
+                            ...analisesRecuperadas.afinidades
+                        };
+                    }
+                    if (analisesRecuperadas.sequencias) {
+                        userPremiumPreferencesMS.sequencias = {
+                            ...userPremiumPreferencesMS.sequencias,
+                            ...analisesRecuperadas.sequencias
+                        };
+                    }
+                    if (analisesRecuperadas.seca) {
+                        userPremiumPreferencesMS.seca = {
+                            ...userPremiumPreferencesMS.seca,
+                            ...analisesRecuperadas.seca
+                        };
+                    }
+                    if (analisesRecuperadas.estatisticas) {
+                        // Não sobrescrever clusters - manter como array
+                        // userPremiumPreferencesMS.clusters deve permanecer como array de IDs selecionados
+                        console.log("📊 Dados de estatísticas avançadas disponíveis, mas clusters mantidos como array");
+                    }
 
-            // Atualizar as preferências com os dados das análises
-            if (analisesRecuperadas.frequencia) {
-                userPremiumPreferencesMS.frequencia = {
-                    ...userPremiumPreferencesMS.frequencia,
-                    ...analisesRecuperadas.frequencia
-                };
-            }
-            if (analisesRecuperadas.distribuicao) {
-                userPremiumPreferencesMS.distribuicao = {
-                    ...userPremiumPreferencesMS.distribuicao,
-                    ...analisesRecuperadas.distribuicao
-                };
-            }
-            if (analisesRecuperadas.afinidades) {
-                userPremiumPreferencesMS.afinidades = {
-                    ...userPremiumPreferencesMS.afinidades,
-                    ...analisesRecuperadas.afinidades
-                };
-            }
-            if (analisesRecuperadas.sequencias) {
-                userPremiumPreferencesMS.sequencias = {
-                    ...userPremiumPreferencesMS.sequencias,
-                    ...analisesRecuperadas.sequencias
-                };
-            }
-            if (analisesRecuperadas.seca) {
-                userPremiumPreferencesMS.seca = {
-                    ...userPremiumPreferencesMS.seca,
-                    ...analisesRecuperadas.seca
-                };
-            }
-            if (analisesRecuperadas.estatisticas) {
-                // Não sobrescrever clusters - manter como array
-                // userPremiumPreferencesMS.clusters deve permanecer como array de IDs selecionados
-                console.log("📊 Dados de estatísticas avançadas disponíveis, mas clusters mantidos como array");
-            }
+                    // Salvar as preferências atualizadas
+                    savePremiumPreferencesMS();
 
-            // Salvar as preferências atualizadas
-            savePremiumPreferencesMS();
+                    // Carregar e exibir as preferências atuais
+                    renderPremiumPreferencesSummaryMS();
 
-            // Carregar e exibir as preferências atuais
-            renderPremiumPreferencesSummaryMS();
+                    // Carregar os valores de configuração
+                    if (qtdeNumerosApostaInput) qtdeNumerosApostaInput.value = userPremiumPreferencesMS.qtdeNumerosAposta;
+                    if (numApostasGerarInput) numApostasGerarInput.value = userPremiumPreferencesMS.numApostasGerar;
+                });
+            } else {
+                // Fallback: abrir modal diretamente se função não estiver disponível
+                console.log('⚠️ Função checkAndProceed não disponível, abrindo modal diretamente');
+                modalPremium.classList.remove('hidden');
+                resultadoSugestaoDiv.classList.add('hidden');
+                
+                // Recuperar dados das análises do localStorage
+                const analisesRecuperadas = recuperarAnalises();
+                console.log("📊 Análises recuperadas do localStorage:", analisesRecuperadas);
 
-            // Carregar os valores de configuração
-            if (qtdeNumerosApostaInput) qtdeNumerosApostaInput.value = userPremiumPreferencesMS.qtdeNumerosAposta;
-            if (numApostasGerarInput) numApostasGerarInput.value = userPremiumPreferencesMS.numApostasGerar;
+                // Atualizar as preferências com os dados das análises
+                if (analisesRecuperadas.frequencia) {
+                    userPremiumPreferencesMS.frequencia = {
+                        ...userPremiumPreferencesMS.frequencia,
+                        ...analisesRecuperadas.frequencia
+                    };
+                }
+                if (analisesRecuperadas.distribuicao) {
+                    userPremiumPreferencesMS.distribuicao = {
+                        ...userPremiumPreferencesMS.distribuicao,
+                        ...analisesRecuperadas.distribuicao
+                    };
+                }
+                if (analisesRecuperadas.afinidades) {
+                    userPremiumPreferencesMS.afinidades = {
+                        ...userPremiumPreferencesMS.afinidades,
+                        ...analisesRecuperadas.afinidades
+                    };
+                }
+                if (analisesRecuperadas.sequencias) {
+                    userPremiumPreferencesMS.sequencias = {
+                        ...userPremiumPreferencesMS.sequencias,
+                        ...analisesRecuperadas.sequencias
+                    };
+                }
+                if (analisesRecuperadas.seca) {
+                    userPremiumPreferencesMS.seca = {
+                        ...userPremiumPreferencesMS.seca,
+                        ...analisesRecuperadas.seca
+                    };
+                }
+                if (analisesRecuperadas.estatisticas) {
+                    // Não sobrescrever clusters - manter como array
+                    // userPremiumPreferencesMS.clusters deve permanecer como array de IDs selecionados
+                    console.log("📊 Dados de estatísticas avançadas disponíveis, mas clusters mantidos como array");
+                }
+
+                // Salvar as preferências atualizadas
+                savePremiumPreferencesMS();
+
+                // Carregar e exibir as preferências atuais
+                renderPremiumPreferencesSummaryMS();
+
+                // Carregar os valores de configuração
+                if (qtdeNumerosApostaInput) qtdeNumerosApostaInput.value = userPremiumPreferencesMS.qtdeNumerosAposta;
+                if (numApostasGerarInput) numApostasGerarInput.value = userPremiumPreferencesMS.numApostasGerar;
+            }
         });
     } else {
         console.log("❌ Botão abrir modal premium não encontrado!");

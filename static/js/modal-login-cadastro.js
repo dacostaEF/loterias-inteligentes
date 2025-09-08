@@ -477,18 +477,38 @@ class ModalLoginCadastro {
         return emailRegex.test(email);
     }
 
-    handleLogin() {
+    async handleLogin() {
         if (!this.validateLogin()) return;
 
         const email = document.getElementById('login-email').value.trim();
         const senha = document.getElementById('login-senha').value.trim();
 
-        // Aqui você implementaria a lógica de login
         console.log('Tentativa de login:', { email, senha });
         
-        // Simular login bem-sucedido
-        alert('Login realizado com sucesso!');
-        this.closeModal();
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Importante para enviar cookies
+                body: JSON.stringify({ email, senha })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                alert('Login realizado com sucesso!');
+                this.closeModal();
+                // Recarregar a página para atualizar o estado de autenticação
+                window.location.reload();
+            } else {
+                alert('Erro: ' + data.error);
+            }
+        } catch (error) {
+            console.error('Erro ao fazer login:', error);
+            alert('Erro ao fazer login. Tente novamente.');
+        }
     }
 
     async handleCadastro() {

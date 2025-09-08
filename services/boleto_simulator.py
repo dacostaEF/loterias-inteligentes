@@ -194,3 +194,4 @@ class BoletoSimulator:
 boleto_simulator = BoletoSimulator()
 
 
+
