@@ -1,0 +1,26 @@
+# Configurações de Produção
+SECRET_KEY=your_secret_key_here
+FLASK_ENV=production
+SESSION_COOKIE_SECURE=True
+
+# Banco de Dados
+DATABASE_URL=sqlite:///database/loterias_inteligentes.db
+
+# Twilio (SMS)
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_PHONE_NUMBER=+1234567890
+
+# SendGrid (Email)
+SENDGRID_API_KEY=your_sendgrid_api_key
+SENDGRID_FROM_EMAIL=your_email@domain.com
+SENDGRID_FROM_NAME=Loterias Inteligentes
+
+# SMTP Alternativo
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your_email@domain.com
+SMTP_PASSWORD=your_app_password
+
+# Modo Teste
+MODO_TESTE=False

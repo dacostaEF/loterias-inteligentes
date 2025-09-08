@@ -100,27 +100,19 @@ class UserPermissions:
     @classmethod
     def has_access(cls, route, user):
         """Verifica se o usuário tem acesso à rota."""
-        print(f"🔍 HAS_ACCESS: Verificando rota '{route}' para usuário {user.email if user else 'None'}")
-        
         # Se é rota gratuita, sempre tem acesso
         if cls.is_free_route(route):
-            print(f"🔍 HAS_ACCESS: Rota gratuita - acesso liberado")
             return True
         
         # Se é rota premium, verificar se é premium ou master
         if cls.is_premium_route(route):
-            print(f"🔍 HAS_ACCESS: Rota premium detectada")
             # Verificar se é usuário master
             if hasattr(user, 'nivel_master') and user.nivel_master:
-                print(f"🔍 HAS_ACCESS: Usuário master - acesso liberado")
                 return True
             
             # Verificar se é premium normal
-            is_premium = user.is_premium
-            print(f"🔍 HAS_ACCESS: is_premium = {is_premium}")
-            return is_premium
+            return user.is_premium
         
-        print(f"🔍 HAS_ACCESS: Rota não reconhecida - acesso negado")
         return False
 
 class User(UserMixin):
@@ -435,16 +427,11 @@ login_manager.login_view = 'landing_page'
 
 @login_manager.user_loader
 def load_user(user_id):
-    print(f"🔍 LOAD_USER: Tentando carregar ID={user_id}")
+    """Carrega usuário da sessão."""
     try:
-        user = get_user_by_id(int(user_id))
-        if user:
-            print(f"✅ LOAD_USER: Usuário carregado - Email={user.email}, Level={user.level}, Premium={user.is_premium}")
-        else:
-            print(f"❌ LOAD_USER: Usuário não encontrado para ID={user_id}")
-        return user
+        return get_user_by_id(int(user_id))
     except Exception as e:
-        print(f"❌ LOAD_USER erro: {e}")
+        logger.error(f"Erro ao carregar usuário: {e}")
         return None
 
 # ============================================================================
@@ -456,18 +443,13 @@ def require_free_or_premium(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         current_route = request.path
-        print(f"🔍 ACESSO: Rota={current_route}, Auth={current_user.is_authenticated}, Cookie={request.headers.get('Cookie')}")
-        print(f"🔍 ACESSO: current_user = {current_user}")
-        print(f"🔍 ACESSO: session.get('_user_id') = {session.get('_user_id')}")
         
         if UserPermissions.is_free_route(current_route):
             return f(*args, **kwargs)
         if UserPermissions.is_premium_route(current_route):
             if not current_user.is_authenticated:
-                print("🔍 ACESSO: Usuário não autenticado - redirecionando")
                 return redirect('/premium_required')
             if not UserPermissions.has_access(current_route, current_user):
-                print("🔍 ACESSO: Usuário não tem acesso - redirecionando")
                 return redirect('/premium_required')
         return f(*args, **kwargs)
     return decorated
@@ -490,26 +472,18 @@ def login():
     if not email or not senha:
         return jsonify({'success': False, 'error': 'Email e senha são obrigatórios'}), 400
 
-    print(f"🔍 LOGIN DEBUG: Tentando login com email='{email}'")
     user = get_user_by_email(email)
-    print(f"🔍 LOGIN DEBUG: get_user_by_email retornou: {user}")
     if not user:
-        print(f"🔍 LOGIN DEBUG: Usuário não encontrado para email='{email}'")
         return jsonify({'success': False, 'error': 'Usuário não encontrado'}), 404
 
-    print(f"🔍 LOGIN DEBUG: Verificando senha para usuário {user.email}")
     if not verify_password(user, senha):
-        print(f"🔍 LOGIN DEBUG: Senha incorreta para usuário {user.email}")
         return jsonify({'success': False, 'error': 'Senha incorreta'}), 401
 
     # 🔑 fixa a sessão
     login_user(user, remember=True, force=True, fresh=True)
     session.permanent = True
     
-    # Debug da sessão
-    print(f"✅ LOGIN: id={user.id}, premium={user.is_premium}, master={getattr(user, 'nivel_master', False)}")
-    print(f"🔍 LOGIN: Sessão criada - user_id na sessão: {session.get('_user_id')}")
-    print(f"🔍 LOGIN: current_user.is_authenticated = {current_user.is_authenticated}")
+    # Login realizado com sucesso
 
     return jsonify({'success': True, 'message': 'Login realizado com sucesso!',
                     'user_level': user.level, 'is_premium': user.is_premium,
