@@ -988,11 +988,72 @@
     .afinidade-card .sub{
       min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
     }
+
+    /* 🚦 INDICADOR DE STATUS DE LOGIN - "SINAL DE TRÂNSITO" */
+
+    /* Círculo indicador no canto esquerdo da barra de menu */
+    .status-indicator {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      z-index: 9999;
+      transition: all 0.3s ease;
+      border: 3px solid white;
+      cursor: pointer;
+    }
+
+    /* Estado visitante - Vermelho */
+    .status-indicator.visitor {
+      background-color: #EF4444 !important; /* Vermelho */
+      box-shadow: 0 0 20px rgba(239, 68, 68, 1.0);
+      animation: pulse-red 2s infinite;
+    }
+
+    /* Estado logado - Verde neon */
+    .status-indicator.logged-in {
+      background-color: #10B981 !important; /* Verde neon */
+      box-shadow: 0 0 25px rgba(16, 185, 129, 1.0);
+      animation: pulse-green 2s infinite;
+    }
+
+    /* Animações de pulso */
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
+      50% { box-shadow: 0 0 30px rgba(239, 68, 68, 1.2); }
+    }
+
+    @keyframes pulse-green {
+      0%, 100% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.9); }
+      50% { box-shadow: 0 0 35px rgba(16, 185, 129, 1.2); }
+    }
+
+    /* Debug: garantir que seja visível */
+    .status-indicator {
+      display: block !important;
+      visibility: visible !important;
+    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
-<body class="p-4 sm:p-6">
+<body class="p-4 sm:p-6 {% if is_logged_in %}logged-in{% endif %}">
+  <!-- 🚦 Indicador de Status de Login -->
+  <div class="status-indicator {% if is_logged_in %}logged-in{% else %}visitor{% endif %}"
+       title="Status: {% if is_logged_in %}Logado{% else %}Visitante{% endif %}">
+  </div>
+
+  {% if is_logged_in %}
+  <!-- Indicador Visual de Status de Login (apenas para usuários logados) -->
+  <div style="position: fixed; top: 45px; left: 15px; background: #10B981; color: white; padding: 8px 12px; z-index: 10001; font-size: 14px; font-weight: bold; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white;">
+    🔓 LOGGED IN
+  </div>
+  {% endif %}
+
+  
+  
   <!-- Menu Desktop -->
     <nav class="desktop-nav">
     <div class="desktop-nav-links">

@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Verificar acesso automaticamente para páginas premium
     const currentPath = window.location.pathname;
     const premiumRoutes = [
-        '/dashboard_MS',
+        // '/dashboard_MS', // REMOVIDO: Backend já controla acesso
         '/aposta_inteligente_premium_MS',
         '/analise_estatistica_avancada_megasena',
         '/dashboard_lotofacil',
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Função global para verificação manual
+// Função global para verificação manual (não usada - template tem sua própria)
 window.checkAccess = function(routeName, onAllowed) {
     if (window.accessChecker) {
         window.accessChecker.checkAndProceed(routeName, onAllowed);
