@@ -1004,50 +1004,23 @@ def validar_codigo_confirmacao():
 
 @app.route('/check_access/<path:route_name>')
 def check_access(route_name):
-    """
-    Checa se o usuário atual tem acesso à rota informada.
-    route_name pode vir como 'dashboard_MS' ou '/dashboard_MS'.
-    """
-    # normaliza para começar com "/"
-    route = route_name if route_name.startswith('/') else f'/{route_name}'
+    """Checa se o usuário atual tem acesso à rota informada."""
+    route = '/' + route_name.lstrip('/')
+    # Sem aliases - usar rota diretamente
 
-    # Se for rota free: libera
+    # Rota free? libera
     if UserPermissions.is_free_route(route):
-        return jsonify({
-            'has_access': True,
-            'reason': 'free',
-            'message': 'Rota gratuita'
-        })
+        return jsonify({'has_access': True, 'reason': 'free_allowed'})
 
-    # Se for premium: exige login + permissão
-    if UserPermissions.is_premium_route(route):
-        if not current_user.is_authenticated:
-            return jsonify({
-                'has_access': False,
-                'reason': 'not_logged_in',
-                'upgrade_url': '/upgrade_plans',
-                'message': 'Usuário não autenticado'
-            }), 200
-        if UserPermissions.has_access(route, current_user):
-            return jsonify({
-                'has_access': True,
-                'reason': 'ok',
-                'message': 'Acesso permitido'
-            })
-        # autenticado mas sem plano
-        return jsonify({
-            'has_access': False,
-            'reason': 'premium_required',
-            'upgrade_url': '/upgrade_plans',
-            'message': 'Plano premium necessário'
-        }), 200
+    # Precisa login?
+    if not current_user.is_authenticated:
+        return jsonify({'has_access': False, 'reason': 'not_logged_in', 'upgrade_url': '/upgrade_plans'})
 
-    # rota desconhecida
-    return jsonify({
-        'has_access': False,
-        'reason': 'unknown_route',
-        'message': f'Rota não mapeada: {route}'
-    }), 404
+    # Master/premium?
+    if UserPermissions.has_access(route, current_user):
+        return jsonify({'has_access': True, 'reason': 'ok'})
+
+    return jsonify({'has_access': False, 'reason': 'premium_required', 'upgrade_url': '/upgrade_plans'})
 
 @app.route('/test_user/<level>')
 def create_test_user(level):
@@ -2639,27 +2612,27 @@ def bolao_interesse():
 
     return jsonify({"message": "Interesse registrado com sucesso! Entraremos em contato."}), 200
 
-@require_free_or_premium
 @app.route('/boloes_loterias')
+@require_free_or_premium
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
     return render_template('boloes_loterias.html')
 
 # --- Rotas da Mega Sena ---
-@require_free_or_premium
 @app.route('/dashboard_MS')
+@require_free_or_premium
 def dashboard_megasena():
     """Renderiza a página principal do dashboard da Mega Sena."""
     return render_template('dashboard_megasena.html')
 
-@require_free_or_premium
 @app.route('/aposta_inteligente_premium_MS')
+@require_free_or_premium
 def aposta_inteligente_premium_megasena():
     """Renderiza a página de Aposta Inteligente Premium da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
 
-@require_free_or_premium
 @app.route('/analise_estatistica_avancada_megasena')
+@require_free_or_premium
 def analise_estatistica_avancada_megasena():
     """Renderiza a página de Análise Estatística Avançada da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
@@ -2670,27 +2643,27 @@ def dashboard_quina():
     """Renderiza a página principal do dashboard da Quina."""
     return render_template('dashboard_quina.html')
 
-@require_free_or_premium
 @app.route('/aposta_inteligente_premium_quina')
+@require_free_or_premium
 def aposta_inteligente_premium_quina():
     """Renderiza a página de Aposta Inteligente Premium da Quina."""
     return render_template('analise_estatistica_avancada_quina.html')
 
 # --- Rotas da Lotofácil ---
-@require_free_or_premium
 @app.route('/dashboard_lotofacil')
+@require_free_or_premium
 def dashboard_lotofacil():
     """Renderiza a página principal do dashboard da Lotofácil."""
     return render_template('dashboard_lotofacil.html')
 
-@require_free_or_premium
 @app.route('/aposta_inteligente_premium_lotofacil')
+@require_free_or_premium
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html')
 
-@require_free_or_premium
 @app.route('/lotofacil_laboratorio')
+@require_free_or_premium
 def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
     return render_template('lotofacil_laboratorio.html')
@@ -2702,8 +2675,8 @@ def teste_api():
 
 # --- Rotas da Milionária ---
 
-@require_free_or_premium
 @app.route('/aposta_inteligente_premium')
+@require_free_or_premium
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
     return render_template('analise_estatistica_avancada_milionaria.html')
