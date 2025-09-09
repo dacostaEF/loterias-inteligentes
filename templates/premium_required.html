@@ -22,7 +22,7 @@
             padding: 20px;
         }
 
-        .error-container {
+        .loading-container {
             text-align: center;
             max-width: 600px;
             background: rgba(255, 255, 255, 0.05);
@@ -33,13 +33,14 @@
             box-shadow: 0 25px 50px rgba(168, 85, 247, 0.3);
         }
 
-        .error-icon {
+        .loading-icon {
             font-size: 4.8rem;
             margin-bottom: 20px;
             display: block;
+            animation: pulse 2s infinite;
         }
 
-        .error-title {
+        .loading-title {
             font-size: 2rem;
             color: #A855F7;
             margin-bottom: 20px;
@@ -50,291 +51,128 @@
             background-clip: text;
         }
 
-        .error-message {
+        .loading-message {
             font-size: 1.2rem;
             color: #cbd5e1;
             margin-bottom: 30px;
             line-height: 1.6;
         }
 
-        .premium-features {
-            background: rgba(168, 85, 247, 0.1);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(168, 85, 247, 0.3);
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(168, 85, 247, 0.3);
+            border-top: 4px solid #A855F7;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
         }
 
-        .premium-features h3 {
-            color: #A855F7;
-            margin-bottom: 20px;
-            font-size: 1.4rem;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .features-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            text-align: left;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            color: #cbd5e1;
-            font-size: 1rem;
-        }
-
-        .feature-item::before {
-            content: '✅';
-            margin-right: 10px;
-            color: #10B981;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 180px;
-            justify-content: center;
-        }
-
-        .btn-premium {
-            background: linear-gradient(135deg, #A855F7, #8B5CF6);
-            color: white;
-        }
-
-        .btn-premium:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.4);
-        }
-
-        .btn-register {
-            background: linear-gradient(135deg, #10B981, #059669);
-            color: white;
-        }
-
-        .btn-register:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
-        }
-
-        .btn-login {
-            background: transparent;
-            color: #A855F7;
-            border: 2px solid #A855F7;
-        }
-
-        .btn-login:hover {
-            background: #A855F7;
-            color: white;
-            transform: translateY(-3px);
-        }
-
-        .btn-home {
-            background: rgba(255, 255, 255, 0.1);
-            color: #cbd5e1;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-home:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-3px);
-        }
-
-        .guarantee {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .guarantee p {
-            color: #10B981;
-            font-weight: 600;
-            margin: 5px 0;
-        }
-
-        .back-home {
-            margin-top: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .error-container {
-                padding: 30px 20px;
-                margin: 10px;
-            }
-
-            .error-title {
-                font-size: 1.6rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-
-            .features-list {
-                grid-template-columns: 1fr;
-            }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
-    <div class="error-container">
-        <div class="error-icon">🔒</div>
-        <h1 class="error-title">Acesso Premium Necessário</h1>
-        
-        <p class="error-message">
-            Esta funcionalidade é exclusiva para assinantes premium!<br>
-            Desbloqueie todo o potencial das Loterias Inteligentes.
-        </p>
+    <div class="loading-container">
+        <div class="loading-icon">🎯</div>
+        <h1 class="loading-title">Carregando Planos Premium</h1>
+        <p class="loading-message">Preparando as melhores opções para você...</p>
+        <div class="spinner"></div>
+    </div>
 
-        <div class="premium-features">
-            <h3>🌟 O que você ganha com o Premium:</h3>
-            <div class="features-list">
-                <div class="feature-item">Apostas Inteligentes com IA</div>
-                <div class="feature-item">Análises Estatísticas Avançadas</div>
-                <div class="feature-item">Laboratório de Simulações</div>
-                <div class="feature-item">Participação em Bolões</div>
-                <div class="feature-item">Dashboard Mega Sena</div>
-                <div class="feature-item">Dashboard Lotofácil</div>
-                <div class="feature-item">Suporte Prioritário</div>
-                <div class="feature-item">Relatórios Personalizados</div>
+    <!-- Modal de Planos Premium -->
+    <div id="welcomePlansModal" style="display: none; position: fixed; z-index: 99999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); backdrop-filter: blur(15px); justify-content: center; align-items: center;">
+        <div style="background: linear-gradient(135deg, #1a1a2e, #16213e); border: 3px solid #A855F7; border-radius: 25px; padding: 30px; max-width: 95%; width: 1200px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 60px rgba(168, 85, 247, 0.5);">
+            <span id="closeWelcomeModal" style="position: absolute; top: 20px; right: 25px; color: #A855F7; font-size: 2.5rem; font-weight: bold; cursor: pointer;">&times;</span>
+            
+            <!-- Header do Modal -->
+            <div style="text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(168, 85, 247, 0.3);">
+                <h2 style="color: #A855F7; font-size: 2.5rem; margin: 0; font-weight: 700;">🎯 Acesso Premium Necessário</h2>
+                <p style="color: #E2E8F0; font-size: 1.2rem; margin: 10px 0 0 0;">Desbloqueie todas as funcionalidades avançadas</p>
             </div>
-        </div>
-
-        <div class="action-buttons">
-            <a href="/upgrade_plans" class="btn btn-premium">
-                <span>⭐</span>
-                Ver Planos Premium
-            </a>
-            <a href="#" onclick="openModalLogin('login'); return false;" class="btn btn-register">
-                <span>🔑</span>
-                Já Tenho Conta
-            </a>
-        </div>
-
-        <div class="guarantee">
-            <p>💯 Garantia de 30 dias ou seu dinheiro de volta!</p>
-            <p>🔒 Pagamento 100% seguro via PIX, cartão, boleto ou PagSeguro</p>
-        </div>
-
-        <div class="back-home">
-            <a href="/" class="btn btn-home">
-                <span>🏠</span>
-                Voltar ao Início
-            </a>
+            
+            <!-- iframe com a página de planos -->
+            <iframe 
+                id="plansIframe"
+                src="/upgrade_plans" 
+                style="width: 100%; height: 100%; border: none; border-radius: 15px; opacity: 0; transition: opacity 0.5s ease-in-out;"
+                frameborder="0"
+                scrolling="yes"
+                allowtransparency="true">
+            </iframe>
+            
+            <!-- Loading Spinner -->
+            <div id="loadingSpinner" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #A855F7; font-size: 1.5rem;">
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div style="width: 40px; height: 40px; border: 4px solid rgba(168, 85, 247, 0.3); border-top: 4px solid #A855F7; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <p style="margin-top: 15px; color: #E2E8F0;">Carregando planos...</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Login/Cadastro CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-login-cadastro.css') }}">
-    <!-- Modal Login/Cadastro JS -->
-    <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
-
     <script>
-        // Timer de redirecionamento (desabilitado quando modal está aberto)
-        let redirectTimer = null;
-        let countdownTimer = null;
-        let countdown = 10;
-        let countdownElement = null;
-
-        function startRedirectTimer() {
-            // Redirecionar automaticamente para a landing page após 10 segundos
-            redirectTimer = setTimeout(() => {
-                window.location.href = '/';
-            }, 10000);
-
-            // Contador regressivo
-            countdown = 10;
-            countdownElement = document.createElement('div');
-            countdownElement.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: rgba(168, 85, 247, 0.9);
-                color: white;
-                padding: 10px 15px;
-                border-radius: 20px;
-                font-weight: 600;
-                z-index: 1000;
-            `;
-            document.body.appendChild(countdownElement);
-
-            countdownTimer = setInterval(() => {
-                countdown--;
-                countdownElement.textContent = `Redirecionando em ${countdown}s...`;
-                
-                if (countdown <= 0) {
-                    clearInterval(countdownTimer);
-                    countdownElement.remove();
-                }
-            }, 1000);
-        }
-
-        function stopRedirectTimer() {
-            if (redirectTimer) {
-                clearTimeout(redirectTimer);
-                redirectTimer = null;
+        // Função para abrir o modal de planos
+        window.openWelcomeModal = function() {
+            const modal = document.getElementById('welcomePlansModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                console.log('✅ Modal de planos aberto');
+            } else {
+                console.error('❌ Modal de planos não encontrado');
+                window.location.href = '/upgrade_plans';
             }
-            if (countdownTimer) {
-                clearInterval(countdownTimer);
-                countdownTimer = null;
-            }
-            if (countdownElement) {
-                countdownElement.remove();
-                countdownElement = null;
-            }
-        }
-
-        // Iniciar timer quando a página carrega
-        startRedirectTimer();
-
-        // Parar timer quando modal de login/cadastro abrir
+        };
+        
+        // Abrir modal automaticamente quando a página carregar
         document.addEventListener('DOMContentLoaded', function() {
-            // Observar quando o modal de login/cadastro é aberto
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'childList') {
-                        const modal = document.getElementById('modal-login-cadastro');
-                        if (modal && modal.style.display !== 'none') {
-                            stopRedirectTimer();
-                        } else if (modal && modal.style.display === 'none') {
-                            startRedirectTimer();
-                        }
+            console.log('🎯 Página premium_required carregada - abrindo modal');
+            
+            // Aguardar um pouco para mostrar a tela de loading
+            setTimeout(() => {
+                window.openWelcomeModal();
+            }, 1500);
+        });
+        
+        // Event listeners do modal
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('welcomePlansModal');
+            const closeBtn = document.getElementById('closeWelcomeModal');
+            const iframe = document.getElementById('plansIframe');
+            const spinner = document.getElementById('loadingSpinner');
+            
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    modal.style.display = 'none';
+                    // Redirecionar para a página inicial
+                    window.location.href = '/';
+                });
+            }
+            
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target.id === 'closeWelcomeModal' || e.target.id === 'welcomePlansModal') {
+                        modal.style.display = 'none';
+                        // Redirecionar para a página inicial
+                        window.location.href = '/';
                     }
                 });
-            });
+            }
             
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
+            if (iframe) {
+                iframe.addEventListener('load', function() {
+                    if (spinner) spinner.style.display = 'none';
+                    iframe.style.opacity = '1';
+                });
+            }
         });
     </script>
 </body>
 </html>
-

@@ -452,9 +452,12 @@ def require_free_or_premium(f):
             return f(*args, **kwargs)
         if UserPermissions.is_premium_route(current_route):
             print(f"🔍 DECORATOR: Rota premium detectada")
-            # Permitir acesso e deixar o frontend lidar com o controle
-            print(f"🔍 DECORATOR: Liberando acesso - frontend irá controlar")
-            return f(*args, **kwargs)
+            if not current_user.is_authenticated:
+                print(f"🔍 DECORATOR: Usuário não autenticado - redirecionando para /premium_required")
+                return redirect('/premium_required')
+            if not UserPermissions.has_access(current_route, current_user):
+                print(f"🔍 DECORATOR: Usuário não tem acesso - redirecionando para /premium_required")
+                return redirect('/premium_required')
         print(f"🔍 DECORATOR: Acesso liberado")
         return f(*args, **kwargs)
     return decorated
