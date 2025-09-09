@@ -1458,6 +1458,44 @@
   
   <!-- 🔐 MODAL LOGIN/CADASTRO JAVASCRIPT -->
   <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
+  
+  <!-- 🔒 VERIFICAÇÃO DE ACESSO PREMIUM -->
+  <script>
+    async function checkAndProceed(routeName, onAllowed) {
+      try {
+        const resp = await fetch(`/check_access/${routeName}`, { credentials: 'include' });
+        const data = await resp.json();
+        if (data.has_access) {
+          onAllowed && onAllowed();
+          return;
+        }
+        if (data.reason === 'not_logged_in') {
+          window.location.href = '/login';
+          return;
+        }
+        if (data.reason === 'premium_required') {
+          // Usar modal elegante se existir, senão redirecionar
+          if (typeof window.openWelcomeModal === 'function') {
+            window.openWelcomeModal();
+          } else {
+            window.location.href = data.upgrade_url || '/upgrade_plans';
+          }
+          return;
+        }
+        alert(data.message || 'Acesso negado.');
+      } catch (err) {
+        console.error('Falha ao checar acesso:', err);
+        alert('Não foi possível verificar o acesso agora.');
+      }
+    }
+
+    // Verificação imediata de acesso ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAndProceed('lotofacil_laboratorio', () => {
+        console.log('✅ Acesso liberado para laboratório Lotofácil');
+      });
+    });
+  </script>
 </body>
 </html>
 

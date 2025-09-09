@@ -6201,7 +6201,12 @@
           return;
         }
         if (data.reason === 'premium_required') {
-          window.location.href = data.upgrade_url || '/upgrade_plans';
+          // Usar modal elegante se existir, senão redirecionar
+          if (typeof window.openWelcomeModal === 'function') {
+            window.openWelcomeModal();
+          } else {
+            window.location.href = data.upgrade_url || '/upgrade_plans';
+          }
           return;
         }
         alert(data.message || 'Acesso negado.');
@@ -6211,8 +6216,41 @@
       }
     }
 
-    // Configurar botão premium
+    // Verificação imediata de acesso ao carregar a página
     document.addEventListener('DOMContentLoaded', () => {
+      // Verificar se usuário está logado
+      fetch('/check_access/analise_estatistica_avancada_megasena', { credentials: 'include' })
+        .then(response => response.json())
+        .then(data => {
+          if (!data.has_access) {
+            if (data.reason === 'not_logged_in') {
+              // Usuário não logado - mostrar modal de planos
+              if (typeof window.openWelcomeModal === 'function') {
+                window.openWelcomeModal();
+              } else {
+                window.location.href = '/login';
+              }
+            } else if (data.reason === 'premium_required') {
+              // Usuário logado mas sem premium - mostrar modal de planos
+              if (typeof window.openWelcomeModal === 'function') {
+                window.openWelcomeModal();
+              } else {
+                window.location.href = '/upgrade_plans';
+              }
+            }
+          } else {
+            console.log('✅ Acesso liberado para análise Mega Sena');
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao verificar acesso:', error);
+          // Em caso de erro, mostrar modal de planos
+          if (typeof window.openWelcomeModal === 'function') {
+            window.openWelcomeModal();
+          }
+        });
+
+      // Configurar botão premium
       const btn = document.getElementById('abrir-modal-premium');
       if (!btn) return;
 

@@ -28,3 +28,5 @@ python scripts/limpar_dados_DB.py
 # Verificar usuários master
 python scripts/teste/verificar_usuarios_master.py
 ```
+
+

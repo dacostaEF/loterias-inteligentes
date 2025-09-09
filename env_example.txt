@@ -24,3 +24,5 @@ SMTP_PASSWORD=your_app_password
 
 # Modo Teste
 MODO_TESTE=False
+
+

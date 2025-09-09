@@ -77,7 +77,7 @@ class UserPermissions:
         '/lotofacil_laboratorio',
         '/boloes_loterias',
         '/boloes',
-        '/dashboard_MS',
+        '/dashboard_MS',  # Mega Sena (PREMIUM - requer cadastro)
         '/dashboard_megasena',
         '/dashboard_lotofacil',
         '/analise_estatistica_avancada_milionaria',
@@ -443,14 +443,22 @@ def require_free_or_premium(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         current_route = request.path
+        print(f"🔍 DECORATOR: Verificando rota {current_route}")
+        print(f"🔍 DECORATOR: Auth={current_user.is_authenticated}")
+        print(f"🔍 DECORATOR: current_user={current_user}")
         
         if UserPermissions.is_free_route(current_route):
+            print(f"🔍 DECORATOR: Rota gratuita - liberando acesso")
             return f(*args, **kwargs)
         if UserPermissions.is_premium_route(current_route):
+            print(f"🔍 DECORATOR: Rota premium detectada")
             if not current_user.is_authenticated:
+                print(f"🔍 DECORATOR: Usuário não autenticado - redirecionando para /premium_required")
                 return redirect('/premium_required')
             if not UserPermissions.has_access(current_route, current_user):
+                print(f"🔍 DECORATOR: Usuário não tem acesso - redirecionando para /premium_required")
                 return redirect('/premium_required')
+        print(f"🔍 DECORATOR: Acesso liberado")
         return f(*args, **kwargs)
     return decorated
 
@@ -994,48 +1002,52 @@ def validar_codigo_confirmacao():
         print(f"❌ Erro ao validar código: {e}")
         return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
 
-@app.route('/check_access/<route_name>')
+@app.route('/check_access/<path:route_name>')
 def check_access(route_name):
-    """API para verificar acesso a uma rota específica."""
-    if not current_user.is_authenticated:
+    """
+    Checa se o usuário atual tem acesso à rota informada.
+    route_name pode vir como 'dashboard_MS' ou '/dashboard_MS'.
+    """
+    # normaliza para começar com "/"
+    route = route_name if route_name.startswith('/') else f'/{route_name}'
+
+    # Se for rota free: libera
+    if UserPermissions.is_free_route(route):
         return jsonify({
-            'has_access': False,
-            'reason': 'not_logged_in',
-            'message': 'Usuário não está logado'
+            'has_access': True,
+            'reason': 'free',
+            'message': 'Rota gratuita'
         })
-    
-    # Verificar se é rota premium
-    if UserPermissions.is_premium_route(f'/{route_name}'):
-        # Verificar se é usuário master (emails master)
-        master_emails = [
-            'master_ef@loterias.com',
-            'master_sf@loterias.com',
-            'master_sm@loterias.com',
-            'master_jj@loterias.com',
-            'master_fc@loterias.com',
-            'master_dc@loterias.com'
-        ]
-        
-        if current_user.email in master_emails:
-            return jsonify({
-                'has_access': True,
-                'reason': 'master_access',
-                'message': 'Acesso master liberado'
-            })
-        
-        if not current_user.is_premium:
+
+    # Se for premium: exige login + permissão
+    if UserPermissions.is_premium_route(route):
+        if not current_user.is_authenticated:
             return jsonify({
                 'has_access': False,
-                'reason': 'premium_required',
-                'message': 'Assinatura premium necessária',
-                'upgrade_url': url_for('upgrade_plans')
+                'reason': 'not_logged_in',
+                'upgrade_url': '/upgrade_plans',
+                'message': 'Usuário não autenticado'
+            }), 200
+        if UserPermissions.has_access(route, current_user):
+            return jsonify({
+                'has_access': True,
+                'reason': 'ok',
+                'message': 'Acesso permitido'
             })
-    
+        # autenticado mas sem plano
+        return jsonify({
+            'has_access': False,
+            'reason': 'premium_required',
+            'upgrade_url': '/upgrade_plans',
+            'message': 'Plano premium necessário'
+        }), 200
+
+    # rota desconhecida
     return jsonify({
-        'has_access': True,
-        'reason': 'access_granted',
-        'message': 'Acesso permitido'
-    })
+        'has_access': False,
+        'reason': 'unknown_route',
+        'message': f'Rota não mapeada: {route}'
+    }), 404
 
 @app.route('/test_user/<level>')
 def create_test_user(level):
@@ -2627,23 +2639,29 @@ def bolao_interesse():
 
     return jsonify({"message": "Interesse registrado com sucesso! Entraremos em contato."}), 200
 
-@app.route('/boloes')
 @require_free_or_premium
+@app.route('/boloes_loterias')
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
     return render_template('boloes_loterias.html')
 
 # --- Rotas da Mega Sena ---
-@app.route('/dashboard_MS')
 @require_free_or_premium
+@app.route('/dashboard_MS')
 def dashboard_megasena():
     """Renderiza a página principal do dashboard da Mega Sena."""
     return render_template('dashboard_megasena.html')
 
-@app.route('/aposta_inteligente_premium_MS')
 @require_free_or_premium
+@app.route('/aposta_inteligente_premium_MS')
 def aposta_inteligente_premium_megasena():
     """Renderiza a página de Aposta Inteligente Premium da Mega Sena."""
+    return render_template('analise_estatistica_avancada_megasena.html')
+
+@require_free_or_premium
+@app.route('/analise_estatistica_avancada_megasena')
+def analise_estatistica_avancada_megasena():
+    """Renderiza a página de Análise Estatística Avançada da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
 
 # --- Rotas da Quina ---
@@ -2652,27 +2670,27 @@ def dashboard_quina():
     """Renderiza a página principal do dashboard da Quina."""
     return render_template('dashboard_quina.html')
 
-@app.route('/aposta_inteligente_premium_quina')
 @require_free_or_premium
+@app.route('/aposta_inteligente_premium_quina')
 def aposta_inteligente_premium_quina():
     """Renderiza a página de Aposta Inteligente Premium da Quina."""
     return render_template('analise_estatistica_avancada_quina.html')
 
 # --- Rotas da Lotofácil ---
-@app.route('/dashboard_lotofacil')
 @require_free_or_premium
+@app.route('/dashboard_lotofacil')
 def dashboard_lotofacil():
     """Renderiza a página principal do dashboard da Lotofácil."""
     return render_template('dashboard_lotofacil.html')
 
-@app.route('/aposta_inteligente_premium_lotofacil')
 @require_free_or_premium
+@app.route('/aposta_inteligente_premium_lotofacil')
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html')
 
-@app.route('/lotofacil_laboratorio')
 @require_free_or_premium
+@app.route('/lotofacil_laboratorio')
 def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
     return render_template('lotofacil_laboratorio.html')
@@ -2684,8 +2702,8 @@ def teste_api():
 
 # --- Rotas da Milionária ---
 
-@app.route('/aposta_inteligente_premium')
 @require_free_or_premium
+@app.route('/aposta_inteligente_premium')
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
     return render_template('analise_estatistica_avancada_milionaria.html')
@@ -3787,13 +3805,14 @@ def pagamento_cancelado():
                 font-family: 'Inter', sans-serif;
                 background: linear-gradient(135deg, #0f0f23, #1a1a2e);
                 color: #ffffff;
-                min-height: 100vh;
+                min-height: 100vh; 
                 margin: 0;
                 padding: 0;
                 display: flex;
                 justify-content: center;
                 align-items: center;
-            }
+            }tem um analise_estatistica_avancada_megasena_backup.html
+            
             
             .container {
                 background: linear-gradient(135deg, #1a1a2e, #16213e);
