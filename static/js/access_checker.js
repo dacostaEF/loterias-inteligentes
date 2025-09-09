@@ -224,6 +224,27 @@ class AccessChecker {
 // Inicializar quando o DOM estiver pronto
 document.addEventListener('DOMContentLoaded', () => {
     window.accessChecker = new AccessChecker();
+    
+    // Verificar acesso automaticamente para páginas premium
+    const currentPath = window.location.pathname;
+    const premiumRoutes = [
+        '/dashboard_MS',
+        '/aposta_inteligente_premium_MS',
+        '/analise_estatistica_avancada_megasena',
+        '/dashboard_lotofacil',
+        '/aposta_inteligente_premium_lotofacil',
+        '/lotofacil_laboratorio',
+        '/aposta_inteligente_premium_quina',
+        '/aposta_inteligente_premium',
+        '/boloes_loterias'
+    ];
+    
+    if (premiumRoutes.includes(currentPath)) {
+        console.log('🔍 Verificando acesso automático para:', currentPath);
+        window.accessChecker.checkAndProceed(currentPath.substring(1), () => {
+            console.log('✅ Usuário tem acesso à página');
+        });
+    }
 });
 
 // Função global para verificação manual
