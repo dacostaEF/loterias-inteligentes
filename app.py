@@ -423,7 +423,7 @@ app.config.update(
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'landing_page'
+login_manager.login_view = 'upgrade_plans'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -435,31 +435,32 @@ def load_user(user_id):
         return None
 
 # ============================================================================
-# 🔒 MIDDLEWARE DE CONTROLE DE ACESSO (APÓS CONFIGURAÇÃO DO FLASK-LOGIN)
+# 🔒 MIDDLEWARE UNIVERSAL DE CONTROLE DE ACESSO
 # ============================================================================
 
-def require_free_or_premium(f):
+# ROTAS GRATUITAS (apenas estas 4 são liberadas)
+ROTAS_GRATUITAS = {
+    '/dashboard_milionaria',
+    '/dashboard_quina', 
+    '/dashboard_lotomania',
+    '/boloes_loterias'
+}
+
+def verificar_acesso_universal(f):
+    """Middleware universal que bloqueia TODAS as rotas exceto as 3 gratuitas."""
     from functools import wraps
     @wraps(f)
     def decorated(*args, **kwargs):
         current_route = request.path
-        print(f"🔍 DECORATOR: Verificando rota {current_route}")
-        print(f"🔍 DECORATOR: Auth={current_user.is_authenticated}")
-        print(f"🔍 DECORATOR: current_user={current_user}")
         
-        if UserPermissions.is_free_route(current_route):
-            print(f"🔍 DECORATOR: Rota gratuita - liberando acesso")
+        # Se for rota gratuita, libera acesso
+        if current_route in ROTAS_GRATUITAS:
             return f(*args, **kwargs)
-        if UserPermissions.is_premium_route(current_route):
-            print(f"🔍 DECORATOR: Rota premium detectada")
-            if not current_user.is_authenticated:
-                print(f"🔍 DECORATOR: Usuário não autenticado - redirecionando para /premium_required")
-                return redirect('/premium_required')
-            if not UserPermissions.has_access(current_route, current_user):
-                print(f"🔍 DECORATOR: Usuário não tem acesso - redirecionando para /premium_required")
-                return redirect('/premium_required')
-        print(f"🔍 DECORATOR: Acesso liberado")
-        return f(*args, **kwargs)
+        
+        # Para TODAS as outras rotas, redireciona para planos
+        print(f"🔒 BLOQUEANDO ROTA: {current_route} - Redirecionando para planos")
+        return redirect('/upgrade_plans')
+    
     return decorated
 
 # ============================================================================
@@ -1215,6 +1216,7 @@ def dashboard():
     return redirect(url_for('dashboard_milionaria'))
 
 @app.route('/dashboard_milionaria')
+@verificar_acesso_universal
 def dashboard_milionaria():
     """Renderiza a página principal do dashboard da Milionária."""
     return render_template('dashboard_milionaria.html')
@@ -2613,57 +2615,58 @@ def bolao_interesse():
     return jsonify({"message": "Interesse registrado com sucesso! Entraremos em contato."}), 200
 
 @app.route('/boloes_loterias')
-@require_free_or_premium
+@verificar_acesso_universal
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
     return render_template('boloes_loterias.html')
 
 # --- Rotas da Mega Sena ---
 @app.route('/dashboard_MS')
-@require_free_or_premium
+@verificar_acesso_universal
 def dashboard_megasena():
     """Renderiza a página principal do dashboard da Mega Sena."""
     return render_template('dashboard_megasena.html')
 
 @app.route('/aposta_inteligente_premium_MS')
-@require_free_or_premium
+@verificar_acesso_universal
 def aposta_inteligente_premium_megasena():
     """Renderiza a página de Aposta Inteligente Premium da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
 
 @app.route('/analise_estatistica_avancada_megasena')
-@require_free_or_premium
+@verificar_acesso_universal
 def analise_estatistica_avancada_megasena():
     """Renderiza a página de Análise Estatística Avançada da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html')
 
 # --- Rotas da Quina ---
 @app.route('/dashboard_quina')
+@verificar_acesso_universal
 def dashboard_quina():
     """Renderiza a página principal do dashboard da Quina."""
     return render_template('dashboard_quina.html')
 
 @app.route('/aposta_inteligente_premium_quina')
-@require_free_or_premium
+@verificar_acesso_universal
 def aposta_inteligente_premium_quina():
     """Renderiza a página de Aposta Inteligente Premium da Quina."""
     return render_template('analise_estatistica_avancada_quina.html')
 
 # --- Rotas da Lotofácil ---
 @app.route('/dashboard_lotofacil')
-@require_free_or_premium
+@verificar_acesso_universal
 def dashboard_lotofacil():
     """Renderiza a página principal do dashboard da Lotofácil."""
     return render_template('dashboard_lotofacil.html')
 
 @app.route('/aposta_inteligente_premium_lotofacil')
-@require_free_or_premium
+@verificar_acesso_universal
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html')
 
 @app.route('/lotofacil_laboratorio')
-@require_free_or_premium
+@verificar_acesso_universal
 def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
     return render_template('lotofacil_laboratorio.html')
@@ -2676,13 +2679,14 @@ def teste_api():
 # --- Rotas da Milionária ---
 
 @app.route('/aposta_inteligente_premium')
-@require_free_or_premium
+@verificar_acesso_universal
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
     return render_template('analise_estatistica_avancada_milionaria.html')
 
 # --- Rotas da Lotomania ---
 @app.route('/dashboard_lotomania')
+@verificar_acesso_universal
 def dashboard_lotomania():
     """Renderiza a página principal do dashboard da Lotomania."""
     return render_template('dashboard_lotomania.html')

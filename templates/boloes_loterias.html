@@ -12,6 +12,305 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   
   <title>Bolões Inteligentes - Loterias Inteligente</title>
+  
+  <!-- Script para controle de acesso -->
+  <script>
+    // Verificar se usuário está logado
+    function verificarAcesso() {
+      // Simular verificação de login (você pode implementar uma verificação real)
+      const usuarioLogado = false; // Aqui você pode verificar se há sessão ativa
+      
+      if (!usuarioLogado) {
+        // Bloquear funcionalidades para usuários não logados
+        document.addEventListener('DOMContentLoaded', function() {
+          // Desabilitar botões de funcionalidades premium
+          const botoesPremium = document.querySelectorAll('button[onclick*="abrirAba"], button[onclick*="abrirSubAba"]');
+          botoesPremium.forEach(botao => {
+            botao.style.opacity = '0.5';
+            botao.style.cursor = 'not-allowed';
+            botao.addEventListener('click', function(e) {
+              e.preventDefault();
+              e.stopPropagation();
+              alert('🔒 Esta funcionalidade requer login. Faça login para acessar os bolões!');
+              // Aqui você pode abrir o modal de login
+              return false;
+            });
+          });
+          
+          // Adicionar aviso de login elegante e delicado
+          const avisoLogin = document.createElement('div');
+          avisoLogin.innerHTML = `
+            <div style="
+              background: rgba(15, 15, 35, 0.95); 
+              border: 1px solid rgba(168, 85, 247, 0.2); 
+              border-radius: 15px; 
+              padding: 25px; 
+              margin: 30px auto; 
+              max-width: 500px; 
+              text-align: center; 
+              backdrop-filter: blur(10px);
+              box-shadow: 0 8px 32px rgba(168, 85, 247, 0.1);
+              position: relative;
+              overflow: hidden;
+            ">
+              <!-- Efeito de brilho sutil -->
+              <div style="
+                position: absolute; 
+                top: 0; 
+                left: -100%; 
+                width: 100%; 
+                height: 100%; 
+                background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.1), transparent);
+                animation: shimmer 3s infinite;
+              "></div>
+              
+              <!-- Ícone elegante -->
+              <div style="
+                width: 60px; 
+                height: 60px; 
+                background: linear-gradient(135deg, #A855F7, #7C3AED); 
+                border-radius: 50%; 
+                margin: 0 auto 20px auto; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center;
+                box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+              ">
+                <i class="fa fa-users" style="color: white; font-size: 24px;"></i>
+              </div>
+              
+              <!-- Título suave -->
+              <h3 style="
+                margin: 0 0 15px 0; 
+                font-size: 1.4rem; 
+                color: #E2E8F0; 
+                font-weight: 600;
+                letter-spacing: 0.5px;
+              ">Participe dos Nossos Bolões</h3>
+              
+              <!-- Descrição elegante -->
+              <p style="
+                margin: 0 0 25px 0; 
+                font-size: 1rem; 
+                color: #94A3B8; 
+                line-height: 1.6;
+                font-weight: 400;
+              ">Acesse funcionalidades exclusivas e participe de bolões inteligentes com análise estatística avançada.</p>
+              
+              <!-- Botão elegante -->
+              <button onclick="abrirModalPlanos()" style="
+                background: linear-gradient(135deg, #A855F7, #7C3AED); 
+                color: white; 
+                border: none; 
+                padding: 12px 30px; 
+                border-radius: 25px; 
+                cursor: pointer; 
+                font-weight: 600; 
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+                position: relative;
+                overflow: hidden;
+              " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(168, 85, 247, 0.4)'" 
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(168, 85, 247, 0.3)'">
+                <i class="fa fa-star" style="margin-right: 8px;"></i>
+                Ver Planos Disponíveis
+              </button>
+              
+              <!-- Texto adicional sutil -->
+              <p style="
+                margin: 15px 0 0 0; 
+                font-size: 0.85rem; 
+                color: #64748B; 
+                font-style: italic;
+              ">✨ Funcionalidades premium disponíveis</p>
+            </div>
+            
+            <style>
+              @keyframes shimmer {
+                0% { left: -100%; }
+                100% { left: 100%; }
+              }
+            </style>
+          `;
+          
+          // Inserir aviso no topo da página
+          const conteudo = document.querySelector('.content') || document.body;
+          conteudo.insertBefore(avisoLogin, conteudo.firstChild);
+        });
+      }
+    }
+    
+    // Função para abrir modal de planos elegante
+    function abrirModalPlanos() {
+      // Criar modal elegante
+      const modal = document.createElement('div');
+      modal.id = 'modalPlanosElegante';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(15px);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      `;
+      
+      modal.innerHTML = `
+        <div style="
+          background: linear-gradient(135deg, #1a1a2e, #16213e);
+          border: 2px solid rgba(168, 85, 247, 0.3);
+          border-radius: 20px;
+          padding: 40px;
+          max-width: 90%;
+          width: 600px;
+          max-height: 80vh;
+          overflow-y: auto;
+          position: relative;
+          box-shadow: 0 20px 60px rgba(168, 85, 247, 0.3);
+          transform: scale(0.9);
+          transition: transform 0.3s ease;
+        ">
+          <!-- Botão fechar -->
+          <button onclick="fecharModalPlanos()" style="
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #A855F7;
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+          " onmouseover="this.style.background='rgba(168, 85, 247, 0.1)'" 
+             onmouseout="this.style.background='none'">
+            ×
+          </button>
+          
+          <!-- Conteúdo do modal -->
+          <div style="text-align: center;">
+            <!-- Ícone -->
+            <div style="
+              width: 80px;
+              height: 80px;
+              background: linear-gradient(135deg, #A855F7, #7C3AED);
+              border-radius: 50%;
+              margin: 0 auto 25px auto;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4);
+            ">
+              <i class="fa fa-crown" style="color: white; font-size: 32px;"></i>
+            </div>
+            
+            <!-- Título -->
+            <h2 style="
+              color: #A855F7;
+              font-size: 2rem;
+              margin: 0 0 15px 0;
+              font-weight: 700;
+            ">🎯 Acesso Premium</h2>
+            
+            <!-- Subtítulo -->
+            <p style="
+              color: #E2E8F0;
+              font-size: 1.1rem;
+              margin: 0 0 30px 0;
+              line-height: 1.6;
+            ">Desbloqueie todas as funcionalidades dos bolões inteligentes</p>
+            
+            <!-- Botões de ação -->
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+              <button onclick="window.location.href='/upgrade_plans'" style="
+                background: linear-gradient(135deg, #A855F7, #7C3AED);
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+              " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(168, 85, 247, 0.4)'" 
+                 onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(168, 85, 247, 0.3)'">
+                <i class="fa fa-star" style="margin-right: 8px;"></i>
+                Ver Planos
+              </button>
+              
+              <button onclick="fecharModalPlanos()" style="
+                background: transparent;
+                color: #94A3B8;
+                border: 1px solid rgba(148, 163, 184, 0.3);
+                padding: 15px 30px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 1rem;
+                transition: all 0.3s ease;
+              " onmouseover="this.style.background='rgba(148, 163, 184, 0.1)'; this.style.color='#E2E8F0'" 
+                 onmouseout="this.style.background='transparent'; this.style.color='#94A3B8'">
+                <i class="fa fa-times" style="margin-right: 8px;"></i>
+                Fechar
+              </button>
+            </div>
+            
+            <!-- Texto adicional -->
+            <p style="
+              color: #64748B;
+              font-size: 0.9rem;
+              margin: 25px 0 0 0;
+              font-style: italic;
+            ">✨ Funcionalidades exclusivas para membros premium</p>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(modal);
+      
+      // Animar entrada
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        modal.querySelector('div').style.transform = 'scale(1)';
+      }, 10);
+      
+      // Fechar ao clicar fora
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          fecharModalPlanos();
+        }
+      });
+    }
+    
+    // Função para fechar modal
+    function fecharModalPlanos() {
+      const modal = document.getElementById('modalPlanosElegante');
+      if (modal) {
+        modal.style.opacity = '0';
+        modal.querySelector('div').style.transform = 'scale(0.9)';
+        setTimeout(() => {
+          modal.remove();
+        }, 300);
+      }
+    }
+    
+    // Executar verificação
+    verificarAcesso();
+  </script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -771,7 +1070,7 @@
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
       </div>
-      <a href="/boloes" class="active"><i class="fa fa-users"></i> Bolões</a>
+      <a href="/boloes_loterias" class="active"><i class="fa fa-users"></i> Bolões</a>
 
     </div>
   </nav>
@@ -841,7 +1140,7 @@
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
         </li>
-        <li><a href="/boloes" class="active"><i class="fa fa-users"></i> Bolões</a></li>
+        <li><a href="/boloes_loterias" class="active"><i class="fa fa-users"></i> Bolões</a></li>
   
         </ul>
     </nav>
