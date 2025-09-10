@@ -123,6 +123,16 @@ class User(UserMixin):
         self.email = email
         self.level = level
         self.subscription_expiry = subscription_expiry
+        self._is_authenticated = False  # 🔒 FLAG DE AUTENTICAÇÃO REAL
+    
+    @property
+    def is_authenticated(self):
+        """Override do UserMixin - só retorna True se realmente logado."""
+        return self._is_authenticated
+    
+    def set_authenticated(self, value=True):
+        """Método para controlar o status de autenticação."""
+        self._is_authenticated = value
     
     @property
     def is_premium(self):
@@ -449,6 +459,7 @@ def load_user(user_id):
         user = get_user_by_id(user_id_int)
 
         if user:
+            # 🔒 NÃO MARCAR COMO AUTENTICADO AQUI - só no login real
             print(f"✅ USUÁRIO CARREGADO: ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
             print(f"✅ IS_AUTHENTICATED: {user.is_authenticated}")
         else:
@@ -528,6 +539,9 @@ def login():
     if not verify_password(user, senha):
         return jsonify({'success': False, 'error': 'Senha incorreta'}), 401
 
+    # 🔑 MARCAR COMO AUTENTICADO ANTES DO LOGIN
+    user.set_authenticated(True)
+    
     # 🔑 fixa a sessão
     login_user(user, remember=True, force=True, fresh=True)
     session.permanent = True
@@ -542,6 +556,10 @@ def login():
 @login_required
 def logout():
     """Logout do usuário."""
+    # 🔒 MARCAR COMO NÃO AUTENTICADO
+    if hasattr(current_user, 'set_authenticated'):
+        current_user.set_authenticated(False)
+    
     logout_user()
     return redirect(url_for('landing_page'))
 
