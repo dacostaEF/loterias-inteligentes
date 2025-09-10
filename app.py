@@ -459,7 +459,8 @@ def load_user(user_id):
         user = get_user_by_id(user_id_int)
 
         if user:
-            # 🔒 NÃO MARCAR COMO AUTENTICADO AQUI - só no login real
+            # 🔒 MARCAR COMO AUTENTICADO - usuário carregado da sessão está logado
+            user.set_authenticated(True)
             print(f"✅ USUÁRIO CARREGADO: ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
             print(f"✅ IS_AUTHENTICATED: {user.is_authenticated}")
         else:
@@ -491,27 +492,21 @@ def verificar_acesso_universal(f):
     from functools import wraps
     @wraps(f)
     def decorated(*args, **kwargs):
-        current_route = request.path
+        route = request.path
 
-        # 1) Rotas free → sempre libera
-        if UserPermissions.is_free_route(current_route):
-            print(f"✅ MIDDLEWARE: Rota gratuita {current_route} - Liberada")
+        # 1) Libera rotas FREE
+        if UserPermissions.is_free_route(route):
             return f(*args, **kwargs)
 
-        # 2) Não logado → empurra para login/planos
+        # 2) Se não estiver logado, manda para os planos
         if not current_user.is_authenticated:
-            print(f"❌ MIDDLEWARE: Usuário não logado em {current_route} - Redirecionando para planos")
             return redirect('/upgrade_plans')
 
-        # 3) Logado → verifica permissão (premium/master)
-        if UserPermissions.has_access(current_route, current_user):
-            print(f"✅ MIDDLEWARE: Usuário logado com acesso em {current_route}")
+        # 3) Logado: se for master/premium, libera; senão, planos
+        if UserPermissions.has_access(route, current_user):
             return f(*args, **kwargs)
 
-        # 4) Logado mas sem permissão premium
-        print(f"❌ MIDDLEWARE: Usuário logado sem permissão em {current_route} - Redirecionando para planos")
         return redirect('/upgrade_plans')
-
     return decorated
 
 # ============================================================================
