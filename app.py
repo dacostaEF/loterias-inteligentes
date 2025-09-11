@@ -3566,12 +3566,24 @@ def google_callback():
         
         conn.close()
         
-        # Criar objeto User e fazer login
+        # Criar objeto User e fazer login com chave de autenticação
         logger.info(f"Criando objeto User: ID={user_id}, Email={email}, Level={user_level}")
         user = User(user_id, email, user_level)
         
-        logger.info(f"Fazendo login do usuário...")
-        login_user(user)
+        # 🔑 GERAR CHAVE DE AUTENTICAÇÃO ÚNICA (mesmo sistema do login normal)
+        auth_key = gerar_chave_autenticacao()
+        
+        # 🔑 MARCAR COMO AUTENTICADO
+        user.set_authenticated(True)
+        
+        # 🔑 FLAGS DE SESSÃO PARA CONTROLE DE AUTENTICAÇÃO
+        session['user_authenticated'] = True
+        session['auth_key'] = auth_key
+        session['login_timestamp'] = datetime.now().isoformat()
+        
+        logger.info(f"Fazendo login do usuário com chave de autenticação...")
+        login_user(user, remember=True, force=True, fresh=True)
+        session.permanent = True
         
         logger.info(f"Login Google bem-sucedido: {email}")
         logger.info(f"Redirecionando para página inicial...")
