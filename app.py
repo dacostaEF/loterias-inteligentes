@@ -22,6 +22,30 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ============================================================================
+# 🛡️ SISTEMA DE VERSÃO DE SESSÃO (ENTRADA SEGURA)
+# ============================================================================
+
+# Versão do protocolo de sessão - AUMENTE quando mudar lógica de auth/sessão
+APP_SESSION_VERSION = 3
+
+# Timeouts de sessão para segurança
+MAX_IDLE = timedelta(hours=2)   # Sessão morre após 2h de inatividade
+MAX_AGE  = timedelta(hours=12)  # Sessão morre após 12h total
+
+# ============================================================================
+# 🔐 FUNÇÕES DE SEGURANÇA
+# ============================================================================
+
+import hashlib
+
+def _fingerprint():
+    """Gera fingerprint único baseado em User-Agent e IP."""
+    ua = request.headers.get('User-Agent','')
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr) or ''
+    base = f"{ua}|{ip}"
+    return hashlib.sha256(base.encode()).hexdigest()[:16]
+
+# ============================================================================
 
 
 
@@ -187,29 +211,33 @@ from datetime import datetime, timedelta
 # ============================================================================
 
 def gerar_chave_autenticacao():
-    """Gera uma chave única e segura para autenticação."""
-    return secrets.token_urlsafe(32)
+    """Gera uma chave única e segura para autenticação com timestamp."""
+    import secrets
+    import time
+    ts = int(time.time())
+    return f"{ts}:{secrets.token_urlsafe(32)}"
 
 def validar_chave_autenticacao(chave):
-    """Valida se a chave de autenticação é válida."""
+    """Valida se a chave de autenticação é válida com timestamp."""
     if not chave:
         return False
     
-    # Verificar se a chave existe na sessão e não expirou
+    # Verificar se a chave existe na sessão
     chave_sessao = session.get('auth_key')
-    timestamp_login = session.get('login_timestamp')
-    
-    if not chave_sessao or not timestamp_login:
+    if not chave_sessao:
         return False
     
     # Verificar se a chave corresponde
     if chave != chave_sessao:
         return False
     
-    # Verificar se não expirou (24 horas)
+    # Verificar timestamp da chave (24 horas)
     try:
-        login_time = datetime.fromisoformat(timestamp_login)
-        if datetime.now() - login_time > timedelta(hours=24):
+        import time
+        ts_str, _ = chave.split(':', 1)
+        ts = int(ts_str)
+        now = int(time.time())
+        if (now - ts) > 86400:  # 24 horas em segundos
             return False
     except:
         return False
@@ -461,7 +489,9 @@ app.config.update(
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=False,        # dev local
     SESSION_COOKIE_SAMESITE='Lax',
-    REMEMBER_COOKIE_DURATION=timedelta(days=30),
+    # Em produção com HTTPS:
+    # SESSION_COOKIE_SECURE=True,
+    REMEMBER_COOKIE_DURATION=0,         # desativa "lembrar" persistente
     REMEMBER_COOKIE_HTTPONLY=True,
     REMEMBER_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=timedelta(days=7),
@@ -474,6 +504,67 @@ app.config.update(
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'upgrade_plans'
+
+# ============================================================================
+# 🛡️ GATE DE VERSÃO DE SESSÃO (ENTRADA SEGURA)
+# ============================================================================
+
+@app.before_request
+def session_version_gate():
+    """Gate de versão de sessão - invalida cookies antigos automaticamente."""
+    # só aplica em rotas "normais" (pule static, favicon, etc)
+    if request.endpoint in (None, 'static'):
+        return
+    
+    sv = session.get('_sv')  # session version
+    if sv != APP_SESSION_VERSION:
+        # Sessão velha/estranha → limpa e recomeça
+        session.clear()
+        session['_sv'] = APP_SESSION_VERSION
+        # opcional: carimbar um nonce de boot
+        session['_boot'] = True
+
+@app.before_request
+def session_fingerprint_gate():
+    """Gate de fingerprint - derruba sessão clonada/antiga."""
+    if request.endpoint in (None, 'static'):
+        return
+    
+    fp = session.get('_fp')
+    cur = _fingerprint()
+    if fp is None:
+        session['_fp'] = cur
+    elif fp != cur:
+        # fingerprint mudou → zera sessão
+        session.clear()
+        session['_sv'] = APP_SESSION_VERSION
+        session['_fp'] = cur
+
+@app.before_request
+def session_time_guard():
+    """Gate de timeout - mata sessões zumbis por tempo."""
+    if request.endpoint in (None, 'static'):
+        return
+    
+    meta = session.get('_meta')
+    now = datetime.utcnow()
+
+    if not meta:
+        session['_meta'] = {'iat': now.isoformat(), 'last': now.isoformat()}
+        return
+
+    iat  = datetime.fromisoformat(meta['iat'])
+    last = datetime.fromisoformat(meta['last'])
+
+    if (now - last) > MAX_IDLE or (now - iat) > MAX_AGE:
+        session.clear()
+        session['_sv'] = APP_SESSION_VERSION
+        session['_meta'] = {'iat': now.isoformat(), 'last': now.isoformat()}
+        return
+
+    # refresh last activity
+    meta['last'] = now.isoformat()
+    session['_meta'] = meta
 
 # ============================================================================
 # 🔍 LOG DE DIAGNÓSTICO TEMPORÁRIO (REMOVER DEPOIS)
@@ -613,10 +704,14 @@ def login():
     session['auth_key'] = auth_key
     session['login_timestamp'] = datetime.now().isoformat()
     
+    # 🔑 INICIALIZAR META DE TIMEOUT
+    now = datetime.utcnow().isoformat()
+    session['_meta'] = {'iat': now, 'last': now}
+    
     # 🔑 MARCAR COMO AUTENTICADO E FAZER LOGIN
     user.set_authenticated(True)
-    login_user(user, remember=True)
-    session.permanent = True
+    login_user(user, remember=False)  # Sessão não-permanente
+    session.permanent = False
     
     return jsonify({'success': True, 'message': 'Login realizado com sucesso!',
                     'user_level': user.level, 'is_premium': user.is_premium,
