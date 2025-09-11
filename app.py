@@ -172,9 +172,45 @@ from database.db_config import get_db_connection, create_user_simple
 import bcrypt
 import random
 import string
+import hashlib
+import secrets
 from datetime import datetime, timedelta
 
 # Função create_user movida para db_config.py
+
+# ============================================================================
+# 🔑 SISTEMA DE CHAVE DE AUTENTICAÇÃO
+# ============================================================================
+
+def gerar_chave_autenticacao():
+    """Gera uma chave única e segura para autenticação."""
+    return secrets.token_urlsafe(32)
+
+def validar_chave_autenticacao(chave):
+    """Valida se a chave de autenticação é válida."""
+    if not chave:
+        return False
+    
+    # Verificar se a chave existe na sessão e não expirou
+    chave_sessao = session.get('auth_key')
+    timestamp_login = session.get('login_timestamp')
+    
+    if not chave_sessao or not timestamp_login:
+        return False
+    
+    # Verificar se a chave corresponde
+    if chave != chave_sessao:
+        return False
+    
+    # Verificar se não expirou (24 horas)
+    try:
+        login_time = datetime.fromisoformat(timestamp_login)
+        if datetime.now() - login_time > timedelta(hours=24):
+            return False
+    except:
+        return False
+    
+    return True
 
 def get_user_by_id(user_id):
     """Recupera usuário por ID do banco SQLite - apenas para verificar acesso."""
@@ -459,9 +495,15 @@ def load_user(user_id):
         user = get_user_by_id(user_id_int)
 
         if user:
-            # 🔒 MARCAR COMO AUTENTICADO - usuário carregado da sessão está logado
-            user.set_authenticated(True)
-            print(f"✅ USUÁRIO CARREGADO: ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
+            # 🔒 MARCAR COMO AUTENTICADO APENAS SE CHAVE VÁLIDA
+            auth_key = session.get('auth_key')
+            if validar_chave_autenticacao(auth_key):
+                user.set_authenticated(True)
+                print(f"✅ USUÁRIO AUTENTICADO (chave válida): ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
+            else:
+                user.set_authenticated(False)
+                print(f"🔍 USUÁRIO CARREGADO (chave inválida/ausente): ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
+            
             print(f"✅ IS_AUTHENTICATED: {user.is_authenticated}")
         else:
             print(f"❌ USUÁRIO NÃO ENCONTRADO PARA ID: {user_id_int}")
@@ -534,8 +576,16 @@ def login():
     if not verify_password(user, senha):
         return jsonify({'success': False, 'error': 'Senha incorreta'}), 401
 
+    # 🔑 GERAR CHAVE DE AUTENTICAÇÃO ÚNICA
+    auth_key = gerar_chave_autenticacao()
+    
     # 🔑 MARCAR COMO AUTENTICADO ANTES DO LOGIN
     user.set_authenticated(True)
+    
+    # 🔑 FLAGS DE SESSÃO PARA CONTROLE DE AUTENTICAÇÃO
+    session['user_authenticated'] = True
+    session['auth_key'] = auth_key
+    session['login_timestamp'] = datetime.now().isoformat()
     
     # 🔑 fixa a sessão
     login_user(user, remember=True, force=True, fresh=True)
@@ -554,6 +604,11 @@ def logout():
     # 🔒 MARCAR COMO NÃO AUTENTICADO
     if hasattr(current_user, 'set_authenticated'):
         current_user.set_authenticated(False)
+    
+    # 🔒 LIMPAR FLAGS DE SESSÃO E CHAVE
+    session.pop('user_authenticated', None)
+    session.pop('auth_key', None)
+    session.pop('login_timestamp', None)
     
     logout_user()
     return redirect(url_for('landing_page'))
