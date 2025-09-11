@@ -125,14 +125,18 @@ class User(UserMixin):
         self.subscription_expiry = subscription_expiry
         self._is_authenticated = False  # 🔒 FLAG DE AUTENTICAÇÃO REAL
     
+    def set_authenticated(self, value: bool):
+        """Método para controlar o status de autenticação."""
+        self._is_authenticated = bool(value)
+    
     @property
     def is_authenticated(self):
         """Override do UserMixin - só retorna True se realmente logado."""
         return self._is_authenticated
     
-    def set_authenticated(self, value=True):
-        """Método para controlar o status de autenticação."""
-        self._is_authenticated = value
+    def get_id(self):
+        """Retorna o ID do usuário como string."""
+        return str(self.id)
     
     @property
     def is_premium(self):
@@ -471,48 +475,66 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'upgrade_plans'
 
+# ============================================================================
+# 🔍 LOG DE DIAGNÓSTICO TEMPORÁRIO (REMOVER DEPOIS)
+# ============================================================================
+
+@app.before_request
+def _auth_debug_log():
+    """Log temporário para diagnóstico de autenticação."""
+    try:
+        app.logger.debug(f"route={request.path} is_auth={getattr(current_user,'is_authenticated',False)} has_key={bool(session.get('auth_key'))}")
+    except:
+        pass
+
+@app.before_request
+def _auth_probe():
+    """Sonda de diagnóstico temporária para monitorar autenticação."""
+    try:
+        app.logger.warning(
+            "AUTH_PROBE route=%s is_auth=%s has_key=%s user_id=%s",
+            request.path,
+            getattr(current_user, 'is_authenticated', False),
+            bool(session.get('auth_key')),
+            getattr(current_user, 'id', None),
+        )
+    except Exception:
+        pass
+
+@app.get('/session_status')
+def session_status():
+    """Endpoint para verificar status da sessão e autenticação."""
+    return jsonify({
+        'is_authenticated': bool(getattr(current_user,'is_authenticated', False)),
+        'has_auth_key': bool(session.get('auth_key')),
+    })
+
 @login_manager.user_loader
 def load_user(user_id):
     """Carrega usuário da sessão."""
     try:
-        print("="*60)
-        print("🔍 LOAD_USER CHAMADO!")
-        print(f"🔍 USER_ID RECEBIDO: {user_id}")
-        print(f"🔍 TIPO USER_ID: {type(user_id)}")
-        print("="*60)
-
         if not user_id:
-            print("❌ USER_ID É NONE OU VAZIO - RETORNANDO NONE")
             return None
 
         try:
             user_id_int = int(user_id)
-            print(f"🔍 USER_ID CONVERTIDO PARA INT: {user_id_int}")
-        except ValueError as e:
-            print(f"❌ ERRO AO CONVERTER USER_ID PARA INT: {e}")
+        except ValueError:
             return None
 
         user = get_user_by_id(user_id_int)
+        if not user:
+            return None
 
-        if user:
-            # 🔒 MARCAR COMO AUTENTICADO APENAS SE CHAVE VÁLIDA
-            auth_key = session.get('auth_key')
-            if validar_chave_autenticacao(auth_key):
-                user.set_authenticated(True)
-                print(f"✅ USUÁRIO AUTENTICADO (chave válida): ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
-            else:
-                user.set_authenticated(False)
-                print(f"🔍 USUÁRIO CARREGADO (chave inválida/ausente): ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
-            
-            print(f"✅ IS_AUTHENTICATED: {user.is_authenticated}")
+        # 🔒 MARCAR COMO AUTENTICADO APENAS SE CHAVE VÁLIDA
+        auth_key = session.get('auth_key')
+        if validar_chave_autenticacao(auth_key):
+            user.set_authenticated(True)
         else:
-            print(f"❌ USUÁRIO NÃO ENCONTRADO PARA ID: {user_id_int}")
-
-        print("="*60)
+            user.set_authenticated(False)
+        
         return user
 
     except Exception as e:
-        print(f"❌ ERRO GERAL EM LOAD_USER: {e}")
         logger.error(f"Erro ao carregar usuário: {e}")
         return None
 
@@ -529,44 +551,30 @@ ROTAS_GRATUITAS = {
     '/boloes_loterias'
 }
 
-def verificar_usuario_logado():
+def verificar_usuario_logado() -> bool:
     """Verifica se o usuário está realmente logado com auth_key válida."""
-    print(f"🔍 VERIFICAR_USUARIO_LOGADO:")
-    print(f"   current_user.is_authenticated: {current_user.is_authenticated}")
-    print(f"   current_user: {current_user}")
-    
-    # 🔒 VERIFICAR AUTH_KEY PRIMEIRO (mais confiável)
-    auth_key = session.get('auth_key')
-    print(f"   auth_key na sessão: {auth_key}")
-    
-    if not validar_chave_autenticacao(auth_key):
-        print(f"   ❌ AUTH_KEY INVÁLIDA - retornando False")
+    try:
+        from flask import session
+        from flask_login import current_user
+        return bool(getattr(current_user, 'is_authenticated', False) and session.get('auth_key'))
+    except Exception:
         return False
-    
-    # 🔒 VERIFICAR SE USUÁRIO ESTÁ AUTENTICADO
-    if not current_user.is_authenticated:
-        print(f"   ❌ NÃO AUTENTICADO - retornando False")
-        return False
-    
-    print(f"   ✅ USUÁRIO LOGADO COM AUTH_KEY VÁLIDA - retornando True")
-    return True
 
+from functools import wraps
 def verificar_acesso_universal(f):
-    """Middleware que libera rotas free e valida login/premium nas demais."""
-    from functools import wraps
     @wraps(f)
     def decorated(*args, **kwargs):
         route = request.path
 
-        # 1) Libera rotas FREE
+        # 1) FREE liberadas
         if UserPermissions.is_free_route(route):
             return f(*args, **kwargs)
 
-        # 2) Se não estiver logado, manda para os planos
-        if not current_user.is_authenticated:
+        # 2) Premium/protegidas: precisa das 2 condições
+        if not current_user.is_authenticated or not session.get('auth_key'):
             return redirect('/upgrade_plans')
 
-        # 3) Logado: se for master/premium, libera; senão, planos
+        # 3) Plano do usuário
         if UserPermissions.has_access(route, current_user):
             return f(*args, **kwargs)
 
@@ -601,20 +609,15 @@ def login():
     # 🔑 GERAR CHAVE DE AUTENTICAÇÃO ÚNICA
     auth_key = gerar_chave_autenticacao()
     
-    # 🔑 MARCAR COMO AUTENTICADO ANTES DO LOGIN
-    user.set_authenticated(True)
-    
-    # 🔑 FLAGS DE SESSÃO PARA CONTROLE DE AUTENTICAÇÃO
-    session['user_authenticated'] = True
+    # 🔑 SALVAR AUTH_KEY NA SESSÃO
     session['auth_key'] = auth_key
     session['login_timestamp'] = datetime.now().isoformat()
     
-    # 🔑 fixa a sessão
-    login_user(user, remember=True, force=True, fresh=True)
+    # 🔑 MARCAR COMO AUTENTICADO E FAZER LOGIN
+    user.set_authenticated(True)
+    login_user(user, remember=True)
     session.permanent = True
     
-    # Login realizado com sucesso
-
     return jsonify({'success': True, 'message': 'Login realizado com sucesso!',
                     'user_level': user.level, 'is_premium': user.is_premium,
                     'nivel_master': getattr(user, 'nivel_master', False)})
@@ -1133,24 +1136,18 @@ def validar_codigo_confirmacao():
         print(f"❌ Erro ao validar código: {e}")
         return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
 
-@app.route('/check_access/<path:route_name>')
-def check_access(route_name):
-    """Checa se o usuário atual tem acesso à rota informada."""
-    route = '/' + route_name.lstrip('/')
+@app.route('/check_access/<path:rota>')
+def check_access(rota):
+    route_path = '/' + rota if not rota.startswith('/') else rota
 
-    # Sem aliases - usar rota diretamente
+    if UserPermissions.is_free_route(route_path):
+        return jsonify({'has_access': True})
 
-    # Rota free? libera
-    if UserPermissions.is_free_route(route):
-        return jsonify({'has_access': True, 'reason': 'free_allowed'})
-
-    # Precisa login?
-    if not current_user.is_authenticated:
+    if not current_user.is_authenticated or not session.get('auth_key'):
         return jsonify({'has_access': False, 'reason': 'not_logged_in', 'upgrade_url': '/upgrade_plans'})
 
-    # Master/premium?
-    if UserPermissions.has_access(route, current_user):
-        return jsonify({'has_access': True, 'reason': 'ok'})
+    if UserPermissions.has_access(route_path, current_user):
+        return jsonify({'has_access': True})
 
     return jsonify({'has_access': False, 'reason': 'premium_required', 'upgrade_url': '/upgrade_plans'})
 
@@ -2768,7 +2765,7 @@ def aposta_inteligente_premium_megasena():
 @verificar_acesso_universal
 def analise_estatistica_avancada_megasena():
     """Renderiza a página de Análise Estatística Avançada da Mega Sena."""
-    return render_template('analise_estatistica_avancada_megasena.html')
+    return render_template('analise_estatistica_avancada_megasena.html', is_logged_in=verificar_usuario_logado())
 
 # --- Rotas da Quina ---
 @app.route('/dashboard_quina')
