@@ -535,16 +535,17 @@ def verificar_usuario_logado():
     print(f"   current_user.is_authenticated: {current_user.is_authenticated}")
     print(f"   current_user: {current_user}")
     
-    if not current_user.is_authenticated:
-        print(f"   ❌ NÃO AUTENTICADO - retornando False")
-        return False
-    
-    # Verificar se tem auth_key válida
+    # 🔒 VERIFICAR AUTH_KEY PRIMEIRO (mais confiável)
     auth_key = session.get('auth_key')
     print(f"   auth_key na sessão: {auth_key}")
     
     if not validar_chave_autenticacao(auth_key):
         print(f"   ❌ AUTH_KEY INVÁLIDA - retornando False")
+        return False
+    
+    # 🔒 VERIFICAR SE USUÁRIO ESTÁ AUTENTICADO
+    if not current_user.is_authenticated:
+        print(f"   ❌ NÃO AUTENTICADO - retornando False")
         return False
     
     print(f"   ✅ USUÁRIO LOGADO COM AUTH_KEY VÁLIDA - retornando True")
