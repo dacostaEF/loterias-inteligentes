@@ -529,6 +529,27 @@ ROTAS_GRATUITAS = {
     '/boloes_loterias'
 }
 
+def verificar_usuario_logado():
+    """Verifica se o usuário está realmente logado com auth_key válida."""
+    print(f"🔍 VERIFICAR_USUARIO_LOGADO:")
+    print(f"   current_user.is_authenticated: {current_user.is_authenticated}")
+    print(f"   current_user: {current_user}")
+    
+    if not current_user.is_authenticated:
+        print(f"   ❌ NÃO AUTENTICADO - retornando False")
+        return False
+    
+    # Verificar se tem auth_key válida
+    auth_key = session.get('auth_key')
+    print(f"   auth_key na sessão: {auth_key}")
+    
+    if not validar_chave_autenticacao(auth_key):
+        print(f"   ❌ AUTH_KEY INVÁLIDA - retornando False")
+        return False
+    
+    print(f"   ✅ USUÁRIO LOGADO COM AUTH_KEY VÁLIDA - retornando True")
+    return True
+
 def verificar_acesso_universal(f):
     """Middleware que libera rotas free e valida login/premium nas demais."""
     from functools import wraps
@@ -618,18 +639,18 @@ def logout():
 @app.route('/upgrade_plans')
 def upgrade_plans():
     """Página de planos premium."""
-    return render_template('upgrade_plans.html', is_logged_in=current_user.is_authenticated)
+    return render_template('upgrade_plans.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/politica_cookies')
 def politica_cookies():
     """Renderiza a página de política de cookies."""
     from datetime import datetime
-    return render_template('politica_cookies.html', data_atual=datetime.now().strftime('%d/%m/%Y'), is_logged_in=current_user.is_authenticated)
+    return render_template('politica_cookies.html', data_atual=datetime.now().strftime('%d/%m/%Y'), is_logged_in=verificar_usuario_logado())
 
 @app.route('/checkout')
 def checkout():
     """Página de checkout/pagamento."""
-    return render_template('checkout.html', is_logged_in=current_user.is_authenticated)
+    return render_template('checkout.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/checkout-transparente/<plano_id>')
 def checkout_transparente(plano_id):
@@ -640,7 +661,7 @@ def checkout_transparente(plano_id):
     if not plano:
         return "Plano não encontrado", 404
     
-    return render_template('checkout_transparente.html', is_logged_in=current_user.is_authenticated, 
+    return render_template('checkout_transparente.html', is_logged_in=verificar_usuario_logado(), 
                          plano_id=plano_id,
                          plano_nome=plano['nome'],
                          plano_valor=plano['preco'])
@@ -847,7 +868,7 @@ def checkout_public_key():
 @app.route('/premium_required')
 def premium_required():
     """Página de erro para acesso premium."""
-    return render_template('premium_required.html', is_logged_in=current_user.is_authenticated)
+    return render_template('premium_required.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/upgrade_plan', methods=['POST'])
 @login_required
@@ -1237,12 +1258,12 @@ with app.app_context():
 @app.route('/')
 def landing_page():
     """Renderiza a página landing como página inicial."""
-    return render_template('landing.html', modo_desenvolvimento=MODO_DESENVOLVIMENTO, is_logged_in=current_user.is_authenticated)
+    return render_template('landing.html', modo_desenvolvimento=MODO_DESENVOLVIMENTO, is_logged_in=verificar_usuario_logado())
 
 @app.route('/planos')
 def planos_page():
     """Renderiza a página de planos premium."""
-    return render_template('upgrade_plans.html', is_logged_in=current_user.is_authenticated)
+    return render_template('upgrade_plans.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/api/carousel_data')
 def get_carousel_data():
@@ -1328,7 +1349,7 @@ def dashboard():
 @verificar_acesso_universal
 def dashboard_milionaria():
     """Renderiza a página principal do dashboard da Milionária."""
-    return render_template('dashboard_milionaria.html', is_logged_in=current_user.is_authenticated)
+    return render_template('dashboard_milionaria.html', is_logged_in=verificar_usuario_logado())
 
 # --- Rotas de API para as Análises ---
 
@@ -2727,20 +2748,20 @@ def bolao_interesse():
 @verificar_acesso_universal
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
-    return render_template('boloes_loterias.html', is_logged_in=current_user.is_authenticated)
+    return render_template('boloes_loterias.html', is_logged_in=verificar_usuario_logado())
 
 # --- Rotas da Mega Sena ---
 @app.route('/dashboard_MS')
 @verificar_acesso_universal
 def dashboard_megasena():
     """Dashboard Mega Sena - Protegido por middleware."""
-    return render_template('dashboard_megasena.html', is_logged_in=current_user.is_authenticated)
+    return render_template('dashboard_megasena.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/aposta_inteligente_premium_MS')
 @verificar_acesso_universal
 def aposta_inteligente_premium_megasena():
     """Aposta Inteligente Premium Mega Sena - Protegido por middleware."""
-    return render_template('analise_estatistica_avancada_megasena.html', is_logged_in=current_user.is_authenticated)
+    return render_template('analise_estatistica_avancada_megasena.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/analise_estatistica_avancada_megasena')
 @verificar_acesso_universal
@@ -2753,32 +2774,32 @@ def analise_estatistica_avancada_megasena():
 @verificar_acesso_universal
 def dashboard_quina():
     """Renderiza a página principal do dashboard da Quina."""
-    return render_template('dashboard_quina.html', is_logged_in=current_user.is_authenticated)
+    return render_template('dashboard_quina.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/aposta_inteligente_premium_quina')
 @verificar_acesso_universal
 def aposta_inteligente_premium_quina():
     """Renderiza a página de Aposta Inteligente Premium da Quina."""
-    return render_template('analise_estatistica_avancada_quina.html', is_logged_in=current_user.is_authenticated)
+    return render_template('analise_estatistica_avancada_quina.html', is_logged_in=verificar_usuario_logado())
 
 # --- Rotas da Lotofácil ---
 @app.route('/dashboard_lotofacil')
 @verificar_acesso_universal
 def dashboard_lotofacil():
     """Renderiza a página principal do dashboard da Lotofácil."""
-    return render_template('dashboard_lotofacil.html', is_logged_in=current_user.is_authenticated)
+    return render_template('dashboard_lotofacil.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/aposta_inteligente_premium_lotofacil')
 @verificar_acesso_universal
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
-    return render_template('analise_estatistica_avancada_lotofacil.html', is_logged_in=current_user.is_authenticated)
+    return render_template('analise_estatistica_avancada_lotofacil.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/lotofacil_laboratorio')
 @verificar_acesso_universal
 def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
-    return render_template('lotofacil_laboratorio.html', is_logged_in=current_user.is_authenticated)
+    return render_template('lotofacil_laboratorio.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/teste_api')
 def teste_api():
@@ -2791,14 +2812,14 @@ def teste_api():
 @verificar_acesso_universal
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
-    return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=current_user.is_authenticated)
+    return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=verificar_usuario_logado())
 
 # --- Rotas da Lotomania ---
 @app.route('/dashboard_lotomania')
 @verificar_acesso_universal
 def dashboard_lotomania():
     """Renderiza a página principal do dashboard da Lotomania."""
-    return render_template('dashboard_lotomania.html', is_logged_in=current_user.is_authenticated)
+    return render_template('dashboard_lotomania.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/api/gerar_aposta_premium', methods=['POST'])
 def gerar_aposta_premium():

@@ -1052,47 +1052,11 @@
       }
     }
 
-    /* 🚦 INDICADOR DE STATUS DE LOGIN - "SINAL DE TRÂNSITO" */
-
-    /* Círculo indicador no canto esquerdo da barra de menu */
-    .status-indicator {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      z-index: 9999;
-      transition: all 0.3s ease;
-      border: 2px solid white;
-    }
-
-    /* Estado visitante - Vermelho */
-    .status-indicator.visitor {
-      background-color: #EF4444 !important; /* Vermelho */
-      box-shadow: 0 0 15px rgba(239, 68, 68, 0.8);
-    }
-
-    /* Estado logado - Verde neon */
-    .status-indicator.logged-in {
-      background-color: #10B981 !important; /* Verde neon */
-      box-shadow: 0 0 20px rgba(16, 185, 129, 0.9);
-    }
-
-    /* Debug: garantir que seja visível */
-    .status-indicator {
-      display: block !important;
-      visibility: visible !important;
-    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
-<body class="p-4 sm:p-6 {% if is_logged_in %}logged-in{% endif %}">
-  <!-- 🚦 Indicador de Status de Login -->
-  <div class="status-indicator {% if is_logged_in %}logged-in{% else %}visitor{% endif %}"
-       title="Status: {% if is_logged_in %}Logado{% else %}Visitante{% endif %}">
-  </div>
+<body class="p-4 sm:p-6">
 
   {% if is_logged_in %}
   <!-- Indicador Visual de Status de Login (apenas para usuários logados) -->
