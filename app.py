@@ -569,28 +569,7 @@ def session_time_guard():
 # ============================================================================
 # 🔍 LOG DE DIAGNÓSTICO TEMPORÁRIO (REMOVER DEPOIS)
 # ============================================================================
-
-@app.before_request
-def _auth_debug_log():
-    """Log temporário para diagnóstico de autenticação."""
-    try:
-        app.logger.debug(f"route={request.path} is_auth={getattr(current_user,'is_authenticated',False)} has_key={bool(session.get('auth_key'))}")
-    except:
-        pass
-
-@app.before_request
-def _auth_probe():
-    """Sonda de diagnóstico temporária para monitorar autenticação."""
-    try:
-        app.logger.warning(
-            "AUTH_PROBE route=%s is_auth=%s has_key=%s user_id=%s",
-            request.path,
-            getattr(current_user, 'is_authenticated', False),
-            bool(session.get('auth_key')),
-            getattr(current_user, 'id', None),
-        )
-    except Exception:
-        pass
+# Funções de debug removidas para evitar interferência
 
 @app.get('/session_status')
 def session_status():
@@ -3706,8 +3685,8 @@ def google_callback():
         session['login_timestamp'] = datetime.now().isoformat()
         
         logger.info(f"Fazendo login do usuário com chave de autenticação...")
-        login_user(user, remember=True, force=True, fresh=True)
-        session.permanent = True
+        login_user(user, remember=False)  # Sessão não-permanente
+        session.permanent = False
         
         logger.info(f"Login Google bem-sucedido: {email}")
         logger.info(f"Redirecionando para página inicial...")
