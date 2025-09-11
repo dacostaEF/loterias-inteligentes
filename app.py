@@ -626,19 +626,29 @@ def login():
 @login_required
 def logout():
     """Logout do usuário."""
-    # 🔒 MARCAR COMO NÃO AUTENTICADO
-    if hasattr(current_user, 'set_authenticated'):
-        current_user.set_authenticated(False)
-    
-    # 🔒 LIMPAR FLAGS DE SESSÃO E CHAVE
-    session.pop('user_authenticated', None)
-    session.pop('auth_key', None)
-    session.pop('login_timestamp', None)
-    
+    from flask_login import logout_user
+    resp = redirect(url_for('landing_page'))
+
+    # 1) desloga no Flask-Login
     logout_user()
-    return redirect(url_for('landing_page'))
 
+    # 2) zera a sessão
+    session.clear()
 
+    # 3) apaga cookies relevantes
+    resp.delete_cookie('session')           # cookie de sessão do Flask
+    resp.delete_cookie('remember_token')    # cookie de "lembrar-me" do Flask-Login
+
+    return resp
+
+@app.route('/wipe_session')
+def wipe_session():
+    """Endpoint de limpeza forçada para debug."""
+    resp = redirect(url_for('landing_page'))
+    session.clear()
+    resp.delete_cookie('session')
+    resp.delete_cookie('remember_token')
+    return resp
 
 @app.route('/upgrade_plans')
 def upgrade_plans():
