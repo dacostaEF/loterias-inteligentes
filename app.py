@@ -21,13 +21,14 @@ from flask_login import LoginManager, UserMixin, login_user, logout_user, login_
 # Configuração do logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+fp_log = logging.getLogger("fp")
 
 # ============================================================================
 # 🛡️ SISTEMA DE VERSÃO DE SESSÃO (ENTRADA SEGURA)
 # ============================================================================
 
 # Versão do protocolo de sessão - AUMENTE quando mudar lógica de auth/sessão
-APP_SESSION_VERSION = 3
+APP_SESSION_VERSION = 4
 
 # Timeouts de sessão para segurança
 MAX_IDLE = timedelta(hours=2)   # Sessão morre após 2h de inatividade
@@ -177,7 +178,7 @@ class User(UserMixin):
         if self.level == UserLevel.LIFETIME:
             return True
         if self.subscription_expiry:
-            return datetime.now() < self.subscription_expiry
+            return datetime.utcnow() < self.subscription_expiry
         # fallback provisório: quando subscription_expiry não vem do DB
         return self.level in {
             UserLevel.PREMIUM_DAILY, UserLevel.PREMIUM_MONTHLY,
@@ -192,8 +193,8 @@ class User(UserMixin):
         elif self.level == UserLevel.LIFETIME:
             return "Vitalício"
         elif self.subscription_expiry:
-            if datetime.now() < self.subscription_expiry:
-                dias_restantes = (self.subscription_expiry - datetime.now()).days
+            if datetime.utcnow() < self.subscription_expiry:
+                dias_restantes = (self.subscription_expiry - datetime.utcnow()).days
                 return f"Ativo ({dias_restantes} dias restantes)"
             else:
                 return "Expirado"
@@ -365,7 +366,7 @@ def criar_codigo_validacao(usuario_id, tipo):
         
         # Gerar novo código
         codigo = gerar_codigo_validacao()
-        data_expiracao = datetime.now() + timedelta(minutes=15)  # 15 minutos para expirar
+        data_expiracao = datetime.utcnow() + timedelta(minutes=15)  # 15 minutos para expirar
         
         # Inserir código
         cursor.execute("""
@@ -408,7 +409,7 @@ def validar_codigo(usuario_id, codigo, tipo):
         codigo_id, status, tentativas, data_expiracao = codigo_data
         
         # Verificar se expirou
-        if datetime.now() > datetime.fromisoformat(data_expiracao):
+        if datetime.utcnow() > datetime.fromisoformat(data_expiracao):
             cursor.execute("UPDATE codigos_validacao SET status = 'expirado' WHERE id = ?", (codigo_id,))
             conn.commit()
             conn.close()
@@ -494,8 +495,9 @@ is_production = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('E
 MODO_DESENVOLVIMENTO = os.getenv('MODO_DESENVOLVIMENTO', '0') == '1'
 
 # Configuração unificada de sessão
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-only-secret-change-me')
+app.config['SESSION_COOKIE_NAME'] = 'li_session'
 app.config.update(
-    SECRET_KEY='loterias_inteligentes_2024_secret_key_secure',
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SECURE=is_production,        # True em produção, False em dev
     SESSION_COOKIE_SAMESITE='Lax',
@@ -549,9 +551,11 @@ def session_fingerprint_gate():
         ua_old = session.get('_fp_ua')
         # Se só o IP mudou e o UA é o mesmo, atualiza sem deslogar
         if ua_old == ua_now:
+            fp_log.info("FP updated by IP change only")
             session['_fp'] = cur
             return
         # Mudou UA (outro device/navegador) → reinicia sessão
+        fp_log.info("FP reset by UA change; dropping session")
         session.clear()
         session['_sv'] = APP_SESSION_VERSION
         session['_fp'] = cur
@@ -589,6 +593,9 @@ def add_security_headers(resp):
     resp.headers['Cache-Control'] = 'no-store'
     resp.headers['Pragma'] = 'no-cache'
     resp.headers['Vary'] = 'Cookie, User-Agent'
+    # HSTS só em prod e conexão segura
+    if is_production and request.is_secure:
+        resp.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     return resp
 
 # ============================================================================
@@ -714,7 +721,7 @@ def login():
     
     # 🔑 SALVAR AUTH_KEY NA SESSÃO
     session['auth_key'] = auth_key
-    session['login_timestamp'] = datetime.now().isoformat()
+    session['login_timestamp'] = datetime.utcnow().isoformat()
     
     # 🔑 INICIALIZAR META DE TIMEOUT
     now = datetime.utcnow().isoformat()
@@ -775,7 +782,7 @@ def upgrade_plans():
 def politica_cookies():
     """Renderiza a página de política de cookies."""
     from datetime import datetime
-    return render_template('politica_cookies.html', data_atual=datetime.now().strftime('%d/%m/%Y'), is_logged_in=verificar_usuario_logado())
+    return render_template('politica_cookies.html', data_atual=datetime.utcnow().strftime('%d/%m/%Y'), is_logged_in=verificar_usuario_logado())
 
 @app.route('/checkout')
 def checkout():
@@ -1027,13 +1034,13 @@ def upgrade_plan():
     
     # Definir data de expiração
     if plan == 'daily':
-        current_user.subscription_expiry = datetime.now() + timedelta(days=1)
+        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=1)
     elif plan == 'monthly':
-        current_user.subscription_expiry = datetime.now() + timedelta(days=30)
+        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=30)
     elif plan == 'semestral':
-        current_user.subscription_expiry = datetime.now() + timedelta(days=180)
+        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=180)
     elif plan == 'annual':
-        current_user.subscription_expiry = datetime.now() + timedelta(days=365)
+        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=365)
     elif plan == 'lifetime':
         current_user.subscription_expiry = None
     
@@ -3742,7 +3749,7 @@ def google_callback():
         # 🔑 FLAGS DE SESSÃO PARA CONTROLE DE AUTENTICAÇÃO
         session['user_authenticated'] = True
         session['auth_key'] = auth_key
-        session['login_timestamp'] = datetime.now().isoformat()
+        session['login_timestamp'] = datetime.utcnow().isoformat()
         
         logger.info(f"Fazendo login do usuário com chave de autenticação...")
         login_user(user, remember=False)  # Sessão não-permanente
