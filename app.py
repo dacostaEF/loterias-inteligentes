@@ -32,7 +32,7 @@ APP_SESSION_VERSION = 4
 
 # Timeouts de sessão para segurança
 MAX_IDLE = timedelta(hours=2)   # Sessão morre após 2h de inatividade
-MAX_AGE  = timedelta(hours=12)  # Sessão morre após 12h total
+MAX_AGE  = timedelta(hours=12)  # Sessão morre após 12h totarequirements.txt
 
 # ============================================================================
 # 🔐 FUNÇÕES DE SEGURANÇA
@@ -3769,14 +3769,7 @@ def google_callback():
 # 🚀 INICIALIZAÇÃO DO APLICATIVO
 # ============================================================================
 
-if __name__ == '__main__':
-    print("🚀 Iniciando Loterias Inteligentes...")
-    print("📱 Servidor rodando em: http://localhost:5000")
-    print("🔐 Sistema de controle de acesso ativo")
-    print("🔗 Google OAuth configurado")
-    print("💎 Páginas Freemium: Landing, +Milionária, Quina, Lotomania")
-    print("⭐ Páginas Premium: Todas as outras (requer assinatura)")
-    print("=" * 60)
+# Configuração de inicialização movida para o final do arquivo
 
 # ============================================================================
 # 💳 SISTEMA DE PAGAMENTO
