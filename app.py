@@ -595,12 +595,8 @@ def load_user(user_id):
         if not user:
             return None
 
-        # 🔒 MARCAR COMO AUTENTICADO APENAS SE CHAVE VÁLIDA
-        auth_key = session.get('auth_key')
-        if validar_chave_autenticacao(auth_key):
-            user.set_authenticated(True)
-        else:
-            user.set_authenticated(False)
+        # 🔒 MARCAR COMO AUTENTICADO - CONFIA NO FLASK-LOGIN
+        user.set_authenticated(True)
 
         return user
 
