@@ -22,4 +22,5 @@ EXPOSE 8000
 # Se quiser mesmo, instale curl e use: HEALTHCHECK ... curl -f http://127.0.0.1:$PORT/healthz
 
 # Comando — ATENÇÃO: use $PORT do Railway
-CMD ["bash", "-lc", "gunicorn app:app --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]
+CMD bash -lc "gunicorn app:app --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -"
+
