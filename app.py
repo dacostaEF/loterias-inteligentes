@@ -4398,18 +4398,29 @@ def pagamento_teste():
     """
 
 # ============================================================================
+# 🏥 HEALTHCHECK ENDPOINT
+# ============================================================================
+
+@app.get("/healthz")
+def healthz():
+    """Healthcheck endpoint para monitoramento."""
+    return "ok", 200
+
+# ============================================================================
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================
 
 # MODO_DESENVOLVIMENTO já definido no topo do arquivo
 
 if __name__ == '__main__':
-    # Configurações otimizadas para melhor performance
+    # Configurações otimizadas para produção
     port = int(os.environ.get('PORT', 5000))
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    
     app.run(
-        debug=MODO_DESENVOLVIMENTO,  # Debug apenas em desenvolvimento
+        debug=debug_mode,
         host='0.0.0.0', 
         port=port,
-        threaded=True,  # Habilita threading
-        use_reloader=MODO_DESENVOLVIMENTO  # Reloader apenas em desenvolvimento
+        threaded=True,
+        use_reloader=False  # Desabilita reloader em produção
     ) 

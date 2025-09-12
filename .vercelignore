@@ -1,0 +1,33 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Arquivos de desenvolvimento
+test_*.py
+*_test.py
+implement_footer_all.py
+fix_logged_in_badge.py
+convert_templates.py
+
+# Arquivos temporários
+*.tmp
+*.temp
