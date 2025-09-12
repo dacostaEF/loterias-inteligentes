@@ -8,3 +8,11 @@ healthcheckPath = "/healthz"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
+
+[environments.production]
+SECRET_KEY = "loterias-inteligentes-secret-key-2024-production"
+SITE_CNPJ = "00.000.000/0000-00"
+SITE_WHATS_LINK = "https://wa.me/55SEUNUMERO"
+FLASK_ENV = "production"
+FLASK_DEBUG = "False"
+DOMAIN = "loteriasinteligente.com.br"
