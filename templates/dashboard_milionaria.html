@@ -296,6 +296,43 @@
         font-size: 1.1rem;
       }
     }
+  
+    /* CSS do Badge LOGGED IN */
+    .logged-in-badge {
+      position: fixed;
+      top: 45px;
+      left: 15px;
+      background: #10B981;
+      color: white;
+      padding: 8px 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .logged-in-badge {
+        top: 60px; /* Abaixa para alinhar com Tour Guiado */
+        left: 10px;
+        padding: 4px 8px; /* Reduz padding */
+        font-size: 11px; /* Reduz fonte */
+        border-radius: 3px;
+        border: 1px solid white; /* Reduz borda */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logged-in-badge {
+        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
+        left: 8px;
+        padding: 3px 6px; /* Padding ainda menor */
+        font-size: 10px; /* Fonte ainda menor */
+      }
+    }
   </style>
 
   <style>
@@ -1195,6 +1232,43 @@
     .afinidade-card .sub{
       min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
     }
+  
+    /* CSS do Badge LOGGED IN */
+    .logged-in-badge {
+      position: fixed;
+      top: 45px;
+      left: 15px;
+      background: #10B981;
+      color: white;
+      padding: 8px 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .logged-in-badge {
+        top: 60px; /* Abaixa para alinhar com Tour Guiado */
+        left: 10px;
+        padding: 4px 8px; /* Reduz padding */
+        font-size: 11px; /* Reduz fonte */
+        border-radius: 3px;
+        border: 1px solid white; /* Reduz borda */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logged-in-badge {
+        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
+        left: 8px;
+        padding: 3px 6px; /* Padding ainda menor */
+        font-size: 10px; /* Fonte ainda menor */
+      }
+    }
   </style>
 
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
@@ -1203,7 +1277,7 @@
   <div class="main-content">
   {% if is_logged_in %}
   <!-- Indicador Visual de Status de Login (apenas para usuários logados) -->
-  <div style="position: fixed; top: 45px; left: 15px; background: #10B981; color: white; padding: 8px 12px; z-index: 10001; font-size: 14px; font-weight: bold; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white;">
+  <div class="logged-in-badge">
     🔓 LOGGED IN
   </div>
   {% endif %}
@@ -6276,6 +6350,43 @@
       font-size: 1.75rem !important;
     }
   }
+  
+    /* CSS do Badge LOGGED IN */
+    .logged-in-badge {
+      position: fixed;
+      top: 45px;
+      left: 15px;
+      background: #10B981;
+      color: white;
+      padding: 8px 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .logged-in-badge {
+        top: 60px; /* Abaixa para alinhar com Tour Guiado */
+        left: 10px;
+        padding: 4px 8px; /* Reduz padding */
+        font-size: 11px; /* Reduz fonte */
+        border-radius: 3px;
+        border: 1px solid white; /* Reduz borda */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logged-in-badge {
+        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
+        left: 8px;
+        padding: 3px 6px; /* Padding ainda menor */
+        font-size: 10px; /* Fonte ainda menor */
+      }
+    }
   </style>
 
   <script src="{{ url_for('static', filename='js/graficos.js') }}"></script>
@@ -6382,6 +6493,43 @@
     
     button[onclick*="destacarNumeros"]:hover {
       background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+  
+    /* CSS do Badge LOGGED IN */
+    .logged-in-badge {
+      position: fixed;
+      top: 45px;
+      left: 15px;
+      background: #10B981;
+      color: white;
+      padding: 8px 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .logged-in-badge {
+        top: 60px; /* Abaixa para alinhar com Tour Guiado */
+        left: 10px;
+        padding: 4px 8px; /* Reduz padding */
+        font-size: 11px; /* Reduz fonte */
+        border-radius: 3px;
+        border: 1px solid white; /* Reduz borda */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logged-in-badge {
+        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
+        left: 8px;
+        padding: 3px 6px; /* Padding ainda menor */
+        font-size: 10px; /* Fonte ainda menor */
+      }
     }
   </style>
 

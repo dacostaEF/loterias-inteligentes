@@ -268,6 +268,43 @@
         font-size: 1.1rem;
       }
     }
+  
+    /* CSS do Badge LOGGED IN */
+    .logged-in-badge {
+      position: fixed;
+      top: 45px;
+      left: 15px;
+      background: #10B981;
+      color: white;
+      padding: 8px 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .logged-in-badge {
+        top: 60px; /* Abaixa para alinhar com Tour Guiado */
+        left: 10px;
+        padding: 4px 8px; /* Reduz padding */
+        font-size: 11px; /* Reduz fonte */
+        border-radius: 3px;
+        border: 1px solid white; /* Reduz borda */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logged-in-badge {
+        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
+        left: 8px;
+        padding: 3px 6px; /* Padding ainda menor */
+        font-size: 10px; /* Fonte ainda menor */
+      }
+    }
   </style>
   
      <!-- Carrossel CSS e JS -->
@@ -1194,13 +1231,50 @@
         margin-top: 0.8rem;
       }
     }
+  
+    /* CSS do Badge LOGGED IN */
+    .logged-in-badge {
+      position: fixed;
+      top: 45px;
+      left: 15px;
+      background: #10B981;
+      color: white;
+      padding: 8px 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .logged-in-badge {
+        top: 60px; /* Abaixa para alinhar com Tour Guiado */
+        left: 10px;
+        padding: 4px 8px; /* Reduz padding */
+        font-size: 11px; /* Reduz fonte */
+        border-radius: 3px;
+        border: 1px solid white; /* Reduz borda */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logged-in-badge {
+        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
+        left: 8px;
+        padding: 3px 6px; /* Padding ainda menor */
+        font-size: 10px; /* Fonte ainda menor */
+      }
+    }
   </style>
 </head>
 <body>
   <div class="main-content">
   {% if is_logged_in %}
   <!-- Indicador Visual de Status de Login (apenas para usuários logados) -->
-  <div style="position: fixed; top: 45px; left: 15px; background: #10B981; color: white; padding: 8px 12px; z-index: 10001; font-size: 14px; font-weight: bold; border-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.3); border: 2px solid white;">
+  <div class="logged-in-badge">
     🔓 LOGGED IN
   </div>
   {% endif %}
@@ -1239,6 +1313,15 @@
              <div class="dropdown-content">
                <a href="javascript:void(0)" onclick="go('/dashboard_quina')"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
                <a href="javascript:void(0)" onclick="go('/aposta_inteligente_premium_quina')"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+             </div>
+           </div>
+         </li>
+         <li>
+           <div class="dropdown">
+             <a href="#" class="dropdown-toggle"><i class="fa fa-plus"></i> +Milionária ▼</a>
+             <div class="dropdown-content">
+               <a href="javascript:void(0)" onclick="go('/dashboard_milionaria')"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+               <a href="javascript:void(0)" onclick="go('/aposta_inteligente_premium')"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
              </div>
            </div>
          </li>
@@ -1310,7 +1393,7 @@
         <li>
           <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
           <div class="mobile-dropdown">
-            <a href="javascript:void(0)" onclick="go('/dashboard')"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+            <a href="javascript:void(0)" onclick="go('/dashboard_milionaria')"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
             <a href="javascript:void(0)" onclick="go('/aposta_inteligente_premium')"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
           </div>
         </li>
@@ -1506,6 +1589,43 @@
     #plansIframe.loaded {
       opacity: 1 !important;
     }
+  
+    /* CSS do Badge LOGGED IN */
+    .logged-in-badge {
+      position: fixed;
+      top: 45px;
+      left: 15px;
+      background: #10B981;
+      color: white;
+      padding: 8px 12px;
+      z-index: 10001;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      border: 2px solid white;
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .logged-in-badge {
+        top: 60px; /* Abaixa para alinhar com Tour Guiado */
+        left: 10px;
+        padding: 4px 8px; /* Reduz padding */
+        font-size: 11px; /* Reduz fonte */
+        border-radius: 3px;
+        border: 1px solid white; /* Reduz borda */
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .logged-in-badge {
+        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
+        left: 8px;
+        padding: 3px 6px; /* Padding ainda menor */
+        font-size: 10px; /* Fonte ainda menor */
+      }
+    }
   </style>
 
   <script>
@@ -1635,7 +1755,9 @@
   <!-- Função para verificar acesso antes de navegar -->
   <script>
   async function go(path){
-    const url = '/check_access' + (path.startsWith('/') ? path : '/' + path);
+    // Remove barra inicial se existir e garante que não há dupla barra
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    const url = '/check_access/' + cleanPath;
     const r = await fetch(url, { credentials:'include' });
     const j = await r.json();
     if (j.has_access) {

@@ -1,11 +1,25 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Política de Cookies - Loterias Inteligentes</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+#!/usr/bin/env python3
+"""
+Script para implementar rodapé em todas as páginas restantes
+"""
+
+import os
+import re
+from pathlib import Path
+
+def add_footer_to_template(file_path):
+    """Adiciona rodapé a um template específico"""
     
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+    
+    # Pular se já tem rodapé
+    if 'site-footer' in content:
+        print(f"✅ {file_path} já tem rodapé")
+        return
+    
+    # CSS do rodapé
+    footer_css = """
   <!-- CSS do Rodapé -->
   <style>
     body {
@@ -225,248 +239,10 @@
         font-size: 1.1rem;
       }
     }
-  
-    /* CSS do Badge LOGGED IN */
-    .logged-in-badge {
-      position: fixed;
-      top: 45px;
-      left: 15px;
-      background: #10B981;
-      color: white;
-      padding: 8px 12px;
-      z-index: 10001;
-      font-size: 14px;
-      font-weight: bold;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      border: 2px solid white;
-    }
-    
-    /* Responsividade para mobile */
-    @media (max-width: 768px) {
-      .logged-in-badge {
-        top: 60px; /* Abaixa para alinhar com Tour Guiado */
-        left: 10px;
-        padding: 4px 8px; /* Reduz padding */
-        font-size: 11px; /* Reduz fonte */
-        border-radius: 3px;
-        border: 1px solid white; /* Reduz borda */
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .logged-in-badge {
-        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
-        left: 8px;
-        padding: 3px 6px; /* Padding ainda menor */
-        font-size: 10px; /* Fonte ainda menor */
-      }
-    }
-  </style><style>
-        body {
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #7C3AED;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        h2 {
-            color: #4A5568;
-            margin-top: 30px;
-            margin-bottom: 15px;
-        }
-        h3 {
-            color: #2D3748;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-        p {
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-        ul {
-            margin-bottom: 15px;
-        }
-        li {
-            margin-bottom: 8px;
-        }
-        .highlight {
-            background: #E6FFFA;
-            padding: 15px;
-            border-left: 4px solid #38B2AC;
-            margin: 20px 0;
-        }
-        .back-button {
-            display: inline-block;
-            background: #7C3AED;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        .back-button:hover {
-            background: #6B46C1;
-        }
-    
-    /* CSS do Badge LOGGED IN */
-    .logged-in-badge {
-      position: fixed;
-      top: 45px;
-      left: 15px;
-      background: #10B981;
-      color: white;
-      padding: 8px 12px;
-      z-index: 10001;
-      font-size: 14px;
-      font-weight: bold;
-      border-radius: 4px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      border: 2px solid white;
-    }
-    
-    /* Responsividade para mobile */
-    @media (max-width: 768px) {
-      .logged-in-badge {
-        top: 60px; /* Abaixa para alinhar com Tour Guiado */
-        left: 10px;
-        padding: 4px 8px; /* Reduz padding */
-        font-size: 11px; /* Reduz fonte */
-        border-radius: 3px;
-        border: 1px solid white; /* Reduz borda */
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .logged-in-badge {
-        top: 65px; /* Ajusta ainda mais para telas muito pequenas */
-        left: 8px;
-        padding: 3px 6px; /* Padding ainda menor */
-        font-size: 10px; /* Fonte ainda menor */
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="main-content">
+  </style>"""
 
-    <div class="container">
-        <a href="/" class="back-button">← Voltar ao Início</a>
-        
-        <h1>🍪 Política de Cookies</h1>
-        
-        <p><strong>Última atualização:</strong> {{ data_atual }}</p>
-        
-        <h2>1. O que são Cookies?</h2>
-        <p>Cookies são pequenos arquivos de texto armazenados no seu navegador quando você visita nosso site. Eles nos ajudam a:</p>
-        <ul>
-            <li>Manter você logado durante a navegação</li>
-            <li>Lembrar suas preferências e configurações</li>
-            <li>Melhorar a performance do site</li>
-            <li>Personalizar sua experiência</li>
-        </ul>
-        
-        <h2>2. Tipos de Cookies que Utilizamos</h2>
-        
-        <h3>🍪 Cookies Essenciais</h3>
-        <p>Estes cookies são <strong>obrigatórios</strong> para o funcionamento básico do site:</p>
-        <ul>
-            <li><strong>Cookies de Sessão:</strong> Mantêm você logado enquanto navega</li>
-            <li><strong>Cookies de Segurança:</strong> Protegem contra ataques maliciosos</li>
-            <li><strong>Cookies de Funcionalidade:</strong> Permitem recursos básicos do site</li>
-        </ul>
-        
-        <h3>⚙️ Cookies de Preferências</h3>
-        <p>Estes cookies lembram suas escolhas e configurações:</p>
-        <ul>
-            <li>Configurações de análise estatística</li>
-            <li>Preferências de exibição</li>
-            <li>Configurações de notificações</li>
-        </ul>
-        
-        <h3>📊 Cookies de Análise</h3>
-        <p>Estes cookies nos ajudam a entender como você usa o site:</p>
-        <ul>
-            <li>Páginas mais visitadas</li>
-            <li>Tempo de permanência</li>
-            <li>Funcionalidades mais utilizadas</li>
-        </ul>
-        
-        <div class="highlight">
-            <h3>🔒 Seus Dados Estão Seguros</h3>
-            <p>Não coletamos informações pessoais sensíveis através de cookies. Todos os dados são anonimizados e utilizados apenas para melhorar sua experiência no site.</p>
-        </div>
-        
-        <h2>3. Como Gerenciar Cookies</h2>
-        <p>Você pode controlar os cookies de várias formas:</p>
-        
-        <h3>📱 Através do Nosso Site</h3>
-        <p>Use o banner de cookies que aparece na primeira visita para:</p>
-        <ul>
-            <li>Aceitar todos os cookies</li>
-            <li>Recusar cookies não essenciais</li>
-            <li>Configurar suas preferências</li>
-        </ul>
-        
-        <h3>🌐 Através do Seu Navegador</h3>
-        <p>Você pode configurar seu navegador para:</p>
-        <ul>
-            <li>Bloquear todos os cookies</li>
-            <li>Aceitar apenas cookies de sites confiáveis</li>
-            <li>Excluir cookies existentes</li>
-        </ul>
-        
-        <h2>4. Cookies de Terceiros</h2>
-        <p>Nosso site pode conter cookies de serviços terceiros:</p>
-        <ul>
-            <li><strong>Google Analytics:</strong> Para análise de tráfego</li>
-            <li><strong>Google Fonts:</strong> Para carregar fontes</li>
-            <li><strong>CDN:</strong> Para carregar recursos externos</li>
-        </ul>
-        
-        <h2>5. Duração dos Cookies</h2>
-        <ul>
-            <li><strong>Cookies de Sessão:</strong> Expiram quando você fecha o navegador</li>
-            <li><strong>Cookies Persistentes:</strong> Duram até 1 ano</li>
-            <li><strong>Cookies de Preferências:</strong> Duram até 30 dias</li>
-        </ul>
-        
-        <h2>6. Seus Direitos</h2>
-        <p>De acordo com a LGPD, você tem o direito de:</p>
-        <ul>
-            <li>Saber quais cookies utilizamos</li>
-            <li>Consentir ou recusar o uso de cookies</li>
-            <li>Solicitar a exclusão de seus dados</li>
-            <li>Revogar seu consentimento a qualquer momento</li>
-        </ul>
-        
-        <h2>7. Contato</h2>
-        <p>Se você tiver dúvidas sobre nossa política de cookies, entre em contato:</p>
-        <ul>
-            <li><strong>Email:</strong> contato@loteriasinteligentes.com</li>
-            <li><strong>Telefone:</strong> (11) 99999-9999</li>
-        </ul>
-        
-        <div class="highlight">
-            <h3>✅ Resumo</h3>
-            <p>Utilizamos cookies para melhorar sua experiência no site. Você pode controlar quais cookies aceita através do banner de consentimento ou das configurações do seu navegador. Seus dados estão seguros e são utilizados apenas para os fins descritos nesta política.</p>
-        </div>
-    </div>
-  </div> <!-- Fim do main-content -->
-
+    # HTML do rodapé
+    footer_html = """
   <!-- RODAPÉ -->
   <footer class="site-footer" role="contentinfo">
     <div class="footer-row">
@@ -598,6 +374,77 @@
         closeFooterModal();
       }
     });
-  </script>
-</body>
-</html>
+  </script>"""
+
+    # Adicionar CSS após o último link de CSS
+    css_pattern = r'(<link[^>]*rel="stylesheet"[^>]*>[\s\n]*)+'
+    css_matches = list(re.finditer(css_pattern, content))
+    
+    if css_matches:
+        last_css = css_matches[-1]
+        content = content[:last_css.end()] + footer_css + content[last_css.end():]
+    else:
+        # Se não encontrar CSS, adicionar antes do </head>
+        content = content.replace('</head>', footer_css + '\n</head>')
+    
+    # Envolver conteúdo em main-content
+    body_pattern = r'<body[^>]*>'
+    body_match = re.search(body_pattern, content)
+    if body_match:
+        body_end = body_match.end()
+        content = content[:body_end] + '\n  <div class="main-content">\n' + content[body_end:]
+    
+    # Adicionar rodapé antes do </body>
+    content = content.replace('</body>', '  </div> <!-- Fim do main-content -->\n' + footer_html + '\n</body>')
+    
+    # Salvar arquivo
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+    
+    print(f"✅ {file_path} - Rodapé implementado")
+
+def main():
+    """Implementa rodapé em todas as páginas restantes"""
+    
+    templates_dir = Path('templates')
+    
+    # Páginas que já têm rodapé
+    already_done = [
+        'landing.html',
+        'dashboard_milionaria.html',
+        'analise_estatistica_avancada_milionaria.html',
+        'dashboard_megasena.html'
+    ]
+    
+    # Páginas para implementar
+    pages_to_do = [
+        'analise_estatistica_avancada_megasena.html',
+        'dashboard_quina.html',
+        'analise_estatistica_avancada_quina.html',
+        'dashboard_lotofacil.html',
+        'analise_estatistica_avancada_lotofacil.html',
+        'dashboard_lotomania.html',
+        'upgrade_plans.html',
+        'checkout.html',
+        'checkout_transparente.html',
+        'politica_cookies.html',
+        'premium_required.html',
+        'boloes_loterias.html',
+        'lotofacil_laboratorio.html',
+        'confianca_login.html',
+        'AppLotofacil_IA_adaptativa.html'
+    ]
+    
+    print("🚀 Implementando rodapé em todas as páginas...")
+    
+    for filename in pages_to_do:
+        file_path = templates_dir / filename
+        if file_path.exists():
+            add_footer_to_template(file_path)
+        else:
+            print(f"⚠️  {file_path} não encontrado")
+    
+    print("\n✅ Implementação concluída!")
+
+if __name__ == "__main__":
+    main()
