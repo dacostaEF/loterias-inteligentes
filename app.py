@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, session
+from functools import wraps
 import pandas as pd
 import os
 import math
@@ -172,7 +173,11 @@ class User(UserMixin):
             return True
         if self.subscription_expiry:
             return datetime.now() < self.subscription_expiry
-        return False
+        # fallback provisório: quando subscription_expiry não vem do DB
+        return self.level in {
+            UserLevel.PREMIUM_DAILY, UserLevel.PREMIUM_MONTHLY,
+            UserLevel.PREMIUM_SEMESTRAL, UserLevel.PREMIUM_ANNUAL
+        }
     
     @property
     def subscription_status(self):
@@ -200,7 +205,6 @@ from database.db_config import get_db_connection, create_user_simple
 import bcrypt
 import random
 import string
-import hashlib
 import secrets
 from datetime import datetime, timedelta
 
@@ -276,15 +280,7 @@ def get_user_by_id(user_id):
         level = level_map.get(plano, UserLevel.FREE)
 
         user = User(row[0], row[1], level)  # id, email, level
-        # Master por email
-        MASTER_EMAILS = {
-            'master_ef@loterias.com',
-            'master_sf@loterias.com',
-            'master_sm@loterias.com',
-            'master_jj@loterias.com',
-            'master_fc@loterias.com',
-            'master_dc@loterias.com'
-        }
+        # Master por email (usando lista global)
         user.nivel_master = (user.email in MASTER_EMAILS)
         return user
         
@@ -336,7 +332,6 @@ def get_user_by_email(email):
 def verify_password(user, password):
     """Verifica se a senha está correta."""
     try:
-        import hashlib
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         return password_hash == user.senha_hash
     except Exception as e:
@@ -483,16 +478,21 @@ def incrementar_tentativas_codigo(usuario_id, codigo, tipo):
 
 app = Flask(__name__, static_folder='static')
 
+# Detectar ambiente (produção vs desenvolvimento)
+is_production = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('ENVIRONMENT') == 'production'
+
+# Variável global para modo de desenvolvimento
+MODO_DESENVOLVIMENTO = os.getenv('MODO_DESENVOLVIMENTO', '0') == '1'
+
 # Configuração unificada de sessão
 app.config.update(
     SECRET_KEY='loterias_inteligentes_2024_secret_key_secure',
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=False,        # dev local
+    SESSION_COOKIE_SECURE=is_production,        # True em produção, False em dev
     SESSION_COOKIE_SAMESITE='Lax',
-    # Em produção com HTTPS:
-    # SESSION_COOKIE_SECURE=True,
     REMEMBER_COOKIE_DURATION=0,         # desativa "lembrar" persistente
     REMEMBER_COOKIE_HTTPONLY=True,
+    REMEMBER_COOKIE_SECURE=is_production,       # True em produção, False em dev
     REMEMBER_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 )
@@ -601,7 +601,7 @@ def load_user(user_id):
             user.set_authenticated(True)
         else:
             user.set_authenticated(False)
-        
+
         return user
 
     except Exception as e:
@@ -613,24 +613,16 @@ def load_user(user_id):
 # 🔒 MIDDLEWARE UNIVERSAL DE CONTROLE DE ACESSO
 # ============================================================================
 
-# ROTAS GRATUITAS (apenas estas 4 são liberadas)
-ROTAS_GRATUITAS = {
-    '/dashboard_milionaria',
-    '/dashboard_quina', 
-    '/dashboard_lotomania',
-    '/boloes_loterias'
-}
+# ROTAS_GRATUITAS removido - usando apenas UserPermissions.FREE_ROUTES
 
 def verificar_usuario_logado() -> bool:
-    """Verifica se o usuário está realmente logado com auth_key válida."""
+    """Verifica se o usuário está realmente logado - confia no Flask-Login."""
     try:
-        from flask import session
         from flask_login import current_user
-        return bool(getattr(current_user, 'is_authenticated', False) and session.get('auth_key'))
+        return bool(getattr(current_user, 'is_authenticated', False))
     except Exception:
         return False
 
-from functools import wraps
 def verificar_acesso_universal(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -640,8 +632,8 @@ def verificar_acesso_universal(f):
         if UserPermissions.is_free_route(route):
             return f(*args, **kwargs)
 
-        # 2) Premium/protegidas: precisa das 2 condições
-        if not current_user.is_authenticated or not session.get('auth_key'):
+        # 2) Premium/protegidas: confia no Flask-Login
+        if not current_user.is_authenticated:
             return redirect('/upgrade_plans')
 
         # 3) Plano do usuário
@@ -662,9 +654,9 @@ def verificar_acesso_universal(f):
 @app.route('/login', methods=['POST'])
 def login():
     """Login com email e senha."""
-    data = request.get_json()
-    email = data.get('email')
-    senha = data.get('senha')
+    data = request.get_json(silent=True) or request.form
+    email = (data.get('email') or '').strip()
+    senha = (data.get('senha') or '').strip()
     
     if not email or not senha:
         return jsonify({'success': False, 'error': 'Email e senha são obrigatórios'}), 400
@@ -691,7 +683,7 @@ def login():
     user.set_authenticated(True)
     login_user(user, remember=False)  # Sessão não-permanente
     session.permanent = False
-    
+
     return jsonify({'success': True, 'message': 'Login realizado com sucesso!',
                     'user_level': user.level, 'is_premium': user.is_premium,
                     'nivel_master': getattr(user, 'nivel_master', False)})
@@ -723,6 +715,15 @@ def wipe_session():
     resp.delete_cookie('session')
     resp.delete_cookie('remember_token')
     return resp
+
+@app.route('/debug_config_full')
+def debug_config_full():
+    """Debug completo das configurações de sessão e cookies."""
+    from flask import jsonify
+    cfg = {k: str(v) for k, v in app.config.items()
+           if k.startswith('REMEMBER_') or k.startswith('SESSION_')}
+    cfg['cookies_present'] = list(request.cookies.keys())
+    return jsonify(cfg)
 
 @app.route('/upgrade_plans')
 def upgrade_plans():
@@ -1227,7 +1228,7 @@ def check_access(rota):
     if UserPermissions.is_free_route(route_path):
         return jsonify({'has_access': True})
 
-    if not current_user.is_authenticated or not session.get('auth_key'):
+    if not current_user.is_authenticated:
         return jsonify({'has_access': False, 'reason': 'not_logged_in', 'upgrade_url': '/upgrade_plans'})
 
     if UserPermissions.has_access(route_path, current_user):
@@ -4334,8 +4335,7 @@ def pagamento_teste():
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================
 
-# Variável global para modo de desenvolvimento
-MODO_DESENVOLVIMENTO = os.environ.get('FLASK_ENV') != 'production'
+# MODO_DESENVOLVIMENTO já definido no topo do arquivo
 
 if __name__ == '__main__':
     # Configurações otimizadas para melhor performance
