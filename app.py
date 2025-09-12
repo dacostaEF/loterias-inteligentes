@@ -39,10 +39,17 @@ MAX_AGE  = timedelta(hours=12)  # Sessão morre após 12h total
 
 import hashlib
 
+def _client_ip():
+    """Pega só o primeiro IP (cliente) do X-Forwarded-For ou remote_addr."""
+    xff = request.headers.get('X-Forwarded-For', '')
+    if xff:
+        return xff.split(',')[0].strip()
+    return request.remote_addr or ''
+
 def _fingerprint():
-    """Gera fingerprint único baseado em User-Agent e IP."""
-    ua = request.headers.get('User-Agent','')
-    ip = request.headers.get('X-Forwarded-For', request.remote_addr) or ''
+    """Fingerprint estável: User-Agent (limitado) + primeiro IP."""
+    ua = (request.headers.get('User-Agent','') or '')[:120]
+    ip = _client_ip()
     base = f"{ua}|{ip}"
     return hashlib.sha256(base.encode()).hexdigest()[:16]
 
@@ -476,6 +483,10 @@ def incrementar_tentativas_codigo(usuario_id, codigo, tipo):
 
 app = Flask(__name__, static_folder='static')
 
+# ⛳ Proxy awareness: HTTPS/IP corretos atrás de LB/CDN
+from werkzeug.middleware.proxy_fix import ProxyFix
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=0, x_port=0, x_prefix=0)
+
 # Detectar ambiente (produção vs desenvolvimento)
 is_production = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('ENVIRONMENT') == 'production'
 
@@ -524,19 +535,27 @@ def session_version_gate():
 
 @app.before_request
 def session_fingerprint_gate():
-    """Gate de fingerprint - derruba sessão clonada/antiga."""
+    """Gate de fingerprint com tolerância a troca de IP (4G/proxy)."""
     if request.endpoint in (None, 'static'):
         return
-    
-    fp = session.get('_fp')
     cur = _fingerprint()
-    if fp is None:
+    old = session.get('_fp')
+    if old is None:
         session['_fp'] = cur
-    elif fp != cur:
-        # fingerprint mudou → zera sessão
+        session['_fp_ua'] = (request.headers.get('User-Agent','') or '')[:120]
+        return
+    if old != cur:
+        ua_now = (request.headers.get('User-Agent','') or '')[:120]
+        ua_old = session.get('_fp_ua')
+        # Se só o IP mudou e o UA é o mesmo, atualiza sem deslogar
+        if ua_old == ua_now:
+            session['_fp'] = cur
+            return
+        # Mudou UA (outro device/navegador) → reinicia sessão
         session.clear()
         session['_sv'] = APP_SESSION_VERSION
         session['_fp'] = cur
+        session['_fp_ua'] = ua_now
 
 @app.before_request
 def session_time_guard():
@@ -564,6 +583,14 @@ def session_time_guard():
     meta['last'] = now.isoformat()
     session['_meta'] = meta
 
+@app.after_request
+def add_security_headers(resp):
+    """Evita cache e garante Vary correto em páginas autenticadas."""
+    resp.headers['Cache-Control'] = 'no-store'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Vary'] = 'Cookie, User-Agent'
+    return resp
+
 # ============================================================================
 # 🔍 LOG DE DIAGNÓSTICO TEMPORÁRIO (REMOVER DEPOIS)
 # ============================================================================
@@ -576,6 +603,26 @@ def session_status():
         'is_authenticated': bool(getattr(current_user,'is_authenticated', False)),
         'has_auth_key': bool(session.get('auth_key')),
     })
+
+# 🔎 Diagnóstico: força um Set-Cookie para validar no navegador
+@app.get('/debug_set_cookie')
+def debug_set_cookie():
+    info = {
+        "secure": app.config['SESSION_COOKIE_SECURE'],
+        "samesite": app.config['SESSION_COOKIE_SAMESITE'],
+        "http_only": app.config['SESSION_COOKIE_HTTPONLY'],
+        "name": app.config.get('SESSION_COOKIE_NAME', 'session')
+    }
+    resp = jsonify(info)
+    resp.set_cookie(
+        key='li_test',
+        value='ok',
+        secure=app.config['SESSION_COOKIE_SECURE'],
+        httponly=True,
+        samesite=app.config['SESSION_COOKIE_SAMESITE'],
+        max_age=3600
+    )
+    return resp
 
 @login_manager.user_loader
 def load_user(user_id):
