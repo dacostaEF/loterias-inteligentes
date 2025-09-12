@@ -2848,6 +2848,12 @@ def analise_estatistica_avancada_megasena():
     """Renderiza a página de Análise Estatística Avançada da Mega Sena."""
     return render_template('analise_estatistica_avancada_megasena.html', is_logged_in=verificar_usuario_logado())
 
+@app.route('/analise_estatistica_avancada_quina')
+@verificar_acesso_universal
+def analise_estatistica_avancada_quina():
+    """Renderiza a página de Análise Estatística Avançada da Quina."""
+    return render_template('analise_estatistica_avancada_quina.html', is_logged_in=verificar_usuario_logado())
+
 # --- Rotas da Quina ---
 @app.route('/dashboard_quina')
 @verificar_acesso_universal
@@ -2874,6 +2880,12 @@ def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
     return render_template('analise_estatistica_avancada_lotofacil.html', is_logged_in=verificar_usuario_logado())
 
+@app.route('/analise_estatistica_avancada_lotofacil')
+@verificar_acesso_universal
+def analise_estatistica_avancada_lotofacil():
+    """Renderiza a página de Análise Estatística Avançada da Lotofácil."""
+    return render_template('analise_estatistica_avancada_lotofacil.html', is_logged_in=verificar_usuario_logado())
+
 @app.route('/lotofacil_laboratorio')
 @verificar_acesso_universal
 def lotofacil_laboratorio():
@@ -2891,6 +2903,12 @@ def teste_api():
 @verificar_acesso_universal
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
+    return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=verificar_usuario_logado())
+
+@app.route('/analise_estatistica_avancada_milionaria')
+@verificar_acesso_universal
+def analise_estatistica_avancada_milionaria():
+    """Renderiza a página de Análise Estatística Avançada da Milionária."""
     return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=verificar_usuario_logado())
 
 # --- Rotas da Lotomania ---
