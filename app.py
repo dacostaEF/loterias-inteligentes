@@ -101,15 +101,13 @@ class UserPermissions:
         '/aposta_inteligente_premium_lotofacil',
         '/lotofacil_laboratorio',
         '/boloes_loterias',
-        '/boloes',
         '/dashboard_MS',  # Mega Sena (PREMIUM - requer cadastro)
         '/dashboard_megasena',
         '/dashboard_lotofacil',
         '/analise_estatistica_avancada_milionaria',
         '/analise_estatistica_avancada_megasena',
         '/analise_estatistica_avancada_quina',
-        '/analise_estatistica_avancada_lotofacil',
-        '/analise_estatistica_avancada_milionaria_OutroPgrogarad'
+        '/analise_estatistica_avancada_lotofacil'
     }
     
     @classmethod
