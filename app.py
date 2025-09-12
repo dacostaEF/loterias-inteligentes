@@ -523,8 +523,8 @@ login_manager.login_view = 'upgrade_plans'
 @app.before_request
 def session_version_gate():
     """Gate de versão de sessão - invalida cookies antigos automaticamente."""
-    # só aplica em rotas "normais" (pule static, favicon, etc)
-    if request.endpoint in (None, 'static'):
+    # ignore rotas que nunca devem exigir sessão
+    if request.path in ("/healthz", "/favicon.ico", "/robots.txt") or request.endpoint in (None, 'static'):
         return
     
     sv = session.get('_sv')  # session version
@@ -538,7 +538,8 @@ def session_version_gate():
 @app.before_request
 def session_fingerprint_gate():
     """Gate de fingerprint com tolerância a troca de IP (4G/proxy)."""
-    if request.endpoint in (None, 'static'):
+    # ignore rotas que nunca devem exigir sessão
+    if request.path in ("/healthz", "/favicon.ico", "/robots.txt") or request.endpoint in (None, 'static'):
         return
     cur = _fingerprint()
     old = session.get('_fp')
@@ -564,7 +565,8 @@ def session_fingerprint_gate():
 @app.before_request
 def session_time_guard():
     """Gate de timeout - mata sessões zumbis por tempo."""
-    if request.endpoint in (None, 'static'):
+    # ignore rotas que nunca devem exigir sessão
+    if request.path in ("/healthz", "/favicon.ico", "/robots.txt") or request.endpoint in (None, 'static'):
         return
     
     meta = session.get('_meta')
