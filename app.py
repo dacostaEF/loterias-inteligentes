@@ -494,7 +494,7 @@ app.config.update(
     REMEMBER_COOKIE_HTTPONLY=True,
     REMEMBER_COOKIE_SECURE=is_production,       # True em produção, False em dev
     REMEMBER_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=timedelta(days=7),
+    PERMANENT_SESSION_LIFETIME=timedelta(hours=2),  # Alinhado com remember=False
 )
 
 # ============================================================================
