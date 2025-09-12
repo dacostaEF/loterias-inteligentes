@@ -2,8 +2,7 @@
 builder = "dockerfile"
 
 [deploy]
-# startCommand é ignorado quando há Dockerfile, mas mantenho por documentação
-startCommand = "gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"
+# (startCommand é ignorado com Dockerfile, ok)
 healthcheckPath = "/healthz"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
