@@ -1,29 +1,25 @@
-# Use Python 3.9 slim image
-FROM python:3.9-slim
+# Use Python 3.11 slim
+FROM python:3.11-slim
 
-# Set working directory
+# Diretório de trabalho
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
+# Dependências do sistema mínimas (curl removido se não usar HEALTHCHECK)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# Cache de deps
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Código da aplicação
 COPY . .
 
-# Expose port
-EXPOSE 5000
+# Exposição é opcional; Railway usa $PORT
+EXPOSE 8000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:5000/healthz || exit 1
+# (Opcional) sem HEALTHCHECK no container; o Railway já checa /healthz
+# Se quiser mesmo, instale curl e use: HEALTHCHECK ... curl -f http://127.0.0.1:$PORT/healthz
 
-# Start command
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--threads", "4", "--timeout", "120", "app:app"]
+# Comando — ATENÇÃO: use $PORT do Railway
+CMD ["bash", "-lc", "gunicorn app:app --bind 0.0.0.0:${PORT} --workers 2 --threads 4 --timeout 120"]

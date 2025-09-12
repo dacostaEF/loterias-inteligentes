@@ -2,12 +2,9 @@
 builder = "dockerfile"
 
 [deploy]
+# startCommand é ignorado quando há Dockerfile, mas mantenho por documentação
+startCommand = "gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120"
 healthcheckPath = "/healthz"
 healthcheckTimeout = 100
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10
-
-[environments.production]
-FLASK_ENV = "production"
-FLASK_DEBUG = "False"
-DOMAIN = "loteriasinteligente.com.br"
