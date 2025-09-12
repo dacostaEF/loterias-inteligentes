@@ -1,0 +1,3 @@
+[33mec3179e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m 🔧 Simplificar lógica de autenticação - confiar apenas no Flask-Login
+[33mcea90d7[m começando a liberar.. o acesoo aogra par aum usuario nao cadastrado esta bloqueado, ao fazer loguin tem acesso. o problema e que as paginas freemuium tambem estão bloqueads
+[33mc3dc5e9[m DOSE 4.3 IMPLEMENTADA COM SUCESSO! 🔑 SISTEMA DE AUTH_KEY COM TIMESTAMP ATIVO: ✅ IMPLEMENTAÇÕES: Chave com timestamp - gerar_chave_autenticacao() agora gera "timestamp:token" Validação temporal - validar_chave_autenticacao() verifica idade da chave Expiração automática - Chaves expiram após 24 horas Formato seguro - "1703123456:abc123def456..."
