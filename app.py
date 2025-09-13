@@ -1777,7 +1777,7 @@ def analise_frequencia_lotofacil_v2_api():
         # Montar dados para a matriz visual (concursos_para_matriz)
         concursos_para_matriz = []
         try:
-            df = carregar_dados_lotofacil()
+            df = carregar_dados_da_loteria("lotofacil")
             if df is not None and not df.empty:
                 # Detectar coluna de concurso
                 concurso_col = None
@@ -3126,9 +3126,9 @@ def gerar_aposta_premium_megasena():
         # print(f"📊 Preferências recebidas (Mega Sena): {preferencias_ml}")  # DEBUG - COMENTADO
         
         # Carregar dados da Mega Sena
-        df_megasena = carregar_dados_megasena_app()
+        df_megasena = carregar_dados_da_loteria("megasena")
         
-        if df_megasena.empty:
+        if df_megasena is None or df_megasena.empty:
             return jsonify({
                 'success': False,
                 'error': 'Dados da Mega Sena não disponíveis'
@@ -3503,9 +3503,9 @@ def gerar_aposta_premium_milionaria():
         # print(f"📊 Preferências recebidas (+Milionária): {preferencias_ml}")  # DEBUG - COMENTADO
         
         # Carregar dados da +Milionária
-        df_milionaria = carregar_dados_milionaria()
+        df_milionaria = carregar_dados_da_loteria("mais_milionaria")
         
-        if df_milionaria.empty:
+        if df_milionaria is None or df_milionaria.empty:
             return jsonify({
                 'success': False,
                 'error': 'Dados da +Milionária não disponíveis'
@@ -4431,6 +4431,11 @@ def healthz():
 def root_debug():
     """Debug endpoint para verificar se o app está rodando."""
     return "App is running", 200
+
+@app.get("/debug")
+def debug_simple():
+    """Endpoint de debug super simples."""
+    return {"status": "ok", "message": "App funcionando"}, 200
 
 # ============================================================================
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
