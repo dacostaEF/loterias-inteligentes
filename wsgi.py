@@ -2,4 +2,5 @@ from app import app
 
 @app.get("/healthz")
 def healthz():
-    return {"status": "ok"}, 200
+    """Healthcheck super simples para Railway."""
+    return "ok", 200

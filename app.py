@@ -19,7 +19,12 @@ import logging
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 # Configuração do logger
-logging.basicConfig(level=logging.INFO)
+# Configuração de logging otimizada para produção
+if os.environ.get('FLASK_ENV') == 'production':
+    logging.basicConfig(level=logging.WARNING)
+else:
+    logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger(__name__)
 fp_log = logging.getLogger("fp")
 
@@ -3798,7 +3803,30 @@ def google_callback():
 # ============================================================================
 
 # Configuração de inicialização movida para o final do arquivo
+# Usa uma imagem base Python com o Python 3.11
+FROM python:3.11-slim
 
+# Define o diretório de trabalho dentro do contêiner
+WORKDIR /app
+
+# Instala as dependências do sistema
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copia o arquivo de requisitos e instala as bibliotecas
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia o restante do código do projeto para o contêiner
+COPY . .
+
+# Expõe a porta que o Gunicorn vai rodar
+EXPOSE 5000
+
+# ⚠️ Comando para iniciar o servidor Gunicorn (CORRIGIDO)
+# Usa uma sintaxe de shell para garantir que a variável de ambiente $PORT seja usada
+CMD sh -c "gunicorn --bind 0.0.0.0:${PORT} app:app --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -"
 # ============================================================================
 # 💳 SISTEMA DE PAGAMENTO
 # ============================================================================
@@ -4424,8 +4452,8 @@ def pagamento_teste():
 
 @app.get("/healthz")
 def healthz():
-    """Healthcheck endpoint para monitoramento."""
-    return "ok", 200
+    """Healthcheck endpoint para Railway - responde imediatamente sem carregar dados."""
+    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}, 200
 
 @app.get("/")
 def root_debug():
