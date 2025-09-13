@@ -1375,18 +1375,32 @@ from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosL_lotofacil import gera
 # Funções de carregamento movidas para services/data_loader.py
 from services.data_loader import carregar_dados_milionaria, carregar_dados_megasena_app, carregar_dados_quina_app
 
-# Variáveis globais para armazenar os DataFrames
-df_milionaria = None
-df_megasena = None
-df_quina = None
-df_lotofacil = None
+# ============================================================================
+# ⚙️ CARREGAMENTO DE DADOS (LAZY LOADING)
+# ============================================================================
 
-# Carrega os dados na inicialização do aplicativo
-with app.app_context():
-    df_milionaria = carregar_dados_milionaria()
-    df_megasena = carregar_dados_megasena_app()
-    df_quina = carregar_dados_quina_app()
-    df_lotofacil = carregar_dados_lotofacil()
+_data_cache = {}
+
+def carregar_dados_da_loteria(loteria):
+    """Carrega dados da loteria especificada, se ainda não estiver em cache."""
+    global _data_cache
+    
+    if loteria not in _data_cache:
+        logger.info(f"Carregando dados da {loteria}...")
+        
+        if loteria == "mais_milionaria":
+            _data_cache[loteria] = carregar_dados_milionaria()
+        elif loteria == "megasena":
+            _data_cache[loteria] = carregar_dados_megasena_app()
+        elif loteria == "quina":
+            _data_cache[loteria] = carregar_dados_quina_app()
+        elif loteria == "lotofacil":
+            _data_cache[loteria] = carregar_dados_lotofacil()
+        else:
+            logger.error(f"Loteria desconhecida: {loteria}")
+            return None
+    
+    return _data_cache.get(loteria)
 
 @app.route('/')
 def landing_page():
@@ -1504,6 +1518,9 @@ def get_analise_frequencia_nova():
         
         # Executar análise com dados reais
         # print("🔍 Chamando analisar_frequencia...")  # DEBUG - COMENTADO
+        df_milionaria = carregar_dados_da_loteria("mais_milionaria")
+        if df_milionaria is None or df_milionaria.empty:
+            return jsonify({"error": "Dados da +Milionária não carregados."}), 500
         resultado = analisar_frequencia(df_milionaria=df_milionaria, qtd_concursos=qtd_concursos)
         # print(f"🔍 Resultado tipo: {type(resultado)}")  # DEBUG - COMENTADO
         # print(f"🔍 Resultado: {resultado}")  # DEBUG - COMENTADO
@@ -1547,6 +1564,9 @@ def get_analise_frequencia_megasena():
         
         # Executar análise com dados reais da Mega Sena
         # print("🔍 Chamando analisar_frequencia Mega Sena...")  # DEBUG - COMENTADO
+        df_megasena = carregar_dados_da_loteria("megasena")
+        if df_megasena is None or df_megasena.empty:
+            return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
         resultado = analisar_frequencia(df_megasena=df_megasena, qtd_concursos=qtd_concursos)
         # print(f"🔍 Resultado tipo: {type(resultado)}")  # DEBUG - COMENTADO
         # print(f"🔍 Resultado: {resultado}")  # DEBUG - COMENTADO
@@ -1561,6 +1581,9 @@ def get_analise_frequencia_megasena():
             # Converter dados do DataFrame para formato da matriz
             # Se qtd_concursos for None (todos os concursos), limitar a 300 para evitar loop
             limite_efetivo = qtd_concursos if qtd_concursos else 300
+            df_megasena = carregar_dados_da_loteria("megasena")
+            if df_megasena is None or df_megasena.empty:
+                return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
             df_filtrado = df_megasena.tail(limite_efetivo)
             for _, row in df_filtrado.iterrows():
                 if not pd.isna(row['Concurso']):
@@ -1585,7 +1608,8 @@ def get_analise_frequencia_megasena():
 @app.route('/api/analise_padroes_sequencias', methods=['GET'])
 def get_analise_padroes_sequencias():
     """Retorna os dados da análise de padrões e sequências."""
-    if df_milionaria.empty:
+    df_milionaria = carregar_dados_da_loteria("mais_milionaria")
+    if df_milionaria is None or df_milionaria.empty:
         return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
     # Verificar se há parâmetro de quantidade de concursos
@@ -1599,7 +1623,8 @@ def get_analise_padroes_sequencias():
 @app.route('/api/analise_de_distribuicao', methods=['GET'])
 def get_analise_de_distribuicao():
     """Retorna os dados da análise de distribuição."""
-    if df_milionaria.empty:
+    df_milionaria = carregar_dados_da_loteria("mais_milionaria")
+    if df_milionaria is None or df_milionaria.empty:
         return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
     # Verificar se há parâmetro de quantidade de concursos
@@ -1613,7 +1638,8 @@ def get_analise_de_distribuicao():
 def get_analise_de_distribuicao_megasena():
     """Retorna os dados da análise de distribuição da Mega Sena."""
     try:
-        if df_megasena.empty:
+        df_megasena = carregar_dados_da_loteria("megasena")
+        if df_megasena is None or df_megasena.empty:
             return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos

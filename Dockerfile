@@ -4,6 +4,7 @@ WORKDIR /app
 
 # deps de sistema mínimas
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # deps Python (cache-friendly)
