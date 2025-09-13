@@ -1,21 +1,24 @@
+# Usa uma imagem base Python com o Python 3.11
 FROM python:3.11-slim
 
+# Define o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
-# deps de sistema mínimas
+# Instala as dependências do sistema
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# deps Python (cache-friendly)
+# Copia o arquivo de requisitos e instala as bibliotecas
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# código
+# Copia o restante do código do projeto para o contêiner
 COPY . .
 
-# opcional: porta "documental"
-EXPOSE 8000
+# Expõe a porta que o Gunicorn vai rodar
+EXPOSE 5000
 
-# Comando para o Railway - porta fixa
-CMD gunicorn app:app --bind 0.0.0.0:8000 --workers 2 --threads 4 --timeout 120
+# Comando para iniciar o servidor Gunicorn
+# Usa a forma de shell para garantir a expansão da variável de ambiente $PORT
+CMD gunicorn --bind 0.0.0.0:${PORT} app:app --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -
