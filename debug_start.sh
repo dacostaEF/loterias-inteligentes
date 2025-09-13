@@ -1,30 +1,22 @@
 #!/bin/bash
-# Script de debug SIMPLES
+# Script de debug ULTRA SIMPLES
 
-echo "=== SIMPLE DEBUG START ==="
-echo "PORT: '$PORT'"
-echo "PWD: $(pwd)"
-echo "Files:"
-ls -la
+echo "=== ULTRA SIMPLE DEBUG ==="
+echo "PORT variable: '$PORT'"
+echo "PORT length: ${#PORT}"
 
-echo ""
-echo "=== TESTING PYTHON ==="
-python -c "print('Python works!')"
+# Se PORT não estiver definido, usar 5000
+if [ -z "$PORT" ]; then
+    echo "PORT not set, using 5000"
+    PORT=5000
+fi
 
-echo ""
-echo "=== TESTING APP IMPORT ==="
-python -c "
-try:
-    from app import app
-    print('App import OK')
-except Exception as e:
-    print('App import ERROR:', e)
-"
+echo "Final PORT: $PORT"
 
 echo ""
-echo "=== STARTING SIMPLE SERVER ==="
+echo "=== STARTING FLASK ==="
 python -c "
 from app import app
-print('Starting Flask app...')
-app.run(host='0.0.0.0', port=int('$PORT' or 5000), debug=False)
+print('Flask app starting on port $PORT')
+app.run(host='0.0.0.0', port=$PORT, debug=False)
 "
