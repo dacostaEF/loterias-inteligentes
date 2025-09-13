@@ -1,67 +1,30 @@
 #!/bin/bash
-# Script de debug para identificar o problema
+# Script de debug SIMPLES
 
-echo "=== DEBUG START ==="
-echo "Current directory: $(pwd)"
-echo "Files in directory:"
+echo "=== SIMPLE DEBUG START ==="
+echo "PORT: '$PORT'"
+echo "PWD: $(pwd)"
+echo "Files:"
 ls -la
 
 echo ""
-echo "=== ENVIRONMENT VARIABLES ==="
-echo "PORT: '$PORT'"
-echo "PATH: '$PATH'"
-echo "PYTHONPATH: '$PYTHONPATH'"
+echo "=== TESTING PYTHON ==="
+python -c "print('Python works!')"
 
 echo ""
-echo "=== PYTHON VERSION ==="
-python --version
-
-echo ""
-echo "=== CHECKING WSGI FILE ==="
-if [ -f "wsgi.py" ]; then
-    echo "wsgi.py exists"
-    echo "Content of wsgi.py:"
-    cat wsgi.py
-else
-    echo "wsgi.py NOT FOUND!"
-fi
-
-echo ""
-echo "=== CHECKING APP.PY ==="
-if [ -f "app.py" ]; then
-    echo "app.py exists"
-    echo "Size: $(wc -l < app.py) lines"
-else
-    echo "app.py NOT FOUND!"
-fi
-
-echo ""
-echo "=== TESTING PYTHON IMPORT ==="
+echo "=== TESTING APP IMPORT ==="
 python -c "
 try:
     from app import app
-    print('✅ app.py import successful')
-    print('App type:', type(app))
+    print('App import OK')
 except Exception as e:
-    print('❌ app.py import failed:', str(e))
+    print('App import ERROR:', e)
 "
 
 echo ""
-echo "=== TESTING WSGI IMPORT ==="
+echo "=== STARTING SIMPLE SERVER ==="
 python -c "
-try:
-    from wsgi import app
-    print('✅ wsgi.py import successful')
-    print('App type:', type(app))
-except Exception as e:
-    print('❌ wsgi.py import failed:', str(e))
+from app import app
+print('Starting Flask app...')
+app.run(host='0.0.0.0', port=int('$PORT' or 5000), debug=False)
 "
-
-echo ""
-echo "=== TESTING GUNICORN COMMAND ==="
-echo "Command that will be executed:"
-echo "gunicorn wsgi:app --bind 0.0.0.0:${PORT:-5000} --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -"
-
-echo ""
-echo "=== STARTING GUNICORN ==="
-exec gunicorn wsgi:app --bind 0.0.0.0:${PORT:-5000} --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -
