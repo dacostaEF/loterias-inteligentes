@@ -19,6 +19,6 @@ COPY . .
 # Expõe a porta que o Gunicorn vai rodar
 EXPOSE 5000
 
-# Comando para iniciar o servidor Gunicorn
-# Usa a forma de shell para garantir a expansão da variável de ambiente $PORT
-CMD gunicorn --bind 0.0.0.0:${PORT} app:app --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -
+# ⚠️ Comando para iniciar o servidor Gunicorn (CORRIGIDO)
+# Usa uma sintaxe de shell para garantir que a variável de ambiente $PORT seja usada
+CMD sh -c "gunicorn --bind 0.0.0.0:${PORT} app:app --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -"
