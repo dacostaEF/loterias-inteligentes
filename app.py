@@ -4401,6 +4401,11 @@ def healthz():
     """Healthcheck endpoint para monitoramento."""
     return "ok", 200
 
+@app.get("/")
+def root_debug():
+    """Debug endpoint para verificar se o app está rodando."""
+    return "App is running", 200
+
 # ============================================================================
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================
