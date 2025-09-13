@@ -17,5 +17,5 @@ COPY . .
 # opcional: porta "documental"
 EXPOSE 8000
 
-# Comando para o Railway
-CMD gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 120
+# Comando para o Railway - porta fixa
+CMD gunicorn app:app --bind 0.0.0.0:8000 --workers 2 --threads 4 --timeout 120
