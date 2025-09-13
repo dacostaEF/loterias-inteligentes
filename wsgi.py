@@ -23,3 +23,9 @@ except Exception as e:
     # Se houver erro ao importar o app principal, usa o health_app
     print(f"Erro ao importar app principal: {e}")
     application = health_app
+
+# Garante que o healthcheck funcione mesmo se o app principal falhar
+if hasattr(application, 'get'):
+    @application.get("/healthz")
+    def healthz_fallback():
+        return "ok", 200
