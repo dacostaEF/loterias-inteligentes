@@ -1,0 +1,40 @@
+# Ambiente virtual Python
+.venv/
+venv/
+env/
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Arquivos de desenvolvimento
+.vscode/
+.git/
+*.log
+*.tmp
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos de sessão Flask
+flask_session/
+
+# Arquivos de teste
+test_*.py
+*_test.py
+
+# Documentação
+*.md
+*.docx
+
+# Arquivos de configuração local
+.env
+env_example.txt
+
+# Arquivos de backup
+*.bak
+*.backup
