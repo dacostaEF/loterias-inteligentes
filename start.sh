@@ -5,6 +5,8 @@ echo "=== INICIANDO LOTERIAS INTELIGENTES ==="
 echo "PORT: $PORT"
 echo "PWD: $(pwd)"
 echo "Python version: $(python --version)"
+echo "Environment variables:"
+env | grep -E "(PORT|FLASK|PYTHON)" | sort
 
 # Se PORT não estiver definido, usar 5000
 if [ -z "$PORT" ]; then
@@ -14,6 +16,10 @@ fi
 
 echo "Porta final: $PORT"
 
+# Testa se o Python consegue importar o módulo
+echo "Testando import do healthcheck..."
+python -c "import healthcheck; print('Healthcheck importado com sucesso')" || echo "ERRO: Não conseguiu importar healthcheck"
+
 # Inicia o gunicorn com healthcheck:app
 echo "Iniciando gunicorn..."
 exec gunicorn healthcheck:app \
@@ -21,6 +27,6 @@ exec gunicorn healthcheck:app \
     --workers 1 \
     --threads 2 \
     --timeout 30 \
-    --log-level info \
+    --log-level debug \
     --access-logfile - \
     --error-logfile -

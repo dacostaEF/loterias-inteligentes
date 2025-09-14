@@ -16,10 +16,23 @@ import logging
 # Importações para Flask-Login
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
-# Configuração do logger
-logging.basicConfig(level=logging.INFO)
+# Configuração do logger mais detalhada
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('app.log')
+    ]
+)
 logger = logging.getLogger(__name__)
 fp_log = logging.getLogger("fp")
+
+# Log de startup
+logger.info("=== INICIANDO APLICACAO ===")
+logger.info(f"Python version: {sys.version}")
+logger.info(f"Working directory: {os.getcwd()}")
+logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
 
 # ============================================================================
 # 🛡️ SISTEMA DE VERSÃO DE SESSÃO (ENTRADA SEGURA)
@@ -4390,7 +4403,18 @@ def pagamento_teste():
 @app.get("/healthz")
 def healthz():
     """Healthcheck endpoint para monitoramento."""
-    return "ok", 200
+    logger.info("=== HEALTHCHECK CHAMADO ===")
+    logger.info(f"Timestamp: {datetime.utcnow().isoformat()}")
+    logger.info(f"Request headers: {dict(request.headers)}")
+    logger.info(f"Request IP: {request.remote_addr}")
+    
+    try:
+        response = "ok"
+        logger.info(f"Healthcheck response: {response}")
+        return response, 200
+    except Exception as e:
+        logger.error(f"Erro no healthcheck: {e}")
+        return "error", 500
 
 @app.get("/")
 def root_debug():
@@ -4414,4 +4438,4 @@ if __name__ == '__main__':
         port=port,
         threaded=True,
         use_reloader=False  # Desabilita reloader em produção
-    ) 
+    ) y
