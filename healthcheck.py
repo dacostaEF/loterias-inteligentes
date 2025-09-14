@@ -1,24 +1,26 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
-Healthcheck super simples para Railway.
-Responde imediatamente sem importar nada pesado.
+Healthcheck mínimo para Railway
 """
 
 from flask import Flask
+import os
 
+# App mínimo só para healthcheck
 app = Flask(__name__)
 
-@app.route('/healthz')
+@app.get("/healthz")
 def healthz():
     """Healthcheck super simples para Railway."""
     return "ok", 200
 
-@app.route('/')
+@app.get("/")
 def root():
     """Endpoint raiz simples."""
     return "Loterias Inteligentes - Online", 200
 
-if __name__ == '__main__':
-    import os
+if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=port, debug=False)
