@@ -3,10 +3,8 @@
 
 from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, session
 from functools import wraps
-import pandas as pd
 import os
 import math
-import numpy as np
 from datetime import datetime, date, timedelta
 import json
 import logging
@@ -19,12 +17,7 @@ import logging
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
 # Configuração do logger
-# Configuração de logging otimizada para produção
-if os.environ.get('FLASK_ENV') == 'production':
-    logging.basicConfig(level=logging.WARNING)
-else:
-    logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 fp_log = logging.getLogger("fp")
 
@@ -1325,55 +1318,11 @@ from utils.data_helpers import _to_native, limpar_valores_problematicos
 # Certifique-se de que esses arquivos Python (.py) estejam no mesmo diretório
 # ou em um subdiretório acessível (no caso, eles estão todos no mesmo nível da pasta +Milionaria/)
 
-# Importa a função de análise de frequência geral
-from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia_milionaria_completa
-
-# Importa a função de análise de distribuição
-from funcoes.milionaria.funcao_analise_de_distribuicao import analise_distribuicao_milionaria
-from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribuicao_megasena
-
-# Importa a função de análise de combinações
-from funcoes.milionaria.funcao_analise_de_combinacoes import analise_combinacoes_milionaria
-from funcoes.megasena.funcao_analise_de_combinacoes_MS import analise_combinacoes_megasena
-from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
-
-# Importa a função de análise de padrões e sequências
-from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
-
-# Importa a função de análise dos trevos da sorte (frequência e combinações)
-# Assumo que 'analise_trevos_da_sorte' é a função principal deste arquivo
-from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
-
-# As funções de 'calculos.py' e a classe 'AnaliseEstatisticaAvancada' de 'analise_estatistica_avancada.py'
-from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
-from funcoes.megasena.calculos_MS import calcular_seca_numeros_megasena
-from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
-from funcoes.megasena.analise_estatistica_avancada_MS import AnaliseEstatisticaAvancada as AnaliseEstatisticaAvancadaMS
+# Imports pesados movidos para lazy loading - serão importados quando necessário
 
 
 
-# --- Importações para Mega Sena ---
-from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
-from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar_aposta_personalizada
-
-# --- Importações para Quina ---
-from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribuicao_quina
-from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
-from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analisar_padroes_sequencias_quina
-from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaAvancadaQuina
-
-# --- Importações para Lotomania ---
-from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
-from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_frequencia_lotomania
-
-# --- Importações para Lotofácil ---
-from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil, obter_ultimos_concursos_lotofacil
-from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import analisar_frequencia_lotofacil, obter_estatisticas_rapidas_lotofacil
-from funcoes.lotofacil.funcao_analise_de_distribuicao_lotofacil import analisar_distribuicao_lotofacil
-from funcoes.lotofacil.funcao_analise_de_combinacoes_lotofacil import analisar_combinacoes_lotofacil
-from funcoes.lotofacil.funcao_analise_de_padroes_sequencia_lotofacil import analisar_padroes_sequencias_lotofacil
-from funcoes.lotofacil.analise_estatistica_avancada_lotofacil import AnaliseEstatisticaAvancadaLotofacil, realizar_analise_estatistica_avancada_lotofacil
-from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosL_lotofacil import gerar_aposta_personalizada_lotofacil, gerar_aposta_aleatoria_lotofacil
+# Imports pesados movidos para lazy loading - serão importados quando necessário
 
 # Funções de carregamento movidas para services/data_loader.py
 
@@ -1385,6 +1334,16 @@ from services.data_loader import carregar_dados_milionaria, carregar_dados_megas
 # ============================================================================
 
 _data_cache = {}
+
+def _lazy_import_pandas():
+    """Importa pandas apenas quando necessário."""
+    import pandas as pd
+    return pd
+
+def _lazy_import_numpy():
+    """Importa numpy apenas quando necessário."""
+    import numpy as np
+    return np
 
 def carregar_dados_da_loteria(loteria):
     """Carrega dados da loteria especificada, se ainda não estiver em cache."""
@@ -1400,6 +1359,8 @@ def carregar_dados_da_loteria(loteria):
         elif loteria == "quina":
             _data_cache[loteria] = carregar_dados_quina_app()
         elif loteria == "lotofacil":
+            # Lazy import para lotofácil
+            from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
             _data_cache[loteria] = carregar_dados_lotofacil()
         else:
             logger.error(f"Loteria desconhecida: {loteria}")
@@ -1442,7 +1403,8 @@ def get_carousel_data():
         else:
             logger.info(f"Arquivo CSV encontrado: {csv_path}")
         
-        # Lê o CSV
+        # Lê o CSV com lazy loading
+        pd = _lazy_import_pandas()
         df = pd.read_csv(csv_path, encoding='utf-8')
         logger.info(f"CSV lido com sucesso. Colunas: {list(df.columns)}")
         logger.info(f"Total de linhas: {len(df)}")
@@ -1628,8 +1590,7 @@ def get_analise_padroes_sequencias():
 @app.route('/api/analise_de_distribuicao', methods=['GET'])
 def get_analise_de_distribuicao():
     """Retorna os dados da análise de distribuição."""
-    df_milionaria = carregar_dados_da_loteria("mais_milionaria")
-    if df_milionaria is None or df_milionaria.empty:
+    if df_milionaria.empty:
         return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
     # Verificar se há parâmetro de quantidade de concursos
@@ -1643,8 +1604,7 @@ def get_analise_de_distribuicao():
 def get_analise_de_distribuicao_megasena():
     """Retorna os dados da análise de distribuição da Mega Sena."""
     try:
-        df_megasena = carregar_dados_da_loteria("megasena")
-        if df_megasena is None or df_megasena.empty:
+        if df_megasena.empty:
             return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
@@ -1782,7 +1742,7 @@ def analise_frequencia_lotofacil_v2_api():
         # Montar dados para a matriz visual (concursos_para_matriz)
         concursos_para_matriz = []
         try:
-            df = carregar_dados_da_loteria("lotofacil")
+            df = carregar_dados_lotofacil()
             if df is not None and not df.empty:
                 # Detectar coluna de concurso
                 concurso_col = None
@@ -3131,9 +3091,9 @@ def gerar_aposta_premium_megasena():
         # print(f"📊 Preferências recebidas (Mega Sena): {preferencias_ml}")  # DEBUG - COMENTADO
         
         # Carregar dados da Mega Sena
-        df_megasena = carregar_dados_da_loteria("megasena")
+        df_megasena = carregar_dados_megasena_app()
         
-        if df_megasena is None or df_megasena.empty:
+        if df_megasena.empty:
             return jsonify({
                 'success': False,
                 'error': 'Dados da Mega Sena não disponíveis'
@@ -3508,9 +3468,9 @@ def gerar_aposta_premium_milionaria():
         # print(f"📊 Preferências recebidas (+Milionária): {preferencias_ml}")  # DEBUG - COMENTADO
         
         # Carregar dados da +Milionária
-        df_milionaria = carregar_dados_da_loteria("mais_milionaria")
+        df_milionaria = carregar_dados_milionaria()
         
-        if df_milionaria is None or df_milionaria.empty:
+        if df_milionaria.empty:
             return jsonify({
                 'success': False,
                 'error': 'Dados da +Milionária não disponíveis'
@@ -3803,30 +3763,7 @@ def google_callback():
 # ============================================================================
 
 # Configuração de inicialização movida para o final do arquivo
-# Usa uma imagem base Python com o Python 3.11
-FROM python:3.11-slim
 
-# Define o diretório de trabalho dentro do contêiner
-WORKDIR /app
-
-# Instala as dependências do sistema
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libsqlite3-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copia o arquivo de requisitos e instala as bibliotecas
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copia o restante do código do projeto para o contêiner
-COPY . .
-
-# Expõe a porta que o Gunicorn vai rodar
-EXPOSE 5000
-
-# ⚠️ Comando para iniciar o servidor Gunicorn (CORRIGIDO)
-# Usa uma sintaxe de shell para garantir que a variável de ambiente $PORT seja usada
-CMD sh -c "gunicorn --bind 0.0.0.0:${PORT} app:app --workers 2 --threads 4 --timeout 120 --log-level info --access-logfile - --error-logfile -"
 # ============================================================================
 # 💳 SISTEMA DE PAGAMENTO
 # ============================================================================
@@ -4452,18 +4389,13 @@ def pagamento_teste():
 
 @app.get("/healthz")
 def healthz():
-    """Healthcheck endpoint para Railway - responde imediatamente sem carregar dados."""
-    return {"status": "ok", "timestamp": datetime.utcnow().isoformat()}, 200
+    """Healthcheck endpoint para monitoramento."""
+    return "ok", 200
 
 @app.get("/")
 def root_debug():
     """Debug endpoint para verificar se o app está rodando."""
     return "App is running", 200
-
-@app.get("/debug")
-def debug_simple():
-    """Endpoint de debug super simples."""
-    return {"status": "ok", "message": "App funcionando"}, 200
 
 # ============================================================================
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
