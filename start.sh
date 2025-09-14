@@ -20,6 +20,14 @@ echo "Porta final: $PORT"
 echo "Testando import do healthcheck..."
 python -c "import healthcheck; print('Healthcheck importado com sucesso')" || echo "ERRO: Não conseguiu importar healthcheck"
 
+# Testa se o Python consegue importar o app principal
+echo "Testando import do app principal..."
+python -c "import app; print('App principal importado com sucesso')" || echo "ERRO: Não conseguiu importar app principal"
+
+# Testa se o Python consegue importar o wsgi
+echo "Testando import do wsgi..."
+python -c "import wsgi; print('WSGI importado com sucesso')" || echo "ERRO: Não conseguiu importar wsgi"
+
 # Inicia o gunicorn com healthcheck:app
 echo "Iniciando gunicorn..."
 exec gunicorn healthcheck:app \

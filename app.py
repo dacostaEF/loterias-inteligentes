@@ -28,11 +28,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 fp_log = logging.getLogger("fp")
 
-# Log de startup
+# Log de startup detalhado
 logger.info("=== INICIANDO APLICACAO ===")
 logger.info(f"Python version: {sys.version}")
 logger.info(f"Working directory: {os.getcwd()}")
 logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
+logger.info(f"PORT: {os.environ.get('PORT', 'NAO_DEFINIDA')}")
+logger.info(f"RAILWAY_ENVIRONMENT: {os.environ.get('RAILWAY_ENVIRONMENT', 'LOCAL')}")
+logger.info(f"PYTHONUNBUFFERED: {os.environ.get('PYTHONUNBUFFERED', 'NAO_DEFINIDO')}")
+logger.info(f"DEBUG: {os.environ.get('DEBUG', 'NAO_DEFINIDO')}")
+logger.info(f"LOG_LEVEL: {os.environ.get('LOG_LEVEL', 'NAO_DEFINIDO')}")
+
+# Lista arquivos importantes
+logger.info("=== ARQUIVOS IMPORTANTES ===")
+for file in ['app.py', 'wsgi.py', 'start.sh', 'requirements.txt', 'Dockerfile']:
+    if os.path.exists(file):
+        size = os.path.getsize(file)
+        logger.info(f"{file}: {size} bytes")
+    else:
+        logger.warning(f"{file}: NAO ENCONTRADO")
 
 # ============================================================================
 # 🛡️ SISTEMA DE VERSÃO DE SESSÃO (ENTRADA SEGURA)

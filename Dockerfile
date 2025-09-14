@@ -14,6 +14,13 @@ COPY . .
 # Torna os scripts executáveis
 RUN chmod +x debug_start.sh start.sh
 
+# Debug: Lista arquivos e variáveis
+RUN echo "=== DEBUG: Listando arquivos ===" && ls -la
+RUN echo "=== DEBUG: Variáveis de ambiente ===" && env
+RUN echo "=== DEBUG: Verificando porta ===" && echo "PORT: $PORT"
+RUN echo "=== DEBUG: Testando Python ===" && python --version
+RUN echo "=== DEBUG: Testando import ===" && python -c "import flask; print('Flask OK')"
+
 EXPOSE 5000
 ENV PORT=5000
 
