@@ -1667,6 +1667,9 @@ def get_analise_frequencia_quina():
         # Obter parâmetro de quantidade de concursos (padrão: 50)
         qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
         
+        # Carregar dados da Quina usando lazy loading
+        df_quina = carregar_dados_da_loteria("quina")
+        
         # Executar análise com dados reais da Quina
         resultado = analisar_frequencia_quina(df_quina=df_quina, qtd_concursos=qtd_concursos)
         
@@ -1836,7 +1839,10 @@ def analise_frequencia_lotofacil_v2_api():
 def get_analise_de_distribuicao_quina():
     """Retorna os dados da análise de distribuição da Quina."""
     try:
-        if df_quina.empty:
+        # Carregar dados da Quina usando lazy loading
+        df_quina = carregar_dados_da_loteria("quina")
+        
+        if df_quina is None or df_quina.empty:
             return jsonify({"error": "Dados da Quina não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
@@ -1875,7 +1881,10 @@ def get_analise_de_distribuicao_lotofacil():
 def get_analise_de_combinacoes_quina():
     """Retorna os dados da análise de combinações da Quina."""
     try:
-        if df_quina.empty:
+        # Carregar dados da Quina usando lazy loading
+        df_quina = carregar_dados_da_loteria("quina")
+        
+        if df_quina is None or df_quina.empty:
             return jsonify({"error": "Dados da Quina não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
@@ -1909,7 +1918,10 @@ def get_analise_de_combinacoes_lotofacil():
 def get_analise_padroes_sequencias_quina():
     """Retorna os dados da análise de padrões e sequências da Quina."""
     try:
-        if df_quina.empty:
+        # Carregar dados da Quina usando lazy loading
+        df_quina = carregar_dados_da_loteria("quina")
+        
+        if df_quina is None or df_quina.empty:
             return jsonify({"error": "Dados da Quina não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
@@ -2088,6 +2100,9 @@ def get_estatisticas_avancadas_quina():
     """Retorna os dados das estatísticas avançadas da Quina."""
     try:
         # print("🔍 Iniciando requisição para /api/estatisticas_avancadas_quina")  # DEBUG - COMENTADO
+        
+        # Carregar dados da Quina usando lazy loading
+        df_quina = carregar_dados_da_loteria("quina")
         
         if df_quina is None or df_quina.empty:
             print("❌ Dados da Quina não carregados")
@@ -3208,11 +3223,60 @@ def gerar_aposta_premium_megasena():
             'error': f'Erro interno: {str(e)}'
         }), 500
 
+@app.route('/api/numeros_quentes_frios_secos_quina', methods=['GET'])
+def get_numeros_quentes_frios_secos_quina():
+    """Retorna números quentes, frios e secos da Quina."""
+    try:
+        qtd_concursos = request.args.get('qtd_concursos', 50, type=int)
+        
+        # Carregar dados da Quina usando lazy loading
+        df_quina = carregar_dados_da_loteria("quina")
+        
+        if df_quina is None or df_quina.empty:
+            return jsonify({
+                'success': False,
+                'error': 'Dados da Quina não carregados'
+            }), 500
+        
+        # Obter análise de frequência
+        from funcoes.quina.funcao_analise_de_frequencia_quina import analisar_frequencia_quina
+        dados_frequencia = analisar_frequencia_quina(df_quina=df_quina, qtd_concursos=qtd_concursos)
+        
+        # Obter análise de seca
+        from funcoes.quina.calculos_quina import calcular_seca_numeros_quina
+        dados_seca = calcular_seca_numeros_quina(df_quina, qtd_concursos=qtd_concursos)
+        
+        # Processar números quentes (mais frequentes)
+        numeros_quentes = dados_frequencia.get('numeros_mais_frequentes', [])[:10]
+        
+        # Processar números frios (menos frequentes)
+        numeros_frios = dados_frequencia.get('numeros_menos_frequentes', [])[:10]
+        
+        # Processar números secos (não saem há muito tempo)
+        numeros_secos = dados_seca.get('numeros_mais_secos', [])[:10]
+        
+        return jsonify({
+            'success': True,
+            'numeros_quentes': numeros_quentes,
+            'numeros_frios': numeros_frios,
+            'numeros_secos': numeros_secos
+        })
+        
+    except Exception as e:
+        logger.error(f"Erro ao obter números quentes/frios/secos da Quina: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Erro interno: {str(e)}'
+        }), 500
+
 @app.route('/api/analise_seca_quina', methods=['GET'])
 def get_analise_seca_quina():
     """Retorna análise de seca (números que não saem há muito tempo) para a Quina."""
     try:
         qtd_concursos = request.args.get('qtd_concursos', 50, type=int)
+        
+        # Carregar dados da Quina usando lazy loading
+        df_quina = carregar_dados_da_loteria("quina")
         
         if df_quina is None or df_quina.empty:
             return jsonify({
