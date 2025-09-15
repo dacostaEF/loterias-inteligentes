@@ -4,6 +4,7 @@
 from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, session
 from functools import wraps
 import os
+import sys
 import math
 from datetime import datetime, date, timedelta
 import json
@@ -4452,4 +4453,4 @@ if __name__ == '__main__':
         port=port,
         threaded=True,
         use_reloader=False  # Desabilita reloader em produção
-    ) y
+    )
