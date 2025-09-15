@@ -16,10 +16,7 @@ def healthz():
     """Healthcheck super simples para Railway."""
     return "ok", 200
 
-@app.get("/")
-def root():
-    """Endpoint raiz simples."""
-    return "Loterias Inteligentes - Online", 200
+# Rota / removida para evitar conflito com app principal
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
