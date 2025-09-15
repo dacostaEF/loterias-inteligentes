@@ -2618,6 +2618,9 @@ from services.geradores.numeros_aleatorios import (
     gerar_numeros_aleatorios_lotomania
 )
 
+# Importar função da Lotomania
+from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
+
 @app.route('/api/gerar-numeros-aleatorios', methods=['GET'])
 def gerar_numeros_aleatorios():
     """Gera números aleatórios para +Milionária (6 números + 2 trevos)."""
