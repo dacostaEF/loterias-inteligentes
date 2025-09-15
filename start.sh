@@ -16,7 +16,7 @@ python -c "import healthcheck; print('healthcheck OK')" || echo "WARN: healthche
 python -c "import wsgi; print('wsgi OK')" || echo "WARN: wsgi import failed"
 
 echo "Starting gunicorn on 0.0.0.0:${PORT}..."
-exec gunicorn healthcheck:app \
+exec gunicorn wsgi:application \
   --bind "0.0.0.0:${PORT}" \
   --workers 1 \
   --threads 2 \
