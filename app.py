@@ -4431,10 +4431,10 @@ def healthz():
         logger.error(f"Erro no healthcheck: {e}")
         return "error", 500
 
-@app.get("/")
-def root_debug():
-    """Debug endpoint para verificar se o app está rodando."""
-    return "App is running", 200
+@app.route("/")
+def index():
+    """Página principal da aplicação."""
+    return render_template("index.html")
 
 # ============================================================================
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
