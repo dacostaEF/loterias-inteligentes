@@ -1381,15 +1381,22 @@ def carregar_dados_da_loteria(loteria):
         logger.info(f"Carregando dados da {loteria}...")
         
         if loteria == "mais_milionaria":
+            from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
             _data_cache[loteria] = carregar_dados_milionaria()
         elif loteria == "megasena":
-            _data_cache[loteria] = carregar_dados_megasena_app()
+            from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
+            _data_cache[loteria] = carregar_dados_megasena()
         elif loteria == "quina":
-            _data_cache[loteria] = carregar_dados_quina_app()
+            from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
+            _data_cache[loteria] = carregar_dados_quina()
         elif loteria == "lotofacil":
             # Lazy import para lotofácil
             from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
             _data_cache[loteria] = carregar_dados_lotofacil()
+        elif loteria == "lotomania":
+            # Lazy import para lotomania
+            pd = _lazy_import_pandas()
+            _data_cache[loteria] = pd.read_excel('LoteriasExcel/Lotomania_edt.xlsx')
         else:
             logger.error(f"Loteria desconhecida: {loteria}")
             return None
@@ -1721,11 +1728,11 @@ def get_analise_frequencia_quina():
 def analise_frequencia_lotomania_api():
     """API para análise de frequência da Lotomania"""
     try:
-        # Importar pandas para uso local
-        pd = _lazy_import_pandas()
+        # Carregar dados da Lotomania usando função centralizada
+        df_lotomania = carregar_dados_da_loteria("lotomania")
         
-        # Carregar dados da Lotomania
-        df_lotomania = pd.read_excel('LoteriasExcel/Lotomania_edt.xlsx')
+        if df_lotomania is None:
+            return jsonify({"error": "Erro ao carregar dados da Lotomania"}), 500
         
         # Executar análise de frequência (últimos 300 concursos)
         resultado = analisar_frequencia_lotomania(df_lotomania, qtd_concursos=300)
