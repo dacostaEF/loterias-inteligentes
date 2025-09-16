@@ -1745,7 +1745,12 @@ def analise_frequencia_lotomania_api():
         
         # Executar análise de frequência (últimos 300 concursos)
         logger.info("Executando análise de frequência...")
-        resultado = analisar_frequencia_lotomania(df_lotomania, qtd_concursos=300)
+        
+        # Converter DataFrame para lista de listas (formato esperado pela função)
+        dados_lista = df_lotomania.values.tolist()
+        logger.info(f"Dados convertidos para lista. Total de linhas: {len(dados_lista)}")
+        
+        resultado = analisar_frequencia_lotomania(dados_lista, qtd_concursos=300)
         
         if resultado:
             return jsonify(resultado)
