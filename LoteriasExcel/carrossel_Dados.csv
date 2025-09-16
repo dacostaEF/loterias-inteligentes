@@ -1,13 +1,13 @@
 loteria,texto_destaque,subtitulo,cor_fundo,cor_borda,cor_texto,valor,unidade,status,data_sorteio,link
-Lotofacil da Independencia,30/08,220 Milhoes,#930089,#00E38C,#FFFFFF,220,Milhoes,Proximo Sorteio,45817,/lotofacil
-Lotofacil,AMANHA,1.8 Milhao,#930089,#00E38C,#FFFFFF,1.8,Milhao,Proximo Sorteio,AMANHA,/lotofacil
-Lotomania,ACUMULADA AMANHA,1 Milhao,#FF8C00,#FF8C00,#FFFFFF,1,Milhao,Acumulado,AMANHA,/lotomania
-Quina,ACUMULADA AMANHA,12.5 Milhoes,#008B8B,#00E38C,#FFFFFF,12.5,Milhoes,Acumulado,AMANHA,/quina
+Lotofacil,HOJE,1.8 Milhao,#930089,#00E38C,#FFFFFF,1.8,Milhao,Proximo Sorteio,HOJE 16/09,/lotofacil
+Lotomania,ACUMULADA 17/09,4.3 Milhoes,#FF8C00,#FF8C00,#FFFFFF,4.3,Milhoes,Acumulado,AMANHA,/lotomania
+Quina,ACUMULADA 16/09,12.0 Milhoes,#008B8B,#00E38C,#FFFFFF,12,Milhoes,Acumulado,HOJE 16/09,/quina
 Super Sete,ACUMULADA AMANHA,250 Mil,#32CD32,#32CD32,#FFFFFF,250,Mil,Acumulado,AMANHA,/super-sete
-Mega-Sena,ACUMULADA 26/08,35 Milhoes,#9ACD32,#00E38C,#FFFFFF,35,Milhoes,Acumulado,26/08,/megasena
+Mega-Sena,ACUMULADA 13/09,27 Milhoes,#9ACD32,#00E38C,#FFFFFF,27,Milhoes,Acumulado,HOJE 16/09,/megasena
+Mega Sena da Virada,31/12,600 Milhoes,#930089,#00E38C,#FFFFFF,600,Milhoes,31/12,31/12,/lotofacil
 Dupla Sena,ACUMULADA AMANHA,4.7 Milhoes,#FF6B6B,#FF6B6B,#FFFFFF,4.7,Milhoes,Acumulado,AMANHA,/dupla-sena
 Loteria Federal,27/08,500 Mil,#4169E1,#4169E1,#FFFFFF,500,Mil,Proximo Sorteio,27/08,/loteria-federal
-Loteca,30/08,A Definir,#FF69B4,#FF69B4,#FFFFFF,A Definir,Proximo Sorteio,30/08,/loteca,
-Timemania,ACUMULADA 26/08,18.2 Milhoes,#FFD700,#FFD700,#FFFFFF,18.2,Milhoes,Acumulado,26/08,/timemania
-Dia de Sorte,ACUMULADA 26/08,580 Mil,#DAA520,#DAA520,#FFFFFF,580,Mil,Acumulado,26/08,/dia-de-sorte
-+Milionaria,ACUMULADA 27/08,148 Milhoes,#3B82F6,#00E38C,#FFFFFF,148,Milhoes,Acumulado,27/08,/milionaria
+Loteca,20/09,500 Mil,#FF69B4,#FF69B4,#FFFFFF,500,Mil,20/09,20/09,/loteca
+Timemania,HOJE,25 Milhoes,#FFD700,#FFD700,#FFFFFF,25,Milhoes,Acumulado,HOJE 16/09,/timemania
+Dia de Sorte,HOJE,400 Mil,#DAA520,#DAA520,#FFFFFF,400,Mil,16/09,HOJE 16/09,/dia-de-sorte
++Milionaria,ACUMULADA 17/09,160 Milhoes,#3B82F6,#00E38C,#FFFFFF,148,160,Acumulado,17/09,/milionaria
