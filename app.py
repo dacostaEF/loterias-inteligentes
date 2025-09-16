@@ -1353,8 +1353,6 @@ from utils.data_helpers import _to_native, limpar_valores_problematicos
 # Imports pesados movidos para lazy loading - serão importados quando necessário
 
 # Funções de carregamento movidas para services/data_loader.py
-
-# Funções de carregamento movidas para services/data_loader.py
 from services.data_loader import carregar_dados_milionaria, carregar_dados_megasena_app, carregar_dados_quina_app
 
 # ============================================================================
@@ -1381,14 +1379,11 @@ def carregar_dados_da_loteria(loteria):
         logger.info(f"Carregando dados da {loteria}...")
         
         if loteria == "mais_milionaria":
-            from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
             _data_cache[loteria] = carregar_dados_milionaria()
         elif loteria == "megasena":
-            from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
-            _data_cache[loteria] = carregar_dados_megasena()
+            _data_cache[loteria] = carregar_dados_megasena_app()
         elif loteria == "quina":
-            from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
-            _data_cache[loteria] = carregar_dados_quina()
+            _data_cache[loteria] = carregar_dados_quina_app()
         elif loteria == "lotofacil":
             # Lazy import para lotofácil
             from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
