@@ -9,7 +9,7 @@ import os
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def carregar_dados_quina(arquivo_excel: str = 'LoteriasExcel/Quina_edt.xlsx', limite_concursos: int = 300) -> pd.DataFrame:
+def carregar_dados_quina(arquivo_excel: str = None, limite_concursos: int = 300) -> pd.DataFrame:
     """
     Carrega os dados históricos da Quina, limitando aos últimos N concursos.
 
@@ -21,6 +21,10 @@ def carregar_dados_quina(arquivo_excel: str = 'LoteriasExcel/Quina_edt.xlsx', li
         pd.DataFrame: DataFrame contendo os dados dos concursos, com números
                       principais (5 números de 1-80).
     """
+    if arquivo_excel is None:
+        # Usar caminho absoluto baseado no diretório atual
+        arquivo_excel = os.path.join(os.getcwd(), 'LoteriasExcel', 'Quina_edt.xlsx')
+    
     if not os.path.exists(arquivo_excel):
         logger.error(f"Arquivo não encontrado: {arquivo_excel}")
         raise FileNotFoundError(f"O arquivo {arquivo_excel} não foi encontrado no diretório.")

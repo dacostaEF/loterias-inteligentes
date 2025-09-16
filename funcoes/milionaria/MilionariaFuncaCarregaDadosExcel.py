@@ -9,7 +9,7 @@ import os
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-def carregar_dados_milionaria(arquivo_excel: str = '../../LoteriasExcel/Milionária_edt.xlsx') -> pd.DataFrame:
+def carregar_dados_milionaria(arquivo_excel: str = None) -> pd.DataFrame:
     """
     Carrega os dados históricos da Mais Milionária.
 
@@ -20,6 +20,10 @@ def carregar_dados_milionaria(arquivo_excel: str = '../../LoteriasExcel/Milioná
         pd.DataFrame: DataFrame contendo os dados dos concursos, com números
                       principais e trevos separados.
     """
+    if arquivo_excel is None:
+        # Usar caminho absoluto baseado no diretório atual
+        arquivo_excel = os.path.join(os.getcwd(), 'LoteriasExcel', 'Milionária_edt.xlsx')
+    
     if not os.path.exists(arquivo_excel):
         logger.error(f"Arquivo não encontrado: {arquivo_excel}")
         raise FileNotFoundError(f"O arquivo {arquivo_excel} não foi encontrado no diretório.")
