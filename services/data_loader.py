@@ -4,14 +4,13 @@
 import pandas as pd
 import os
 
-# Caminho para o arquivo Excel
-EXCEL_FILE = 'LoteriasExcel/Milionária_edt.xlsx'
-
 def carregar_dados_milionaria():
     """Carrega os dados da +Milionária do arquivo Excel."""
-    if os.path.exists(EXCEL_FILE):
+    # Usar caminho absoluto baseado no diretório atual
+    excel_file = os.path.join(os.getcwd(), 'LoteriasExcel', 'Milionária_edt.xlsx')
+    if os.path.exists(excel_file):
         try:
-            df = pd.read_excel(EXCEL_FILE)
+            df = pd.read_excel(excel_file)
             # Renomeia as colunas para o padrão esperado pelas funções de análise
             df.columns = ['Concurso', 'Bola1', 'Bola2', 'Bola3', 'Bola4', 'Bola5', 'Bola6', 'Trevo1', 'Trevo2']
             # Converte os números para tipos numéricos, forçando erros para NaN e depois Int64
@@ -24,7 +23,7 @@ def carregar_dados_milionaria():
             print(f"Erro ao carregar o arquivo Excel: {e}")
             return pd.DataFrame() # Retorna DataFrame vazio em caso de erro
     else:
-        print(f"Arquivo Excel não encontrado: {EXCEL_FILE}")
+        print(f"Arquivo Excel não encontrado: {excel_file}")
         return pd.DataFrame() # Retorna DataFrame vazio se o arquivo não existir
 
 def carregar_dados_megasena_app():
