@@ -2193,7 +2193,7 @@
       container.innerHTML = "🔄 Carregando análise de frequência...";
 
       try {
-        const response = await fetch('/api/analise-frequencia');
+        const response = await fetch('/api/analise-frequencia-MS');
         const data = await response.json();
 
         if (data.error) {
@@ -2478,7 +2478,7 @@
       container.innerHTML = "🔄 Atualizando análise...";
 
       try {
-        const url = janela ? `/api/analise-frequencia?qtd_concursos=${janela}` : '/api/analise-frequencia';
+        const url = janela ? `/api/analise-frequencia-MS?qtd_concursos=${janela}` : '/api/analise-frequencia-MS';
         const response = await fetch(url);
         const data = await response.json();
 
