@@ -1391,7 +1391,15 @@ def carregar_dados_da_loteria(loteria):
         elif loteria == "lotomania":
             # Lazy import para lotomania
             pd = _lazy_import_pandas()
-            _data_cache[loteria] = pd.read_excel('LoteriasExcel/Lotomania_edt.xlsx')
+            import os
+            excel_path = os.path.join(os.getcwd(), 'LoteriasExcel', 'Lotomania_edt.xlsx')
+            logger.info(f"Tentando carregar Lotomania de: {excel_path}")
+            if os.path.exists(excel_path):
+                _data_cache[loteria] = pd.read_excel(excel_path)
+                logger.info(f"Lotomania carregada com sucesso. Linhas: {len(_data_cache[loteria])}")
+            else:
+                logger.error(f"Arquivo Lotomania não encontrado: {excel_path}")
+                _data_cache[loteria] = None
         else:
             logger.error(f"Loteria desconhecida: {loteria}")
             return None
@@ -1723,13 +1731,20 @@ def get_analise_frequencia_quina():
 def analise_frequencia_lotomania_api():
     """API para análise de frequência da Lotomania"""
     try:
+        logger.info("=== INICIANDO API LOTOMANIA ===")
+        
         # Carregar dados da Lotomania usando função centralizada
+        logger.info("Carregando dados da Lotomania...")
         df_lotomania = carregar_dados_da_loteria("lotomania")
         
         if df_lotomania is None:
+            logger.error("Dados da Lotomania são None")
             return jsonify({"error": "Erro ao carregar dados da Lotomania"}), 500
         
+        logger.info(f"Dados carregados. Linhas: {len(df_lotomania)}")
+        
         # Executar análise de frequência (últimos 300 concursos)
+        logger.info("Executando análise de frequência...")
         resultado = analisar_frequencia_lotomania(df_lotomania, qtd_concursos=300)
         
         if resultado:
