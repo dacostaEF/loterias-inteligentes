@@ -1754,8 +1754,13 @@ def analise_frequencia_lotomania_api():
         logger.info("Executando análise de frequência...")
         
         # Usar a função que aceita DataFrame (igual às outras APIs)
+        logger.info("Importando função analise_frequencia_lotomania_completa...")
         from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analise_frequencia_lotomania_completa
+        logger.info("Função importada com sucesso!")
+        
+        logger.info("Chamando analise_frequencia_lotomania_completa...")
         resultado = analise_frequencia_lotomania_completa(df_lotomania, qtd_concursos=300)
+        logger.info(f"Resultado da função: {type(resultado)}")
         
         if resultado:
             logger.info("Análise concluída com sucesso!")
