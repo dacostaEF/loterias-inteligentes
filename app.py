@@ -1753,22 +1753,9 @@ def analise_frequencia_lotomania_api():
         # Executar análise de frequência (últimos 300 concursos)
         logger.info("Executando análise de frequência...")
         
-        # Converter DataFrame para lista de listas (formato esperado pela função)
-        dados_lista = df_lotomania.values.tolist()
-        logger.info(f"Dados convertidos para lista. Total de linhas: {len(dados_lista)}")
-        logger.info(f"Primeira linha: {dados_lista[0] if dados_lista else 'Lista vazia'}")
-        logger.info(f"Tipo da primeira linha: {type(dados_lista[0]) if dados_lista else 'N/A'}")
-        logger.info(f"Tamanho da primeira linha: {len(dados_lista[0]) if dados_lista else 'N/A'}")
-        
-        # Testar com dados menores primeiro
-        logger.info("Testando com últimos 10 concursos...")
-        dados_teste = dados_lista[-10:] if len(dados_lista) >= 10 else dados_lista
-        resultado_teste = analisar_frequencia_lotomania(dados_teste, qtd_concursos=10)
-        logger.info(f"Teste com 10 concursos: {type(resultado_teste)}")
-        
-        # Agora testar com todos os dados
-        logger.info("Testando com todos os dados...")
-        resultado = analisar_frequencia_lotomania(dados_lista, qtd_concursos=300)
+        # Usar a função que aceita DataFrame (igual às outras APIs)
+        from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analise_frequencia_lotomania_completa
+        resultado = analise_frequencia_lotomania_completa(df_lotomania, qtd_concursos=300)
         
         if resultado:
             logger.info("Análise concluída com sucesso!")
