@@ -15,9 +15,16 @@ try:
     # Usa o app principal como padrão
     application = main_app
     print("App principal importado com sucesso!")
+    print(f"Total de rotas registradas: {len(application.url_map._rules)}")
+    print("Rotas de API encontradas:")
+    for rule in application.url_map.iter_rules():
+        if 'api' in rule.rule:
+            print(f"  {rule.rule} -> {rule.endpoint}")
 except Exception as e:
     # Se houver erro ao importar o app principal, usa o health_app
     print(f"Erro ao importar app principal: {e}")
+    import traceback
+    traceback.print_exc()
     application = health_app
 
 # Garante que o healthcheck funcione mesmo se o app principal falhar
