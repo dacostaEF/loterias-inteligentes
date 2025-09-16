@@ -1844,28 +1844,29 @@
 
       dropdowns.forEach(dropdown => {
         const dropdownContent = dropdown.querySelector('.dropdown-content');
+        let dropdownTimeoutId; // Timeout único para cada dropdown
         
         // Mostrar dropdown no hover
         dropdown.addEventListener('mouseenter', () => {
-          clearTimeout(timeoutId);
+          clearTimeout(dropdownTimeoutId);
           dropdownContent.classList.add('show');
         });
         
         // Esconder dropdown com delay
         dropdown.addEventListener('mouseleave', () => {
-          timeoutId = setTimeout(() => {
+          dropdownTimeoutId = setTimeout(() => {
             dropdownContent.classList.remove('show');
           }, 300); // 300ms de delay
         });
         
         // Manter dropdown aberto se o mouse estiver sobre ele
         dropdownContent.addEventListener('mouseenter', () => {
-          clearTimeout(timeoutId);
+          clearTimeout(dropdownTimeoutId);
         });
         
         // Fechar dropdown quando sair do conteúdo
         dropdownContent.addEventListener('mouseleave', () => {
-          timeoutId = setTimeout(() => {
+          dropdownTimeoutId = setTimeout(() => {
             dropdownContent.classList.remove('show');
           }, 300);
         });

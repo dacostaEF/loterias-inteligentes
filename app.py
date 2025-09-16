@@ -1580,6 +1580,9 @@ def get_analise_frequencia_megasena():
             if df_megasena is None or df_megasena.empty:
                 return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
             df_filtrado = df_megasena.tail(limite_efetivo)
+            # Importar pandas para uso local
+            pd = _lazy_import_pandas()
+            
             for _, row in df_filtrado.iterrows():
                 if not pd.isna(row['Concurso']):
                     concursos_para_matriz.append({
@@ -1688,6 +1691,9 @@ def get_analise_frequencia_quina():
         df_filtrado = df_quina.tail(limite_efetivo)
         print(f"🔍 Debug: Shape do df_filtrado={df_filtrado.shape}")
         
+        # Importar pandas para uso local
+        pd = _lazy_import_pandas()
+        
         for _, row in df_filtrado.iterrows():
             if not pd.isna(row['Concurso']):
                 concursos_para_matriz.append({
@@ -1715,6 +1721,9 @@ def get_analise_frequencia_quina():
 def analise_frequencia_lotomania_api():
     """API para análise de frequência da Lotomania"""
     try:
+        # Importar pandas para uso local
+        pd = _lazy_import_pandas()
+        
         # Carregar dados da Lotomania
         df_lotomania = pd.read_excel('LoteriasExcel/Lotomania_edt.xlsx')
         
@@ -1804,6 +1813,9 @@ def analise_frequencia_lotofacil_v2_api():
                 if concurso_col and bolas_cols:
                     df_ord = df.sort_values(concurso_col, ascending=False)
                     limite = qtd_concursos if qtd_concursos else 300
+                    # Importar pandas para uso local
+                    pd = _lazy_import_pandas()
+                    
                     for _, row in df_ord.head(limite).iloc[::-1].iterrows():
                         try:
                             concurso_num = int(row[concurso_col]) if not pd.isna(row[concurso_col]) else None
@@ -1964,6 +1976,9 @@ def api_analise_seca_lotofacil():
         qtd_concursos = min(qtd_concursos, 200)
 
         # Detectores locais de colunas (concurso e bolas 1..15)
+        # Importar pandas para uso local
+        pd = _lazy_import_pandas()
+        
         def _detectar_coluna_concurso_local(df: pd.DataFrame):
             possiveis = ['concurso', 'nrconcurso', 'n_concurso', 'numero_concurso', 'idconcurso']
             lower = {str(c).strip().lower(): c for c in df.columns}
@@ -1999,6 +2014,9 @@ def api_analise_seca_lotofacil():
         if concurso_col is None or not bolas:
             return jsonify({'error': 'Colunas de concurso/bolas não detectadas.'}), 500
 
+        # Importar pandas para uso local
+        pd = _lazy_import_pandas()
+        
         df = df_lotofacil.copy()
         for col in bolas:
             df[col] = pd.to_numeric(df[col], errors='coerce')
@@ -2023,6 +2041,9 @@ def api_analise_seca_lotofacil():
             seca_por_numero[n]['seca_atual'] = cont
 
         # Estatísticas simples
+        # Importar pandas para uso local
+        pd = _lazy_import_pandas()
+        
         valores = [v['seca_atual'] for v in seca_por_numero.values()]
         seca_max = int(max(valores) if valores else 0)
         seca_med = float(pd.Series(valores).median()) if valores else 0.0
@@ -2034,6 +2055,8 @@ def api_analise_seca_lotofacil():
 
         # Números que saíram mais recentemente (último concurso)
         ultimo = df[bolas].iloc[-1].tolist()
+        # Importar pandas para uso local
+        pd = _lazy_import_pandas()
         numeros_recentes = [int(x) for x in ultimo if pd.notna(x)]
 
         payload = {
@@ -2633,8 +2656,9 @@ from services.geradores.numeros_aleatorios import (
     gerar_numeros_aleatorios_lotomania
 )
 
-# Importar função da Lotomania
+# Importar funções da Lotomania
 from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
+from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_frequencia_lotomania
 
 @app.route('/api/gerar-numeros-aleatorios', methods=['GET'])
 def gerar_numeros_aleatorios():
