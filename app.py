@@ -1753,8 +1753,10 @@ def analise_frequencia_lotomania_api():
             return jsonify({"error": "Não foi possível analisar os dados da Lotomania"}), 500
             
     except Exception as e:
+        import traceback
         logger.error(f"Erro ao analisar frequência da Lotomania: {e}")
-        return jsonify({"error": "Erro interno do servidor"}), 500
+        logger.error(f"Traceback completo: {traceback.format_exc()}")
+        return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
 
 @app.route('/api/analise-frequencia-lotofacil')
 def analise_frequencia_lotofacil_api():
