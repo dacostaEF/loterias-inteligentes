@@ -23,9 +23,15 @@ def carregar_dados_milionaria(arquivo_excel: str = None) -> pd.DataFrame:
     if arquivo_excel is None:
         # Usar caminho absoluto baseado no diretório atual
         arquivo_excel = os.path.join(os.getcwd(), 'LoteriasExcel', 'Milionária_edt.xlsx')
+        logger.info(f"Usando caminho padrão: {arquivo_excel}")
+        logger.info(f"Diretório atual: {os.getcwd()}")
+        logger.info(f"Listando arquivos em LoteriasExcel: {os.listdir(os.path.join(os.getcwd(), 'LoteriasExcel')) if os.path.exists(os.path.join(os.getcwd(), 'LoteriasExcel')) else 'Diretório não existe'}")
     
+    logger.info(f"Verificando existência do arquivo: {arquivo_excel}")
     if not os.path.exists(arquivo_excel):
         logger.error(f"Arquivo não encontrado: {arquivo_excel}")
+        logger.error(f"Diretório atual: {os.getcwd()}")
+        logger.error(f"Arquivos disponíveis: {os.listdir('.')}")
         raise FileNotFoundError(f"O arquivo {arquivo_excel} não foi encontrado no diretório.")
 
     try:
