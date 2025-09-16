@@ -1764,7 +1764,20 @@ def analise_frequencia_lotomania_api():
         
         if resultado:
             logger.info("Análise concluída com sucesso!")
-            return jsonify(resultado)
+            
+            # Extrair dados da estrutura aninhada para compatibilidade com o frontend
+            if 'analise_frequencia' in resultado:
+                analise = resultado['analise_frequencia']
+                # Retornar na mesma estrutura das outras APIs
+                return jsonify({
+                    'analise_temporal': analise.get('analise_temporal', []),
+                    'frequencia_absoluta_numeros': analise.get('frequencia_absoluta', {}).get('numeros', {}),
+                    'frequencia_relativa_numeros': analise.get('frequencia_relativa', {}).get('numeros', {}),
+                    'numeros_quentes_frios': analise.get('numeros_quentes_frios', {}),
+                    'periodo_analisado': resultado.get('periodo_analisado', {})
+                })
+            else:
+                return jsonify(resultado)
         else:
             logger.error("Resultado da análise é None ou vazio")
             return jsonify({"error": "Não foi possível analisar os dados da Lotomania"}), 500
