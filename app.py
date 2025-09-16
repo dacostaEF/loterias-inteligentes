@@ -1733,6 +1733,12 @@ def analise_frequencia_lotomania_api():
     try:
         logger.info("=== INICIANDO API LOTOMANIA ===")
         
+        # Verificar ambiente e arquivos
+        import os
+        logger.info(f"PWD: {os.getcwd()}")
+        logger.info(f"Lista LoteriasExcel: {os.listdir('LoteriasExcel') if os.path.exists('LoteriasExcel') else 'Diretório não existe'}")
+        logger.info(f"Arquivo Lotomania existe? {os.path.exists(os.path.join(os.getcwd(), 'LoteriasExcel', 'Lotomania_edt.xlsx'))}")
+        
         # Carregar dados da Lotomania usando função centralizada
         logger.info("Carregando dados da Lotomania...")
         df_lotomania = carregar_dados_da_loteria("lotomania")
@@ -1742,6 +1748,7 @@ def analise_frequencia_lotomania_api():
             return jsonify({"error": "Erro ao carregar dados da Lotomania"}), 500
         
         logger.info(f"Dados carregados. Linhas: {len(df_lotomania)}")
+        logger.info(f"Colunas: {df_lotomania.columns.tolist()}")
         
         # Executar análise de frequência (últimos 300 concursos)
         logger.info("Executando análise de frequência...")
@@ -1749,19 +1756,23 @@ def analise_frequencia_lotomania_api():
         # Converter DataFrame para lista de listas (formato esperado pela função)
         dados_lista = df_lotomania.values.tolist()
         logger.info(f"Dados convertidos para lista. Total de linhas: {len(dados_lista)}")
+        logger.info(f"Primeira linha: {dados_lista[0] if dados_lista else 'Lista vazia'}")
         
         resultado = analisar_frequencia_lotomania(dados_lista, qtd_concursos=300)
         
         if resultado:
+            logger.info("Análise concluída com sucesso!")
             return jsonify(resultado)
         else:
+            logger.error("Resultado da análise é None ou vazio")
             return jsonify({"error": "Não foi possível analisar os dados da Lotomania"}), 500
             
     except Exception as e:
         import traceback
+        tb = traceback.format_exc()
         logger.error(f"Erro ao analisar frequência da Lotomania: {e}")
-        logger.error(f"Traceback completo: {traceback.format_exc()}")
-        return jsonify({"error": f"Erro interno do servidor: {str(e)}"}), 500
+        logger.error(f"Traceback completo:\n{tb}")
+        return jsonify({"error": "Erro interno do servidor"}), 500
 
 @app.route('/api/analise-frequencia-lotofacil')
 def analise_frequencia_lotofacil_api():
