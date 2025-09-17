@@ -6415,27 +6415,181 @@
       '/analise_estatistica_avancada_lotofacil'
     ]);
 
+    // Função para mostrar indicador de carregamento
+    function showLoadingIndicator(message = '🔍 Verificando acesso...') {
+      // Remover indicador existente se houver
+      hideLoadingIndicator();
+      
+      // Criar overlay de carregamento
+      const loadingOverlay = document.createElement('div');
+      loadingOverlay.id = 'loading-overlay';
+      loadingOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        animation: fadeIn 0.3s ease-in;
+      `;
+      
+      // Criar spinner animado
+      const spinner = document.createElement('div');
+      spinner.style.cssText = `
+        width: 70px;
+        height: 70px;
+        border: 5px solid rgba(255, 140, 0, 0.2);
+        border-top: 5px solid #FF8C00;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 25px;
+        box-shadow: 0 0 20px rgba(255, 140, 0, 0.3);
+      `;
+      
+      // Criar texto de carregamento
+      const loadingText = document.createElement('div');
+      loadingText.style.cssText = `
+        color: #FF8C00;
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        font-family: 'Inter', sans-serif;
+        text-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+        margin-bottom: 10px;
+      `;
+      loadingText.innerHTML = message;
+      
+      // Criar texto secundário
+      const loadingSubtext = document.createElement('div');
+      loadingSubtext.style.cssText = `
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 400;
+        text-align: center;
+        font-family: 'Inter', sans-serif;
+        opacity: 0.8;
+      `;
+      loadingSubtext.innerHTML = 'Aguarde um momento...';
+      
+      // Adicionar CSS das animações
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
+        }
+        @keyframes fadeOut {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+      
+      // Montar o indicador
+      loadingOverlay.appendChild(spinner);
+      loadingOverlay.appendChild(loadingText);
+      loadingOverlay.appendChild(loadingSubtext);
+      document.body.appendChild(loadingOverlay);
+      
+      // Prevenir scroll do body
+      document.body.style.overflow = 'hidden';
+    }
+    
+    // Função para atualizar mensagem do indicador
+    function updateLoadingMessage(message) {
+      const loadingOverlay = document.getElementById('loading-overlay');
+      if (loadingOverlay) {
+        const loadingText = loadingOverlay.querySelector('div:first-of-type + div');
+        if (loadingText) {
+          loadingText.innerHTML = message;
+        }
+      }
+    }
+    
+    // Função para esconder indicador de carregamento
+    function hideLoadingIndicator() {
+      const loadingOverlay = document.getElementById('loading-overlay');
+      if (loadingOverlay) {
+        loadingOverlay.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+          loadingOverlay.remove();
+        }, 300);
+      }
+      
+      // Restaurar scroll do body
+      document.body.style.overflow = 'auto';
+    }
+
     async function checkAccess(route) {
-      const routeName = route.startsWith('/') ? route.slice(1) : route;
-      const resp = await fetch(`/check_access/${routeName}`, { credentials: 'include' });
-      return resp.json();
+      try {
+        // Garantir que a rota não tenha barra dupla
+        const cleanRoute = route.replace(/^\/+/, '').replace(/\/+/g, '/');
+        const routeName = cleanRoute.startsWith('/') ? cleanRoute.slice(1) : cleanRoute;
+        
+        console.log('🔍 Fazendo requisição para:', `/check_access/${routeName}`);
+        
+        const resp = await fetch(`/check_access/${routeName}`, { 
+          credentials: 'include',
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+        }
+        
+        const data = await resp.json();
+        console.log('📊 Dados recebidos:', data);
+        return data;
+        
+      } catch (error) {
+        console.error('❌ Erro em checkAccess:', error);
+        throw error;
+      }
     }
 
     // Abre o modal de planos, se existir; senão, redireciona
     function openPlansModalOrRedirect(upgradeUrl = '/upgrade_plans') {
-      // Se você já tem window.openWelcomeModal (usado na landing), reutilize:
+      console.log('🔓 Tentando abrir modal de planos...');
+      
+      // Tentar abrir modal elegante primeiro
       if (typeof window.openWelcomeModal === 'function') {
-        window.openWelcomeModal();
-        return;
+        console.log('✅ Abrindo modal elegante...');
+        try {
+          window.openWelcomeModal();
+          return;
+        } catch (error) {
+          console.error('❌ Erro ao abrir modal elegante:', error);
+        }
       }
-      // Se você tem um modal local com id específico, pode abrir aqui:
+      
+      // Tentar abrir modal local
       const modal = document.getElementById('modal-premium') || document.getElementById('modal-login-cadastro');
       if (modal) {
-        modal.classList.remove('hidden');
-        modal.style.display = 'block';
-        return;
+        console.log('✅ Abrindo modal local...');
+        try {
+          modal.classList.remove('hidden');
+          modal.style.display = 'block';
+          return;
+        } catch (error) {
+          console.error('❌ Erro ao abrir modal local:', error);
+        }
       }
-      // Fallback final:
+      
+      // Fallback final: redirecionar
+      console.log('⚠️ Nenhum modal disponível, redirecionando para:', upgradeUrl);
       window.location.href = upgradeUrl;
     }
 
@@ -6449,18 +6603,50 @@
 
       // É rota premium: checar antes de navegar
       e.preventDefault();
+      
+      console.log('🔍 Verificando acesso para:', href);
+      
+      // Mostrar indicador de carregamento
+      showLoadingIndicator();
+      
+      // Adicionar timeout para evitar travamento
+      const timeoutId = setTimeout(() => {
+        console.log('⏰ Timeout na verificação de acesso, permitindo navegação...');
+        hideLoadingIndicator();
+        window.location.href = href;
+      }, 5000); // 5 segundos de timeout
+      
       checkAccess(href).then((data) => {
+        clearTimeout(timeoutId); // Cancelar timeout se sucesso
+        console.log('📊 Resposta de acesso:', data);
+        
         if (data.has_access) {
           // Tem acesso (master/premium) → navega
-          window.location.href = href;
+          console.log('✅ Acesso liberado, redirecionando...');
+          updateLoadingMessage('✅ Acesso liberado! Redirecionando...');
+          setTimeout(() => {
+            hideLoadingIndicator();
+            window.location.href = href;
+          }, 1000);
         } else {
           // Sem acesso → mostra modal de planos (ou redireciona)
-          openPlansModalOrRedirect(data.upgrade_url);
+          console.log('🚫 Acesso negado:', data.reason);
+          updateLoadingMessage('🚫 Acesso negado. Abrindo planos...');
+          setTimeout(() => {
+            hideLoadingIndicator();
+            openPlansModalOrRedirect(data.upgrade_url);
+          }, 1500);
         }
       }).catch((err) => {
-        console.error('Falha ao checar acesso:', err);
-        // Em falha, seja conservador: leva para planos
-        openPlansModalOrRedirect();
+        clearTimeout(timeoutId); // Cancelar timeout se erro
+        console.error('❌ Falha ao checar acesso:', err);
+        // Em caso de erro, permitir navegação normal (fallback)
+        console.log('⚠️ Erro na verificação, permitindo navegação normal...');
+        updateLoadingMessage('⚠️ Erro na verificação. Redirecionando...');
+        setTimeout(() => {
+          hideLoadingIndicator();
+          window.location.href = href;
+        }, 1000);
       });
     });
   </script>

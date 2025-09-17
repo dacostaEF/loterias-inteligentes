@@ -84,7 +84,10 @@ class AccessChecker {
         try {
             console.log(`🔍 Verificando acesso para rota: ${routeName}`);
             
-            const response = await fetch(`/check_access/${routeName}`, {
+            // Garantir que a rota não tenha barra dupla
+            const cleanRoute = routeName.replace(/^\/+/, '').replace(/\/+/g, '/');
+            
+            const response = await fetch(`/check_access/${cleanRoute}`, {
                 credentials: 'include'
             });
             
@@ -225,26 +228,9 @@ class AccessChecker {
 document.addEventListener('DOMContentLoaded', () => {
     window.accessChecker = new AccessChecker();
     
-    // Verificar acesso automaticamente para páginas premium
-    const currentPath = window.location.pathname;
-    const premiumRoutes = [
-        // '/dashboard_MS', // REMOVIDO: Backend já controla acesso
-        '/aposta_inteligente_premium_MS',
-        '/analise_estatistica_avancada_megasena',
-        '/dashboard_lotofacil',
-        '/aposta_inteligente_premium_lotofacil',
-        '/lotofacil_laboratorio',
-        '/aposta_inteligente_premium_quina',
-        '/aposta_inteligente_premium',
-        '/boloes_loterias'
-    ];
-    
-    if (premiumRoutes.includes(currentPath)) {
-        console.log('🔍 Verificando acesso automático para:', currentPath);
-        window.accessChecker.checkAndProceed(currentPath.substring(1), () => {
-            console.log('✅ Usuário tem acesso à página');
-        });
-    }
+    // REMOVIDO: Verificação automática duplicada que causava conflito
+    // O sistema inline no template já cuida da verificação de acesso
+    console.log('🔧 AccessChecker inicializado - sistema inline ativo');
 });
 
 // Função global para verificação manual (não usada - template tem sua própria)
