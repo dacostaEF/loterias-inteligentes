@@ -74,6 +74,7 @@
       font-family: 'Inter', sans-serif;
       background-color: #000000; /* Fundo completamente preto */
       min-height: 100vh;
+      padding-top: 80px; /* Espaço para o menu fixo */
     }
 
     /* Moldura Neon Laranja - Desktop */
@@ -121,194 +122,441 @@
     .shadow-glow {
       box-shadow: 0 0 20px rgba(255, 140, 0, 0.3), 0 0 40px rgba(255, 140, 0, 0.1);
     }
+
+    /* Estilos para os menus responsivos */
+    /* Menu Desktop - LOTOMANIA */
+    .desktop-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
+      backdrop-filter: blur(10px);
+      border-bottom: 3px solid #FF8C00;
+      box-shadow: 0 2px 8px rgba(255, 140, 0, 0.15);
+      z-index: 1000;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .desktop-nav .logo {
+      max-width: 150px;
+      height: auto;
+    }
+
+    .desktop-nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .desktop-nav-links a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.875rem; /* PADRÃO: 14px para todos os menus */
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .desktop-nav-links a:hover {
+      color: #FF8C00;
+      background: rgba(255, 140, 0, 0.1);
+      transform: translateY(-1px);
+    }
+
+    /* Estilo para destacar a página atual */
+    .desktop-nav-links a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border: 1px solid rgba(0, 227, 140, 0.3) !important;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .desktop-nav-links a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
+    /* Esconder menu desktop em mobile */
+    @media (max-width: 768px) {
+      .desktop-nav {
+        display: none;
+      }
+    }
+
+    /* Mostrar menu desktop em telas maiores */
+    @media (min-width: 769px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    /* Ajuste de espaçamento para telas menores */
+    @media (max-width: 1200px) {
+      .desktop-nav-links {
+        gap: 1.5rem; /* 24px */
+      }
+    }
+
+    @media (max-width: 1000px) {
+      .desktop-nav-links {
+        gap: 1.25rem; /* 20px */
+      }
+    }
+
+    @media (max-width: 900px) {
+      .desktop-nav-links {
+        gap: 1rem; /* 16px */
+      }
+    }
+
+    @media (max-width: 800px) {
+      .desktop-nav-links {
+        gap: 0.75rem; /* 12px - limite mínimo */
+      }
+    }
+
+    /* Estilos para o menu hambúrguer */
+    .hamburger-menu {
+      position: fixed;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 1000;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger-menu {
+        display: block;
+      }
+    }
+
+    .hamburger-icon {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-icon:hover {
+      background: rgba(255, 140, 0, 0.1);
+    }
+
+    .hamburger-icon span {
+      width: 25px;
+      height: 3px;
+      background: #FF8C00;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+
+    .hamburger-icon.open span:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .hamburger-icon.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger-icon.open span:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    /* Sidebar deslizante */
+    .nav-panel {
+      position: fixed;
+      top: 0;
+      left: -280px;
+      width: 280px;
+      height: 100%;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+      display: flex;
+      flex-direction: column;
+      transition: left 0.3s ease-in-out;
+      z-index: 999;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .nav-panel.open {
+      left: 0;
+    }
+
+    /* Header do sidebar */
+    .nav-header {
+      padding: 20px 25px;
+      border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+      text-align: center;
+      background: rgba(255, 140, 0, 0.05);
+    }
+
+    .nav-logo {
+      max-width: 120px;
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    .nav-header h3 {
+      color: #FF8C00;
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .nav-panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
+    }
+
+    .nav-panel li {
+      margin: 0;
+      border-bottom: 1px solid rgba(255, 140, 0, 0.1);
+    }
+
+    .nav-panel a {
+      color: #ffffff;
+      text-decoration: none;
+      font-size: 0.95rem; /* ⚡ PADRÃO LANDING: mais compacto e profissional */
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 20px 25px;
+      display: block;
+      border-left: 3px solid transparent;
+    }
+
+    .nav-panel a:hover {
+      color: #FF8C00;
+      background: rgba(255, 140, 0, 0.1);
+      border-left-color: #FF8C00;
+    }
+
+    /* Estilo para destacar a página atual no menu mobile */
+    .nav-panel a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+      box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+    }
+
+    .nav-panel a.active:hover {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.2) !important;
+    }
+
+    /* Estilos para submenu dropdown */
+    .dropdown {
+      position: relative;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      background: #2a2a3e;
+      min-width: 200px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.5), 0 4px 8px rgba(255, 140, 0, 0.2);
+      border-radius: 8px;
+      z-index: 1000;
+      border: 2px solid rgba(255, 140, 0, 0.6);
+    }
+
+    .dropdown-content a {
+      color: #e2e8f0;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      border-left: 3px solid transparent;
+      transition: all 0.3s ease;
+      font-size: 0.875rem; /* PADRÃO: 14px para todos os submenus */
+    }
+
+    .dropdown-content a:hover {
+      color: #FF8C00;
+      background: rgba(255, 140, 0, 0.1);
+      border-left-color: #FF8C00;
+    }
+
+    .dropdown-content a.active {
+      color: #00E38C !important;
+      background: rgba(0, 227, 140, 0.15) !important;
+      border-left-color: #00E38C !important;
+    }
+
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    /* Submenu para mobile */
+    .mobile-dropdown {
+      display: none;
+      background: rgba(255, 140, 0, 0.05);
+      border-left: 3px solid rgba(255, 140, 0, 0.3);
+      margin-left: 20px;
+    }
+
+    .mobile-dropdown.show {
+      display: block;
+    }
+
+    .mobile-dropdown a {
+      padding: 15px 25px;
+      font-size: 0.9rem;
+      border-left: none;
+    }
+
+    .mobile-dropdown-toggle {
+      position: relative;
+    }
+
+    .mobile-dropdown-toggle::after {
+      content: '▼';
+      position: absolute;
+      right: 25px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.8rem;
+      color: #FF8C00;
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-dropdown-toggle.active::after {
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    /* Overlay para fechar o menu */
+    .nav-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      display: none;
+    }
+
+    .nav-overlay.open {
+      display: block;
+    }
   </style>
 </head>
 
 <body class="text-text">
-  <!-- Header -->
-  <header class="bg-dark/90 backdrop-blur-md border-b border-primary/20 sticky top-0 z-50">
-    <div class="container mx-auto px-4 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-4">
-          <a href="/" class="flex items-center space-x-2">
-            <img src="/static/img/Favicon_LI.png" alt="Logo" class="w-8 h-8">
-            <span class="text-xl font-bold text-gradient">Loterias Inteligentes</span>
-          </a>
-        </div>
-        
-        <nav class="hidden md:flex items-center space-x-6">
-          <a href="/" class="text-text-secondary hover:text-primary transition-colors">
-            <i class="fas fa-home mr-2"></i>Início
-          </a>
-          
-          <div class="relative group">
-            <a href="#" class="text-text-secondary hover:text-primary transition-colors flex items-center">
-              <i class="fas fa-diamond mr-2"></i>+Milionária
-              <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
-            <div class="absolute top-full left-0 mt-2 w-64 bg-dark/95 backdrop-blur-md border border-primary/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div class="py-2">
-                <a href="/dashboard_milionaria" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-                </a>
-                <a href="/aposta_inteligente_premium" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative group">
-            <a href="#" class="text-text-secondary hover:text-primary transition-colors flex items-center">
-              <i class="fas fa-bullseye mr-2"></i>Mega Sena
-              <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
-            <div class="absolute top-full left-0 mt-2 w-64 bg-dark/95 backdrop-blur-md border border-primary/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div class="py-2">
-                <a href="/dashboard_MS" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-                </a>
-                <a href="/aposta_inteligente_premium_MS" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative group">
-            <a href="#" class="text-text-secondary hover:text-primary transition-colors flex items-center">
-              <i class="fas fa-hashtag mr-2"></i>Quina
-              <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
-            <div class="absolute top-full left-0 mt-2 w-64 bg-dark/95 backdrop-blur-md border border-primary/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div class="py-2">
-                <a href="/dashboard_quina" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-                </a>
-                <a href="/aposta_inteligente_premium_quina" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative group">
-            <a href="#" class="bg-teal-600 border border-teal-400 text-white px-3 py-2 rounded-lg flex items-center">
-              <i class="fas fa-circle mr-2 text-green-400"></i>Lotomania
-              <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
-            <div class="absolute top-full left-0 mt-2 w-64 bg-dark/95 backdrop-blur-md border border-primary/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div class="py-2">
-                <a href="/dashboard_lotomania" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-                </a>
-                <a href="/analise_estatistica_avancada_lotomania" class="block px-4 py-3 text-green-400 bg-green-400/10 font-medium">
-                  <i class="fas fa-chart-bar mr-3"></i>Inteligência Estatística
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="relative group">
-            <a href="#" class="text-text-secondary hover:text-primary transition-colors flex items-center">
-              <i class="fas fa-dice mr-2"></i>Lotofácil
-              <i class="fas fa-chevron-down ml-1 text-xs"></i>
-            </a>
-            <div class="absolute top-full left-0 mt-2 w-64 bg-dark/95 backdrop-blur-md border border-primary/20 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
-              <div class="py-2">
-                <a href="/dashboard_lotofacil" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-                </a>
-                <a href="/aposta_inteligente_premium_lotofacil" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-                </a>
-                <a href="/lotofacil_laboratorio" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors">
-                  <i class="fas fa-flask mr-3"></i>Laboratório de Simulação
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <a href="/boloes_loterias" class="text-text-secondary hover:text-primary transition-colors">
-            <i class="fas fa-users mr-2"></i>Bolões
-          </a>
-        </nav>
-
-        <!-- Mobile menu button -->
-        <button id="mobile-menu-btn" class="md:hidden text-text-secondary hover:text-primary transition-colors">
-          <i class="fas fa-bars text-xl"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="md:hidden bg-dark/95 backdrop-blur-md border-t border-primary/20 hidden">
-      <div class="px-4 py-4 space-y-2">
-        <a href="/" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-home mr-3"></i>Início
-        </a>
-        
-        <div class="border-b border-primary/20 pb-2 mb-2">
-          <span class="text-primary font-medium text-sm">+Milionária</span>
-        </div>
-        <a href="/dashboard_milionaria" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-        </a>
-        <a href="/aposta_inteligente_premium" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-        </a>
-
-        <div class="border-b border-primary/20 pb-2 mb-2">
-          <span class="text-primary font-medium text-sm">Mega Sena</span>
-        </div>
-        <a href="/dashboard_MS" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-        </a>
-        <a href="/aposta_inteligente_premium_MS" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-        </a>
-
-        <div class="border-b border-primary/20 pb-2 mb-2">
-          <span class="text-primary font-medium text-sm">Quina</span>
-        </div>
-        <a href="/dashboard_quina" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-        </a>
-        <a href="/aposta_inteligente_premium_quina" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-        </a>
-
-        <div class="border-b border-primary/20 pb-2 mb-2">
-          <span class="text-primary font-medium text-sm">Lotomania</span>
-        </div>
-        <a href="/dashboard_lotomania" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-        </a>
-        <a href="/analise_estatistica_avancada_lotomania" class="block px-4 py-3 text-green-400 bg-green-400/10 font-medium rounded-lg">
-          <i class="fas fa-chart-bar mr-3"></i>Inteligência Estatística
-        </a>
-
-        <div class="border-b border-primary/20 pb-2 mb-2">
-          <span class="text-primary font-medium text-sm">Lotofácil</span>
-        </div>
-        <a href="/dashboard_lotofacil" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-bullseye mr-3"></i>Palpite da Sorte
-        </a>
-        <a href="/aposta_inteligente_premium_lotofacil" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-chart-line mr-3"></i>Inteligência Estatística
-        </a>
-        <a href="/lotofacil_laboratorio" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-          <i class="fas fa-flask mr-3"></i>Laboratório de Simulação
-        </a>
-
-        <div class="border-t border-primary/20 pt-2 mt-2">
-          <a href="/boloes_loterias" class="block px-4 py-3 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors rounded-lg">
-            <i class="fas fa-users mr-3"></i>Bolões
-          </a>
+  <!-- Menu Desktop -->
+  <nav class="desktop-nav">
+    <div class="desktop-nav-links">
+      <a href="/"><i class="fa fa-home"></i> Início</a>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_milionaria"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
         </div>
       </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle active"><i class="fa fa-circle"></i> Lotomania ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/analise_estatistica_avancada_lotomania" class="active"><i class="fa fa-chart-bar"></i> Inteligência Estatística</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
+        <div class="dropdown-content">
+          <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+          <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
+        </div>
+      </div>
+      <a href="/boloes_loterias"><i class="fa fa-users"></i> Bolões</a>
     </div>
-  </header>
+  </nav>
+
+  <!-- Sidebar deslizante -->
+  <nav class="nav-panel" id="navPanel">
+    <div class="nav-header">
+      <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo" class="nav-logo">
+      <h3>Menu</h3>
+    </div>
+    <ul>
+      <li><a href="/"><i class="fa fa-home"></i> Início</a></li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_milionaria"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-circle"></i> Lotomania ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/analise_estatistica_avancada_lotomania" class="active"><i class="fa fa-chart-bar"></i> Inteligência Estatística</a>
+        </div>
+      </li>
+      <li>
+        <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
+        <div class="mobile-dropdown">
+          <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+          <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
+        </div>
+      </li>
+      <li><a href="/boloes_loterias"><i class="fa fa-users"></i> Bolões</a></li>
+    </ul>
+  </nav>
+
+  <!-- Overlay para fechar o menu -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
+  <!-- Menu Hambúrguer -->
+  <div class="hamburger-menu">
+    <button id="hamburgerIcon" class="hamburger-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
 
   <!-- Breadcrumbs -->
   <div class="bg-dark/50 backdrop-blur-sm border-b border-primary/10 py-3">
@@ -496,48 +744,63 @@
   </footer>
 
   <script>
-    // Mobile menu toggle
     document.addEventListener('DOMContentLoaded', function() {
-      const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-      const mobileMenu = document.getElementById('mobile-menu');
-      
-      if (mobileMenuBtn && mobileMenu) {
-        mobileMenuBtn.addEventListener('click', function() {
-          mobileMenu.classList.toggle('hidden');
+      const hamburgerIcon = document.getElementById('hamburgerIcon');
+      const navPanel = document.getElementById('navPanel');
+      const navOverlay = document.getElementById('navOverlay');
+      const mobileDropdownToggles = document.querySelectorAll('.mobile-dropdown-toggle');
+
+      if (hamburgerIcon && navPanel && navOverlay) {
+        hamburgerIcon.addEventListener('click', () => {
+          hamburgerIcon.classList.toggle('open');
+          navPanel.classList.toggle('open');
+          navOverlay.classList.toggle('open');
+          
+          // Previne scroll do body quando menu está aberto
+          document.body.style.overflow = navPanel.classList.contains('open') ? 'hidden' : '';
+        });
+
+        // Controle do submenu mobile
+        mobileDropdownToggles.forEach(toggle => {
+          toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggle.classList.toggle('active');
+            const dropdown = toggle.nextElementSibling;
+            if (dropdown) {
+              dropdown.classList.toggle('show');
+            }
+          });
+        });
+
+        // Fechar menu ao clicar em links (exceto dropdown toggles)
+        const navLinks = document.querySelectorAll('.nav-panel a:not(.mobile-dropdown-toggle)');
+        navLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          });
+        });
+
+        // Fechar o menu ao clicar no overlay
+        navOverlay.addEventListener('click', () => {
+          hamburgerIcon.classList.remove('open');
+          navPanel.classList.remove('open');
+          navOverlay.classList.remove('open');
+          document.body.style.overflow = '';
+        });
+
+        // Fechar o menu com tecla ESC
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navPanel.classList.contains('open')) {
+            hamburgerIcon.classList.remove('open');
+            navPanel.classList.remove('open');
+            navOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+          }
         });
       }
-
-      // Close mobile menu when clicking outside
-      document.addEventListener('click', function(event) {
-        if (!mobileMenuBtn.contains(event.target) && !mobileMenu.contains(event.target)) {
-          mobileMenu.classList.add('hidden');
-        }
-      });
-    });
-
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector(this.getAttribute('href')).scrollIntoView({
-          behavior: 'smooth'
-        });
-      });
-    });
-
-    // Add some interactive effects
-    document.addEventListener('DOMContentLoaded', function() {
-      // Add fade-in animation to cards
-      const cards = document.querySelectorAll('.bg-card\\/50');
-      cards.forEach((card, index) => {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-          card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-          card.style.opacity = '1';
-          card.style.transform = 'translateY(0)';
-        }, index * 200);
-      });
     });
   </script>
 </body>

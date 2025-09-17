@@ -141,7 +141,8 @@ class UserPermissions:
         '/analise_estatistica_avancada_milionaria',
         '/analise_estatistica_avancada_megasena',
         '/analise_estatistica_avancada_quina',
-        '/analise_estatistica_avancada_lotofacil'
+        '/analise_estatistica_avancada_lotofacil',
+        '/analise_estatistica_avancada_lotomania'
     }
     
     @classmethod
