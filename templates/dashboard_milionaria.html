@@ -333,6 +333,50 @@
         font-size: 10px; /* Fonte ainda menor */
       }
     }
+    
+    /* Tooltips elegantes para a interface */
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip-container .tooltip {
+      visibility: hidden;
+      width: 280px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1b69 100%);
+      color: #F9FAFB;
+      text-align: center;
+      border-radius: 12px;
+      padding: 16px 20px;
+      position: absolute;
+      z-index: 1000;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -140px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      font-size: 14px;
+      line-height: 1.5;
+      backdrop-filter: blur(10px);
+    }
+
+    .tooltip-container .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -8px;
+      border-width: 8px;
+      border-style: solid;
+      border-color: #2d1b69 transparent transparent transparent;
+    }
+
+    .tooltip-container:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
   </style>
 
   <style>
@@ -1484,7 +1528,7 @@
 
   <!-- Seção de Estatísticas Rápidas -->
   <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="stat-card p-6 rounded-2xl" style="border: 2px solid #3B82F6; box-shadow: 0 0 8px rgba(59,130,246,0.85), 0 0 16px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.35), 0 12px 28px rgba(0,0,0,0.6);">
+    <div class="stat-card p-6 rounded-2xl tooltip-container" style="border: 2px solid #3B82F6; box-shadow: 0 0 8px rgba(59,130,246,0.85), 0 0 16px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.35), 0 12px 28px rgba(0,0,0,0.6);">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">🔥 Números Quentes</h3>
         <div class="flex space-x-2">
@@ -1503,8 +1547,9 @@
       <div class="text-sm text-gray-300" id="numeros-quentes">
         Carregando...
       </div>
+      <div class="tooltip">🔥 <strong>Números Quentes</strong><br><br>Números que mais apareceram nos últimos sorteios. Use para orientar suas escolhas.</div>
     </div>
-    <div class="stat-card p-6 rounded-2xl" style="border: 2px solid #3B82F6; box-shadow: 0 0 8px rgba(59,130,246,0.85), 0 0 16px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.35), 0 12px 28px rgba(0,0,0,0.6);">
+    <div class="stat-card p-6 rounded-2xl tooltip-container" style="border: 2px solid #3B82F6; box-shadow: 0 0 8px rgba(59,130,246,0.85), 0 0 16px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.35), 0 12px 28px rgba(0,0,0,0.6);">
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">❄️ Números Frios</h3>
         <div class="flex space-x-2">
@@ -1523,6 +1568,7 @@
       <div class="text-sm text-gray-300" id="numeros-frios">
         Carregando...
       </div>
+      <div class="tooltip">❄️ <strong>Números Frios</strong><br><br>Números que aparecem com menos frequência nos sorteios recentes. Alguns jogadores acreditam que "devem" sair em breve.</div>
     </div>
     <div class="stat-card p-6 rounded-2xl" style="border: 2px solid #3B82F6; box-shadow: 0 0 8px rgba(59,130,246,0.85), 0 0 16px rgba(59,130,246,0.55), 0 0 24px rgba(59,130,246,0.35), 0 12px 28px rgba(0,0,0,0.6);">
       <h3 class="text-lg font-semibold mb-2"><img src="/static/img/trevo4folhas.webp" alt="Trevo" class="inline w-4 h-4 mr-1"> Trevos Mais Frequentes</h3>
