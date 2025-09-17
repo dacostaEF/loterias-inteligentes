@@ -1927,6 +1927,7 @@ def get_analise_de_distribuicao_quina():
 def get_analise_de_distribuicao_lotofacil():
     """Retorna os dados da análise de distribuição da Lotofácil."""
     try:
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
 
@@ -1965,6 +1966,7 @@ def get_analise_de_combinacoes_quina():
 def get_analise_de_combinacoes_lotofacil():
     """Retorna os dados da análise de combinações da Lotofácil."""
     try:
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
 
@@ -2002,6 +2004,7 @@ def get_analise_padroes_sequencias_quina():
 def get_analise_padroes_sequencias_lotofacil():
     """Retorna os dados da análise de padrões e sequências da Lotofácil."""
     try:
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
 
@@ -2017,6 +2020,7 @@ def get_analise_padroes_sequencias_lotofacil():
 @app.route('/api/analise_seca_lotofacil', methods=['GET'])
 def api_analise_seca_lotofacil():
     try:
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
 
@@ -2134,6 +2138,7 @@ def api_analise_seca_lotofacil():
 @app.route('/api/lotofacil/sequencias/detalhe', methods=['GET'])
 def get_lotofacil_sequencias_detalhe():
     try:
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
 
@@ -2316,6 +2321,7 @@ def gerar_aposta_premium_quina():
 def get_estatisticas_avancadas_lotofacil():
     """Retorna os dados das estatísticas avançadas da Lotofácil."""
     try:
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
 
@@ -3392,7 +3398,8 @@ def api_lotofacil_matriz():
     try:
         # print("🔍 API Lotofácil Matriz chamada!")
         
-        # Verificar se df_lotofacil existe
+        # Carregar dados da Lotofácil
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
@@ -3449,7 +3456,8 @@ def get_estatisticas_frequencia():
     try:
         # print("🔍 API Estatísticas Frequência chamada!")
         
-        # Verificar se df_lotofacil existe
+        # Carregar dados da Lotofácil
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
@@ -3503,7 +3511,8 @@ def analisar_cartoes():
     try:
         # print("🔍 API Analisar Padrões dos Últimos 25 Concursos chamada!")
         
-        # Verificar se df_lotofacil existe
+        # Carregar dados da Lotofácil
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
