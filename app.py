@@ -3076,6 +3076,12 @@ def analise_estatistica_avancada_milionaria():
     """Renderiza a página de Análise Estatística Avançada da Milionária."""
     return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=verificar_usuario_logado())
 
+@app.route('/analise_estatistica_avancada_lotomania')
+@verificar_acesso_universal
+def analise_estatistica_avancada_lotomania():
+    """Renderiza a página de Inteligência Estatística da Lotomania."""
+    return render_template('analise_estatistica_avancada_lotomania.html', is_logged_in=verificar_usuario_logado())
+
 # --- Rotas da Lotomania ---
 @app.route('/dashboard_lotomania')
 @verificar_acesso_universal
