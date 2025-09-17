@@ -123,6 +123,9 @@ class UserPermissions:
         '/dashboard_milionaria',  # +Milionária
         '/dashboard_quina',  # Quina
         '/dashboard_lotomania',  # Lotomania
+        '/dashboard_MS',  # Mega Sena (liberado para freemium)
+        '/dashboard_megasena',  # Mega Sena (alias)
+        '/dashboard_lotofacil',  # Lotofácil (liberado para freemium)
         '/upgrade_plans',
         '/checkout'
     }
@@ -135,9 +138,6 @@ class UserPermissions:
         '/aposta_inteligente_premium_lotofacil',
         '/lotofacil_laboratorio',
         '/boloes_loterias',
-        '/dashboard_MS',  # Mega Sena (PREMIUM - requer cadastro)
-        '/dashboard_megasena',
-        '/dashboard_lotofacil',
         '/analise_estatistica_avancada_milionaria',
         '/analise_estatistica_avancada_megasena',
         '/analise_estatistica_avancada_quina',
