@@ -142,7 +142,11 @@ class UserPermissions:
         '/analise_estatistica_avancada_megasena',
         '/analise_estatistica_avancada_quina',
         '/analise_estatistica_avancada_lotofacil',
-        '/analise_estatistica_avancada_lotomania'
+        '/analise_estatistica_avancada_lotomania',
+        '/painel_analises_estatisticas_quina',
+        '/painel_analises_estatisticas_megasena',
+        '/painel_analises_estatisticas_milionaria',
+        '/painel_analises_estatisticas_lotofacil'
     }
     
     @classmethod
@@ -4597,6 +4601,33 @@ def index():
     return render_template("index.html")
 
 # ============================================================================
+# 📊 PAINEL DE ANÁLISES ESTATÍSTICAS - QUINA
+# ============================================================================
+
+@app.route('/painel_analises_estatisticas_quina')
+@verificar_acesso_universal
+def painel_analises_estatisticas_quina():
+    """Renderiza o painel de análises estatísticas da Quina."""
+    return render_template('painel_analises_estatisticas_quina.html', is_logged_in=verificar_usuario_logado())
+
+@app.route('/painel_analises_estatisticas_megasena')
+@verificar_acesso_universal
+def painel_analises_estatisticas_megasena():
+    """Renderiza o painel de análises estatísticas da Mega Sena."""
+    return render_template('painel_analises_estatisticas_megasena.html', is_logged_in=verificar_usuario_logado())
+
+@app.route('/painel_analises_estatisticas_milionaria')
+@verificar_acesso_universal
+def painel_analises_estatisticas_milionaria():
+    """Renderiza o painel de análises estatísticas da +Milionária."""
+    return render_template('painel_analises_estatisticas_milionaria.html', is_logged_in=verificar_usuario_logado())
+
+@app.route('/painel_analises_estatisticas_lotofacil')
+@verificar_acesso_universal
+def painel_analises_estatisticas_lotofacil():
+    """Renderiza o painel de análises estatísticas da Lotofácil."""
+    return render_template('painel_analises_estatisticas_lotofacil.html', is_logged_in=verificar_usuario_logado())
+
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================
 

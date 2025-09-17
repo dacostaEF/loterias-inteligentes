@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Análises Estatísticas - Mega Sena | Loterias Inteligentes</title>
+    
+    <!-- Meta tags para colorir a status bar dos dispositivos móveis -->
+    <meta name="theme-color" content="#7C3AED">
+    <meta name="msapplication-navbutton-color" content="#7C3AED">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <!-- Favicons -->
+    <link rel="icon" href="/static/img/Favicon_LI.png" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/static/img/Favicon_LI.png" sizes="180x180">
+    
+    <!-- Fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            important: false,
+            corePlugins: {
+                preflight: false,
+            },
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#00E38C',
+                        'secondary': '#8B5CF6',
+                        'background': '#000000',
+                        'card': '#1A1D25',
+                        'surface': '#2E303A',
+                        'megasena': '#9ACD32'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #000000 0%, #1A1D25 50%, #2D1B69 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Animações */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-20px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Estilos para os menus responsivos - IDENTIDADE MEGA SENA */
+        .desktop-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+            z-index: 1000;
+            padding: 12px 20px;
+        }
+
+        .desktop-nav .logo {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .desktop-nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .desktop-nav-links a {
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 8px 12px;
+            border-radius: 6px;
+        }
+
+        .desktop-nav-links a:hover {
+            color: #A855F7;
+            background: rgba(168, 85, 247, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .desktop-nav-links a.active {
+            color: #00E38C !important;
+            background: rgba(0, 227, 140, 0.15) !important;
+            border: 1px solid rgba(0, 227, 140, 0.3) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+        }
+
+        /* Dropdown styles */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background: rgba(30, 27, 41, 0.95);
+            backdrop-filter: blur(10px);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            z-index: 1001;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 8px;
+            top: 100%;
+            left: 0;
+            margin-top: 5px;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content a {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        .dropdown-content a:hover {
+            background: rgba(168, 85, 247, 0.1);
+            color: #A855F7;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        /* Breadcrumbs - IDENTIDADE MEGA SENA */
+        .breadcrumbs-container {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(0, 227, 140, 0.05) 100%);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 8px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumbs {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .breadcrumb-list {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: 8px;
+        }
+        
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            color: #94a3b8;
+        }
+        
+        .breadcrumb-item:not(:last-child)::after {
+            content: "›";
+            margin: 0 8px;
+            color: #64748b;
+            font-weight: bold;
+        }
+        
+        .breadcrumb-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+        
+        .breadcrumb-item:not(.active) .breadcrumb-link:hover {
+            color: #A855F7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+        
+        .breadcrumb-item.active .breadcrumb-link {
+            color: #00E38C;
+            font-weight: 600;
+        }
+
+        /* Mobile optimizations - mantendo dimensões originais */
+        @media (max-width: 768px) {
+            .mobile-header {
+                padding: 16px;
+            }
+            .mobile-title {
+                font-size: 1.25rem;
+                line-height: 1.3;
+            }
+            .mobile-subtitle {
+                font-size: 0.9rem;
+            }
+            .mobile-card {
+                padding: 20px;
+                margin-bottom: 16px;
+            }
+            .mobile-text-sm {
+                font-size: 0.875rem;
+            }
+            .mobile-text-lg {
+                font-size: 1.125rem;
+            }
+            .mobile-text-xl {
+                font-size: 1.5rem;
+            }
+            .mobile-button {
+                padding: 14px 24px;
+                font-size: 1rem;
+                min-height: 48px;
+            }
+            .mobile-grid {
+                gap: 16px;
+            }
+            .mobile-chart {
+                height: 300px !important;
+                max-height: 300px !important;
+            }
+            .chart-container {
+                height: 300px !important;
+                max-height: 300px !important;
+                position: relative;
+            }
+            .mobile-stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            .mobile-stats-card {
+                min-height: 100px;
+                padding: 16px !important;
+                width: 100%;
+                max-width: none;
+                margin: 0;
+            }
+            .mobile-analysis-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+
+        /* Esconder menu desktop em mobile */
+        @media (max-width: 768px) {
+            .desktop-nav {
+                display: none;
+            }
+        }
+
+        /* Mostrar menu desktop em telas maiores */
+        @media (min-width: 769px) {
+            .desktop-nav {
+                display: flex;
+            }
+        }
+
+        /* Cards com identidade Mega Sena */
+        .megasena-card {
+            background: #1A1D25;
+            border: 2px solid #9ACD32;
+            box-shadow: 0 0 8px rgba(154,205,50,0.85), 0 0 16px rgba(154,205,50,0.55), 0 0 24px rgba(154,205,50,0.35), 0 12px 28px rgba(0,0,0,0.6);
+        }
+
+        .megasena-button {
+            background: linear-gradient(135deg, #9ACD32, #7CB342);
+            color: #000000;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .megasena-button:hover {
+            background: linear-gradient(135deg, #7CB342, #9ACD32);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(154,205,50,0.4);
+        }
+
+        /* Touch-friendly elements */
+        .touch-target {
+            min-height: 48px;
+            min-width: 48px;
+        }
+    </style>
+</head>
+<body class="text-white">
+    <!-- Menu Desktop - IDENTIDADE MEGA SENA -->
+    <nav class="desktop-nav">
+        <div class="desktop-nav-links">
+            <a href="/"><i class="fa fa-home"></i> Início</a>
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle"><i class="fa fa-diamond"></i> +Milionária ▼</a>
+                <div class="dropdown-content">
+                    <a href="/dashboard_milionaria"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/aposta_inteligente_premium"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
+                <div class="dropdown-content">
+                    <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/aposta_inteligente_premium_quina"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle"><i class="fa fa-circle"></i> Lotomania ▼</a>
+                <div class="dropdown-content">
+                    <a href="/dashboard_lotomania"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/analise_estatistica_avancada_lotomania"><i class="fa fa-chart-bar"></i> Inteligência Estatística</a>
+                </div>
+            </div>
+            <div class="dropdown">
+                <a href="#" class="dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
+                <div class="dropdown-content">
+                    <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                </div>
+            </div>
+            <a href="#" class="active"><i class="fa fa-circle"></i> Mega Sena</a>
+            <a href="/boloes_loterias"><i class="fa fa-users"></i> Bolões</a>
+        </div>
+    </nav>
+
+    <!-- Breadcrumbs - IDENTIDADE MEGA SENA -->
+    <div class="breadcrumbs-container" style="margin-top: 60px;">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="#" class="breadcrumb-link">🎰 Mega Sena</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <span class="breadcrumb-link">📊 Painel de Análises Estatísticas</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center">
+                <i class="fas fa-chart-line text-primary mr-3"></i>
+                Painel de Análises Estatísticas
+            </h1>
+            <p class="text-gray-400 text-lg">Mega Sena - Análise de Dados</p>
+        </div>
+
+        <!-- Stats Overview - Grid responsivo -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#9ACD32]/30 megasena-card w-full min-w-0">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Concursos Analisados</p>
+                        <p class="text-2xl font-bold text-green-400">2,847</p>
+                    </div>
+                    <i class="fas fa-database text-2xl text-green-400"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#9ACD32]/30 megasena-card w-full min-w-0">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Período</p>
+                        <p class="text-xl font-bold text-blue-400">1996-2024</p>
+                    </div>
+                    <i class="fas fa-calendar-alt text-2xl text-blue-400"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#9ACD32]/30 megasena-card w-full min-w-0">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Números Únicos</p>
+                        <p class="text-2xl font-bold text-purple-400">60</p>
+                    </div>
+                    <i class="fas fa-hashtag text-2xl text-purple-400"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#9ACD32]/30 megasena-card w-full min-w-0">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm mb-1">Última Atualização</p>
+                        <p class="text-xl font-bold text-yellow-400">Hoje</p>
+                    </div>
+                    <i class="fas fa-sync-alt text-2xl text-yellow-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Analysis Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 mobile-analysis-grid gap-6">
+            <!-- Análise de Frequência -->
+            <div class="megasena-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-list text-green-400 mr-2"></i>
+                        Análise de Frequência
+                    </h3>
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
+                </div>
+                
+                
+                <div class="space-y-6">
+                    <!-- Números Quentes -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-3 flex items-center">
+                            <i class="fas fa-fire text-orange-500 mr-2"></i>
+                            Números Quentes (Mais Frequentes)
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">10</span>
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">23</span>
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">44</span>
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">05</span>
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">33</span>
+                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">42</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Números Frios -->
+                    <div>
+                        <h4 class="text-lg font-medium mb-3 flex items-center">
+                            <i class="fas fa-snowflake text-blue-400 mr-2"></i>
+                            Números Frios (Menos Frequentes)
+                        </h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">16</span>
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">29</span>
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">37</span>
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">51</span>
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">58</span>
+                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análise de Distribuição -->
+            <div class="megasena-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-chart-pie text-purple-400 mr-2"></i>
+                        Análise de Distribuição
+                    </h3>
+                    <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
+                </div>
+                
+                
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium mb-4 flex items-center">
+                        <i class="fas fa-chart-bar text-green-400 mr-2"></i>
+                        Distribuição por Faixas
+                    </h4>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium">1-10:</span>
+                            <div class="flex-1 mx-4">
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 18%"></div>
+                                </div>
+                            </div>
+                            <span class="text-sm font-bold text-purple-400">18%</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium">11-20:</span>
+                            <div class="flex-1 mx-4">
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 22%"></div>
+                                </div>
+                            </div>
+                            <span class="text-sm font-bold text-purple-400">22%</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium">21-30:</span>
+                            <div class="flex-1 mx-4">
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 20%"></div>
+                                </div>
+                            </div>
+                            <span class="text-sm font-bold text-purple-400">20%</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium">31-40:</span>
+                            <div class="flex-1 mx-4">
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 19%"></div>
+                                </div>
+                            </div>
+                            <span class="text-sm font-bold text-purple-400">19%</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium">41-50:</span>
+                            <div class="flex-1 mx-4">
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 12%"></div>
+                                </div>
+                            </div>
+                            <span class="text-sm font-bold text-purple-400">12%</span>
+                        </div>
+                        
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium">51-60:</span>
+                            <div class="flex-1 mx-4">
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-500 h-2 rounded-full" style="width: 9%"></div>
+                                </div>
+                            </div>
+                            <span class="text-sm font-bold text-purple-400">9%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análise de Sequências -->
+            <div class="megasena-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-sort-amount-down text-orange-400 mr-2"></i>
+                        Análise de Sequências
+                    </h3>
+                    <span class="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium mb-4 flex items-center">
+                        <i class="fas fa-sort-numeric-down text-blue-400 mr-2"></i>
+                        Sequências Mais Comuns
+                    </h4>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-sm">01-02-03</span>
+                            <span class="text-blue-400 font-bold">47 ocorrências</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-sm">10-11-12</span>
+                            <span class="text-blue-400 font-bold">39 ocorrências</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-sm">20-21-22</span>
+                            <span class="text-blue-400 font-bold">35 ocorrências</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-sm">30-31-32</span>
+                            <span class="text-blue-400 font-bold">28 ocorrências</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análise de Seca -->
+            <div class="megasena-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-shovel text-yellow-400 mr-2"></i>
+                        Análise de Seca
+                    </h3>
+                    <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium mb-4 flex items-center">
+                        <i class="fas fa-seedling text-green-400 mr-2"></i>
+                        Números Mais Secos
+                    </h4>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-lg font-bold">16</span>
+                            <span class="text-yellow-400 font-bold">47 concursos sem sair</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-lg font-bold">29</span>
+                            <span class="text-yellow-400 font-bold">42 concursos sem sair</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-lg font-bold">37</span>
+                            <span class="text-yellow-400 font-bold">38 concursos sem sair</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="font-mono text-lg font-bold">51</span>
+                            <span class="text-yellow-400 font-bold">35 concursos sem sair</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análise de Combinações -->
+            <div class="megasena-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-layer-group text-red-400 mr-2"></i>
+                        Análise de Combinações
+                    </h3>
+                    <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium mb-4 flex items-center">
+                        <i class="fas fa-bullseye text-orange-400 mr-2"></i>
+                        Padrões de Combinação
+                    </h4>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Pares consecutivos:</span>
+                            <span class="text-red-400 font-bold">23.4%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Números pares:</span>
+                            <span class="text-red-400 font-bold">52.1%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Números ímpares:</span>
+                            <span class="text-red-400 font-bold">47.9%</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Soma total média:</span>
+                            <span class="text-red-400 font-bold">183.7</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas Avançadas -->
+            <div class="megasena-card rounded-xl p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold flex items-center">
+                        <i class="fas fa-calculator text-blue-400 mr-2"></i>
+                        Estatísticas Avançadas
+                    </h3>
+                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium mb-4 flex items-center">
+                        <i class="fas fa-list-check text-red-400 mr-2"></i>
+                        Métricas Importantes
+                    </h4>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Média de números por concurso:</span>
+                            <span class="text-blue-400 font-bold">6.0</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Desvio padrão:</span>
+                            <span class="text-blue-400 font-bold">0.0</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Probabilidade de acerto:</span>
+                            <span class="text-blue-400 font-bold">1:50.063.860</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Tendência atual:</span>
+                            <span class="text-green-400 font-bold">Estável</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Visualizações Gráficas -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-center mb-8 flex items-center justify-center">
+                <i class="fas fa-chart-bar text-primary mr-3"></i>
+                Visualizações Gráficas
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Gráfico de Frequência -->
+                <div class="megasena-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-chart-line text-purple-400 mr-2"></i>
+                        Frequência dos Números (Últimos 100 Concursos)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="frequencyChart" class="mobile-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de Distribuição -->
+                <div class="megasena-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-chart-pie text-red-400 mr-2"></i>
+                        Distribuição por Faixas
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="distributionChart" class="mobile-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="text-center mt-8">
+            <button class="megasena-button px-8 py-3 rounded-lg mr-4 touch-target">
+                <i class="fas fa-download mr-2"></i>
+                Exportar Relatório
+            </button>
+            <button class="megasena-button px-8 py-3 rounded-lg touch-target">
+                <i class="fas fa-refresh mr-2"></i>
+                Atualizar Dados
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Simulação de dados dinâmicos
+        console.log('Painel de Análises Estatísticas - Mega Sena carregado');
+        
+        // Adicionar animações de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.megasena-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+            
+            // Inicializar gráficos
+            initCharts();
+        });
+        
+        function initCharts() {
+            // Gráfico de Frequência
+            const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
+            new Chart(frequencyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'],
+                    datasets: [{
+                        label: 'Frequência',
+                        data: [12, 8, 15, 9, 8, 11, 13, 7, 14, 12, 10, 6, 11, 13, 15, 9, 10, 8, 16, 11, 9, 7, 17, 12, 10, 6, 9, 13, 8, 10, 12, 14, 15, 9, 8, 11, 6, 13, 9, 12, 14, 11, 8, 18, 10, 7, 12, 10, 8, 11, 5, 15, 9, 13, 14, 10, 7, 6, 10, 9],
+                        backgroundColor: 'rgba(139, 92, 246, 0.8)',
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20,
+                            stepSize: 4,
+                            min: 0,
+                            maxTicksLimit: 6,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            maxTicksLimit: 13,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de Distribuição
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1-10', '11-20', '21-30', '31-40', '41-50', '51-60'],
+                    datasets: [{
+                        label: 'Distribuição (%)',
+                        data: [17, 20, 19, 18, 12, 9],
+                        backgroundColor: [
+                            'rgba(239, 68, 68, 0.8)',   // Red
+                            'rgba(249, 115, 22, 0.8)',  // Orange
+                            'rgba(34, 197, 94, 0.8)',   // Green
+                            'rgba(59, 130, 246, 0.8)',  // Blue
+                            'rgba(139, 92, 246, 0.8)',  // Purple
+                            'rgba(236, 72, 153, 0.8)'   // Pink
+                        ],
+                        borderColor: [
+                            'rgba(239, 68, 68, 1)',
+                            'rgba(249, 115, 22, 1)',
+                            'rgba(34, 197, 94, 1)',
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(139, 92, 246, 1)',
+                            'rgba(236, 72, 153, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 25,
+                            stepSize: 5,
+                            min: 0,
+                            maxTicksLimit: 6,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            maxTicksLimit: 13,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

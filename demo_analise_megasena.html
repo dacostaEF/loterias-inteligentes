@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análise Estatística Avançada - Mega Sena</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #0F0F0F 0%, #1A1D25 50%, #2D1B69 100%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white">
+    <!-- Header -->
+    <header class="bg-black/50 backdrop-blur-sm border-b border-purple-500/20 py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-chart-line text-2xl text-purple-400"></i>
+                    <h1 class="text-2xl font-bold">Análise Estatística Avançada</h1>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-diamond text-yellow-400"></i>
+                    <span class="text-lg font-semibold">Mega Sena</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        
+        <!-- Breadcrumbs -->
+        <nav class="flex items-center space-x-2 text-sm mb-8">
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-home mr-1"></i>Início
+            </a>
+            <i class="fas fa-chevron-right text-gray-400"></i>
+            <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                <i class="fas fa-diamond mr-1"></i>Mega Sena
+            </a>
+            <i class="fas fa-chevron-right text-gray-400"></i>
+            <span class="text-purple-400 font-medium">
+                <i class="fas fa-chart-line mr-1"></i>Análise Estatística
+            </span>
+        </nav>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Concursos Analisados</p>
+                        <p class="text-2xl font-bold text-green-400">2,847</p>
+                    </div>
+                    <i class="fas fa-database text-3xl text-green-400"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Período</p>
+                        <p class="text-2xl font-bold text-blue-400">1996-2024</p>
+                    </div>
+                    <i class="fas fa-calendar-alt text-3xl text-blue-400"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Números Únicos</p>
+                        <p class="text-2xl font-bold text-purple-400">60</p>
+                    </div>
+                    <i class="fas fa-hashtag text-3xl text-purple-400"></i>
+                </div>
+            </div>
+            
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-400 text-sm">Última Atualização</p>
+                        <p class="text-2xl font-bold text-yellow-400">Hoje</p>
+                    </div>
+                    <i class="fas fa-sync-alt text-3xl text-yellow-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Sections -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- 1. Análise de Frequência -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-chart-bar text-green-400 mr-3"></i>
+                        Análise de Frequência
+                    </h3>
+                    <span class="bg-green-400/20 text-green-400 px-3 py-1 rounded-full text-sm">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-lg font-semibold text-green-400 mb-3">🔥 Números Quentes (Mais Frequentes)</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-green-400 text-black px-3 py-1 rounded-full text-sm font-bold">10</span>
+                            <span class="bg-green-400 text-black px-3 py-1 rounded-full text-sm font-bold">23</span>
+                            <span class="bg-green-400 text-black px-3 py-1 rounded-full text-sm font-bold">44</span>
+                            <span class="bg-green-400 text-black px-3 py-1 rounded-full text-sm font-bold">05</span>
+                            <span class="bg-green-400 text-black px-3 py-1 rounded-full text-sm font-bold">33</span>
+                            <span class="bg-green-400 text-black px-3 py-1 rounded-full text-sm font-bold">42</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 class="text-lg font-semibold text-blue-400 mb-3">❄️ Números Frios (Menos Frequentes)</h4>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-blue-400 text-white px-3 py-1 rounded-full text-sm font-bold">16</span>
+                            <span class="bg-blue-400 text-white px-3 py-1 rounded-full text-sm font-bold">29</span>
+                            <span class="bg-blue-400 text-white px-3 py-1 rounded-full text-sm font-bold">37</span>
+                            <span class="bg-blue-400 text-white px-3 py-1 rounded-full text-sm font-bold">51</span>
+                            <span class="bg-blue-400 text-white px-3 py-1 rounded-full text-sm font-bold">58</span>
+                            <span class="bg-blue-400 text-white px-3 py-1 rounded-full text-sm font-bold">12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Análise de Distribuição -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-chart-pie text-purple-400 mr-3"></i>
+                        Análise de Distribuição
+                    </h3>
+                    <span class="bg-purple-400/20 text-purple-400 px-3 py-1 rounded-full text-sm">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-lg font-semibold text-purple-400 mb-3">📊 Distribuição por Faixas</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">1-10:</span>
+                                <div class="flex-1 mx-3 bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-400 h-2 rounded-full" style="width: 18%"></div>
+                                </div>
+                                <span class="text-sm font-bold">18%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">11-20:</span>
+                                <div class="flex-1 mx-3 bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-400 h-2 rounded-full" style="width: 22%"></div>
+                                </div>
+                                <span class="text-sm font-bold">22%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">21-30:</span>
+                                <div class="flex-1 mx-3 bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-400 h-2 rounded-full" style="width: 20%"></div>
+                                </div>
+                                <span class="text-sm font-bold">20%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">31-40:</span>
+                                <div class="flex-1 mx-3 bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-400 h-2 rounded-full" style="width: 19%"></div>
+                                </div>
+                                <span class="text-sm font-bold">19%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">41-50:</span>
+                                <div class="flex-1 mx-3 bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-400 h-2 rounded-full" style="width: 12%"></div>
+                                </div>
+                                <span class="text-sm font-bold">12%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">51-60:</span>
+                                <div class="flex-1 mx-3 bg-gray-700 rounded-full h-2">
+                                    <div class="bg-purple-400 h-2 rounded-full" style="width: 9%"></div>
+                                </div>
+                                <span class="text-sm font-bold">9%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Análise de Sequências -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-sort-numeric-down text-orange-400 mr-3"></i>
+                        Análise de Sequências
+                    </h3>
+                    <span class="bg-orange-400/20 text-orange-400 px-3 py-1 rounded-full text-sm">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-lg font-semibold text-orange-400 mb-3">🔢 Sequências Mais Comuns</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-mono">01-02-03</span>
+                                <span class="text-orange-400 font-bold">47 ocorrências</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-mono">10-11-12</span>
+                                <span class="text-orange-400 font-bold">39 ocorrências</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-mono">20-21-22</span>
+                                <span class="text-orange-400 font-bold">35 ocorrências</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-mono">30-31-32</span>
+                                <span class="text-orange-400 font-bold">28 ocorrências</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Análise de Combinações -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-layer-group text-red-400 mr-3"></i>
+                        Análise de Combinações
+                    </h3>
+                    <span class="bg-red-400/20 text-red-400 px-3 py-1 rounded-full text-sm">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-lg font-semibold text-red-400 mb-3">🎯 Padrões de Combinação</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Pares consecutivos:</span>
+                                <span class="text-red-400 font-bold">23.4%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Números pares:</span>
+                                <span class="text-red-400 font-bold">52.1%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Números ímpares:</span>
+                                <span class="text-red-400 font-bold">47.9%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Soma total média:</span>
+                                <span class="text-red-400 font-bold">183.7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Análise de Seca -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-tint-slash text-yellow-400 mr-3"></i>
+                        Análise de Seca
+                    </h3>
+                    <span class="bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded-full text-sm">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-lg font-semibold text-yellow-400 mb-3">🌵 Números Mais Secos</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-bold text-lg">16</span>
+                                <span class="text-yellow-400 font-bold">47 concursos sem sair</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-bold text-lg">29</span>
+                                <span class="text-yellow-400 font-bold">42 concursos sem sair</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-bold text-lg">37</span>
+                                <span class="text-yellow-400 font-bold">38 concursos sem sair</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-white/5 p-3 rounded">
+                                <span class="font-bold text-lg">51</span>
+                                <span class="text-yellow-400 font-bold">35 concursos sem sair</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Estatísticas Avançadas -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 card-hover">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i class="fas fa-calculator text-cyan-400 mr-3"></i>
+                        Estatísticas Avançadas
+                    </h3>
+                    <span class="bg-cyan-400/20 text-cyan-400 px-3 py-1 rounded-full text-sm">Ativo</span>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <h4 class="text-lg font-semibold text-cyan-400 mb-3">📈 Métricas Importantes</h4>
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Média de números por concurso:</span>
+                                <span class="text-cyan-400 font-bold">6.0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Desvio padrão:</span>
+                                <span class="text-cyan-400 font-bold">0.0</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Número mais atrasado:</span>
+                                <span class="text-cyan-400 font-bold">16 (47x)</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Número mais frequente:</span>
+                                <span class="text-cyan-400 font-bold">10 (89x)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="mt-12">
+            <h2 class="text-3xl font-bold text-center mb-8">
+                <i class="fas fa-chart-line text-purple-400 mr-3"></i>
+                Visualizações Gráficas
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Frequency Chart -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                    <h3 class="text-xl font-bold mb-6 text-center">Frequência dos Números (Últimos 100 Concursos)</h3>
+                    <canvas id="frequencyChart" width="400" height="200"></canvas>
+                </div>
+                
+                <!-- Distribution Chart -->
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                    <h3 class="text-xl font-bold mb-6 text-center">Distribuição por Faixas</h3>
+                    <canvas id="distributionChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-12 text-center">
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                    <i class="fas fa-download mr-2"></i>Exportar Relatório
+                </button>
+                <button class="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                    <i class="fas fa-play mr-2"></i>Gerar Palpite Inteligente
+                </button>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                    <i class="fas fa-share mr-2"></i>Compartilhar Análise
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Frequency Chart
+        const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
+        new Chart(frequencyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['01', '05', '10', '15', '20', '25', '30', '35', '40', '45', '50', '55', '60'],
+                datasets: [{
+                    label: 'Frequência',
+                    data: [12, 8, 15, 11, 9, 13, 7, 10, 14, 6, 16, 4, 18],
+                    backgroundColor: 'rgba(147, 51, 234, 0.8)',
+                    borderColor: 'rgba(147, 51, 234, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: 'white'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Distribution Chart
+        const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+        new Chart(distributionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['1-10', '11-20', '21-30', '31-40', '41-50', '51-60'],
+                datasets: [{
+                    data: [18, 22, 20, 19, 12, 9],
+                    backgroundColor: [
+                        'rgba(239, 68, 68, 0.8)',
+                        'rgba(245, 158, 11, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(147, 51, 234, 0.8)',
+                        'rgba(236, 72, 153, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(239, 68, 68, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(34, 197, 94, 1)',
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(147, 51, 234, 1)',
+                        'rgba(236, 72, 153, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
