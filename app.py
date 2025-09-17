@@ -1794,6 +1794,9 @@ def analise_frequencia_lotomania_api():
 def analise_frequencia_lotofacil_api():
     """API para análise de frequência da Lotofácil"""
     try:
+        # Importar função necessária
+        from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import obter_estatisticas_rapidas_lotofacil
+        
         # Executar análise de frequência da Lotofácil
         resultado = obter_estatisticas_rapidas_lotofacil()
         
