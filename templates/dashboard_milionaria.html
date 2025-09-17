@@ -1531,14 +1531,14 @@
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">🔥 Números Quentes</h3>
         <div class="flex space-x-2">
-          <button onclick="destacarNumeros('quentes')" class="text-white hover:text-green-300 transition-colors" title="Destacar no grid">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <button onclick="destacarNumeros('quentes')" class="w-8 h-8 bg-green-400 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors shadow-lg hover:shadow-xl" title="→ Destacar estes números no grid de seleção">
+            <svg class="w-5 h-5" fill="none" stroke="black" viewBox="0 0 24 24" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
             </svg>
           </button>
-          <button onclick="limparDestaques()" class="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors" title="Limpar destaques">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          <button onclick="limparDestaques()" class="w-8 h-8 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors shadow-lg hover:shadow-xl" title="✕ Remover destaques do grid">
+            <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
@@ -1552,14 +1552,14 @@
       <div class="flex justify-between items-center mb-2">
         <h3 class="text-lg font-semibold">❄️ Números Frios</h3>
         <div class="flex space-x-2">
-          <button onclick="destacarNumeros('frios')" class="text-white hover:text-blue-300 transition-colors" title="Destacar no grid">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          <button onclick="destacarNumeros('frios')" class="w-8 h-8 bg-green-400 hover:bg-green-500 rounded-full flex items-center justify-center transition-colors shadow-lg hover:shadow-xl" title="→ Destacar estes números no grid de seleção">
+            <svg class="w-5 h-5" fill="none" stroke="black" viewBox="0 0 24 24" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
             </svg>
           </button>
-          <button onclick="limparDestaques()" class="w-5 h-5 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors" title="Limpar destaques">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          <button onclick="limparDestaques()" class="w-8 h-8 bg-red-500 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors shadow-lg hover:shadow-xl" title="✕ Remover destaques do grid">
+            <svg class="w-5 h-5" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </button>
         </div>
@@ -6529,15 +6529,15 @@
   </script>
 
   <style>
-    /* Remover fundo dos botões de seta */
-    button[onclick*="destacarNumeros"] {
+    /* Estilos para botões de seta - apenas para os que não têm classes específicas */
+    button[onclick*="destacarNumeros"]:not(.w-8) {
       background: none !important;
       border: none !important;
       padding: 4px !important;
       border-radius: 50% !important;
     }
     
-    button[onclick*="destacarNumeros"]:hover {
+    button[onclick*="destacarNumeros"]:not(.w-8):hover {
       background-color: rgba(255, 255, 255, 0.1) !important;
     }
   
