@@ -49,7 +49,7 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #000000 0%, #1A1D25 50%, #0F172A 100%);
+            background: #000000;
             min-height: 100vh;
             margin: 0;
             padding: 0;
@@ -170,8 +170,8 @@
             top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
-            backdrop-filter: blur(10px);
+            background: transparent;
+            backdrop-filter: none;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
             padding: 1rem 2rem;
@@ -462,6 +462,97 @@
             font-weight: 600;
         }
 
+        /* Auto-ajuste centralizado da imagem da Quina */
+        .quina-logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+        
+        .quina-logo {
+            max-width: 240px;
+            min-width: 96px;
+            height: auto;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        /* Responsividade total para mobile e tablet */
+        @media (max-width: 640px) {
+            .quina-logo {
+                max-width: 144px;
+                min-width: 72px;
+                height: 58px;
+            }
+        }
+        
+        @media (min-width: 641px) and (max-width: 768px) {
+            .quina-logo {
+                max-width: 180px;
+                min-width: 84px;
+                height: 77px;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .quina-logo {
+                max-width: 216px;
+                min-width: 96px;
+                height: 96px;
+            }
+        }
+        
+        @media (min-width: 1025px) {
+            .quina-logo {
+                max-width: 240px;
+                min-width: 120px;
+                height: 115px;
+            }
+        }
+
+        /* Logo do site Loterias Inteligentes - 30% menor que a Quina */
+        .site-logo {
+            max-width: 168px; /* 240px - 30% */
+            min-width: 67px;  /* 96px - 30% */
+            height: auto;
+            width: auto;
+            object-fit: contain;
+        }
+        
+        @media (max-width: 640px) {
+            .site-logo {
+                max-width: 101px; /* 144px - 30% */
+                min-width: 50px;  /* 72px - 30% */
+                height: 41px;     /* 58px - 30% */
+            }
+        }
+        
+        @media (min-width: 641px) and (max-width: 768px) {
+            .site-logo {
+                max-width: 126px; /* 180px - 30% */
+                min-width: 59px;  /* 84px - 30% */
+                height: 54px;     /* 77px - 30% */
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .site-logo {
+                max-width: 151px; /* 216px - 30% */
+                min-width: 67px;  /* 96px - 30% */
+                height: 67px;     /* 96px - 30% */
+            }
+        }
+        
+        @media (min-width: 1025px) {
+            .site-logo {
+                max-width: 168px; /* 240px - 30% */
+                min-width: 84px;  /* 120px - 30% */
+                height: 81px;     /* 115px - 30% */
+            }
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
             .desktop-nav {
@@ -623,15 +714,12 @@
     <!-- Hero/header da página (alinhado à esquerda, como no dashboard) -->
     <header class="max-w-7xl mx-auto px-4 py-6">
         <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <img src="/static/img/Quina.png" alt="Quina" class="h-8 w-auto">
-                <h1 class="text-3xl md:text-4xl font-bold flex items-center gap-2">
-                    <span class="text-[#0EA5E9]">📈</span> Painel de Análises Estatísticas
-                </h1>
+            <div class="flex-1 flex justify-center quina-logo-container">
+                <img src="/static/img/Quina.png" alt="Quina" class="quina-logo">
             </div>
-            <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="h-8 w-auto hidden md:block">
+            <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="site-logo hidden md:block">
         </div>
-        <p class="text-neutral-400 mt-1">Quina — Análise de Dados</p>
+        <p class="font-semibold text-lg mb-0 text-center" style="color: #008B8B;">📈 Painel de Análises Estatísticas</p>
     </header>
 
     <div class="max-w-7xl mx-auto px-4 py-8">
