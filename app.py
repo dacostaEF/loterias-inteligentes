@@ -4610,6 +4610,88 @@ def painel_analises_estatisticas_quina():
     """Renderiza o painel de análises estatísticas da Quina."""
     return render_template('painel_analises_estatisticas_quina.html', is_logged_in=verificar_usuario_logado())
 
+@app.route('/api/quina/dados-reais')
+@verificar_acesso_universal
+def api_quina_dados_reais():
+    """
+    API que retorna dados reais da Quina para o painel de análises estatísticas.
+    Conecta com as funções reais que leem o Excel da Quina.
+    """
+    try:
+        # Importar as funções reais da Quina
+        from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
+        from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_quina
+        from funcoes.quina.funcao_analise_de_distribuicao_quina import analise_de_distribuicao_quina
+        from funcoes.quina.analise_estatistica_avancada_quina import realizar_analise_estatistica_avancada_quina
+        
+        # Carregar dados reais da Quina
+        df_quina = carregar_dados_quina()
+        
+        if df_quina is None or df_quina.empty:
+            return jsonify({'erro': 'Não foi possível carregar os dados da Quina'}), 500
+        
+        # Converter DataFrame para formato esperado pelas funções
+        dados_sorteios = []
+        for _, row in df_quina.iterrows():
+            concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+            bolas = [int(row[f'Bola{i}']) for i in range(1, 6) if pd.notna(row[f'Bola{i}'])]
+            if len(bolas) == 5:
+                dados_sorteios.append([concurso] + bolas)
+        
+        # Análise de frequência (últimos 100 concursos)
+        analise_freq = analise_frequencia_quina(dados_sorteios, qtd_concursos=100)
+        
+        # Análise de distribuição (últimos 100 concursos)
+        analise_dist = analise_de_distribuicao_quina(dados_sorteios, qtd_concursos=100)
+        
+        # Análise estatística avançada (últimos 50 concursos)
+        analise_avancada = realizar_analise_estatistica_avancada_quina(df_quina, qtd_concursos=50)
+        
+        # Preparar dados para os gráficos
+        dados_graficos = {
+            'frequencia_numeros': [],
+            'distribuicao_faixas': [],
+            'estatisticas_gerais': {
+                'total_concursos': len(dados_sorteios),
+                'periodo_analise': 'Últimos 100 concursos',
+                'ultima_atualizacao': datetime.now().strftime('%d/%m/%Y %H:%M')
+            }
+        }
+        
+        # Processar dados de frequência para o gráfico
+        if 'frequencia_absoluta' in analise_freq:
+            freq_abs = analise_freq['frequencia_absoluta']
+            for num in range(1, 81):
+                dados_graficos['frequencia_numeros'].append(freq_abs.get(num, 0))
+        
+        # Processar dados de distribuição para o gráfico
+        if 'distribuicao_faixas' in analise_dist:
+            dist_faixas = analise_dist['distribuicao_faixas']
+            dados_graficos['distribuicao_faixas'] = [
+                dist_faixas.get('1-16', 0),
+                dist_faixas.get('17-32', 0),
+                dist_faixas.get('33-48', 0),
+                dist_faixas.get('49-64', 0),
+                dist_faixas.get('65-80', 0)
+            ]
+        
+        # Adicionar números quentes e frios
+        if 'numeros_quentes' in analise_freq:
+            dados_graficos['numeros_quentes'] = analise_freq['numeros_quentes'][:10]
+        
+        if 'numeros_frios' in analise_freq:
+            dados_graficos['numeros_frios'] = analise_freq['numeros_frios'][:10]
+        
+        # Adicionar análise avançada
+        if analise_avancada and 'distribuicao_numeros' in analise_avancada:
+            dados_graficos['analise_avancada'] = analise_avancada
+        
+        return jsonify(dados_graficos)
+        
+    except Exception as e:
+        logger.error(f"Erro ao carregar dados reais da Quina: {e}")
+        return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
+
 @app.route('/painel_analises_estatisticas_megasena')
 @verificar_acesso_universal
 def painel_analises_estatisticas_megasena():
@@ -4621,6 +4703,110 @@ def painel_analises_estatisticas_megasena():
 def painel_analises_estatisticas_milionaria():
     """Renderiza o painel de análises estatísticas da +Milionária."""
     return render_template('painel_analises_estatisticas_milionaria.html', is_logged_in=verificar_usuario_logado())
+
+@app.route('/api/milionaria/dados-reais')
+@verificar_acesso_universal
+def api_milionaria_dados_reais():
+    """
+    API que retorna dados reais da Milionária para o painel de análises estatísticas.
+    Conecta com as funções reais que leem o Excel da Milionária.
+    """
+    try:
+        # Importar as funções reais da Milionária
+        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+        from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia
+        from funcoes.milionaria.funcao_analise_de_distribuicao import analise_de_distribuicao
+        from funcoes.milionaria.analise_estatistica_avancada import realizar_analise_estatistica_avancada_milionaria
+        
+        # Carregar dados reais da Milionária
+        df_milionaria = carregar_dados_milionaria()
+        
+        if df_milionaria is None or df_milionaria.empty:
+            return jsonify({'erro': 'Não foi possível carregar os dados da Milionária'}), 500
+        
+        # Converter DataFrame para formato esperado pelas funções
+        dados_sorteios = []
+        for _, row in df_milionaria.iterrows():
+            concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+            bolas = [int(row[f'Bola{i}']) for i in range(1, 7) if pd.notna(row[f'Bola{i}'])]
+            trevos = [int(row[f'Trevo{i}']) for i in range(1, 3) if pd.notna(row[f'Trevo{i}'])]
+            if len(bolas) == 6 and len(trevos) == 2:
+                dados_sorteios.append([concurso] + bolas + trevos)
+        
+        # Análise de frequência (últimos 100 concursos)
+        analise_freq = analise_frequencia(dados_sorteios, qtd_concursos=100)
+        
+        # Análise de distribuição (últimos 100 concursos)
+        analise_dist = analise_de_distribuicao(dados_sorteios, qtd_concursos=100)
+        
+        # Análise estatística avançada (últimos 50 concursos)
+        analise_avancada = realizar_analise_estatistica_avancada_milionaria(df_milionaria, qtd_concursos=50)
+        
+        # Preparar dados para os gráficos
+        dados_graficos = {
+            'frequencia_numeros': [],
+            'frequencia_trevos': [],
+            'distribuicao_faixas': [],
+            'distribuicao_trevos': [],
+            'estatisticas_gerais': {
+                'total_concursos': len(dados_sorteios),
+                'periodo_analise': 'Últimos 100 concursos',
+                'ultima_atualizacao': datetime.now().strftime('%d/%m/%Y %H:%M')
+            }
+        }
+        
+        # Processar dados de frequência dos números (1-50)
+        if 'frequencia_absoluta' in analise_freq and 'bolas' in analise_freq['frequencia_absoluta']:
+            freq_bolas = analise_freq['frequencia_absoluta']['bolas']
+            for num in range(1, 51):
+                dados_graficos['frequencia_numeros'].append(freq_bolas.get(num, 0))
+        
+        # Processar dados de frequência dos trevos (1-6)
+        if 'frequencia_absoluta' in analise_freq and 'trevos' in analise_freq['frequencia_absoluta']:
+            freq_trevos = analise_freq['frequencia_absoluta']['trevos']
+            for trevo in range(1, 7):
+                dados_graficos['frequencia_trevos'].append(freq_trevos.get(trevo, 0))
+        
+        # Processar dados de distribuição por faixas dos números
+        if 'distribuicao_faixas' in analise_dist:
+            dist_faixas = analise_dist['distribuicao_faixas']
+            dados_graficos['distribuicao_faixas'] = [
+                dist_faixas.get('1-10', 0),
+                dist_faixas.get('11-20', 0),
+                dist_faixas.get('21-30', 0),
+                dist_faixas.get('31-40', 0),
+                dist_faixas.get('41-50', 0)
+            ]
+        
+        # Processar dados de distribuição dos trevos
+        if 'distribuicao_trevos' in analise_dist:
+            dist_trevos = analise_dist['distribuicao_trevos']
+            dados_graficos['distribuicao_trevos'] = [
+                dist_trevos.get('1', 0),
+                dist_trevos.get('2', 0),
+                dist_trevos.get('3', 0),
+                dist_trevos.get('4', 0),
+                dist_trevos.get('5', 0),
+                dist_trevos.get('6', 0)
+            ]
+        
+        # Adicionar números quentes e frios
+        if 'numeros_quentes_frios' in analise_freq:
+            numeros_quentes_frios = analise_freq['numeros_quentes_frios']
+            dados_graficos['numeros_quentes'] = numeros_quentes_frios.get('numeros_quentes', [])[:10]
+            dados_graficos['numeros_frios'] = numeros_quentes_frios.get('numeros_frios', [])[:10]
+            dados_graficos['trevos_quentes'] = numeros_quentes_frios.get('trevos_quentes', [])[:3]
+            dados_graficos['trevos_frios'] = numeros_quentes_frios.get('trevos_frios', [])[:3]
+        
+        # Adicionar análise avançada
+        if analise_avancada:
+            dados_graficos['analise_avancada'] = analise_avancada
+        
+        return jsonify(dados_graficos)
+        
+    except Exception as e:
+        logger.error(f"Erro ao carregar dados reais da Milionária: {e}")
+        return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
 
 @app.route('/painel_analises_estatisticas_lotofacil')
 @verificar_acesso_universal

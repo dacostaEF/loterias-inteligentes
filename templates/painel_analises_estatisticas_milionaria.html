@@ -1245,7 +1245,7 @@
             </h2>
             
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Gráfico de Frequência -->
+                <!-- Gráfico de Frequência dos Números -->
                 <div class="milionaria-card rounded-xl p-6">
                     <h3 class="text-xl font-semibold mb-6 flex items-center">
                         <i class="fas fa-chart-line text-yellow-400 mr-2"></i>
@@ -1256,7 +1256,20 @@
                     </div>
                 </div>
                 
-                <!-- Gráfico de Distribuição -->
+                <!-- Gráfico de Frequência dos Trevos -->
+                <div class="milionaria-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-clover text-green-400 mr-2"></i>
+                        Frequência dos Trevos (Últimos 100 Concursos)
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="trevosChart" class="mobile-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                <!-- Gráfico de Distribuição por Faixas -->
                 <div class="milionaria-card rounded-xl p-6">
                     <h3 class="text-xl font-semibold mb-6 flex items-center">
                         <i class="fas fa-chart-pie text-amber-400 mr-2"></i>
@@ -1264,6 +1277,17 @@
                     </h3>
                     <div class="chart-container">
                         <canvas id="distributionChart" class="mobile-chart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico de Distribuição dos Trevos -->
+                <div class="milionaria-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-chart-donut text-purple-400 mr-2"></i>
+                        Distribuição dos Trevos
+                    </h3>
+                    <div class="chart-container">
+                        <canvas id="trevosDistributionChart" class="mobile-chart"></canvas>
                     </div>
                 </div>
             </div>
@@ -1292,8 +1316,86 @@
             initCharts();
         });
         
-        function initCharts() {
-            // Gráfico de Frequência
+        // Função para carregar dados reais da Milionária
+        async function carregarDadosReaisMilionaria() {
+            try {
+                const response = await fetch('/api/milionaria/dados-reais');
+                const dados = await response.json();
+                
+                if (dados.erro) {
+                    console.error('Erro ao carregar dados:', dados.erro);
+                    return null;
+                }
+                
+                return dados;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                return null;
+            }
+        }
+
+        // Função para atualizar estatísticas gerais
+        function atualizarEstatisticasGerais(dados) {
+            if (dados.estatisticas_gerais) {
+                // Atualizar total de concursos
+                const totalConcursos = document.querySelector('.text-2xl.font-bold.text-blue-400');
+                if (totalConcursos) {
+                    totalConcursos.textContent = dados.estatisticas_gerais.total_concursos;
+                }
+                
+                // Atualizar período de análise
+                const periodoElement = document.querySelector('.text-gray-400.text-sm');
+                if (periodoElement && periodoElement.textContent.includes('Período')) {
+                    periodoElement.textContent = `Período: ${dados.estatisticas_gerais.periodo_analise}`;
+                }
+                
+                // Atualizar última atualização
+                const ultimaAtualizacao = document.querySelector('.text-gray-400.text-sm:last-child');
+                if (ultimaAtualizacao && ultimaAtualizacao.textContent.includes('Última')) {
+                    ultimaAtualizacao.textContent = `Última Atualização: ${dados.estatisticas_gerais.ultima_atualizacao}`;
+                }
+            }
+        }
+
+        // Função para atualizar números e trevos quentes e frios
+        function atualizarNumerosTrevosQuentesFrios(dados) {
+            // Atualizar números quentes
+            if (dados.numeros_quentes) {
+                const quentesContainer = document.querySelector('.bg-blue-500');
+                if (quentesContainer) {
+                    const numerosQuentes = dados.numeros_quentes.slice(0, 5).map(n => n.toString().padStart(2, '0')).join(', ');
+                    quentesContainer.querySelector('.text-2xl').textContent = numerosQuentes;
+                }
+            }
+            
+            // Atualizar números frios
+            if (dados.numeros_frios) {
+                const friosContainer = document.querySelector('.bg-cyan-500');
+                if (friosContainer) {
+                    const numerosFrios = dados.numeros_frios.slice(0, 5).map(n => n.toString().padStart(2, '0')).join(', ');
+                    friosContainer.querySelector('.text-2xl').textContent = numerosFrios;
+                }
+            }
+        }
+
+        async function initCharts() {
+            // Carregar dados reais
+            const dados = await carregarDadosReaisMilionaria();
+            
+            if (!dados) {
+                console.error('Não foi possível carregar dados reais, usando dados de fallback');
+                // Usar dados estáticos como fallback
+                initChartsFallback();
+                return;
+            }
+            
+            // Atualizar estatísticas gerais
+            atualizarEstatisticasGerais(dados);
+            
+            // Atualizar números e trevos quentes e frios
+            atualizarNumerosTrevosQuentesFrios(dados);
+            
+            // Gráfico de Frequência com dados reais
             const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
             new Chart(frequencyCtx, {
                 type: 'bar',
@@ -1301,9 +1403,9 @@
                     labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50'],
                     datasets: [{
                         label: 'Frequência',
-                        data: [8, 6, 10, 7, 6, 9, 11, 5, 12, 10, 8, 4, 9, 11, 12, 7, 8, 6, 13, 9, 7, 5, 14, 10, 8, 4, 7, 11, 6, 8, 10, 12, 13, 7, 6, 9, 4, 11, 7, 10, 12, 9, 6, 15, 8, 5, 10, 8, 6, 9],
-                        backgroundColor: 'rgba(245, 158, 11, 0.8)',
-                        borderColor: 'rgba(245, 158, 11, 1)',
+                        data: dados.frequencia_numeros || [],
+                        backgroundColor: 'rgba(168, 85, 247, 0.8)',
+                        borderColor: 'rgba(168, 85, 247, 1)',
                         borderWidth: 1
                     }]
                 },
@@ -1345,29 +1447,17 @@
                 }
             });
             
-            // Gráfico de Distribuição
-            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-            new Chart(distributionCtx, {
+            // Gráfico de Frequência dos Trevos com dados reais
+            const trevosCtx = document.getElementById('trevosChart').getContext('2d');
+            new Chart(trevosCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['1-10', '11-20', '21-30', '31-40', '41-50'],
+                    labels: ['Trevo 1', 'Trevo 2', 'Trevo 3', 'Trevo 4', 'Trevo 5', 'Trevo 6'],
                     datasets: [{
-                        label: 'Distribuição (%)',
-                        data: [20, 22, 21, 19, 18],
-                        backgroundColor: [
-                            'rgba(245, 158, 11, 0.8)',   // Yellow
-                            'rgba(217, 119, 6, 0.8)',    // Amber
-                            'rgba(180, 83, 9, 0.8)',     // Orange
-                            'rgba(146, 64, 14, 0.8)',    // Dark Orange
-                            'rgba(120, 53, 15, 0.8)'     // Darker Orange
-                        ],
-                        borderColor: [
-                            'rgba(245, 158, 11, 1)',
-                            'rgba(217, 119, 6, 1)',
-                            'rgba(180, 83, 9, 1)',
-                            'rgba(146, 64, 14, 1)',
-                            'rgba(120, 53, 15, 1)'
-                        ],
+                        label: 'Frequência',
+                        data: dados.frequencia_trevos || [],
+                        backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
                         borderWidth: 1
                     }]
                 },
@@ -1378,8 +1468,194 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 25,
-                            stepSize: 5,
+                            max: 50,
+                            stepSize: 10,
+                            min: 0,
+                            maxTicksLimit: 6,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de Distribuição (Pizza/Donut) com dados reais
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['1-10', '11-20', '21-30', '31-40', '41-50'],
+                    datasets: [{
+                        data: dados.distribuicao_faixas || [20, 22, 21, 19, 18], // Fallback data
+                        backgroundColor: [
+                            '#ef4444',  // Red
+                            '#f97316',  // Orange
+                            '#22c55e',  // Green
+                            '#3b82f6',  // Blue
+                            '#8b5cf6'   // Purple
+                        ],
+                        borderColor: [
+                            '#dc2626',  // Dark Red
+                            '#ea580c',  // Dark Orange
+                            '#16a34a',  // Dark Green
+                            '#2563eb',  // Dark Blue
+                            '#7c3aed'   // Dark Purple
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1,
+                    cutout: '60%', // Torna um donut chart
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#cbd5e1',
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#3B82F6',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return `${label}: ${value}%`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 1000
+                    }
+                }
+            });
+            
+            // Gráfico de Distribuição dos Trevos com dados reais
+            const trevosDistributionCtx = document.getElementById('trevosDistributionChart').getContext('2d');
+            new Chart(trevosDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Trevo 1', 'Trevo 2', 'Trevo 3', 'Trevo 4', 'Trevo 5', 'Trevo 6'],
+                    datasets: [{
+                        data: dados.distribuicao_trevos || [16, 18, 15, 17, 16, 18], // Fallback data
+                        backgroundColor: [
+                            '#10b981',  // Emerald
+                            '#059669',  // Emerald Dark
+                            '#047857',  // Emerald Darker
+                            '#065f46',  // Emerald Darkest
+                            '#064e3b',  // Emerald Very Dark
+                            '#022c22'   // Emerald Ultra Dark
+                        ],
+                        borderColor: [
+                            '#34d399',  // Light Emerald
+                            '#10b981',  // Emerald
+                            '#059669',  // Emerald Dark
+                            '#047857',  // Emerald Darker
+                            '#065f46',  // Emerald Darkest
+                            '#064e3b'   // Emerald Very Dark
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1,
+                    cutout: '60%', // Torna um donut chart
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#cbd5e1',
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return `${label}: ${value}%`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 1000
+                    }
+                }
+            });
+        }
+
+        // Função de fallback com dados estáticos (caso a API falhe)
+        function initChartsFallback() {
+            console.log('Usando dados estáticos como fallback');
+            
+            // Gráfico de Frequência (fallback)
+            const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
+            new Chart(frequencyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50'],
+                    datasets: [{
+                        label: 'Frequência',
+                        data: [8, 6, 10, 7, 6, 9, 11, 5, 12, 10, 8, 4, 9, 11, 12, 7, 8, 6, 13, 9, 7, 5, 14, 10, 8, 4, 7, 11, 6, 8, 10, 12, 13, 7, 6, 9, 4, 11, 7, 10, 12, 9, 6, 15, 8, 5, 10, 8, 6, 9],
+                        backgroundColor: 'rgba(168, 85, 247, 0.8)',
+                        borderColor: 'rgba(168, 85, 247, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20,
+                            stepSize: 4,
                             min: 0,
                             maxTicksLimit: 6,
                             grid: {
@@ -1405,6 +1681,189 @@
                                 color: '#cbd5e1'
                             }
                         }
+                    }
+                }
+            });
+            
+            // Gráfico de Frequência dos Trevos (fallback)
+            const trevosCtx = document.getElementById('trevosChart').getContext('2d');
+            new Chart(trevosCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Trevo 1', 'Trevo 2', 'Trevo 3', 'Trevo 4', 'Trevo 5', 'Trevo 6'],
+                    datasets: [{
+                        label: 'Frequência',
+                        data: [18, 22, 16, 20, 19, 21],
+                        backgroundColor: 'rgba(34, 197, 94, 0.8)',
+                        borderColor: 'rgba(34, 197, 94, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 50,
+                            stepSize: 10,
+                            min: 0,
+                            maxTicksLimit: 6,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de Distribuição (fallback)
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['1-10', '11-20', '21-30', '31-40', '41-50'],
+                    datasets: [{
+                        data: [20, 22, 21, 19, 18],
+                        backgroundColor: [
+                            '#ef4444',  // Red
+                            '#f97316',  // Orange
+                            '#22c55e',  // Green
+                            '#3b82f6',  // Blue
+                            '#8b5cf6'   // Purple
+                        ],
+                        borderColor: [
+                            '#dc2626',  // Dark Red
+                            '#ea580c',  // Dark Orange
+                            '#16a34a',  // Dark Green
+                            '#2563eb',  // Dark Blue
+                            '#7c3aed'   // Dark Purple
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#cbd5e1',
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#3B82F6',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return `${label}: ${value}%`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+            
+            // Gráfico de Distribuição dos Trevos (fallback)
+            const trevosDistributionCtx = document.getElementById('trevosDistributionChart').getContext('2d');
+            new Chart(trevosDistributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Trevo 1', 'Trevo 2', 'Trevo 3', 'Trevo 4', 'Trevo 5', 'Trevo 6'],
+                    datasets: [{
+                        data: [16, 18, 15, 17, 16, 18],
+                        backgroundColor: [
+                            '#10b981',  // Emerald
+                            '#059669',  // Emerald Dark
+                            '#047857',  // Emerald Darker
+                            '#065f46',  // Emerald Darkest
+                            '#064e3b',  // Emerald Very Dark
+                            '#022c22'   // Emerald Ultra Dark
+                        ],
+                        borderColor: [
+                            '#34d399',  // Light Emerald
+                            '#10b981',  // Emerald
+                            '#059669',  // Emerald Dark
+                            '#047857',  // Emerald Darker
+                            '#065f46',  // Emerald Darkest
+                            '#064e3b'   // Emerald Very Dark
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#cbd5e1',
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    return `${label}: ${value}%`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
