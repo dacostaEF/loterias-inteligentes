@@ -170,11 +170,14 @@
             top: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(135deg, rgba(14, 165, 233, 0.95) 0%, rgba(30, 27, 41, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(30, 27, 41, 0.95) 0%, rgba(42, 35, 64, 0.95) 100%);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(14, 165, 233, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             z-index: 1000;
-            padding: 12px 20px;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
         }
 
         .desktop-nav-links {
@@ -190,22 +193,27 @@
             font-size: 0.875rem;
             font-weight: 500;
             transition: all 0.3s ease;
-            padding: 8px 12px;
+            padding: 0.5rem 1rem;
             border-radius: 6px;
         }
 
         .desktop-nav-links a:hover {
-            color: #0EA5E9;
-            background: rgba(14, 165, 233, 0.1);
+            color: #A855F7;
+            background: rgba(168, 85, 247, 0.1);
             transform: translateY(-1px);
         }
 
         .desktop-nav-links a.active {
-            color: #0EA5E9 !important;
-            background: rgba(14, 165, 233, 0.15) !important;
-            border: 1px solid rgba(14, 165, 233, 0.3) !important;
+            color: #00E38C !important;
+            background: rgba(0, 227, 140, 0.15) !important;
+            border: 1px solid rgba(0, 227, 140, 0.3) !important;
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 227, 140, 0.2);
+        }
+
+        .desktop-nav-links a.active:hover {
+            color: #00E38C !important;
+            background: rgba(0, 227, 140, 0.2) !important;
         }
 
         .dropdown {
@@ -221,7 +229,7 @@
             min-width: 200px;
             box-shadow: 0 8px 16px rgba(0,0,0,0.3);
             z-index: 1001;
-            border: 1px solid rgba(14, 165, 233, 0.2);
+            border: 1px solid rgba(168, 85, 247, 0.2);
             border-radius: 8px;
             top: 100%;
             left: 0;
@@ -238,12 +246,17 @@
             text-decoration: none;
             display: block;
             transition: all 0.3s ease;
-            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
         }
 
         .dropdown-content a:hover {
-            background: rgba(14, 165, 233, 0.1);
-            color: #0EA5E9;
+            background: rgba(168, 85, 247, 0.1);
+            color: #A855F7;
+        }
+
+        .dropdown-content a.active {
+            color: #00E38C !important;
+            background: rgba(0, 227, 140, 0.15) !important;
         }
 
         .dropdown-content a:last-child {
@@ -324,7 +337,7 @@
 
         .nav-header {
             padding: 20px;
-            border-bottom: 1px solid rgba(14, 165, 233, 0.2);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
             display: flex;
             align-items: center;
             gap: 10px;
@@ -348,7 +361,7 @@
         }
 
         .nav-panel li {
-            border-bottom: 1px solid rgba(14, 165, 233, 0.1);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
         }
 
         .nav-panel a {
@@ -360,14 +373,14 @@
         }
 
         .nav-panel a:hover {
-            background: rgba(14, 165, 233, 0.1);
-            color: #0EA5E9;
+            background: rgba(168, 85, 247, 0.1);
+            color: #A855F7;
         }
 
         .nav-panel a.active {
-            background: rgba(14, 165, 233, 0.15);
-            color: #0EA5E9;
-            border-right: 3px solid #0EA5E9;
+            background: rgba(0, 227, 140, 0.15);
+            color: #00E38C;
+            border-right: 3px solid #00E38C;
         }
 
         .mobile-dropdown {
@@ -394,6 +407,61 @@
             transform: rotate(180deg);
         }
 
+        /* Estilos para Breadcrumbs */
+        .breadcrumbs-container {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.05) 0%, rgba(0, 227, 140, 0.05) 100%);
+            border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 8px 0;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumbs {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .breadcrumb-list {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            font-size: 0.9rem;
+        }
+        
+        .breadcrumb-item {
+            display: flex;
+            align-items: center;
+            color: #94a3b8;
+        }
+        
+        .breadcrumb-item:not(:last-child)::after {
+            content: "›";
+            margin: 0 8px;
+            color: #64748b;
+            font-weight: bold;
+        }
+        
+        .breadcrumb-link {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .breadcrumb-item:not(.active) .breadcrumb-link:hover {
+            color: #A855F7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+        
+        .breadcrumb-item.active .breadcrumb-link {
+            color: #00E38C;
+            font-weight: 600;
+        }
+
         /* Responsividade */
         @media (max-width: 768px) {
             .desktop-nav {
@@ -401,6 +469,22 @@
             }
             .hamburger-menu {
                 display: block;
+            }
+            .breadcrumbs-container {
+                padding: 6px 0;
+                margin-bottom: 15px;
+            }
+            
+            .breadcrumbs {
+                padding: 0 15px;
+            }
+            
+            .breadcrumb-list {
+                font-size: 0.85rem;
+            }
+            
+            .breadcrumb-item:not(:last-child)::after {
+                margin: 0 6px;
             }
         }
 
@@ -522,19 +606,18 @@
     </nav>
 
     <!-- Breadcrumb bar (igual ao dashboard) -->
-    <section class="border-b border-neutral-800 bg-gradient-to-r from-[#0EA5E9]/10 to-emerald-400/10">
-        <div class="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
-            <nav class="flex items-center gap-2 text-sm">
-                <a href="/" class="text-neutral-300 hover:text-white">Quina</a>
-                <span class="text-[#0EA5E9]">›</span>
-                <span class="text-white font-semibold">Painel de Análises Estatísticas</span>
-            </nav>
-
-            <button class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 hover:bg-emerald-500/30">
-                <span>🧭</span> Tour Guiado
-            </button>
-        </div>
-    </section>
+    <div class="breadcrumbs-container">
+        <nav class="breadcrumbs" aria-label="Breadcrumb">
+            <ol class="breadcrumb-list">
+                <li class="breadcrumb-item">
+                    <a href="#" class="breadcrumb-link">🎰 Quina</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    <span class="breadcrumb-link">📊 Painel de Análises Estatísticas</span>
+                </li>
+            </ol>
+        </nav>
+    </div>
 
 
     <!-- Hero/header da página (alinhado à esquerda, como no dashboard) -->
