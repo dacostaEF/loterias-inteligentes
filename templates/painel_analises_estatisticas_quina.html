@@ -914,7 +914,7 @@
     </nav>
 
     <!-- Breadcrumb bar (igual ao dashboard) -->
-    <div class="breadcrumbs-container">
+    <div class="breadcrumbs-container" style="margin-top: 88px !important; padding-top: 0px !important;">
         <nav class="breadcrumbs" aria-label="Breadcrumb">
             <ol class="breadcrumb-list">
                 <li class="breadcrumb-item">
@@ -931,7 +931,7 @@
     <!-- Hero/header da página (alinhado à esquerda, como no dashboard) -->
     <header class="max-w-7xl mx-auto px-4 py-6">
         <div class="flex items-center justify-between">
-            <div class="flex-1 flex justify-center quina-logo-container">
+            <div>
                 <img src="/static/img/Quina.png" alt="Quina" class="quina-logo">
             </div>
             <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Loterias Inteligentes" class="site-logo hidden md:block">
@@ -1406,8 +1406,86 @@
             initCharts();
         });
         
-        function initCharts() {
-            // Gráfico de Frequência
+        // Função para carregar dados reais da Quina
+        async function carregarDadosReaisQuina() {
+            try {
+                const response = await fetch('/api/quina/dados-reais');
+                const dados = await response.json();
+                
+                if (dados.erro) {
+                    console.error('Erro ao carregar dados:', dados.erro);
+                    return null;
+                }
+                
+                return dados;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                return null;
+            }
+        }
+
+        // Função para atualizar estatísticas gerais
+        function atualizarEstatisticasGerais(dados) {
+            if (dados.estatisticas_gerais) {
+                // Atualizar total de concursos
+                const totalConcursos = document.querySelector('.text-2xl.font-bold.text-blue-400');
+                if (totalConcursos) {
+                    totalConcursos.textContent = dados.estatisticas_gerais.total_concursos;
+                }
+                
+                // Atualizar período de análise
+                const periodoElement = document.querySelector('.text-gray-400.text-sm');
+                if (periodoElement && periodoElement.textContent.includes('Período')) {
+                    periodoElement.textContent = `Período: ${dados.estatisticas_gerais.periodo_analise}`;
+                }
+                
+                // Atualizar última atualização
+                const ultimaAtualizacao = document.querySelector('.text-gray-400.text-sm:last-child');
+                if (ultimaAtualizacao && ultimaAtualizacao.textContent.includes('Última')) {
+                    ultimaAtualizacao.textContent = `Última Atualização: ${dados.estatisticas_gerais.ultima_atualizacao}`;
+                }
+            }
+        }
+
+        // Função para atualizar números quentes e frios
+        function atualizarNumerosQuentesFrios(dados) {
+            // Atualizar números quentes
+            if (dados.numeros_quentes) {
+                const quentesContainer = document.querySelector('.bg-blue-500');
+                if (quentesContainer) {
+                    const numerosQuentes = dados.numeros_quentes.slice(0, 5).map(n => n.toString().padStart(2, '0')).join(', ');
+                    quentesContainer.querySelector('.text-2xl').textContent = numerosQuentes;
+                }
+            }
+            
+            // Atualizar números frios
+            if (dados.numeros_frios) {
+                const friosContainer = document.querySelector('.bg-cyan-500');
+                if (friosContainer) {
+                    const numerosFrios = dados.numeros_frios.slice(0, 5).map(n => n.toString().padStart(2, '0')).join(', ');
+                    friosContainer.querySelector('.text-2xl').textContent = numerosFrios;
+                }
+            }
+        }
+
+        async function initCharts() {
+            // Carregar dados reais
+            const dados = await carregarDadosReaisQuina();
+            
+            if (!dados) {
+                console.error('Não foi possível carregar dados reais, usando dados de fallback');
+                // Usar dados estáticos como fallback
+                initChartsFallback();
+                return;
+            }
+            
+            // Atualizar estatísticas gerais
+            atualizarEstatisticasGerais(dados);
+            
+            // Atualizar números quentes e frios
+            atualizarNumerosQuentesFrios(dados);
+            
+            // Gráfico de Frequência com dados reais
             const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
             new Chart(frequencyCtx, {
                 type: 'bar',
@@ -1415,7 +1493,7 @@
                     labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '80'],
                     datasets: [{
                         label: 'Frequência',
-                        data: [12, 8, 15, 9, 8, 11, 13, 7, 14, 12, 10, 6, 11, 13, 15, 9, 10, 8, 16, 11, 9, 7, 17, 12, 10, 6, 9, 13, 8, 10, 12, 14, 15, 9, 8, 11, 6, 13, 9, 12, 14, 11, 8, 18, 10, 7, 12, 10, 8, 11, 5, 15, 9, 13, 14, 10, 7, 6, 10, 9, 11, 8, 13, 12, 9, 7, 14, 10, 8, 12, 6, 16, 9, 11, 13, 8, 7, 9, 10, 8],
+                        data: dados.frequencia_numeros || [],
                         backgroundColor: 'rgba(14, 165, 233, 0.8)',
                         borderColor: 'rgba(14, 165, 233, 1)',
                         borderWidth: 1
@@ -1459,14 +1537,14 @@
                 }
             });
             
-            // Gráfico de Distribuição (Pizza/Donut)
+            // Gráfico de Distribuição (Pizza/Donut) com dados reais
             const distributionCtx = document.getElementById('distributionChart').getContext('2d');
             new Chart(distributionCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['1-16', '17-32', '33-48', '49-64', '65-80'],
                     datasets: [{
-                        data: [20, 22, 21, 19, 18],
+                        data: dados.distribuicao_faixas || [20, 22, 21, 19, 18],
                         backgroundColor: [
                             '#ef4444',  // Red
                             '#f97316',  // Orange
@@ -1521,6 +1599,130 @@
                         animateRotate: true,
                         animateScale: true,
                         duration: 1000
+                    }
+                }
+            });
+        }
+
+        // Função de fallback com dados estáticos (caso a API falhe)
+        function initChartsFallback() {
+            console.log('Usando dados estáticos como fallback');
+            
+            // Gráfico de Frequência (fallback)
+            const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
+            new Chart(frequencyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60', '61', '62', '63', '64', '65', '66', '67', '68', '69', '70', '71', '72', '73', '74', '75', '76', '77', '78', '79', '80'],
+                    datasets: [{
+                        label: 'Frequência',
+                        data: [12, 8, 15, 9, 8, 11, 13, 7, 14, 12, 10, 6, 11, 13, 15, 9, 10, 8, 16, 11, 9, 7, 17, 12, 10, 6, 9, 13, 8, 10, 12, 14, 15, 9, 8, 11, 6, 13, 9, 12, 14, 11, 8, 18, 10, 7, 12, 10, 8, 11, 5, 15, 9, 13, 14, 10, 7, 6, 10, 9, 11, 8, 13, 12, 9, 7, 14, 10, 8, 12, 6, 16, 9, 11, 13, 8, 7, 9, 10, 8],
+                        backgroundColor: 'rgba(14, 165, 233, 0.8)',
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 20,
+                            stepSize: 4,
+                            min: 0,
+                            maxTicksLimit: 6,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        },
+                        x: {
+                            maxTicksLimit: 13,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#94a3b8'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Gráfico de Distribuição (fallback)
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['1-16', '17-32', '33-48', '49-64', '65-80'],
+                    datasets: [{
+                        data: [20, 22, 21, 19, 18],
+                        backgroundColor: [
+                            '#ef4444',  // Red
+                            '#f97316',  // Orange
+                            '#22c55e',  // Green
+                            '#3b82f6',  // Blue
+                            '#8b5cf6'   // Purple
+                        ],
+                        borderColor: [
+                            '#dc2626',  // Dark Red
+                            '#ea580c',  // Dark Orange
+                            '#16a34a',  // Dark Green
+                            '#2563eb',  // Dark Blue
+                            '#7c3aed'   // Dark Purple
+                        ],
+                        borderWidth: 2,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: '#cbd5e1',
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#3B82F6',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        animateScale: true,
+                        duration: 2000,
+                        easing: 'easeOutQuart'
                     }
                 }
             });
