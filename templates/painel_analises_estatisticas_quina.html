@@ -1373,68 +1373,80 @@
             </h2>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Análise por Mês -->
+                <!-- Último Concurso -->
                 <div class="quina-card rounded-xl p-6">
                     <h3 class="text-xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-calendar-alt text-purple-400 mr-2"></i>
-                        Análise por Mês
+                        <i class="fas fa-trophy text-yellow-400 mr-2"></i>
+                        Último Concurso
                     </h3>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Mês mais frequente:</span>
-                            <span class="text-purple-400 font-bold" id="mesMaisFrequente">-</span>
+                            <span class="text-sm">Pares/Ímpares:</span>
+                            <span class="text-yellow-400 font-bold" id="ultimoConcursoParesImpares">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Mês menos frequente:</span>
-                            <span class="text-purple-400 font-bold" id="mesMenosFrequente">-</span>
+                            <span class="text-sm">Primos:</span>
+                            <span class="text-yellow-400 font-bold" id="ultimoConcursoPrimos">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Variação mensal:</span>
-                            <span class="text-white font-bold" id="variacaoMensal">-</span>
+                            <span class="text-sm">Repetições:</span>
+                            <span class="text-yellow-400 font-bold" id="ultimoConcursoRepeticoes">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Números sorteados:</span>
+                            <span class="text-yellow-400 font-bold" id="ultimoConcursoNumeros">-</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Análise por Ano -->
+                <!-- Últimos 25 Concursos -->
                 <div class="quina-card rounded-xl p-6">
                     <h3 class="text-xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-calendar text-blue-400 mr-2"></i>
-                        Análise por Ano
+                        <i class="fas fa-chart-line text-blue-400 mr-2"></i>
+                        Últimos 25 Concursos
                     </h3>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Ano mais frequente:</span>
-                            <span class="text-blue-400 font-bold" id="anoMaisFrequente">-</span>
+                            <span class="text-sm">Pares/Ímpares:</span>
+                            <span class="text-blue-400 font-bold" id="ultimos25ParesImpares">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Ano menos frequente:</span>
-                            <span class="text-blue-400 font-bold" id="anoMenosFrequente">-</span>
+                            <span class="text-sm">Primos:</span>
+                            <span class="text-blue-400 font-bold" id="ultimos25Primos">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Tendência anual:</span>
-                            <span class="text-white font-bold" id="tendenciaAnual">-</span>
+                            <span class="text-sm">Repetições:</span>
+                            <span class="text-blue-400 font-bold" id="ultimos25Repeticoes">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Seca atual:</span>
+                            <span class="text-blue-400 font-bold" id="ultimos25Seca">-</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Análise por Concurso -->
+                <!-- Últimos 50 Concursos -->
                 <div class="quina-card rounded-xl p-6">
                     <h3 class="text-xl font-semibold mb-6 flex items-center">
-                        <i class="fas fa-list-ol text-green-400 mr-2"></i>
-                        Análise por Concurso
+                        <i class="fas fa-chart-bar text-green-400 mr-2"></i>
+                        Últimos 50 Concursos
                     </h3>
                     <div class="space-y-3">
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Frequência média:</span>
-                            <span class="text-green-400 font-bold" id="frequenciaMediaConcurso">-</span>
+                            <span class="text-sm">Pares/Ímpares:</span>
+                            <span class="text-green-400 font-bold" id="ultimos50ParesImpares">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Pico de frequência:</span>
-                            <span class="text-green-400 font-bold" id="picoFrequenciaConcurso">-</span>
+                            <span class="text-sm">Primos:</span>
+                            <span class="text-green-400 font-bold" id="ultimos50Primos">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Estabilidade:</span>
-                            <span class="text-white font-bold" id="estabilidadeConcurso">-</span>
+                            <span class="text-sm">Repetições:</span>
+                            <span class="text-green-400 font-bold" id="ultimos50Repeticoes">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Seca atual:</span>
+                            <span class="text-green-400 font-bold" id="ultimos50Seca">-</span>
                         </div>
                     </div>
                 </div>
@@ -1904,71 +1916,162 @@
         }
         
         function atualizarAnalisesTemporais(dados) {
-            console.log('Atualizando análises temporais...', dados.analise_temporal); // DEBUG
+            console.log('Atualizando análises temporais...', dados); // DEBUG
             
-            if (!dados.analise_temporal) {
-                console.log('Dados temporais não disponíveis');
+            if (!dados.concursos_para_matriz || dados.concursos_para_matriz.length === 0) {
+                console.log('Dados de concursos não disponíveis para análises temporais');
                 return;
             }
             
-            // Verificar se é array ou objeto
-            let temporal = dados.analise_temporal;
-            if (!Array.isArray(temporal)) {
-                console.log('Dados temporais não são array, tentando processar como objeto');
-                // Se for objeto, tentar extrair dados relevantes
-                if (typeof temporal === 'object' && temporal !== null) {
-                    // Processar dados temporais como objeto
-                    const frequencias = temporal.frequencia || {};
-                    const valoresFreq = Object.values(frequencias);
-                    const frequenciaMedia = valoresFreq.length > 0 ? 
-                        (valoresFreq.reduce((a, b) => a + b, 0) / valoresFreq.length).toFixed(1) : '0';
-                    
-                    document.getElementById('mesMaisFrequente').textContent = temporal.periodo || '-';
-                    document.getElementById('mesMenosFrequente').textContent = temporal.concursos || '-';
-                    document.getElementById('variacaoMensal').textContent = frequenciaMedia;
-                    
-                    document.getElementById('anoMaisFrequente').textContent = temporal.concursos || '-';
-                    document.getElementById('anoMenosFrequente').textContent = '-';
-                    document.getElementById('tendenciaAnual').textContent = 'Estável';
-                    
-                    document.getElementById('frequenciaMediaConcurso').textContent = frequenciaMedia;
-                    document.getElementById('picoFrequenciaConcurso').textContent = Math.max(...valoresFreq).toString();
-                    document.getElementById('estabilidadeConcurso').textContent = 'Média';
+            const concursos = dados.concursos_para_matriz;
+            console.log('Total de concursos disponíveis:', concursos.length); // DEBUG
+            
+            // Função auxiliar para verificar se um número é primo
+            function ehPrimo(num) {
+                if (num < 2) return false;
+                for (let i = 2; i <= Math.sqrt(num); i++) {
+                    if (num % i === 0) return false;
                 }
-                return;
+                return true;
             }
             
-            // Processar dados temporais por períodos
-            if (temporal.length > 0) {
-                // Pegar o período mais recente (último item da lista)
-                const periodoRecente = temporal[temporal.length - 1];
-                const periodoAnterior = temporal.length > 1 ? temporal[temporal.length - 2] : null;
-                
-                // Calcular métricas básicas
-                const frequencias = periodoRecente.frequencia || {};
-                const valoresFrequencia = Object.values(frequencias);
-                const frequenciaMedia = valoresFrequencia.length > 0 ? 
-                    (valoresFrequencia.reduce((a, b) => a + b, 0) / valoresFrequencia.length).toFixed(1) : '0';
-                
-                const frequenciaMax = Math.max(...valoresFrequencia);
-                const frequenciaMin = Math.min(...valoresFrequencia);
-                const variacao = frequenciaMax - frequenciaMin;
-                
-                // Atualizar análise por mês (usando dados do período)
-                document.getElementById('mesMaisFrequente').textContent = periodoRecente.periodo || '-';
-                document.getElementById('mesMenosFrequente').textContent = periodoAnterior ? periodoAnterior.periodo : '-';
-                document.getElementById('variacaoMensal').textContent = variacao.toString();
-                
-                // Atualizar análise por ano (usando dados do período)
-                document.getElementById('anoMaisFrequente').textContent = periodoRecente.concursos || '-';
-                document.getElementById('anoMenosFrequente').textContent = periodoAnterior ? periodoAnterior.concursos : '-';
-                document.getElementById('tendenciaAnual').textContent = 'Estável';
-                
-                // Atualizar análise por concurso
-                document.getElementById('frequenciaMediaConcurso').textContent = frequenciaMedia;
-                document.getElementById('picoFrequenciaConcurso').textContent = frequenciaMax.toString();
-                document.getElementById('estabilidadeConcurso').textContent = variacao <= 2 ? 'Alta' : variacao <= 4 ? 'Média' : 'Baixa';
+            // Função auxiliar para calcular pares/ímpares
+            function calcularParesImpares(numeros) {
+                const pares = numeros.filter(num => num % 2 === 0).length;
+                const impares = numeros.length - pares;
+                return `${pares}P/${impares}I`;
             }
+            
+            // Função auxiliar para calcular primos
+            function calcularPrimos(numeros) {
+                return numeros.filter(num => ehPrimo(num)).length;
+            }
+            
+            // Função auxiliar para calcular repetições
+            function calcularRepeticoes(concursoAtual, concursoAnterior) {
+                if (!concursoAnterior) return 0;
+                const setAtual = new Set(concursoAtual);
+                const setAnterior = new Set(concursoAnterior);
+                return [...setAtual].filter(num => setAnterior.has(num)).length;
+            }
+            
+            // Função auxiliar para calcular seca (números há mais tempo sem sair)
+            function calcularSeca(concursos, limite) {
+                const ultimosConcursos = concursos.slice(0, limite);
+                const secas = [];
+                
+                // Calcular seca para cada número de 1 a 80
+                for (let num = 1; num <= 80; num++) {
+                    let seca = 0;
+                    let encontrou = false;
+                    
+                    // Procurar o número nos concursos (do mais recente para o mais antigo)
+                    for (let i = 0; i < ultimosConcursos.length; i++) {
+                        if (ultimosConcursos[i].numeros.includes(num)) {
+                            encontrou = true;
+                            break;
+                        }
+                        seca++;
+                    }
+                    
+                    // Se não encontrou em nenhum concurso do período, seca = limite
+                    if (!encontrou) {
+                        seca = limite;
+                    }
+                    
+                    secas.push({ numero: num, seca: seca });
+                }
+                
+                // Ordenar por seca (maior primeiro) e pegar os 3 primeiros
+                secas.sort((a, b) => b.seca - a.seca);
+                const top3 = secas.slice(0, 3);
+                
+                // Formatar resultado
+                return top3.map(item => `${item.numero}(${item.seca})`).join(', ');
+            }
+            
+            // ÚLTIMO CONCURSO
+            if (concursos.length > 0) {
+                const ultimoConcurso = concursos[0];
+                const segundoConcurso = concursos[1];
+                
+                document.getElementById('ultimoConcursoParesImpares').textContent = 
+                    calcularParesImpares(ultimoConcurso.numeros);
+                document.getElementById('ultimoConcursoPrimos').textContent = 
+                    calcularPrimos(ultimoConcurso.numeros).toString();
+                document.getElementById('ultimoConcursoRepeticoes').textContent = 
+                    calcularRepeticoes(ultimoConcurso.numeros, segundoConcurso?.numeros).toString();
+                document.getElementById('ultimoConcursoNumeros').textContent = 
+                    ultimoConcurso.numeros.sort((a, b) => a - b).join(', ');
+            }
+            
+            // ÚLTIMOS 25 CONCURSOS
+            if (concursos.length >= 25) {
+                const ultimos25 = concursos.slice(0, 25);
+                
+                // Calcular médias dos últimos 25
+                let totalPares = 0, totalImpares = 0, totalPrimos = 0, totalRepeticoes = 0;
+                
+                ultimos25.forEach((concurso, index) => {
+                    const pares = concurso.numeros.filter(num => num % 2 === 0).length;
+                    totalPares += pares;
+                    totalImpares += (5 - pares);
+                    totalPrimos += calcularPrimos(concurso.numeros);
+                    
+                    if (index < ultimos25.length - 1) {
+                        totalRepeticoes += calcularRepeticoes(concurso.numeros, ultimos25[index + 1].numeros);
+                    }
+                });
+                
+                const mediaPares = (totalPares / 25).toFixed(1);
+                const mediaImpares = (totalImpares / 25).toFixed(1);
+                const mediaPrimos = (totalPrimos / 25).toFixed(1);
+                const mediaRepeticoes = (totalRepeticoes / 24).toFixed(1);
+                
+                document.getElementById('ultimos25ParesImpares').textContent = 
+                    `${mediaPares}P/${mediaImpares}I`;
+                document.getElementById('ultimos25Primos').textContent = 
+                    `${mediaPrimos} média`;
+                document.getElementById('ultimos25Repeticoes').textContent = 
+                    `${mediaRepeticoes} média`;
+                document.getElementById('ultimos25Seca').textContent = 
+                    calcularSeca(concursos, 25);
+            }
+            
+            // ÚLTIMOS 50 CONCURSOS
+            if (concursos.length >= 50) {
+                const ultimos50 = concursos.slice(0, 50);
+                
+                // Calcular médias dos últimos 50
+                let totalPares = 0, totalImpares = 0, totalPrimos = 0, totalRepeticoes = 0;
+                
+                ultimos50.forEach((concurso, index) => {
+                    const pares = concurso.numeros.filter(num => num % 2 === 0).length;
+                    totalPares += pares;
+                    totalImpares += (5 - pares);
+                    totalPrimos += calcularPrimos(concurso.numeros);
+                    
+                    if (index < ultimos50.length - 1) {
+                        totalRepeticoes += calcularRepeticoes(concurso.numeros, ultimos50[index + 1].numeros);
+                    }
+                });
+                
+                const mediaPares = (totalPares / 50).toFixed(1);
+                const mediaImpares = (totalImpares / 50).toFixed(1);
+                const mediaPrimos = (totalPrimos / 50).toFixed(1);
+                const mediaRepeticoes = (totalRepeticoes / 49).toFixed(1);
+                
+                document.getElementById('ultimos50ParesImpares').textContent = 
+                    `${mediaPares}P/${mediaImpares}I`;
+                document.getElementById('ultimos50Primos').textContent = 
+                    `${mediaPrimos} média`;
+                document.getElementById('ultimos50Repeticoes').textContent = 
+                    `${mediaRepeticoes} média`;
+                document.getElementById('ultimos50Seca').textContent = 
+                    calcularSeca(concursos, 50);
+            }
+            
+            console.log('Análises temporais atualizadas com sucesso!'); // DEBUG
         }
         
         function atualizarCalculosEspecificos(dados) {
