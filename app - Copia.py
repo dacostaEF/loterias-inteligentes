@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, session
-from functools import wraps
+import pandas as pd
 import os
-import sys
 import math
+import numpy as np
 from datetime import datetime, date, timedelta
 import json
 import logging
@@ -17,68 +17,9 @@ import logging
 # Importações para Flask-Login
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
-# Configuração do logger mais detalhada
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('app.log')
-    ]
-)
+# Configuração do logger
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-fp_log = logging.getLogger("fp")
-
-# Log de startup detalhado
-logger.info("=== INICIANDO APLICACAO ===")
-logger.info(f"Python version: {sys.version}")
-logger.info(f"Working directory: {os.getcwd()}")
-logger.info(f"Environment: {os.environ.get('FLASK_ENV', 'development')}")
-logger.info(f"PORT: {os.environ.get('PORT', 'NAO_DEFINIDA')}")
-logger.info(f"RAILWAY_ENVIRONMENT: {os.environ.get('RAILWAY_ENVIRONMENT', 'LOCAL')}")
-logger.info(f"PYTHONUNBUFFERED: {os.environ.get('PYTHONUNBUFFERED', 'NAO_DEFINIDO')}")
-logger.info(f"DEBUG: {os.environ.get('DEBUG', 'NAO_DEFINIDO')}")
-logger.info(f"LOG_LEVEL: {os.environ.get('LOG_LEVEL', 'NAO_DEFINIDO')}")
-
-# Lista arquivos importantes
-logger.info("=== ARQUIVOS IMPORTANTES ===")
-for file in ['app.py', 'wsgi.py', 'start.sh', 'requirements.txt', 'Dockerfile']:
-    if os.path.exists(file):
-        size = os.path.getsize(file)
-        logger.info(f"{file}: {size} bytes")
-    else:
-        logger.warning(f"{file}: NAO ENCONTRADO")
-
-# ============================================================================
-# 🛡️ SISTEMA DE VERSÃO DE SESSÃO (ENTRADA SEGURA)
-# ============================================================================
-
-# Versão do protocolo de sessão - AUMENTE quando mudar lógica de auth/sessão
-APP_SESSION_VERSION = 4
-
-# Timeouts de sessão para segurança
-MAX_IDLE = timedelta(hours=2)   # Sessão morre após 2h de inatividade
-MAX_AGE  = timedelta(hours=12)  # Sessão morre após 12h totarequirements.txt
-
-# ============================================================================
-# 🔐 FUNÇÕES DE SEGURANÇA
-# ============================================================================
-
-import hashlib
-
-def _client_ip():
-    """Pega só o primeiro IP (cliente) do X-Forwarded-For ou remote_addr."""
-    xff = request.headers.get('X-Forwarded-For', '')
-    if xff:
-        return xff.split(',')[0].strip()
-    return request.remote_addr or ''
-
-def _fingerprint():
-    """Fingerprint estável: User-Agent (limitado) + primeiro IP."""
-    ua = (request.headers.get('User-Agent','') or '')[:120]
-    ip = _client_ip()
-    base = f"{ua}|{ip}"
-    return hashlib.sha256(base.encode()).hexdigest()[:16]
 
 # ============================================================================
 
@@ -123,12 +64,8 @@ class UserPermissions:
         '/dashboard_milionaria',  # +Milionária
         '/dashboard_quina',  # Quina
         '/dashboard_lotomania',  # Lotomania
-        '/dashboard_MS',  # Mega Sena (liberado para freemium)
-        '/dashboard_megasena',  # Mega Sena (alias)
-        '/dashboard_lotofacil',  # Lotofácil (liberado para freemium)
         '/upgrade_plans',
-        '/checkout',
-        '/api/quina/dados-reais'  # API de dados da Quina
+        '/checkout'
     }
     
     # Rotas PREMIUM (requer assinatura)
@@ -139,15 +76,15 @@ class UserPermissions:
         '/aposta_inteligente_premium_lotofacil',
         '/lotofacil_laboratorio',
         '/boloes_loterias',
+        '/boloes',
+        '/dashboard_MS',  # Mega Sena (PREMIUM - requer cadastro)
+        '/dashboard_megasena',
+        '/dashboard_lotofacil',
         '/analise_estatistica_avancada_milionaria',
         '/analise_estatistica_avancada_megasena',
         '/analise_estatistica_avancada_quina',
         '/analise_estatistica_avancada_lotofacil',
-        '/analise_estatistica_avancada_lotomania',
-        '/painel_analises_estatisticas_quina',
-        '/painel_analises_estatisticas_megasena',
-        '/painel_analises_estatisticas_milionaria',
-        '/painel_analises_estatisticas_lotofacil'
+        '/analise_estatistica_avancada_milionaria_OutroPgrogarad'
     }
     
     @classmethod
@@ -188,18 +125,14 @@ class User(UserMixin):
         self.subscription_expiry = subscription_expiry
         self._is_authenticated = False  # 🔒 FLAG DE AUTENTICAÇÃO REAL
     
-    def set_authenticated(self, value: bool):
-        """Método para controlar o status de autenticação."""
-        self._is_authenticated = bool(value)
-    
     @property
     def is_authenticated(self):
         """Override do UserMixin - só retorna True se realmente logado."""
         return self._is_authenticated
     
-    def get_id(self):
-        """Retorna o ID do usuário como string."""
-        return str(self.id)
+    def set_authenticated(self, value=True):
+        """Método para controlar o status de autenticação."""
+        self._is_authenticated = value
     
     @property
     def is_premium(self):
@@ -210,12 +143,8 @@ class User(UserMixin):
         if self.level == UserLevel.LIFETIME:
             return True
         if self.subscription_expiry:
-            return datetime.utcnow() < self.subscription_expiry
-        # fallback provisório: quando subscription_expiry não vem do DB
-        return self.level in {
-            UserLevel.PREMIUM_DAILY, UserLevel.PREMIUM_MONTHLY,
-            UserLevel.PREMIUM_SEMESTRAL, UserLevel.PREMIUM_ANNUAL
-        }
+            return datetime.now() < self.subscription_expiry
+        return False
     
     @property
     def subscription_status(self):
@@ -225,8 +154,8 @@ class User(UserMixin):
         elif self.level == UserLevel.LIFETIME:
             return "Vitalício"
         elif self.subscription_expiry:
-            if datetime.utcnow() < self.subscription_expiry:
-                dias_restantes = (self.subscription_expiry - datetime.utcnow()).days
+            if datetime.now() < self.subscription_expiry:
+                dias_restantes = (self.subscription_expiry - datetime.now()).days
                 return f"Ativo ({dias_restantes} dias restantes)"
             else:
                 return "Expirado"
@@ -243,6 +172,7 @@ from database.db_config import get_db_connection, create_user_simple
 import bcrypt
 import random
 import string
+import hashlib
 import secrets
 from datetime import datetime, timedelta
 
@@ -253,33 +183,29 @@ from datetime import datetime, timedelta
 # ============================================================================
 
 def gerar_chave_autenticacao():
-    """Gera uma chave única e segura para autenticação com timestamp."""
-    import secrets
-    import time
-    ts = int(time.time())
-    return f"{ts}:{secrets.token_urlsafe(32)}"
+    """Gera uma chave única e segura para autenticação."""
+    return secrets.token_urlsafe(32)
 
 def validar_chave_autenticacao(chave):
-    """Valida se a chave de autenticação é válida com timestamp."""
+    """Valida se a chave de autenticação é válida."""
     if not chave:
         return False
     
-    # Verificar se a chave existe na sessão
+    # Verificar se a chave existe na sessão e não expirou
     chave_sessao = session.get('auth_key')
-    if not chave_sessao:
+    timestamp_login = session.get('login_timestamp')
+    
+    if not chave_sessao or not timestamp_login:
         return False
     
     # Verificar se a chave corresponde
     if chave != chave_sessao:
         return False
     
-    # Verificar timestamp da chave (24 horas)
+    # Verificar se não expirou (24 horas)
     try:
-        import time
-        ts_str, _ = chave.split(':', 1)
-        ts = int(ts_str)
-        now = int(time.time())
-        if (now - ts) > 86400:  # 24 horas em segundos
+        login_time = datetime.fromisoformat(timestamp_login)
+        if datetime.now() - login_time > timedelta(hours=24):
             return False
     except:
         return False
@@ -318,7 +244,15 @@ def get_user_by_id(user_id):
         level = level_map.get(plano, UserLevel.FREE)
 
         user = User(row[0], row[1], level)  # id, email, level
-        # Master por email (usando lista global)
+        # Master por email
+        MASTER_EMAILS = {
+            'master_ef@loterias.com',
+            'master_sf@loterias.com',
+            'master_sm@loterias.com',
+            'master_jj@loterias.com',
+            'master_fc@loterias.com',
+            'master_dc@loterias.com'
+        }
         user.nivel_master = (user.email in MASTER_EMAILS)
         return user
         
@@ -370,6 +304,7 @@ def get_user_by_email(email):
 def verify_password(user, password):
     """Verifica se a senha está correta."""
     try:
+        import hashlib
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         return password_hash == user.senha_hash
     except Exception as e:
@@ -398,7 +333,7 @@ def criar_codigo_validacao(usuario_id, tipo):
         
         # Gerar novo código
         codigo = gerar_codigo_validacao()
-        data_expiracao = datetime.utcnow() + timedelta(minutes=15)  # 15 minutos para expirar
+        data_expiracao = datetime.now() + timedelta(minutes=15)  # 15 minutos para expirar
         
         # Inserir código
         cursor.execute("""
@@ -441,7 +376,7 @@ def validar_codigo(usuario_id, codigo, tipo):
         codigo_id, status, tentativas, data_expiracao = codigo_data
         
         # Verificar se expirou
-        if datetime.utcnow() > datetime.fromisoformat(data_expiracao):
+        if datetime.now() > datetime.fromisoformat(data_expiracao):
             cursor.execute("UPDATE codigos_validacao SET status = 'expirado' WHERE id = ?", (codigo_id,))
             conn.commit()
             conn.close()
@@ -516,28 +451,16 @@ def incrementar_tentativas_codigo(usuario_id, codigo, tipo):
 
 app = Flask(__name__, static_folder='static')
 
-# ⛳ Proxy awareness: HTTPS/IP corretos atrás de LB/CDN
-from werkzeug.middleware.proxy_fix import ProxyFix
-app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=0, x_port=0, x_prefix=0)
-
-# Detectar ambiente (produção vs desenvolvimento)
-is_production = os.environ.get('FLASK_ENV') == 'production' or os.environ.get('ENVIRONMENT') == 'production'
-
-# Variável global para modo de desenvolvimento
-MODO_DESENVOLVIMENTO = os.getenv('MODO_DESENVOLVIMENTO', '0') == '1'
-
 # Configuração unificada de sessão
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-only-secret-change-me')
-app.config['SESSION_COOKIE_NAME'] = 'li_session'
 app.config.update(
+    SECRET_KEY='loterias_inteligentes_2024_secret_key_secure',
     SESSION_COOKIE_HTTPONLY=True,
-    SESSION_COOKIE_SECURE=is_production,        # True em produção, False em dev
+    SESSION_COOKIE_SECURE=False,        # dev local
     SESSION_COOKIE_SAMESITE='Lax',
-    REMEMBER_COOKIE_DURATION=0,         # desativa "lembrar" persistente
+    REMEMBER_COOKIE_DURATION=timedelta(days=30),
     REMEMBER_COOKIE_HTTPONLY=True,
-    REMEMBER_COOKIE_SECURE=is_production,       # True em produção, False em dev
     REMEMBER_COOKIE_SAMESITE='Lax',
-    PERMANENT_SESSION_LIFETIME=timedelta(hours=2),  # Alinhado com remember=False
+    PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 )
 
 # ============================================================================
@@ -548,145 +471,48 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'upgrade_plans'
 
-# ============================================================================
-# 🛡️ GATE DE VERSÃO DE SESSÃO (ENTRADA SEGURA)
-# ============================================================================
-
-@app.before_request
-def session_version_gate():
-    """Gate de versão de sessão - invalida cookies antigos automaticamente."""
-    # ignore rotas que nunca devem exigir sessão
-    if request.path in ("/healthz", "/favicon.ico", "/robots.txt") or request.endpoint in (None, 'static'):
-        return
-    
-    sv = session.get('_sv')  # session version
-    if sv != APP_SESSION_VERSION:
-        # Sessão velha/estranha → limpa e recomeça
-        session.clear()
-        session['_sv'] = APP_SESSION_VERSION
-        # opcional: carimbar um nonce de boot
-        session['_boot'] = True
-
-@app.before_request
-def session_fingerprint_gate():
-    """Gate de fingerprint com tolerância a troca de IP (4G/proxy)."""
-    # ignore rotas que nunca devem exigir sessão
-    if request.path in ("/healthz", "/favicon.ico", "/robots.txt") or request.endpoint in (None, 'static'):
-        return
-    cur = _fingerprint()
-    old = session.get('_fp')
-    if old is None:
-        session['_fp'] = cur
-        session['_fp_ua'] = (request.headers.get('User-Agent','') or '')[:120]
-        return
-    if old != cur:
-        ua_now = (request.headers.get('User-Agent','') or '')[:120]
-        ua_old = session.get('_fp_ua')
-        # Se só o IP mudou e o UA é o mesmo, atualiza sem deslogar
-        if ua_old == ua_now:
-            fp_log.info("FP updated by IP change only")
-            session['_fp'] = cur
-            return
-        # Mudou UA (outro device/navegador) → reinicia sessão
-        fp_log.info("FP reset by UA change; dropping session")
-        session.clear()
-        session['_sv'] = APP_SESSION_VERSION
-        session['_fp'] = cur
-        session['_fp_ua'] = ua_now
-
-@app.before_request
-def session_time_guard():
-    """Gate de timeout - mata sessões zumbis por tempo."""
-    # ignore rotas que nunca devem exigir sessão
-    if request.path in ("/healthz", "/favicon.ico", "/robots.txt") or request.endpoint in (None, 'static'):
-        return
-    
-    meta = session.get('_meta')
-    now = datetime.utcnow()
-
-    if not meta:
-        session['_meta'] = {'iat': now.isoformat(), 'last': now.isoformat()}
-        return
-
-    iat  = datetime.fromisoformat(meta['iat'])
-    last = datetime.fromisoformat(meta['last'])
-
-    if (now - last) > MAX_IDLE or (now - iat) > MAX_AGE:
-        session.clear()
-        session['_sv'] = APP_SESSION_VERSION
-        session['_meta'] = {'iat': now.isoformat(), 'last': now.isoformat()}
-        return
-
-    # refresh last activity
-    meta['last'] = now.isoformat()
-    session['_meta'] = meta
-
-@app.after_request
-def add_security_headers(resp):
-    """Evita cache e garante Vary correto em páginas autenticadas."""
-    resp.headers['Cache-Control'] = 'no-store'
-    resp.headers['Pragma'] = 'no-cache'
-    resp.headers['Vary'] = 'Cookie, User-Agent'
-    # HSTS só em prod e conexão segura
-    if is_production and request.is_secure:
-        resp.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-    return resp
-
-# ============================================================================
-# 🔍 LOG DE DIAGNÓSTICO TEMPORÁRIO (REMOVER DEPOIS)
-# ============================================================================
-# Funções de debug removidas para evitar interferência
-
-@app.get('/session_status')
-def session_status():
-    """Endpoint para verificar status da sessão e autenticação."""
-    return jsonify({
-        'is_authenticated': bool(getattr(current_user,'is_authenticated', False)),
-        'has_auth_key': bool(session.get('auth_key')),
-    })
-
-# 🔎 Diagnóstico: força um Set-Cookie para validar no navegador
-@app.get('/debug_set_cookie')
-def debug_set_cookie():
-    info = {
-        "secure": app.config['SESSION_COOKIE_SECURE'],
-        "samesite": app.config['SESSION_COOKIE_SAMESITE'],
-        "http_only": app.config['SESSION_COOKIE_HTTPONLY'],
-        "name": app.config.get('SESSION_COOKIE_NAME', 'session')
-    }
-    resp = jsonify(info)
-    resp.set_cookie(
-        key='li_test',
-        value='ok',
-        secure=app.config['SESSION_COOKIE_SECURE'],
-        httponly=True,
-        samesite=app.config['SESSION_COOKIE_SAMESITE'],
-        max_age=3600
-    )
-    return resp
-
 @login_manager.user_loader
 def load_user(user_id):
     """Carrega usuário da sessão."""
     try:
+        print("="*60)
+        print("🔍 LOAD_USER CHAMADO!")
+        print(f"🔍 USER_ID RECEBIDO: {user_id}")
+        print(f"🔍 TIPO USER_ID: {type(user_id)}")
+        print("="*60)
+
         if not user_id:
+            print("❌ USER_ID É NONE OU VAZIO - RETORNANDO NONE")
             return None
 
         try:
             user_id_int = int(user_id)
-        except ValueError:
+            print(f"🔍 USER_ID CONVERTIDO PARA INT: {user_id_int}")
+        except ValueError as e:
+            print(f"❌ ERRO AO CONVERTER USER_ID PARA INT: {e}")
             return None
 
         user = get_user_by_id(user_id_int)
-        if not user:
-            return None
 
-        # 🔒 MARCAR COMO AUTENTICADO - CONFIA NO FLASK-LOGIN
-        user.set_authenticated(True)
+        if user:
+            # 🔒 MARCAR COMO AUTENTICADO APENAS SE CHAVE VÁLIDA
+            auth_key = session.get('auth_key')
+            if validar_chave_autenticacao(auth_key):
+                user.set_authenticated(True)
+                print(f"✅ USUÁRIO AUTENTICADO (chave válida): ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
+            else:
+                user.set_authenticated(False)
+                print(f"🔍 USUÁRIO CARREGADO (chave inválida/ausente): ID={user.id}, EMAIL={user.email}, LEVEL={user.level}")
+            
+            print(f"✅ IS_AUTHENTICATED: {user.is_authenticated}")
+        else:
+            print(f"❌ USUÁRIO NÃO ENCONTRADO PARA ID: {user_id_int}")
 
+        print("="*60)
         return user
 
     except Exception as e:
+        print(f"❌ ERRO GERAL EM LOAD_USER: {e}")
         logger.error(f"Erro ao carregar usuário: {e}")
         return None
 
@@ -695,30 +521,30 @@ def load_user(user_id):
 # 🔒 MIDDLEWARE UNIVERSAL DE CONTROLE DE ACESSO
 # ============================================================================
 
-# ROTAS_GRATUITAS removido - usando apenas UserPermissions.FREE_ROUTES
-
-def verificar_usuario_logado() -> bool:
-    """Verifica se o usuário está realmente logado - confia no Flask-Login."""
-    try:
-        from flask_login import current_user
-        return bool(getattr(current_user, 'is_authenticated', False))
-    except Exception:
-        return False
+# ROTAS GRATUITAS (apenas estas 4 são liberadas)
+ROTAS_GRATUITAS = {
+    '/dashboard_milionaria',
+    '/dashboard_quina', 
+    '/dashboard_lotomania',
+    '/boloes_loterias'
+}
 
 def verificar_acesso_universal(f):
+    """Middleware que libera rotas free e valida login/premium nas demais."""
+    from functools import wraps
     @wraps(f)
     def decorated(*args, **kwargs):
         route = request.path
 
-        # 1) FREE liberadas
+        # 1) Libera rotas FREE
         if UserPermissions.is_free_route(route):
             return f(*args, **kwargs)
 
-        # 2) Premium/protegidas: confia no Flask-Login
+        # 2) Se não estiver logado, manda para os planos
         if not current_user.is_authenticated:
             return redirect('/upgrade_plans')
 
-        # 3) Plano do usuário
+        # 3) Logado: se for master/premium, libera; senão, planos
         if UserPermissions.has_access(route, current_user):
             return f(*args, **kwargs)
 
@@ -736,9 +562,9 @@ def verificar_acesso_universal(f):
 @app.route('/login', methods=['POST'])
 def login():
     """Login com email e senha."""
-    data = request.get_json(silent=True) or request.form
-    email = (data.get('email') or '').strip()
-    senha = (data.get('senha') or '').strip()
+    data = request.get_json()
+    email = data.get('email')
+    senha = data.get('senha')
     
     if not email or not senha:
         return jsonify({'success': False, 'error': 'Email e senha são obrigatórios'}), 400
@@ -753,18 +579,19 @@ def login():
     # 🔑 GERAR CHAVE DE AUTENTICAÇÃO ÚNICA
     auth_key = gerar_chave_autenticacao()
     
-    # 🔑 SALVAR AUTH_KEY NA SESSÃO
-    session['auth_key'] = auth_key
-    session['login_timestamp'] = datetime.utcnow().isoformat()
-    
-    # 🔑 INICIALIZAR META DE TIMEOUT
-    now = datetime.utcnow().isoformat()
-    session['_meta'] = {'iat': now, 'last': now}
-    
-    # 🔑 MARCAR COMO AUTENTICADO E FAZER LOGIN
+    # 🔑 MARCAR COMO AUTENTICADO ANTES DO LOGIN
     user.set_authenticated(True)
-    login_user(user, remember=False)  # Sessão não-permanente
-    session.permanent = False
+    
+    # 🔑 FLAGS DE SESSÃO PARA CONTROLE DE AUTENTICAÇÃO
+    session['user_authenticated'] = True
+    session['auth_key'] = auth_key
+    session['login_timestamp'] = datetime.now().isoformat()
+    
+    # 🔑 fixa a sessão
+    login_user(user, remember=True, force=True, fresh=True)
+    session.permanent = True
+    
+    # Login realizado com sucesso
 
     return jsonify({'success': True, 'message': 'Login realizado com sucesso!',
                     'user_level': user.level, 'is_premium': user.is_premium,
@@ -774,54 +601,35 @@ def login():
 @login_required
 def logout():
     """Logout do usuário."""
-    from flask_login import logout_user
-    resp = redirect(url_for('landing_page'))
-
-    # 1) desloga no Flask-Login
+    # 🔒 MARCAR COMO NÃO AUTENTICADO
+    if hasattr(current_user, 'set_authenticated'):
+        current_user.set_authenticated(False)
+    
+    # 🔒 LIMPAR FLAGS DE SESSÃO E CHAVE
+    session.pop('user_authenticated', None)
+    session.pop('auth_key', None)
+    session.pop('login_timestamp', None)
+    
     logout_user()
+    return redirect(url_for('landing_page'))
 
-    # 2) zera a sessão
-    session.clear()
 
-    # 3) apaga cookies relevantes
-    resp.delete_cookie('session')           # cookie de sessão do Flask
-    resp.delete_cookie('remember_token')    # cookie de "lembrar-me" do Flask-Login
-
-    return resp
-
-@app.route('/wipe_session')
-def wipe_session():
-    """Endpoint de limpeza forçada para debug."""
-    resp = redirect(url_for('landing_page'))
-    session.clear()
-    resp.delete_cookie('session')
-    resp.delete_cookie('remember_token')
-    return resp
-
-@app.route('/debug_config_full')
-def debug_config_full():
-    """Debug completo das configurações de sessão e cookies."""
-    from flask import jsonify
-    cfg = {k: str(v) for k, v in app.config.items()
-           if k.startswith('REMEMBER_') or k.startswith('SESSION_')}
-    cfg['cookies_present'] = list(request.cookies.keys())
-    return jsonify(cfg)
 
 @app.route('/upgrade_plans')
 def upgrade_plans():
     """Página de planos premium."""
-    return render_template('upgrade_plans.html', is_logged_in=verificar_usuario_logado())
+    return render_template('upgrade_plans.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/politica_cookies')
 def politica_cookies():
     """Renderiza a página de política de cookies."""
     from datetime import datetime
-    return render_template('politica_cookies.html', data_atual=datetime.utcnow().strftime('%d/%m/%Y'), is_logged_in=verificar_usuario_logado())
+    return render_template('politica_cookies.html', data_atual=datetime.now().strftime('%d/%m/%Y'), is_logged_in=current_user.is_authenticated)
 
 @app.route('/checkout')
 def checkout():
     """Página de checkout/pagamento."""
-    return render_template('checkout.html', is_logged_in=verificar_usuario_logado())
+    return render_template('checkout.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/checkout-transparente/<plano_id>')
 def checkout_transparente(plano_id):
@@ -832,7 +640,7 @@ def checkout_transparente(plano_id):
     if not plano:
         return "Plano não encontrado", 404
     
-    return render_template('checkout_transparente.html', is_logged_in=verificar_usuario_logado(), 
+    return render_template('checkout_transparente.html', is_logged_in=current_user.is_authenticated, 
                          plano_id=plano_id,
                          plano_nome=plano['nome'],
                          plano_valor=plano['preco'])
@@ -1039,7 +847,7 @@ def checkout_public_key():
 @app.route('/premium_required')
 def premium_required():
     """Página de erro para acesso premium."""
-    return render_template('premium_required.html', is_logged_in=verificar_usuario_logado())
+    return render_template('premium_required.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/upgrade_plan', methods=['POST'])
 @login_required
@@ -1068,13 +876,13 @@ def upgrade_plan():
     
     # Definir data de expiração
     if plan == 'daily':
-        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=1)
+        current_user.subscription_expiry = datetime.now() + timedelta(days=1)
     elif plan == 'monthly':
-        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=30)
+        current_user.subscription_expiry = datetime.now() + timedelta(days=30)
     elif plan == 'semestral':
-        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=180)
+        current_user.subscription_expiry = datetime.now() + timedelta(days=180)
     elif plan == 'annual':
-        current_user.subscription_expiry = datetime.utcnow() + timedelta(days=365)
+        current_user.subscription_expiry = datetime.now() + timedelta(days=365)
     elif plan == 'lifetime':
         current_user.subscription_expiry = None
     
@@ -1303,18 +1111,24 @@ def validar_codigo_confirmacao():
         print(f"❌ Erro ao validar código: {e}")
         return jsonify({'success': False, 'error': 'Erro interno do servidor'}), 500
 
-@app.route('/check_access/<path:rota>')
-def check_access(rota):
-    route_path = '/' + rota if not rota.startswith('/') else rota
+@app.route('/check_access/<path:route_name>')
+def check_access(route_name):
+    """Checa se o usuário atual tem acesso à rota informada."""
+    route = '/' + route_name.lstrip('/')
 
-    if UserPermissions.is_free_route(route_path):
-        return jsonify({'has_access': True})
+    # Sem aliases - usar rota diretamente
 
+    # Rota free? libera
+    if UserPermissions.is_free_route(route):
+        return jsonify({'has_access': True, 'reason': 'free_allowed'})
+
+    # Precisa login?
     if not current_user.is_authenticated:
         return jsonify({'has_access': False, 'reason': 'not_logged_in', 'upgrade_url': '/upgrade_plans'})
 
-    if UserPermissions.has_access(route_path, current_user):
-        return jsonify({'has_access': True})
+    # Master/premium?
+    if UserPermissions.has_access(route, current_user):
+        return jsonify({'has_access': True, 'reason': 'ok'})
 
     return jsonify({'has_access': False, 'reason': 'premium_required', 'upgrade_url': '/upgrade_plans'})
 
@@ -1352,97 +1166,83 @@ from utils.data_helpers import _to_native, limpar_valores_problematicos
 # Certifique-se de que esses arquivos Python (.py) estejam no mesmo diretório
 # ou em um subdiretório acessível (no caso, eles estão todos no mesmo nível da pasta +Milionaria/)
 
-# Imports pesados movidos para lazy loading - serão importados quando necessário
+# Importa a função de análise de frequência geral
+from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia_milionaria_completa
+
+# Importa a função de análise de distribuição
+from funcoes.milionaria.funcao_analise_de_distribuicao import analise_distribuicao_milionaria
+from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribuicao_megasena
+
+# Importa a função de análise de combinações
+from funcoes.milionaria.funcao_analise_de_combinacoes import analise_combinacoes_milionaria
+from funcoes.megasena.funcao_analise_de_combinacoes_MS import analise_combinacoes_megasena
+from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
+
+# Importa a função de análise de padrões e sequências
+from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
+
+# Importa a função de análise dos trevos da sorte (frequência e combinações)
+# Assumo que 'analise_trevos_da_sorte' é a função principal deste arquivo
+from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
+
+# As funções de 'calculos.py' e a classe 'AnaliseEstatisticaAvancada' de 'analise_estatistica_avancada.py'
+from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
+from funcoes.megasena.calculos_MS import calcular_seca_numeros_megasena
+from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
+from funcoes.megasena.analise_estatistica_avancada_MS import AnaliseEstatisticaAvancada as AnaliseEstatisticaAvancadaMS
 
 
 
-# Imports pesados movidos para lazy loading - serão importados quando necessário
+# --- Importações para Mega Sena ---
+from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
+from funcoes.megasena.gerarCombinacao_numeros_aleatoriosMegasena_MS import gerar_aposta_personalizada
+
+# --- Importações para Quina ---
+from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribuicao_quina
+from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
+from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analisar_padroes_sequencias_quina
+from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaAvancadaQuina
+
+# --- Importações para Lotomania ---
+from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
+from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_frequencia_lotomania
+
+# --- Importações para Lotofácil ---
+from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil, obter_ultimos_concursos_lotofacil
+from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import analisar_frequencia_lotofacil, obter_estatisticas_rapidas_lotofacil
+from funcoes.lotofacil.funcao_analise_de_distribuicao_lotofacil import analisar_distribuicao_lotofacil
+from funcoes.lotofacil.funcao_analise_de_combinacoes_lotofacil import analisar_combinacoes_lotofacil
+from funcoes.lotofacil.funcao_analise_de_padroes_sequencia_lotofacil import analisar_padroes_sequencias_lotofacil
+from funcoes.lotofacil.analise_estatistica_avancada_lotofacil import AnaliseEstatisticaAvancadaLotofacil, realizar_analise_estatistica_avancada_lotofacil
+from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosL_lotofacil import gerar_aposta_personalizada_lotofacil, gerar_aposta_aleatoria_lotofacil
+
+# Funções de carregamento movidas para services/data_loader.py
 
 # Funções de carregamento movidas para services/data_loader.py
 from services.data_loader import carregar_dados_milionaria, carregar_dados_megasena_app, carregar_dados_quina_app
-from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
 
-# Importações das funções da Milionária (como estava no backup)
-from funcoes.milionaria.funcao_analise_de_distribuicao import analise_distribuicao_milionaria
-from funcoes.milionaria.funcao_analise_de_combinacoes import analise_combinacoes_milionaria
-from funcoes.milionaria.funcao_analise_de_padroes_sequencia import analise_padroes_sequencias_milionaria
-from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise_trevos_da_sorte
-from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
-from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
-
-# Variáveis globais para armazenar os DataFrames (como estava no backup)
+# Variáveis globais para armazenar os DataFrames
 df_milionaria = None
 df_megasena = None
 df_quina = None
 df_lotofacil = None
 
-# Carrega os dados na inicialização do aplicativo (como estava no backup)
+# Carrega os dados na inicialização do aplicativo
 with app.app_context():
     df_milionaria = carregar_dados_milionaria()
     df_megasena = carregar_dados_megasena_app()
     df_quina = carregar_dados_quina_app()
     df_lotofacil = carregar_dados_lotofacil()
 
-# ============================================================================
-# ⚙️ CARREGAMENTO DE DADOS (LAZY LOADING)
-# ============================================================================
-
-_data_cache = {}
-
-def _lazy_import_pandas():
-    """Importa pandas apenas quando necessário."""
-    import pandas as pd
-    return pd
-
-def _lazy_import_numpy():
-    """Importa numpy apenas quando necessário."""
-    import numpy as np
-    return np
-
-def carregar_dados_da_loteria(loteria):
-    """Carrega dados da loteria especificada, se ainda não estiver em cache."""
-    global _data_cache
-    
-    if loteria not in _data_cache:
-        logger.info(f"Carregando dados da {loteria}...")
-        
-        if loteria == "mais_milionaria":
-            _data_cache[loteria] = carregar_dados_milionaria()
-        elif loteria == "megasena":
-            _data_cache[loteria] = carregar_dados_megasena_app()
-        elif loteria == "quina":
-            _data_cache[loteria] = carregar_dados_quina_app()
-        elif loteria == "lotofacil":
-            # Lazy import para lotofácil
-            from funcoes.lotofacil.LotofacilFuncaCarregaDadosExcel import carregar_dados_lotofacil
-            _data_cache[loteria] = carregar_dados_lotofacil()
-        elif loteria == "lotomania":
-            # Lazy import para lotomania
-            pd = _lazy_import_pandas()
-            import os
-            excel_path = os.path.join(os.getcwd(), 'LoteriasExcel', 'Lotomania_edt.xlsx')
-            logger.info(f"Tentando carregar Lotomania de: {excel_path}")
-            if os.path.exists(excel_path):
-                _data_cache[loteria] = pd.read_excel(excel_path)
-                logger.info(f"Lotomania carregada com sucesso. Linhas: {len(_data_cache[loteria])}")
-            else:
-                logger.error(f"Arquivo Lotomania não encontrado: {excel_path}")
-                _data_cache[loteria] = None
-        else:
-            logger.error(f"Loteria desconhecida: {loteria}")
-            return None
-    
-    return _data_cache.get(loteria)
-
 @app.route('/')
 def landing_page():
     """Renderiza a página landing como página inicial."""
-    return render_template('landing.html', modo_desenvolvimento=MODO_DESENVOLVIMENTO, is_logged_in=verificar_usuario_logado())
+    return render_template('landing.html', modo_desenvolvimento=MODO_DESENVOLVIMENTO, is_logged_in=current_user.is_authenticated)
 
 @app.route('/planos')
 def planos_page():
     """Renderiza a página de planos premium."""
-    return render_template('upgrade_plans.html', is_logged_in=verificar_usuario_logado())
+    return render_template('upgrade_plans.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/api/carousel_data')
 def get_carousel_data():
@@ -1469,8 +1269,7 @@ def get_carousel_data():
         else:
             logger.info(f"Arquivo CSV encontrado: {csv_path}")
         
-        # Lê o CSV com lazy loading
-        pd = _lazy_import_pandas()
+        # Lê o CSV
         df = pd.read_csv(csv_path, encoding='utf-8')
         logger.info(f"CSV lido com sucesso. Colunas: {list(df.columns)}")
         logger.info(f"Total de linhas: {len(df)}")
@@ -1529,7 +1328,7 @@ def dashboard():
 @verificar_acesso_universal
 def dashboard_milionaria():
     """Renderiza a página principal do dashboard da Milionária."""
-    return render_template('dashboard_milionaria.html', is_logged_in=verificar_usuario_logado())
+    return render_template('dashboard_milionaria.html', is_logged_in=current_user.is_authenticated)
 
 # --- Rotas de API para as Análises ---
 
@@ -1551,9 +1350,6 @@ def get_analise_frequencia_nova():
         
         # Executar análise com dados reais
         # print("🔍 Chamando analisar_frequencia...")  # DEBUG - COMENTADO
-        df_milionaria = carregar_dados_da_loteria("mais_milionaria")
-        if df_milionaria is None or df_milionaria.empty:
-            return jsonify({"error": "Dados da +Milionária não carregados."}), 500
         resultado = analisar_frequencia(df_milionaria=df_milionaria, qtd_concursos=qtd_concursos)
         # print(f"🔍 Resultado tipo: {type(resultado)}")  # DEBUG - COMENTADO
         # print(f"🔍 Resultado: {resultado}")  # DEBUG - COMENTADO
@@ -1597,9 +1393,6 @@ def get_analise_frequencia_megasena():
         
         # Executar análise com dados reais da Mega Sena
         # print("🔍 Chamando analisar_frequencia Mega Sena...")  # DEBUG - COMENTADO
-        df_megasena = carregar_dados_da_loteria("megasena")
-        if df_megasena is None or df_megasena.empty:
-            return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
         resultado = analisar_frequencia(df_megasena=df_megasena, qtd_concursos=qtd_concursos)
         # print(f"🔍 Resultado tipo: {type(resultado)}")  # DEBUG - COMENTADO
         # print(f"🔍 Resultado: {resultado}")  # DEBUG - COMENTADO
@@ -1614,13 +1407,7 @@ def get_analise_frequencia_megasena():
             # Converter dados do DataFrame para formato da matriz
             # Se qtd_concursos for None (todos os concursos), limitar a 300 para evitar loop
             limite_efetivo = qtd_concursos if qtd_concursos else 300
-            df_megasena = carregar_dados_da_loteria("megasena")
-            if df_megasena is None or df_megasena.empty:
-                return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
             df_filtrado = df_megasena.tail(limite_efetivo)
-            # Importar pandas para uso local
-            pd = _lazy_import_pandas()
-            
             for _, row in df_filtrado.iterrows():
                 if not pd.isna(row['Concurso']):
                     concursos_para_matriz.append({
@@ -1644,8 +1431,7 @@ def get_analise_frequencia_megasena():
 @app.route('/api/analise_padroes_sequencias', methods=['GET'])
 def get_analise_padroes_sequencias():
     """Retorna os dados da análise de padrões e sequências."""
-    df_milionaria = carregar_dados_da_loteria("mais_milionaria")
-    if df_milionaria is None or df_milionaria.empty:
+    if df_milionaria.empty:
         return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
     # Verificar se há parâmetro de quantidade de concursos
@@ -1658,24 +1444,16 @@ def get_analise_padroes_sequencias():
 
 @app.route('/api/analise_de_distribuicao', methods=['GET'])
 def get_analise_de_distribuicao():
-    """Retorna os dados da análise de distribuição da +Milionária."""
-    try:
-        # Carrega os dados no escopo da rota (lazy loading)
-        df_milionaria = carregar_dados_da_loteria("mais_milionaria")
-        if df_milionaria is None or df_milionaria.empty:
-            return jsonify({"error": "Dados da +Milionária não carregados."}), 500
+    """Retorna os dados da análise de distribuição."""
+    if df_milionaria.empty:
+        return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
-        # Parâmetro opcional: quantidade de concursos
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
+    # Verificar se há parâmetro de quantidade de concursos
+    qtd_concursos = request.args.get('qtd_concursos', type=int)
+    # print(f"🎯 Distribuição - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
 
-        # Import lazy da função de análise
-        from funcoes.milionaria.funcao_analise_de_distribuicao import analise_distribuicao_milionaria
-        resultado = analise_distribuicao_milionaria(df_milionaria, qtd_concursos)
-
-        return jsonify(resultado)
-    except Exception as e:
-        logger.error(f"Erro na API de distribuição +Milionária: {e}")
-        return jsonify({'error': 'Erro interno do servidor'}), 500
+    resultado = analise_distribuicao_milionaria(df_milionaria, qtd_concursos)
+    return jsonify(resultado)
 
 @app.route('/api/analise_de_distribuicao-MS', methods=['GET'])
 def get_analise_de_distribuicao_megasena():
@@ -1716,65 +1494,12 @@ def get_analise_frequencia_quina():
         # Obter parâmetro de quantidade de concursos (padrão: 50)
         qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
         
-        # Carregar dados da Quina usando lazy loading
-        df_quina = carregar_dados_da_loteria("quina")
-        
         # Executar análise com dados reais da Quina
         resultado = analisar_frequencia_quina(df_quina=df_quina, qtd_concursos=qtd_concursos)
         
         if not resultado or resultado == {}:
             print("❌ Resultado vazio ou None")
             return jsonify({'error': 'Erro ao carregar dados de frequência da Quina.'}), 500
-        
-        # Adicionar análises temporais ao resultado
-        try:
-            from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_temporal_estruturada_quina
-            
-            # Converter DataFrame para formato esperado pelas funções temporais
-            dados_sorteios = []
-            for _, row in df_quina.iterrows():
-                concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
-                bolas = [int(row[f'Bola{i}']) for i in range(1, 6) if pd.notna(row[f'Bola{i}'])]
-                if len(bolas) == 5:
-                    dados_sorteios.append([concurso] + bolas)
-            
-            # Análise temporal estruturada
-            analise_temporal = analise_frequencia_temporal_estruturada_quina(dados_sorteios, periodo='meses', qtd_concursos=qtd_concursos)
-            resultado['analise_temporal'] = analise_temporal or {}
-            
-        except Exception as e:
-            print(f"⚠️ Erro ao carregar análises temporais: {e}")
-            resultado['analise_temporal'] = {}
-        
-        # Adicionar análise de combinações (versão simplificada)
-        print("🔍 DEBUG: Iniciando análise de combinações...")
-        try:
-            from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
-            print("✅ DEBUG: Importação da função OK")
-            
-            # Análise de combinações simplificada
-            print(f"🔍 DEBUG: Chamando analisar_combinacoes_quina com qtd_concursos={qtd_concursos}")
-            combinacoes = analisar_combinacoes_quina(df_quina, qtd_concursos=qtd_concursos)
-            print(f"✅ DEBUG: Função executada. Tipo: {type(combinacoes)}")
-            
-            if combinacoes:
-                print(f"✅ DEBUG: Combinacoes não vazio. Chaves: {list(combinacoes.keys())}")
-                # Extrair apenas dados essenciais para evitar problemas de serialização
-                resultado['analise_combinacoes'] = {
-                    'padroes_geometricos': combinacoes.get('padroes_geometricos', {}),
-                    'afinidade_entre_numeros': combinacoes.get('afinidade_entre_numeros', {}),
-                    'combinacoes_frequentes': combinacoes.get('combinacoes_frequentes', {})
-                }
-                print("✅ DEBUG: analise_combinacoes adicionado ao resultado")
-            else:
-                print("❌ DEBUG: Combinacoes vazio")
-                resultado['analise_combinacoes'] = {}
-                
-        except Exception as e:
-            print(f"❌ DEBUG: Erro ao carregar combinações: {e}")
-            import traceback
-            traceback.print_exc()
-            resultado['analise_combinacoes'] = {}
 
         # Preparar dados dos concursos individuais para a matriz visual
         concursos_para_matriz = []
@@ -1787,9 +1512,6 @@ def get_analise_frequencia_quina():
         df_filtrado = df_quina.tail(limite_efetivo)
         print(f"🔍 Debug: Shape do df_filtrado={df_filtrado.shape}")
         
-        # Importar pandas para uso local
-        pd = _lazy_import_pandas()
-        
         for _, row in df_filtrado.iterrows():
             if not pd.isna(row['Concurso']):
                 concursos_para_matriz.append({
@@ -1800,13 +1522,6 @@ def get_analise_frequencia_quina():
         
         print(f"🔍 Debug: Total de concursos para matriz={len(concursos_para_matriz)}")
 
-        # Log final para verificar o que está sendo retornado
-        print(f"🔍 DEBUG: Resultado final. Chaves: {list(resultado.keys())}")
-        if 'analise_combinacoes' in resultado:
-            print("✅ DEBUG: analise_combinacoes presente no resultado final")
-        else:
-            print("❌ DEBUG: analise_combinacoes NÃO presente no resultado final")
-
         return jsonify({
             'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
             'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
@@ -1814,8 +1529,7 @@ def get_analise_frequencia_quina():
             'analise_temporal': resultado['analise_temporal'],
             'periodo_analisado': resultado['periodo_analisado'],
             'concursos_para_matriz': concursos_para_matriz,  # Dados para a matriz visual
-            'ultimos_concursos': resultado.get('ultimos_concursos', []),  # Dados para o grid
-            'analise_combinacoes': resultado.get('analise_combinacoes', {})  # Dados de combinações
+            'ultimos_concursos': resultado.get('ultimos_concursos', [])  # Dados para o grid
         })
     except Exception as e:
         print(f"❌ Erro na API de frequência Quina: {e}")
@@ -1825,71 +1539,25 @@ def get_analise_frequencia_quina():
 def analise_frequencia_lotomania_api():
     """API para análise de frequência da Lotomania"""
     try:
-        logger.info("=== INICIANDO API LOTOMANIA ===")
-        
-        # Verificar ambiente e arquivos
-        import os
-        logger.info(f"PWD: {os.getcwd()}")
-        logger.info(f"Lista LoteriasExcel: {os.listdir('LoteriasExcel') if os.path.exists('LoteriasExcel') else 'Diretório não existe'}")
-        logger.info(f"Arquivo Lotomania existe? {os.path.exists(os.path.join(os.getcwd(), 'LoteriasExcel', 'Lotomania_edt.xlsx'))}")
-        
-        # Carregar dados da Lotomania usando função centralizada
-        logger.info("Carregando dados da Lotomania...")
-        df_lotomania = carregar_dados_da_loteria("lotomania")
-        
-        if df_lotomania is None:
-            logger.error("Dados da Lotomania são None")
-            return jsonify({"error": "Erro ao carregar dados da Lotomania"}), 500
-        
-        logger.info(f"Dados carregados. Linhas: {len(df_lotomania)}")
-        logger.info(f"Colunas: {df_lotomania.columns.tolist()}")
+        # Carregar dados da Lotomania
+        df_lotomania = pd.read_excel('LoteriasExcel/Lotomania_edt.xlsx')
         
         # Executar análise de frequência (últimos 300 concursos)
-        logger.info("Executando análise de frequência...")
-        
-        # Usar a função que aceita DataFrame (igual às outras APIs)
-        logger.info("Importando função analise_frequencia_lotomania_completa...")
-        from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analise_frequencia_lotomania_completa
-        logger.info("Função importada com sucesso!")
-        
-        logger.info("Chamando analise_frequencia_lotomania_completa...")
-        resultado = analise_frequencia_lotomania_completa(df_lotomania, qtd_concursos=300)
-        logger.info(f"Resultado da função: {type(resultado)}")
+        resultado = analisar_frequencia_lotomania(df_lotomania, qtd_concursos=300)
         
         if resultado:
-            logger.info("Análise concluída com sucesso!")
-            
-            # Extrair dados da estrutura aninhada para compatibilidade com o frontend
-            if 'analise_frequencia' in resultado:
-                analise = resultado['analise_frequencia']
-                # Retornar na mesma estrutura das outras APIs
-                return jsonify({
-                    'analise_temporal': analise.get('analise_temporal', []),
-                    'frequencia_absoluta_numeros': analise.get('frequencia_absoluta', {}).get('numeros', {}),
-                    'frequencia_relativa_numeros': analise.get('frequencia_relativa', {}).get('numeros', {}),
-                    'numeros_quentes_frios': analise.get('numeros_quentes_frios', {}),
-                    'periodo_analisado': resultado.get('periodo_analisado', {})
-                })
-            else:
-                return jsonify(resultado)
+            return jsonify(resultado)
         else:
-            logger.error("Resultado da análise é None ou vazio")
             return jsonify({"error": "Não foi possível analisar os dados da Lotomania"}), 500
             
     except Exception as e:
-        import traceback
-        tb = traceback.format_exc()
         logger.error(f"Erro ao analisar frequência da Lotomania: {e}")
-        logger.error(f"Traceback completo:\n{tb}")
         return jsonify({"error": "Erro interno do servidor"}), 500
 
 @app.route('/api/analise-frequencia-lotofacil')
 def analise_frequencia_lotofacil_api():
     """API para análise de frequência da Lotofácil"""
     try:
-        # Importar função necessária
-        from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import obter_estatisticas_rapidas_lotofacil
-        
         # Executar análise de frequência da Lotofácil
         resultado = obter_estatisticas_rapidas_lotofacil()
         
@@ -1960,9 +1628,6 @@ def analise_frequencia_lotofacil_v2_api():
                 if concurso_col and bolas_cols:
                     df_ord = df.sort_values(concurso_col, ascending=False)
                     limite = qtd_concursos if qtd_concursos else 300
-                    # Importar pandas para uso local
-                    pd = _lazy_import_pandas()
-                    
                     for _, row in df_ord.head(limite).iloc[::-1].iterrows():
                         try:
                             concurso_num = int(row[concurso_col]) if not pd.isna(row[concurso_col]) else None
@@ -1998,10 +1663,7 @@ def analise_frequencia_lotofacil_v2_api():
 def get_analise_de_distribuicao_quina():
     """Retorna os dados da análise de distribuição da Quina."""
     try:
-        # Carregar dados da Quina usando lazy loading
-        df_quina = carregar_dados_da_loteria("quina")
-        
-        if df_quina is None or df_quina.empty:
+        if df_quina.empty:
             return jsonify({"error": "Dados da Quina não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
@@ -2024,7 +1686,6 @@ def get_analise_de_distribuicao_quina():
 def get_analise_de_distribuicao_lotofacil():
     """Retorna os dados da análise de distribuição da Lotofácil."""
     try:
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
 
@@ -2041,10 +1702,7 @@ def get_analise_de_distribuicao_lotofacil():
 def get_analise_de_combinacoes_quina():
     """Retorna os dados da análise de combinações da Quina."""
     try:
-        # Carregar dados da Quina usando lazy loading
-        df_quina = carregar_dados_da_loteria("quina")
-        
-        if df_quina is None or df_quina.empty:
+        if df_quina.empty:
             return jsonify({"error": "Dados da Quina não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
@@ -2063,7 +1721,6 @@ def get_analise_de_combinacoes_quina():
 def get_analise_de_combinacoes_lotofacil():
     """Retorna os dados da análise de combinações da Lotofácil."""
     try:
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
 
@@ -2079,10 +1736,7 @@ def get_analise_de_combinacoes_lotofacil():
 def get_analise_padroes_sequencias_quina():
     """Retorna os dados da análise de padrões e sequências da Quina."""
     try:
-        # Carregar dados da Quina usando lazy loading
-        df_quina = carregar_dados_da_loteria("quina")
-        
-        if df_quina is None or df_quina.empty:
+        if df_quina.empty:
             return jsonify({"error": "Dados da Quina não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
@@ -2101,7 +1755,6 @@ def get_analise_padroes_sequencias_quina():
 def get_analise_padroes_sequencias_lotofacil():
     """Retorna os dados da análise de padrões e sequências da Lotofácil."""
     try:
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
 
@@ -2117,7 +1770,6 @@ def get_analise_padroes_sequencias_lotofacil():
 @app.route('/api/analise_seca_lotofacil', methods=['GET'])
 def api_analise_seca_lotofacil():
     try:
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
 
@@ -2127,9 +1779,6 @@ def api_analise_seca_lotofacil():
         qtd_concursos = min(qtd_concursos, 200)
 
         # Detectores locais de colunas (concurso e bolas 1..15)
-        # Importar pandas para uso local
-        pd = _lazy_import_pandas()
-        
         def _detectar_coluna_concurso_local(df: pd.DataFrame):
             possiveis = ['concurso', 'nrconcurso', 'n_concurso', 'numero_concurso', 'idconcurso']
             lower = {str(c).strip().lower(): c for c in df.columns}
@@ -2165,9 +1814,6 @@ def api_analise_seca_lotofacil():
         if concurso_col is None or not bolas:
             return jsonify({'error': 'Colunas de concurso/bolas não detectadas.'}), 500
 
-        # Importar pandas para uso local
-        pd = _lazy_import_pandas()
-        
         df = df_lotofacil.copy()
         for col in bolas:
             df[col] = pd.to_numeric(df[col], errors='coerce')
@@ -2192,9 +1838,6 @@ def api_analise_seca_lotofacil():
             seca_por_numero[n]['seca_atual'] = cont
 
         # Estatísticas simples
-        # Importar pandas para uso local
-        pd = _lazy_import_pandas()
-        
         valores = [v['seca_atual'] for v in seca_por_numero.values()]
         seca_max = int(max(valores) if valores else 0)
         seca_med = float(pd.Series(valores).median()) if valores else 0.0
@@ -2206,8 +1849,6 @@ def api_analise_seca_lotofacil():
 
         # Números que saíram mais recentemente (último concurso)
         ultimo = df[bolas].iloc[-1].tolist()
-        # Importar pandas para uso local
-        pd = _lazy_import_pandas()
         numeros_recentes = [int(x) for x in ultimo if pd.notna(x)]
 
         payload = {
@@ -2235,7 +1876,6 @@ def api_analise_seca_lotofacil():
 @app.route('/api/lotofacil/sequencias/detalhe', methods=['GET'])
 def get_lotofacil_sequencias_detalhe():
     try:
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
 
@@ -2275,9 +1915,6 @@ def get_estatisticas_avancadas_quina():
     """Retorna os dados das estatísticas avançadas da Quina."""
     try:
         # print("🔍 Iniciando requisição para /api/estatisticas_avancadas_quina")  # DEBUG - COMENTADO
-        
-        # Carregar dados da Quina usando lazy loading
-        df_quina = carregar_dados_da_loteria("quina")
         
         if df_quina is None or df_quina.empty:
             print("❌ Dados da Quina não carregados")
@@ -2418,7 +2055,6 @@ def gerar_aposta_premium_quina():
 def get_estatisticas_avancadas_lotofacil():
     """Retorna os dados das estatísticas avançadas da Lotofácil."""
     try:
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({'error': 'Dados da Lotofácil não carregados.'}), 500
 
@@ -2599,14 +2235,11 @@ def get_analise_trevos_da_sorte():
 def get_analise_seca():
     """Retorna os dados da análise de seca dos números principais e trevos."""
     try:
-        # Carrega os dados no escopo da rota (lazy loading)
-        df_milionaria = carregar_dados_da_loteria("mais_milionaria")
-        if df_milionaria is None or df_milionaria.empty:
+        if df_milionaria.empty:
             return jsonify({"error": "Dados da +Milionária não carregados."}), 500
 
         # Verificar se há parâmetro de quantidade de concursos
         qtd_concursos = request.args.get('qtd_concursos', type=int)
-
 
         # Calcular seca dos números principais
         numeros_seca = calcular_seca_numeros(df_milionaria, qtd_concursos=qtd_concursos)
@@ -2672,8 +2305,6 @@ def get_estatisticas_avancadas():
     try:
         # print("🔍 Iniciando requisição para /api/estatisticas_avancadas")  # DEBUG - COMENTADO
         
-        # Carrega os dados no escopo da rota (lazy loading)
-        df_milionaria = carregar_dados_da_loteria("mais_milionaria")
         if df_milionaria is None or df_milionaria.empty:
             print("❌ Dados da +Milionária não carregados")
             return jsonify({'error': 'Dados da +Milionária não carregados.'}), 500
@@ -2681,7 +2312,6 @@ def get_estatisticas_avancadas():
         qtd_concursos = request.args.get('qtd_concursos', type=int, default=25)
         # print(f"📈 Estatísticas Avançadas - Parâmetro qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
         # print(f"📊 DataFrame disponível: {len(df_milionaria)} concursos")  # DEBUG - COMENTADO
-
 
         # Criar instância da classe de análise
         # print("🔧 Criando instância da AnaliseEstatisticaAvancada...")  # DEBUG - COMENTADO
@@ -2814,10 +2444,6 @@ from services.geradores.numeros_aleatorios import (
     gerar_numeros_aleatorios_quina,
     gerar_numeros_aleatorios_lotomania
 )
-
-# Importar funções da Lotomania
-from funcoes.lotomania.gerarCombinacao_numeros_aleatoriosLotomania import gerar_aposta_personalizada_lotomania
-from funcoes.lotomania.funcao_analise_de_frequencia_lotomania import analisar_frequencia_lotomania
 
 @app.route('/api/gerar-numeros-aleatorios', methods=['GET'])
 def gerar_numeros_aleatorios():
@@ -3101,70 +2727,58 @@ def bolao_interesse():
 @verificar_acesso_universal
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
-    return render_template('boloes_loterias.html', is_logged_in=verificar_usuario_logado())
+    return render_template('boloes_loterias.html', is_logged_in=current_user.is_authenticated)
 
 # --- Rotas da Mega Sena ---
 @app.route('/dashboard_MS')
 @verificar_acesso_universal
 def dashboard_megasena():
     """Dashboard Mega Sena - Protegido por middleware."""
-    return render_template('dashboard_megasena.html', is_logged_in=verificar_usuario_logado())
+    return render_template('dashboard_megasena.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/aposta_inteligente_premium_MS')
 @verificar_acesso_universal
 def aposta_inteligente_premium_megasena():
     """Aposta Inteligente Premium Mega Sena - Protegido por middleware."""
-    return render_template('analise_estatistica_avancada_megasena.html', is_logged_in=verificar_usuario_logado())
+    return render_template('analise_estatistica_avancada_megasena.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/analise_estatistica_avancada_megasena')
 @verificar_acesso_universal
 def analise_estatistica_avancada_megasena():
     """Renderiza a página de Análise Estatística Avançada da Mega Sena."""
-    return render_template('analise_estatistica_avancada_megasena.html', is_logged_in=verificar_usuario_logado())
-
-@app.route('/analise_estatistica_avancada_quina')
-@verificar_acesso_universal
-def analise_estatistica_avancada_quina():
-    """Renderiza a página de Análise Estatística Avançada da Quina."""
-    return render_template('analise_estatistica_avancada_quina.html', is_logged_in=verificar_usuario_logado())
+    return render_template('analise_estatistica_avancada_megasena.html')
 
 # --- Rotas da Quina ---
 @app.route('/dashboard_quina')
 @verificar_acesso_universal
 def dashboard_quina():
     """Renderiza a página principal do dashboard da Quina."""
-    return render_template('dashboard_quina.html', is_logged_in=verificar_usuario_logado())
+    return render_template('dashboard_quina.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/aposta_inteligente_premium_quina')
 @verificar_acesso_universal
 def aposta_inteligente_premium_quina():
     """Renderiza a página de Aposta Inteligente Premium da Quina."""
-    return render_template('analise_estatistica_avancada_quina.html', is_logged_in=verificar_usuario_logado())
+    return render_template('analise_estatistica_avancada_quina.html', is_logged_in=current_user.is_authenticated)
 
 # --- Rotas da Lotofácil ---
 @app.route('/dashboard_lotofacil')
 @verificar_acesso_universal
 def dashboard_lotofacil():
     """Renderiza a página principal do dashboard da Lotofácil."""
-    return render_template('dashboard_lotofacil.html', is_logged_in=verificar_usuario_logado())
+    return render_template('dashboard_lotofacil.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/aposta_inteligente_premium_lotofacil')
 @verificar_acesso_universal
 def aposta_inteligente_premium_lotofacil():
     """Renderiza a página de Aposta Inteligente Premium da Lotofácil."""
-    return render_template('analise_estatistica_avancada_lotofacil.html', is_logged_in=verificar_usuario_logado())
-
-@app.route('/analise_estatistica_avancada_lotofacil')
-@verificar_acesso_universal
-def analise_estatistica_avancada_lotofacil():
-    """Renderiza a página de Análise Estatística Avançada da Lotofácil."""
-    return render_template('analise_estatistica_avancada_lotofacil.html', is_logged_in=verificar_usuario_logado())
+    return render_template('analise_estatistica_avancada_lotofacil.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/lotofacil_laboratorio')
 @verificar_acesso_universal
 def lotofacil_laboratorio():
     """Renderiza a página do Laboratório de Simulação da Lotofácil."""
-    return render_template('lotofacil_laboratorio.html', is_logged_in=verificar_usuario_logado())
+    return render_template('lotofacil_laboratorio.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/teste_api')
 def teste_api():
@@ -3177,26 +2791,14 @@ def teste_api():
 @verificar_acesso_universal
 def aposta_inteligente_premium():
     """Renderiza a página de Aposta Inteligente Premium."""
-    return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=verificar_usuario_logado())
-
-@app.route('/analise_estatistica_avancada_milionaria')
-@verificar_acesso_universal
-def analise_estatistica_avancada_milionaria():
-    """Renderiza a página de Análise Estatística Avançada da Milionária."""
-    return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=verificar_usuario_logado())
-
-@app.route('/analise_estatistica_avancada_lotomania')
-@verificar_acesso_universal
-def analise_estatistica_avancada_lotomania():
-    """Renderiza a página de Inteligência Estatística da Lotomania."""
-    return render_template('analise_estatistica_avancada_lotomania.html', is_logged_in=verificar_usuario_logado())
+    return render_template('analise_estatistica_avancada_milionaria.html', is_logged_in=current_user.is_authenticated)
 
 # --- Rotas da Lotomania ---
 @app.route('/dashboard_lotomania')
 @verificar_acesso_universal
 def dashboard_lotomania():
     """Renderiza a página principal do dashboard da Lotomania."""
-    return render_template('dashboard_lotomania.html', is_logged_in=verificar_usuario_logado())
+    return render_template('dashboard_lotomania.html', is_logged_in=current_user.is_authenticated)
 
 @app.route('/api/gerar_aposta_premium', methods=['POST'])
 def gerar_aposta_premium():
@@ -3412,60 +3014,11 @@ def gerar_aposta_premium_megasena():
             'error': f'Erro interno: {str(e)}'
         }), 500
 
-@app.route('/api/numeros_quentes_frios_secos_quina', methods=['GET'])
-def get_numeros_quentes_frios_secos_quina():
-    """Retorna números quentes, frios e secos da Quina."""
-    try:
-        qtd_concursos = request.args.get('qtd_concursos', 50, type=int)
-        
-        # Carregar dados da Quina usando lazy loading
-        df_quina = carregar_dados_da_loteria("quina")
-        
-        if df_quina is None or df_quina.empty:
-            return jsonify({
-                'success': False,
-                'error': 'Dados da Quina não carregados'
-            }), 500
-        
-        # Obter análise de frequência
-        from funcoes.quina.funcao_analise_de_frequencia_quina import analisar_frequencia_quina
-        dados_frequencia = analisar_frequencia_quina(df_quina=df_quina, qtd_concursos=qtd_concursos)
-        
-        # Obter análise de seca
-        from funcoes.quina.calculos_quina import calcular_seca_numeros_quina
-        dados_seca = calcular_seca_numeros_quina(df_quina, qtd_concursos=qtd_concursos)
-        
-        # Processar números quentes (mais frequentes)
-        numeros_quentes = dados_frequencia.get('numeros_mais_frequentes', [])[:10]
-        
-        # Processar números frios (menos frequentes)
-        numeros_frios = dados_frequencia.get('numeros_menos_frequentes', [])[:10]
-        
-        # Processar números secos (não saem há muito tempo)
-        numeros_secos = dados_seca.get('numeros_mais_secos', [])[:10]
-        
-        return jsonify({
-            'success': True,
-            'numeros_quentes': numeros_quentes,
-            'numeros_frios': numeros_frios,
-            'numeros_secos': numeros_secos
-        })
-        
-    except Exception as e:
-        logger.error(f"Erro ao obter números quentes/frios/secos da Quina: {e}")
-        return jsonify({
-            'success': False,
-            'error': f'Erro interno: {str(e)}'
-        }), 500
-
 @app.route('/api/analise_seca_quina', methods=['GET'])
 def get_analise_seca_quina():
     """Retorna análise de seca (números que não saem há muito tempo) para a Quina."""
     try:
         qtd_concursos = request.args.get('qtd_concursos', 50, type=int)
-        
-        # Carregar dados da Quina usando lazy loading
-        df_quina = carregar_dados_da_loteria("quina")
         
         if df_quina is None or df_quina.empty:
             return jsonify({
@@ -3501,8 +3054,7 @@ def api_lotofacil_matriz():
     try:
         # print("🔍 API Lotofácil Matriz chamada!")
         
-        # Carregar dados da Lotofácil
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
+        # Verificar se df_lotofacil existe
         if df_lotofacil is None or df_lotofacil.empty:
             # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
@@ -3559,8 +3111,7 @@ def get_estatisticas_frequencia():
     try:
         # print("🔍 API Estatísticas Frequência chamada!")
         
-        # Carregar dados da Lotofácil
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
+        # Verificar se df_lotofacil existe
         if df_lotofacil is None or df_lotofacil.empty:
             # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
@@ -3614,8 +3165,7 @@ def analisar_cartoes():
     try:
         # print("🔍 API Analisar Padrões dos Últimos 25 Concursos chamada!")
         
-        # Carregar dados da Lotofácil
-        df_lotofacil = carregar_dados_da_loteria("lotofacil")
+        # Verificar se df_lotofacil existe
         if df_lotofacil is None or df_lotofacil.empty:
             # print("❌ df_lotofacil está vazio ou None!")
             return jsonify({"error": "Dados da Lotofácil não carregados"}), 500
@@ -4016,24 +3566,12 @@ def google_callback():
         
         conn.close()
         
-        # Criar objeto User e fazer login com chave de autenticação
+        # Criar objeto User e fazer login
         logger.info(f"Criando objeto User: ID={user_id}, Email={email}, Level={user_level}")
         user = User(user_id, email, user_level)
         
-        # 🔑 GERAR CHAVE DE AUTENTICAÇÃO ÚNICA (mesmo sistema do login normal)
-        auth_key = gerar_chave_autenticacao()
-        
-        # 🔑 MARCAR COMO AUTENTICADO
-        user.set_authenticated(True)
-        
-        # 🔑 FLAGS DE SESSÃO PARA CONTROLE DE AUTENTICAÇÃO
-        session['user_authenticated'] = True
-        session['auth_key'] = auth_key
-        session['login_timestamp'] = datetime.utcnow().isoformat()
-        
-        logger.info(f"Fazendo login do usuário com chave de autenticação...")
-        login_user(user, remember=False)  # Sessão não-permanente
-        session.permanent = False
+        logger.info(f"Fazendo login do usuário...")
+        login_user(user)
         
         logger.info(f"Login Google bem-sucedido: {email}")
         logger.info(f"Redirecionando para página inicial...")
@@ -4049,7 +3587,14 @@ def google_callback():
 # 🚀 INICIALIZAÇÃO DO APLICATIVO
 # ============================================================================
 
-# Configuração de inicialização movida para o final do arquivo
+if __name__ == '__main__':
+    print("🚀 Iniciando Loterias Inteligentes...")
+    print("📱 Servidor rodando em: http://localhost:5000")
+    print("🔐 Sistema de controle de acesso ativo")
+    print("🔗 Google OAuth configurado")
+    print("💎 Páginas Freemium: Landing, +Milionária, Quina, Lotomania")
+    print("⭐ Páginas Premium: Todas as outras (requer assinatura)")
+    print("=" * 60)
 
 # ============================================================================
 # 💳 SISTEMA DE PAGAMENTO
@@ -4671,300 +4216,19 @@ def pagamento_teste():
     """
 
 # ============================================================================
-# 🏥 HEALTHCHECK ENDPOINT
-# ============================================================================
-
-@app.get("/healthz")
-def healthz():
-    """Healthcheck endpoint para monitoramento."""
-    logger.info("=== HEALTHCHECK CHAMADO ===")
-    logger.info(f"Timestamp: {datetime.utcnow().isoformat()}")
-    logger.info(f"Request headers: {dict(request.headers)}")
-    logger.info(f"Request IP: {request.remote_addr}")
-    
-    try:
-        response = "ok"
-        logger.info(f"Healthcheck response: {response}")
-        return response, 200
-    except Exception as e:
-        logger.error(f"Erro no healthcheck: {e}")
-        return "error", 500
-
-@app.route("/")
-def index():
-    """Página principal da aplicação."""
-    return render_template("index.html")
-
-# ============================================================================
-# 📊 PAINEL DE ANÁLISES ESTATÍSTICAS - QUINA
-# ============================================================================
-
-@app.route('/painel_analises_estatisticas_quina')
-@verificar_acesso_universal
-def painel_analises_estatisticas_quina():
-    """Renderiza o painel de análises estatísticas da Quina."""
-    return render_template('painel_analises_estatisticas_quina.html', is_logged_in=verificar_usuario_logado())
-
-@app.route('/api/quina/dados-reais')
-def api_quina_dados_reais():
-    """
-    API que retorna dados reais da Quina para o painel de análises estatísticas.
-    Conecta com as funções reais que leem o Excel da Quina.
-    """
-    try:
-        # Importar pandas diretamente para evitar problemas de escopo
-        import pandas as pd
-        
-        # Importar as funções reais da Quina
-        from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
-        from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_quina
-        from funcoes.quina.funcao_analise_de_distribuicao_quina import analise_de_distribuicao_quina
-        from funcoes.quina.analise_estatistica_avancada_quina import realizar_analise_estatistica_avancada_quina
-        
-        # Carregar dados reais da Quina
-        df_quina = carregar_dados_quina()
-        
-        if df_quina is None or df_quina.empty:
-            return jsonify({'erro': 'Não foi possível carregar os dados da Quina'}), 500
-        
-        # Converter DataFrame para formato esperado pelas funções
-        dados_sorteios = []
-        for _, row in df_quina.iterrows():
-            concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
-            bolas = [int(row[f'Bola{i}']) for i in range(1, 6) if pd.notna(row[f'Bola{i}'])]
-            if len(bolas) == 5:
-                dados_sorteios.append([concurso] + bolas)
-        
-        # Análise de frequência (últimos 100 concursos)
-        analise_freq = analise_frequencia_quina(dados_sorteios, qtd_concursos=100)
-        
-        # Análise de distribuição (últimos 100 concursos)
-        analise_dist = analise_de_distribuicao_quina(dados_sorteios, qtd_concursos=100)
-        
-        # Análise estatística avançada (últimos 50 concursos)
-        analise_avancada = realizar_analise_estatistica_avancada_quina(df_quina, qtd_concursos=50)
-        
-        # Preparar dados para os gráficos
-        dados_graficos = {
-            'frequencia_numeros': [],
-            'distribuicao_faixas': [],
-            'estatisticas_gerais': {
-                'total_concursos': len(dados_sorteios),
-                'periodo_analise': 'Últimos 100 concursos',
-                'ultima_atualizacao': datetime.now().strftime('%d/%m/%Y %H:%M')
-            }
-        }
-        
-        # Processar dados de frequência para o gráfico - CORRIGIDO conforme sua análise
-        freq_abs = (analise_freq.get('frequencia_absoluta') or {}).get('numeros', {})
-        dados_graficos['frequencia_numeros'] = [int(freq_abs.get(num, 0)) for num in range(1, 81)]
-        
-        # Processar dados de distribuição para o gráfico - CORRIGIDO
-        if 'distribuicao_por_faixa' in analise_dist:
-            dist_faixas = analise_dist['distribuicao_por_faixa']
-            dados_graficos['distribuicao_faixas'] = [
-                dist_faixas.get('1-16', 0),
-                dist_faixas.get('17-32', 0),
-                dist_faixas.get('33-48', 0),
-                dist_faixas.get('49-64', 0),
-                dist_faixas.get('65-80', 0)
-            ]
-        
-        # Adicionar números quentes, frios e secos - CORRIGIDO conforme sua análise
-        nqf = analise_freq.get('numeros_quentes_frios', {})
-        dados_graficos['numeros_quentes'] = nqf.get('numeros_quentes', [])[:10]
-        dados_graficos['numeros_frios'] = nqf.get('numeros_frios', [])[:10]
-        dados_graficos['numeros_secos'] = nqf.get('numeros_secos', [])[:10]
-        
-        # Adicionar análise avançada
-        if analise_avancada and 'distribuicao_numeros' in analise_avancada:
-            dados_graficos['analise_avancada'] = analise_avancada
-        
-        # Incluir padrões e sequências - ADICIONADO conforme sua sugestão
-        try:
-            from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analise_padroes_sequencias_quina
-            from funcoes.quina.calculos_quina import calcular_seca_numeros_quina
-            from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
-            
-            # Análise de padrões e sequências
-            padroes = analise_padroes_sequencias_quina(dados_sorteios) or {}
-            dados_graficos['padroes_sequencias'] = padroes
-            
-            # Análise de seca
-            seca = calcular_seca_numeros_quina(df_quina, qtd_concursos=100) or {}
-            dados_graficos['seca_numeros'] = seca
-            
-            # Análises temporais
-            try:
-                from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_temporal_estruturada_quina
-                
-                # Análise temporal estruturada
-                analise_temporal = analise_frequencia_temporal_estruturada_quina(dados_sorteios, periodo='meses', qtd_concursos=100)
-                dados_graficos['analise_temporal'] = analise_temporal or {}
-                
-            except Exception as e:
-                logger.error(f"Erro ao carregar análises temporais: {e}")
-                dados_graficos['analise_temporal'] = {}
-            
-            # Análise de combinações - TEMPORARIAMENTE DESABILITADA
-            # try:
-            #     combinacoes = analisar_combinacoes_quina(df_quina, qtd_concursos=100) or {}
-            #     combinacoes_limpo = converter_para_json(combinacoes)
-            #     dados_graficos['analise_combinacoes'] = combinacoes_limpo
-            # except Exception as e:
-            #     logger.error(f"Erro ao processar combinações: {e}")
-            dados_graficos['analise_combinacoes'] = {}
-            
-        except Exception as e:
-            logger.error(f"Erro ao carregar padrões, seca e combinações: {e}")
-            dados_graficos['padroes_sequencias'] = {}
-            dados_graficos['seca_numeros'] = {}
-            dados_graficos['analise_combinacoes'] = {}
-        
-        # Converter todos os dados para JSON serializável
-        dados_graficos_limpo = converter_para_json(dados_graficos)
-        return jsonify(dados_graficos_limpo)
-        
-    except Exception as e:
-        logger.error(f"Erro ao carregar dados reais da Quina: {e}")
-        return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
-
-@app.route('/painel_analises_estatisticas_megasena')
-@verificar_acesso_universal
-def painel_analises_estatisticas_megasena():
-    """Renderiza o painel de análises estatísticas da Mega Sena."""
-    return render_template('painel_analises_estatisticas_megasena.html', is_logged_in=verificar_usuario_logado())
-
-@app.route('/painel_analises_estatisticas_milionaria')
-@verificar_acesso_universal
-def painel_analises_estatisticas_milionaria():
-    """Renderiza o painel de análises estatísticas da +Milionária."""
-    return render_template('painel_analises_estatisticas_milionaria.html', is_logged_in=verificar_usuario_logado())
-
-@app.route('/api/milionaria/dados-reais')
-@verificar_acesso_universal
-def api_milionaria_dados_reais():
-    """
-    API que retorna dados reais da Milionária para o painel de análises estatísticas.
-    Conecta com as funções reais que leem o Excel da Milionária.
-    """
-    try:
-        # Importar as funções reais da Milionária
-        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
-        from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia
-        from funcoes.milionaria.funcao_analise_de_distribuicao import analise_de_distribuicao
-        from funcoes.milionaria.analise_estatistica_avancada import realizar_analise_estatistica_avancada_milionaria
-        
-        # Carregar dados reais da Milionária
-        df_milionaria = carregar_dados_milionaria()
-        
-        if df_milionaria is None or df_milionaria.empty:
-            return jsonify({'erro': 'Não foi possível carregar os dados da Milionária'}), 500
-        
-        # Converter DataFrame para formato esperado pelas funções
-        dados_sorteios = []
-        for _, row in df_milionaria.iterrows():
-            concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
-            bolas = [int(row[f'Bola{i}']) for i in range(1, 7) if pd.notna(row[f'Bola{i}'])]
-            trevos = [int(row[f'Trevo{i}']) for i in range(1, 3) if pd.notna(row[f'Trevo{i}'])]
-            if len(bolas) == 6 and len(trevos) == 2:
-                dados_sorteios.append([concurso] + bolas + trevos)
-        
-        # Análise de frequência (últimos 100 concursos)
-        analise_freq = analise_frequencia(dados_sorteios, qtd_concursos=100)
-        
-        # Análise de distribuição (últimos 100 concursos)
-        analise_dist = analise_de_distribuicao(dados_sorteios, qtd_concursos=100)
-        
-        # Análise estatística avançada (últimos 50 concursos)
-        analise_avancada = realizar_analise_estatistica_avancada_milionaria(df_milionaria, qtd_concursos=50)
-        
-        # Preparar dados para os gráficos
-        dados_graficos = {
-            'frequencia_numeros': [],
-            'frequencia_trevos': [],
-            'distribuicao_faixas': [],
-            'distribuicao_trevos': [],
-            'estatisticas_gerais': {
-                'total_concursos': len(dados_sorteios),
-                'periodo_analise': 'Últimos 100 concursos',
-                'ultima_atualizacao': datetime.now().strftime('%d/%m/%Y %H:%M')
-            }
-        }
-        
-        # Processar dados de frequência dos números (1-50)
-        if 'frequencia_absoluta' in analise_freq and 'bolas' in analise_freq['frequencia_absoluta']:
-            freq_bolas = analise_freq['frequencia_absoluta']['bolas']
-            for num in range(1, 51):
-                dados_graficos['frequencia_numeros'].append(freq_bolas.get(num, 0))
-        
-        # Processar dados de frequência dos trevos (1-6)
-        if 'frequencia_absoluta' in analise_freq and 'trevos' in analise_freq['frequencia_absoluta']:
-            freq_trevos = analise_freq['frequencia_absoluta']['trevos']
-            for trevo in range(1, 7):
-                dados_graficos['frequencia_trevos'].append(freq_trevos.get(trevo, 0))
-        
-        # Processar dados de distribuição por faixas dos números
-        if 'distribuicao_faixas' in analise_dist:
-            dist_faixas = analise_dist['distribuicao_faixas']
-            dados_graficos['distribuicao_faixas'] = [
-                dist_faixas.get('1-10', 0),
-                dist_faixas.get('11-20', 0),
-                dist_faixas.get('21-30', 0),
-                dist_faixas.get('31-40', 0),
-                dist_faixas.get('41-50', 0)
-            ]
-        
-        # Processar dados de distribuição dos trevos
-        if 'distribuicao_trevos' in analise_dist:
-            dist_trevos = analise_dist['distribuicao_trevos']
-            dados_graficos['distribuicao_trevos'] = [
-                dist_trevos.get('1', 0),
-                dist_trevos.get('2', 0),
-                dist_trevos.get('3', 0),
-                dist_trevos.get('4', 0),
-                dist_trevos.get('5', 0),
-                dist_trevos.get('6', 0)
-            ]
-        
-        # Adicionar números quentes e frios
-        if 'numeros_quentes_frios' in analise_freq:
-            numeros_quentes_frios = analise_freq['numeros_quentes_frios']
-            dados_graficos['numeros_quentes'] = numeros_quentes_frios.get('numeros_quentes', [])[:10]
-            dados_graficos['numeros_frios'] = numeros_quentes_frios.get('numeros_frios', [])[:10]
-            dados_graficos['trevos_quentes'] = numeros_quentes_frios.get('trevos_quentes', [])[:3]
-            dados_graficos['trevos_frios'] = numeros_quentes_frios.get('trevos_frios', [])[:3]
-        
-        # Adicionar análise avançada
-        if analise_avancada:
-            dados_graficos['analise_avancada'] = analise_avancada
-        
-        return jsonify(dados_graficos)
-        
-    except Exception as e:
-        logger.error(f"Erro ao carregar dados reais da Milionária: {e}")
-        return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
-
-@app.route('/painel_analises_estatisticas_lotofacil')
-@verificar_acesso_universal
-def painel_analises_estatisticas_lotofacil():
-    """Renderiza o painel de análises estatísticas da Lotofácil."""
-    return render_template('painel_analises_estatisticas_lotofacil.html', is_logged_in=verificar_usuario_logado())
-
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================
 
-# MODO_DESENVOLVIMENTO já definido no topo do arquivo
+# Variável global para modo de desenvolvimento
+MODO_DESENVOLVIMENTO = os.environ.get('FLASK_ENV') != 'production'
 
 if __name__ == '__main__':
-    # Configurações otimizadas para produção
+    # Configurações otimizadas para melhor performance
     port = int(os.environ.get('PORT', 5000))
-    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
-    
     app.run(
-        debug=debug_mode,
+        debug=MODO_DESENVOLVIMENTO,  # Debug apenas em desenvolvimento
         host='0.0.0.0', 
         port=port,
-        threaded=True,
-        use_reloader=False  # Desabilita reloader em produção
-    )
+        threaded=True,  # Habilita threading
+        use_reloader=MODO_DESENVOLVIMENTO  # Reloader apenas em desenvolvimento
+    ) 
