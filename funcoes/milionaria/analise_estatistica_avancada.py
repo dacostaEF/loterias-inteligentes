@@ -1173,4 +1173,48 @@ if __name__ == "__main__":
         
         analise = AnaliseEstatisticaAvancada(df_exemplo)
         resultados = analise.executar_analise_completa()
-        exibir_analise_estatistica_avancada(resultados) 
+        exibir_analise_estatistica_avancada(resultados)
+
+def realizar_analise_estatistica_avancada_milionaria(df_milionaria=None, qtd_concursos=50):
+    """
+    Função wrapper para análise estatística avançada da +Milionária.
+    Esta função padroniza o carregamento de dados e filtragem antes de chamar
+    a função principal de análise.
+    
+    Args:
+        df_milionaria (pd.DataFrame, optional): DataFrame com dados da +Milionária
+        qtd_concursos (int): Quantidade de últimos concursos a analisar (padrão: 50)
+    
+    Returns:
+        dict: Resultado da análise estatística avançada
+    """
+    try:
+        from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
+        
+        # Carregar dados se não fornecidos
+        if df_milionaria is None:
+            print("🔄 Carregando dados da +Milionária...")
+            df_milionaria = carregar_dados_milionaria()
+            
+        if df_milionaria is None or df_milionaria.empty:
+            print("❌ Erro: Não foi possível carregar os dados da +Milionária")
+            return {'erro': 'Dados da +Milionária não disponíveis'}
+        
+        # Filtrar para os últimos N concursos se especificado
+        if qtd_concursos is not None and qtd_concursos > 0:
+            df_filtrado = df_milionaria.tail(qtd_concursos).copy()
+            print(f"🔧 Filtrando para os últimos {qtd_concursos} concursos (de {len(df_milionaria)} disponíveis)")
+        else:
+            df_filtrado = df_milionaria.copy()
+            print(f"🔧 Analisando todos os {len(df_milionaria)} concursos disponíveis")
+        
+        # Criar instância da análise e executar
+        analise = AnaliseEstatisticaAvancada(df_filtrado)
+        resultados = analise.executar_analise_completa()
+        
+        print("✅ Análise estatística avançada da +Milionária concluída com sucesso!")
+        return resultados
+        
+    except Exception as e:
+        print(f"❌ Erro na análise estatística avançada da +Milionária: {e}")
+        return {'erro': f'Erro interno: {str(e)}'} 

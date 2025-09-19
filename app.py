@@ -4868,6 +4868,9 @@ def api_milionaria_dados_reais():
     Conecta com as funções reais que leem o Excel da Milionária.
     """
     try:
+        # Importar pandas diretamente para evitar problemas de escopo
+        import pandas as pd
+        
         # Importar as funções reais da Milionária
         from funcoes.milionaria.MilionariaFuncaCarregaDadosExcel import carregar_dados_milionaria
         from funcoes.milionaria.funcao_analise_de_frequencia import analise_frequencia
@@ -4895,8 +4898,20 @@ def api_milionaria_dados_reais():
         # Análise de distribuição (últimos 100 concursos)
         analise_dist = analise_de_distribuicao(dados_sorteios, qtd_concursos=100)
         
-        # Análise estatística avançada (últimos 50 concursos)
-        analise_avancada = realizar_analise_estatistica_avancada_milionaria(df_milionaria, qtd_concursos=50)
+        # Análise estatística avançada (últimos 100 concursos)
+        analise_avancada = realizar_analise_estatistica_avancada_milionaria(df_milionaria, qtd_concursos=100)
+        
+        # Calcular período para exatamente 100 concursos (últimos 100)
+        if dados_sorteios:
+            # Pegar apenas os últimos 100 concursos
+            ultimos_100 = dados_sorteios[-100:] if len(dados_sorteios) >= 100 else dados_sorteios
+            primeiro_concurso = ultimos_100[0][0] if ultimos_100 else 0
+            ultimo_concurso = ultimos_100[-1][0] if ultimos_100 else 0
+            periodo_analise = f"Concursos {primeiro_concurso} a {ultimo_concurso}"
+            # Atualizar dados_sorteios para usar apenas os últimos 100
+            dados_sorteios = ultimos_100
+        else:
+            periodo_analise = 'Nenhum concurso encontrado'
         
         # Preparar dados para os gráficos
         dados_graficos = {
@@ -4905,17 +4920,17 @@ def api_milionaria_dados_reais():
             'distribuicao_faixas': [],
             'distribuicao_trevos': [],
             'estatisticas_gerais': {
-                'total_concursos': len(dados_sorteios),
-                'periodo_analise': 'Últimos 100 concursos',
+                'total_concursos': 100,  # Sempre 100 concursos analisados
+                'periodo_analise': periodo_analise,
                 'ultima_atualizacao': datetime.now().strftime('%d/%m/%Y %H:%M')
             }
         }
         
         # Processar dados de frequência dos números (1-50)
-        if 'frequencia_absoluta' in analise_freq and 'bolas' in analise_freq['frequencia_absoluta']:
-            freq_bolas = analise_freq['frequencia_absoluta']['bolas']
+        if 'frequencia_absoluta' in analise_freq and 'numeros' in analise_freq['frequencia_absoluta']:
+            freq_numeros = analise_freq['frequencia_absoluta']['numeros']
             for num in range(1, 51):
-                dados_graficos['frequencia_numeros'].append(freq_bolas.get(num, 0))
+                dados_graficos['frequencia_numeros'].append(freq_numeros.get(num, 0))
         
         # Processar dados de frequência dos trevos (1-6)
         if 'frequencia_absoluta' in analise_freq and 'trevos' in analise_freq['frequencia_absoluta']:
