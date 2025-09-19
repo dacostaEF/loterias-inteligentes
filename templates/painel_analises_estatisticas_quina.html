@@ -1195,19 +1195,62 @@
                     <div class="space-y-3">
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
                             <span class="text-sm">Pares consecutivos:</span>
-                            <span class="text-red-400 font-bold">18.4%</span>
+                            <span class="text-red-400 font-bold" id="paresConsecutivos">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
                             <span class="text-sm">Números pares:</span>
-                            <span class="text-red-400 font-bold">48.1%</span>
+                            <span class="text-red-400 font-bold" id="numerosPares">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
                             <span class="text-sm">Números ímpares:</span>
-                            <span class="text-red-400 font-bold">51.9%</span>
+                            <span class="text-red-400 font-bold" id="numerosImpares">-</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
                             <span class="text-sm">Soma total média:</span>
-                            <span class="text-red-400 font-bold">202.3</span>
+                            <span class="text-white font-bold" id="somaTotalMedia">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Novas métricas de combinações -->
+                    <div class="mt-6">
+                        <h5 class="text-md font-medium mb-3 flex items-center">
+                            <i class="fas fa-link text-blue-400 mr-2"></i>
+                            Afinidades entre Números
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div class="p-3 bg-gray-800/50 rounded-lg">
+                                <div class="text-xs text-gray-400">Duplas mais frequentes</div>
+                                <div class="text-sm font-medium" id="duplasFrequentes">-</div>
+                            </div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg">
+                                <div class="text-xs text-gray-400">Ternas mais frequentes</div>
+                                <div class="text-sm font-medium" id="ternasFrequentes">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <h5 class="text-md font-medium mb-3 flex items-center">
+                            <i class="fas fa-shapes text-green-400 mr-2"></i>
+                            Padrões Geométricos
+                        </h5>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
+                                <div class="text-xs text-gray-400">Cantos</div>
+                                <div class="text-sm font-bold text-green-400" id="padroesCantos">-</div>
+                            </div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
+                                <div class="text-xs text-gray-400">Bordas</div>
+                                <div class="text-sm font-bold text-green-400" id="padroesBordas">-</div>
+                            </div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
+                                <div class="text-xs text-gray-400">Centro</div>
+                                <div class="text-sm font-bold text-green-400" id="padroesCentro">-</div>
+                            </div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
+                                <div class="text-xs text-gray-400">Linhas</div>
+                                <div class="text-sm font-bold text-green-400" id="padroesLinhas">-</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1252,6 +1295,158 @@
         </div>
 
         <!-- Visualizações Gráficas -->
+        <!-- NOVA SEÇÃO: ANÁLISES TEMPORAIS -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-center mb-8 flex items-center justify-center">
+                <i class="fas fa-clock text-purple-400 mr-3"></i>
+                Análises Temporais
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Análise por Mês -->
+                <div class="quina-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-calendar-alt text-purple-400 mr-2"></i>
+                        Análise por Mês
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Mês mais frequente:</span>
+                            <span class="text-purple-400 font-bold" id="mesMaisFrequente">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Mês menos frequente:</span>
+                            <span class="text-purple-400 font-bold" id="mesMenosFrequente">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Variação mensal:</span>
+                            <span class="text-white font-bold" id="variacaoMensal">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Análise por Ano -->
+                <div class="quina-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-calendar text-blue-400 mr-2"></i>
+                        Análise por Ano
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Ano mais frequente:</span>
+                            <span class="text-blue-400 font-bold" id="anoMaisFrequente">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Ano menos frequente:</span>
+                            <span class="text-blue-400 font-bold" id="anoMenosFrequente">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Tendência anual:</span>
+                            <span class="text-white font-bold" id="tendenciaAnual">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Análise por Concurso -->
+                <div class="quina-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-list-ol text-green-400 mr-2"></i>
+                        Análise por Concurso
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Frequência média:</span>
+                            <span class="text-green-400 font-bold" id="frequenciaMediaConcurso">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Pico de frequência:</span>
+                            <span class="text-green-400 font-bold" id="picoFrequenciaConcurso">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Estabilidade:</span>
+                            <span class="text-white font-bold" id="estabilidadeConcurso">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NOVA SEÇÃO: CÁLCULOS ESPECÍFICOS -->
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-center mb-8 flex items-center justify-center">
+                <i class="fas fa-calculator text-orange-400 mr-3"></i>
+                Cálculos Específicos
+            </h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Análise de Pares -->
+                <div class="quina-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-sort-numeric-up text-orange-400 mr-2"></i>
+                        Análise de Pares
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Pares consecutivos:</span>
+                            <span class="text-orange-400 font-bold" id="paresConsecutivosCalc">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Pares não consecutivos:</span>
+                            <span class="text-orange-400 font-bold" id="paresNaoConsecutivos">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Percentual de pares:</span>
+                            <span class="text-white font-bold" id="percentualPares">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Análise de Primos -->
+                <div class="quina-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-hashtag text-red-400 mr-2"></i>
+                        Análise de Primos
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Números primos:</span>
+                            <span class="text-red-400 font-bold" id="numerosPrimos">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Percentual de primos:</span>
+                            <span class="text-red-400 font-bold" id="percentualPrimos">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Primos mais frequentes:</span>
+                            <span class="text-white font-bold" id="primosFrequentes">-</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Análise de Repetições -->
+                <div class="quina-card rounded-xl p-6">
+                    <h3 class="text-xl font-semibold mb-6 flex items-center">
+                        <i class="fas fa-redo text-green-400 mr-2"></i>
+                        Análise de Repetições
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Média de repetições:</span>
+                            <span class="text-green-400 font-bold" id="mediaRepeticoesCalc">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Maior repetição:</span>
+                            <span class="text-green-400 font-bold" id="maiorRepeticao">-</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
+                            <span class="text-sm">Tendência de repetição:</span>
+                            <span class="text-white font-bold" id="tendenciaRepeticao">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="mt-12">
             <h2 class="text-2xl font-bold text-center mb-8 flex items-center justify-center">
                 <i class="fas fa-chart-bar text-primary mr-3"></i>
@@ -1299,7 +1494,7 @@
             <div class="footer-actions">
                 <button class="footer-toggle" id="footerToggle" onclick="openFooterModal()">
                     Ver detalhes
-                </button>
+            </button>
             </div>
         </div>
     </footer>
@@ -1489,6 +1684,166 @@
                 });
             }
         }
+        
+        function atualizarAnaliseCombinacoes(dados) {
+            console.log('Atualizando análise de combinações...', dados.analise_combinacoes); // DEBUG
+            
+            if (!dados.analise_combinacoes) {
+                console.log('Dados de combinações não disponíveis');
+                return;
+            }
+            
+            const combinacoes = dados.analise_combinacoes;
+            
+            // Atualizar métricas básicas
+            if (combinacoes.padroes_geometricos) {
+                const padroes = combinacoes.padroes_geometricos;
+                
+                // Atualizar padrões geométricos
+                document.getElementById('padroesCantos').textContent = padroes.cantos || '-';
+                document.getElementById('padroesBordas').textContent = padroes.bordas || '-';
+                document.getElementById('padroesCentro').textContent = padroes.centro || '-';
+                document.getElementById('padroesLinhas').textContent = padroes.linhas || '-';
+            }
+            
+            // Atualizar afinidades
+            if (combinacoes.afinidade_entre_numeros) {
+                const afinidade = combinacoes.afinidade_entre_numeros;
+                
+                // Duplas mais frequentes
+                if (afinidade.pares_com_maior_afinidade && afinidade.pares_com_maior_afinidade.length > 0) {
+                    const duplas = afinidade.pares_com_maior_afinidade.slice(0, 3).map(par => 
+                        `${par[0]}-${par[1]}`
+                    ).join(', ');
+                    document.getElementById('duplasFrequentes').textContent = duplas;
+                }
+                
+                // Ternas mais frequentes
+                if (combinacoes.combinacoes_frequentes && combinacoes.combinacoes_frequentes.ternas) {
+                    const ternas = combinacoes.combinacoes_frequentes.ternas.slice(0, 2).map(terna => 
+                        `${terna[0]}-${terna[1]}-${terna[2]}`
+                    ).join(', ');
+                    document.getElementById('ternasFrequentes').textContent = ternas;
+                }
+            }
+            
+            // Atualizar métricas de pares/ímpares (se disponível)
+            if (combinacoes.sequencias_aritmeticas) {
+                // Aqui podemos adicionar lógica para calcular pares/ímpares se necessário
+                // Por enquanto, vamos manter os valores padrão
+            }
+        }
+        
+        function atualizarAnalisesTemporais(dados) {
+            console.log('Atualizando análises temporais...', dados.analise_temporal); // DEBUG
+            
+            if (!dados.analise_temporal || !Array.isArray(dados.analise_temporal)) {
+                console.log('Dados temporais não disponíveis ou formato inválido');
+                return;
+            }
+            
+            const temporal = dados.analise_temporal;
+            
+            // Processar dados temporais por períodos
+            if (temporal.length > 0) {
+                // Pegar o período mais recente (último item da lista)
+                const periodoRecente = temporal[temporal.length - 1];
+                const periodoAnterior = temporal.length > 1 ? temporal[temporal.length - 2] : null;
+                
+                // Calcular métricas básicas
+                const frequencias = periodoRecente.frequencia || {};
+                const valoresFrequencia = Object.values(frequencias);
+                const frequenciaMedia = valoresFrequencia.length > 0 ? 
+                    (valoresFrequencia.reduce((a, b) => a + b, 0) / valoresFrequencia.length).toFixed(1) : '0';
+                
+                const frequenciaMax = Math.max(...valoresFrequencia);
+                const frequenciaMin = Math.min(...valoresFrequencia);
+                const variacao = frequenciaMax - frequenciaMin;
+                
+                // Atualizar análise por mês (usando dados do período)
+                document.getElementById('mesMaisFrequente').textContent = periodoRecente.periodo || '-';
+                document.getElementById('mesMenosFrequente').textContent = periodoAnterior ? periodoAnterior.periodo : '-';
+                document.getElementById('variacaoMensal').textContent = variacao.toString();
+                
+                // Atualizar análise por ano (usando dados do período)
+                document.getElementById('anoMaisFrequente').textContent = periodoRecente.concursos || '-';
+                document.getElementById('anoMenosFrequente').textContent = periodoAnterior ? periodoAnterior.concursos : '-';
+                document.getElementById('tendenciaAnual').textContent = 'Estável';
+                
+                // Atualizar análise por concurso
+                document.getElementById('frequenciaMediaConcurso').textContent = frequenciaMedia;
+                document.getElementById('picoFrequenciaConcurso').textContent = frequenciaMax.toString();
+                document.getElementById('estabilidadeConcurso').textContent = variacao <= 2 ? 'Alta' : variacao <= 4 ? 'Média' : 'Baixa';
+            }
+        }
+        
+        function atualizarCalculosEspecificos(dados) {
+            console.log('Atualizando cálculos específicos...', dados); // DEBUG
+            
+            // Calcular pares, primos e repetições usando os dados de frequência
+            if (dados.frequencia_absoluta_numeros && Array.isArray(dados.frequencia_absoluta_numeros)) {
+                const frequencias = dados.frequencia_absoluta_numeros;
+                
+                // Análise de pares
+                let paresConsecutivos = 0;
+                let paresNaoConsecutivos = 0;
+                let totalPares = 0;
+                
+                for (let i = 0; i < frequencias.length; i += 2) {
+                    if (i + 1 < frequencias.length) {
+                        const par1 = frequencias[i];
+                        const par2 = frequencias[i + 1];
+                        if (par1 > 0 && par2 > 0) {
+                            totalPares++;
+                            if (Math.abs(par1 - par2) <= 1) {
+                                paresConsecutivos++;
+                            } else {
+                                paresNaoConsecutivos++;
+                            }
+                        }
+                    }
+                }
+                
+                const percentualPares = totalPares > 0 ? ((paresConsecutivos / totalPares) * 100).toFixed(1) : '0';
+                
+                document.getElementById('paresConsecutivosCalc').textContent = paresConsecutivos.toString();
+                document.getElementById('paresNaoConsecutivos').textContent = paresNaoConsecutivos.toString();
+                document.getElementById('percentualPares').textContent = percentualPares + '%';
+                
+                // Análise de primos (números primos de 1 a 80)
+                const primos = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79];
+                let totalPrimos = 0;
+                let primosFrequentes = [];
+                
+                primos.forEach(primo => {
+                    if (primo <= frequencias.length && frequencias[primo - 1] > 0) {
+                        totalPrimos++;
+                        primosFrequentes.push({numero: primo, freq: frequencias[primo - 1]});
+                    }
+                });
+                
+                primosFrequentes.sort((a, b) => b.freq - a.freq);
+                const percentualPrimos = frequencias.length > 0 ? ((totalPrimos / frequencias.length) * 100).toFixed(1) : '0';
+                const primosTop = primosFrequentes.slice(0, 3).map(p => p.numero).join(', ');
+                
+                document.getElementById('numerosPrimos').textContent = totalPrimos.toString();
+                document.getElementById('percentualPrimos').textContent = percentualPrimos + '%';
+                document.getElementById('primosFrequentes').textContent = primosTop || '-';
+                
+                // Análise de repetições (simulada baseada na variação de frequências)
+                const valoresFreq = frequencias.filter(f => f > 0);
+                const mediaFreq = valoresFreq.length > 0 ? 
+                    (valoresFreq.reduce((a, b) => a + b, 0) / valoresFreq.length).toFixed(1) : '0';
+                const maxFreq = Math.max(...valoresFreq);
+                const variacaoFreq = maxFreq - Math.min(...valoresFreq);
+                
+                const tendenciaRepeticao = variacaoFreq <= 2 ? 'Baixa' : variacaoFreq <= 4 ? 'Média' : 'Alta';
+                
+                document.getElementById('mediaRepeticoesCalc').textContent = mediaFreq;
+                document.getElementById('maiorRepeticao').textContent = maxFreq.toString();
+                document.getElementById('tendenciaRepeticao').textContent = tendenciaRepeticao;
+            }
+        }
 
         async function initCharts() {
             console.log('Iniciando initCharts...'); // DEBUG
@@ -1517,6 +1872,15 @@
             
             // Atualizar números quentes e frios
             atualizarNumerosQuentesFrios(dados);
+            
+            // Atualizar análise de combinações
+            atualizarAnaliseCombinacoes(dados);
+            
+            // Atualizar análises temporais
+            atualizarAnalisesTemporais(dados);
+            
+            // Atualizar cálculos específicos
+            atualizarCalculosEspecificos(dados);
             
             // Gráfico de Frequência com dados reais - AJUSTADO PARA ENDPOINT QUE FUNCIONA
             const frequencyCanvas = document.getElementById('frequencyChart');

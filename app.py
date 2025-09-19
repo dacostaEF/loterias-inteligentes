@@ -1695,6 +1695,26 @@ def get_analise_frequencia_quina():
         if not resultado or resultado == {}:
             print("❌ Resultado vazio ou None")
             return jsonify({'error': 'Erro ao carregar dados de frequência da Quina.'}), 500
+        
+        # Adicionar análises temporais ao resultado
+        try:
+            from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_temporal_estruturada_quina
+            
+            # Converter DataFrame para formato esperado pelas funções temporais
+            dados_sorteios = []
+            for _, row in df_quina.iterrows():
+                concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+                bolas = [int(row[f'Bola{i}']) for i in range(1, 6) if pd.notna(row[f'Bola{i}'])]
+                if len(bolas) == 5:
+                    dados_sorteios.append([concurso] + bolas)
+            
+            # Análise temporal estruturada
+            analise_temporal = analise_frequencia_temporal_estruturada_quina(dados_sorteios, periodo='meses', qtd_concursos=qtd_concursos)
+            resultado['analise_temporal'] = analise_temporal or {}
+            
+        except Exception as e:
+            print(f"⚠️ Erro ao carregar análises temporais: {e}")
+            resultado['analise_temporal'] = {}
 
         # Preparar dados dos concursos individuais para a matriz visual
         concursos_para_matriz = []
@@ -4690,6 +4710,7 @@ def api_quina_dados_reais():
         try:
             from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analise_padroes_sequencias_quina
             from funcoes.quina.calculos_quina import calcular_seca_numeros_quina
+            from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
             
             # Análise de padrões e sequências
             padroes = analise_padroes_sequencias_quina(dados_sorteios) or {}
@@ -4699,12 +4720,36 @@ def api_quina_dados_reais():
             seca = calcular_seca_numeros_quina(df_quina, qtd_concursos=100) or {}
             dados_graficos['seca_numeros'] = seca
             
+            # Análises temporais
+            try:
+                from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_temporal_estruturada_quina
+                
+                # Análise temporal estruturada
+                analise_temporal = analise_frequencia_temporal_estruturada_quina(dados_sorteios, periodo='meses', qtd_concursos=100)
+                dados_graficos['analise_temporal'] = analise_temporal or {}
+                
+            except Exception as e:
+                logger.error(f"Erro ao carregar análises temporais: {e}")
+                dados_graficos['analise_temporal'] = {}
+            
+            # Análise de combinações - TEMPORARIAMENTE DESABILITADA
+            # try:
+            #     combinacoes = analisar_combinacoes_quina(df_quina, qtd_concursos=100) or {}
+            #     combinacoes_limpo = converter_para_json(combinacoes)
+            #     dados_graficos['analise_combinacoes'] = combinacoes_limpo
+            # except Exception as e:
+            #     logger.error(f"Erro ao processar combinações: {e}")
+            dados_graficos['analise_combinacoes'] = {}
+            
         except Exception as e:
-            logger.error(f"Erro ao carregar padrões e seca: {e}")
+            logger.error(f"Erro ao carregar padrões, seca e combinações: {e}")
             dados_graficos['padroes_sequencias'] = {}
             dados_graficos['seca_numeros'] = {}
+            dados_graficos['analise_combinacoes'] = {}
         
-        return jsonify(dados_graficos)
+        # Converter todos os dados para JSON serializável
+        dados_graficos_limpo = converter_para_json(dados_graficos)
+        return jsonify(dados_graficos_limpo)
         
     except Exception as e:
         logger.error(f"Erro ao carregar dados reais da Quina: {e}")
