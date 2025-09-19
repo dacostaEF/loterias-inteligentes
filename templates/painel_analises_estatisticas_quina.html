@@ -1656,29 +1656,33 @@
         function atualizarNumerosQuentesFrios(dados) {
             console.log('Atualizando números quentes e frios...', dados.numeros_quentes_frios); // DEBUG
             
-            // Atualizar números quentes - CORRIGIDO
+            // Atualizar números quentes - CORRIGIDO PARA FORMATO [[numero, freq], ...]
             if (dados.numeros_quentes_frios && dados.numeros_quentes_frios.numeros_quentes) {
                 const numerosQuentes = dados.numeros_quentes_frios.numeros_quentes.slice(0, 6);
                 console.log('Números quentes:', numerosQuentes); // DEBUG
                 
                 // Atualizar os spans dos números quentes no HTML
                 const quentesSpans = document.querySelectorAll('.bg-blue-500');
-                numerosQuentes.forEach((numero, index) => {
+                numerosQuentes.forEach((item, index) => {
                     if (quentesSpans[index]) {
+                        // Se item é array [numero, freq], pegar o número
+                        const numero = Array.isArray(item) ? item[0] : item;
                         quentesSpans[index].textContent = numero.toString().padStart(2, '0');
                     }
                 });
             }
             
-            // Atualizar números frios - CORRIGIDO
+            // Atualizar números frios - CORRIGIDO PARA FORMATO [[numero, freq], ...]
             if (dados.numeros_quentes_frios && dados.numeros_quentes_frios.numeros_frios) {
                 const numerosFrios = dados.numeros_quentes_frios.numeros_frios.slice(0, 6);
                 console.log('Números frios:', numerosFrios); // DEBUG
                 
                 // Atualizar os spans dos números frios no HTML
                 const friosSpans = document.querySelectorAll('.bg-cyan-500');
-                numerosFrios.forEach((numero, index) => {
+                numerosFrios.forEach((item, index) => {
                     if (friosSpans[index]) {
+                        // Se item é array [numero, freq], pegar o número
+                        const numero = Array.isArray(item) ? item[0] : item;
                         friosSpans[index].textContent = numero.toString().padStart(2, '0');
                     }
                 });
@@ -1809,7 +1813,8 @@
             
             // Calcular pares, primos e repetições usando os dados de frequência
             if (dados.frequencia_absoluta_numeros && Array.isArray(dados.frequencia_absoluta_numeros)) {
-                const frequencias = dados.frequencia_absoluta_numeros;
+                // Converter lista de objetos para array de frequências
+                const frequencias = dados.frequencia_absoluta_numeros.map(item => item.frequencia || 0);
                 
                 // Análise de pares
                 let paresConsecutivos = 0;
@@ -1942,6 +1947,12 @@
                 frequenciaData.push(Math.floor(Math.random() * 20) + 1);
             }
         }
+        
+        // Garantir que temos exatamente 80 valores
+        while (frequenciaData.length < 80) {
+            frequenciaData.push(0);
+        }
+        frequenciaData = frequenciaData.slice(0, 80);
             
             console.log('Criando gráfico de frequência com dados:', frequenciaData.length, 'pontos'); // DEBUG
             
