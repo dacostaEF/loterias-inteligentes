@@ -1502,21 +1502,35 @@
         // Função para atualizar números e trevos quentes e frios
         function atualizarNumerosTrevosQuentesFrios(dados) {
             // Atualizar números quentes
-            if (dados.numeros_quentes) {
-                const quentesContainer = document.querySelector('.bg-blue-500');
-                if (quentesContainer) {
-                    const numerosQuentes = dados.numeros_quentes.slice(0, 5).map(n => n.toString().padStart(2, '0')).join(', ');
-                    quentesContainer.querySelector('.text-2xl').textContent = numerosQuentes;
-                }
+            if (dados.numeros_quentes && Array.isArray(dados.numeros_quentes)) {
+                const quentesSpans = document.querySelectorAll('.bg-blue-500.text-white');
+                const numerosQuentes = dados.numeros_quentes.slice(0, 6).map(item => {
+                    // Se item é array [número, frequência], pegar apenas o número
+                    const numero = Array.isArray(item) ? item[0] : item;
+                    return numero.toString().padStart(2, '0');
+                });
+                
+                quentesSpans.forEach((span, index) => {
+                    if (index < numerosQuentes.length) {
+                        span.textContent = numerosQuentes[index];
+                    }
+                });
             }
             
             // Atualizar números frios
-            if (dados.numeros_frios) {
-                const friosContainer = document.querySelector('.bg-cyan-500');
-                if (friosContainer) {
-                    const numerosFrios = dados.numeros_frios.slice(0, 5).map(n => n.toString().padStart(2, '0')).join(', ');
-                    friosContainer.querySelector('.text-2xl').textContent = numerosFrios;
-                }
+            if (dados.numeros_frios && Array.isArray(dados.numeros_frios)) {
+                const friosSpans = document.querySelectorAll('.bg-cyan-500.text-white');
+                const numerosFrios = dados.numeros_frios.slice(0, 6).map(item => {
+                    // Se item é array [número, frequência], pegar apenas o número
+                    const numero = Array.isArray(item) ? item[0] : item;
+                    return numero.toString().padStart(2, '0');
+                });
+                
+                friosSpans.forEach((span, index) => {
+                    if (index < numerosFrios.length) {
+                        span.textContent = numerosFrios[index];
+                    }
+                });
             }
         }
 
