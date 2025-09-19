@@ -60,7 +60,7 @@ class AnaliseEstatisticaAvancadaLotofacil:
         self.df = df_lotofacil
         self.colunas_bolas = [f'Bola{i}' for i in range(1, 16)]
         # Preparar dados para análise
-        self.df_validos = self.preparar_dados_para_analise()
+        self._preparar_dados()
         
         if self.df_validos is None or len(self.df_validos) == 0:
             logger.error("❌ Nenhum dado válido encontrado para análise")

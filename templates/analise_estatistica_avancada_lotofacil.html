@@ -3436,8 +3436,8 @@
         const nodes = Array.from(numerosUnicos).map(num => ({
           id: num,
           label: num.toString(),
-          // Mesmo critério da Quina: tamanho base + score/10
-          size: 20 + (afinidades.numeros_com_maior_afinidade_geral.find(n => n[0] === num)?.[1] || 0) / 10
+          // Mesmo critério da Quina: tamanho base + score/10 (reduzido em 50%)
+          size: 10 + (afinidades.numeros_com_maior_afinidade_geral.find(n => n[0] === num)?.[1] || 0) / 20
         }));
 
         // Criar arestas (conexões)

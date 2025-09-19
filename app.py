@@ -1383,6 +1383,12 @@ from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinaco
 from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analisar_padroes_sequencias_quina
 from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaAvancadaQuina
 
+# Importações da Lotofácil
+from funcoes.lotofacil.funcao_analise_de_distribuicao_lotofacil import analisar_distribuicao_lotofacil
+from funcoes.lotofacil.funcao_analise_de_combinacoes_lotofacil import analisar_combinacoes_lotofacil
+from funcoes.lotofacil.funcao_analise_de_padroes_sequencia_lotofacil import analisar_padroes_sequencias_lotofacil
+from funcoes.lotofacil.analise_estatistica_avancada_lotofacil import AnaliseEstatisticaAvancadaLotofacil, realizar_analise_estatistica_avancada_lotofacil
+
 # Variáveis globais para armazenar os DataFrames (como estava no backup)
 df_milionaria = None
 df_megasena = None
@@ -2080,7 +2086,7 @@ def get_analise_de_combinacoes_lotofacil():
         if df_lotofacil is None or df_lotofacil.empty:
             return jsonify({"error": "Dados da Lotofácil não carregados."}), 500
 
-        qtd_concursos = request.args.get('qtd_concursos', type=int)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
 
         resultado = analisar_combinacoes_lotofacil(df_lotofacil, qtd_concursos)
         
