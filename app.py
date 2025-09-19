@@ -1715,6 +1715,26 @@ def get_analise_frequencia_quina():
         except Exception as e:
             print(f"⚠️ Erro ao carregar análises temporais: {e}")
             resultado['analise_temporal'] = {}
+        
+        # Adicionar análise de combinações (versão simplificada)
+        try:
+            from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
+            
+            # Análise de combinações simplificada
+            combinacoes = analisar_combinacoes_quina(df_quina, qtd_concursos=qtd_concursos)
+            if combinacoes:
+                # Extrair apenas dados essenciais para evitar problemas de serialização
+                resultado['analise_combinacoes'] = {
+                    'padroes_geometricos': combinacoes.get('padroes_geometricos', {}),
+                    'afinidade_entre_numeros': combinacoes.get('afinidade_entre_numeros', {}),
+                    'combinacoes_frequentes': combinacoes.get('combinacoes_frequentes', {})
+                }
+            else:
+                resultado['analise_combinacoes'] = {}
+                
+        except Exception as e:
+            print(f"⚠️ Erro ao carregar combinações: {e}")
+            resultado['analise_combinacoes'] = {}
 
         # Preparar dados dos concursos individuais para a matriz visual
         concursos_para_matriz = []

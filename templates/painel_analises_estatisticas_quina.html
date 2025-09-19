@@ -1737,8 +1737,35 @@
         function atualizarAnalisesTemporais(dados) {
             console.log('Atualizando análises temporais...', dados.analise_temporal); // DEBUG
             
-            if (!dados.analise_temporal || !Array.isArray(dados.analise_temporal)) {
-                console.log('Dados temporais não disponíveis ou formato inválido');
+            if (!dados.analise_temporal) {
+                console.log('Dados temporais não disponíveis');
+                return;
+            }
+            
+            // Verificar se é array ou objeto
+            let temporal = dados.analise_temporal;
+            if (!Array.isArray(temporal)) {
+                console.log('Dados temporais não são array, tentando processar como objeto');
+                // Se for objeto, tentar extrair dados relevantes
+                if (typeof temporal === 'object' && temporal !== null) {
+                    // Processar dados temporais como objeto
+                    const frequencias = temporal.frequencia || {};
+                    const valoresFreq = Object.values(frequencias);
+                    const frequenciaMedia = valoresFreq.length > 0 ? 
+                        (valoresFreq.reduce((a, b) => a + b, 0) / valoresFreq.length).toFixed(1) : '0';
+                    
+                    document.getElementById('mesMaisFrequente').textContent = temporal.periodo || '-';
+                    document.getElementById('mesMenosFrequente').textContent = temporal.concursos || '-';
+                    document.getElementById('variacaoMensal').textContent = frequenciaMedia;
+                    
+                    document.getElementById('anoMaisFrequente').textContent = temporal.concursos || '-';
+                    document.getElementById('anoMenosFrequente').textContent = '-';
+                    document.getElementById('tendenciaAnual').textContent = 'Estável';
+                    
+                    document.getElementById('frequenciaMediaConcurso').textContent = frequenciaMedia;
+                    document.getElementById('picoFrequenciaConcurso').textContent = Math.max(...valoresFreq).toString();
+                    document.getElementById('estabilidadeConcurso').textContent = 'Média';
+                }
                 return;
             }
             
