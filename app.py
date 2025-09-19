@@ -1370,6 +1370,13 @@ from funcoes.milionaria.funcao_analise_de_trevodasorte_frequencia import analise
 from funcoes.milionaria.calculos import calcular_seca_numeros, calcular_seca_trevos
 from funcoes.milionaria.analise_estatistica_avancada import AnaliseEstatisticaAvancada
 
+# Importações da Mega Sena
+from funcoes.megasena.calculos_MS import calcular_seca_numeros_megasena
+from funcoes.megasena.analise_estatistica_avancada_MS import AnaliseEstatisticaAvancada as AnaliseEstatisticaAvancadaMS
+from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribuicao_megasena
+from funcoes.megasena.funcao_analise_de_combinacoes_MS import analise_combinacoes_megasena
+from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
+
 # Variáveis globais para armazenar os DataFrames (como estava no backup)
 df_milionaria = None
 df_megasena = None
