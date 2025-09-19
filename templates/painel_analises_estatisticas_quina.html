@@ -948,7 +948,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Concursos Analisados</p>
-                        <p class="text-2xl font-bold text-blue-400">1,247</p>
+                        <p class="text-2xl font-bold text-blue-400" id="totalConcursosAnalisados">-</p>
                     </div>
                     <i class="fas fa-database text-2xl text-blue-400"></i>
                 </div>
@@ -994,7 +994,6 @@
                         <i class="fas fa-list text-blue-400 mr-2"></i>
                         Análise de Frequência
                     </h3>
-                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
                 
                 <div class="space-y-6">
@@ -1039,7 +1038,6 @@
                         <i class="fas fa-chart-pie text-blue-400 mr-2"></i>
                         Análise de Distribuição
                     </h3>
-                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
                 
                 <div class="space-y-4">
@@ -1109,7 +1107,6 @@
                         <i class="fas fa-sort-amount-down text-cyan-400 mr-2"></i>
                         Análise de Sequências
                     </h3>
-                    <span class="bg-cyan-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
                 
                 <div class="space-y-4">
@@ -1146,7 +1143,6 @@
                         <i class="fas fa-shovel text-yellow-400 mr-2"></i>
                         Análise de Seca
                     </h3>
-                    <span class="bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
                 
                 <div class="space-y-4">
@@ -1183,7 +1179,6 @@
                         <i class="fas fa-layer-group text-red-400 mr-2"></i>
                         Análise de Combinações
                     </h3>
-                    <span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
                 
                 <div class="space-y-4">
@@ -1193,21 +1188,45 @@
                     </h4>
                     
                     <div class="space-y-3">
-                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Pares consecutivos:</span>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg group relative">
+                            <span class="text-sm flex items-center gap-1">
+                                Pares consecutivos:
+                                <i class="fas fa-info-circle text-blue-400 cursor-help" title="Números que saíram em sequência (ex: 15, 16)"></i>
+                            </span>
                             <span class="text-red-400 font-bold" id="paresConsecutivos">-</span>
+                            <div class="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                Quantos pares de números consecutivos saíram nos últimos 100 concursos
+                            </div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Números pares:</span>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg group relative">
+                            <span class="text-sm flex items-center gap-1">
+                                Números pares:
+                                <i class="fas fa-info-circle text-blue-400 cursor-help" title="Números divisíveis por 2"></i>
+                            </span>
                             <span class="text-red-400 font-bold" id="numerosPares">-</span>
+                            <div class="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                Total de números pares sorteados nos últimos 100 concursos
+                            </div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Números ímpares:</span>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg group relative">
+                            <span class="text-sm flex items-center gap-1">
+                                Números ímpares:
+                                <i class="fas fa-info-circle text-blue-400 cursor-help" title="Números não divisíveis por 2"></i>
+                            </span>
                             <span class="text-red-400 font-bold" id="numerosImpares">-</span>
+                            <div class="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                Total de números ímpares sorteados nos últimos 100 concursos
+                            </div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg">
-                            <span class="text-sm">Soma total média:</span>
+                        <div class="flex items-center justify-between p-3 bg-gray-800/50 rounded-lg group relative">
+                            <span class="text-sm flex items-center gap-1">
+                                Soma total média:
+                                <i class="fas fa-info-circle text-blue-400 cursor-help" title="Média da soma dos 5 números por concurso"></i>
+                            </span>
                             <span class="text-white font-bold" id="somaTotalMedia">-</span>
+                            <div class="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                Média da soma dos 5 números sorteados por concurso nos últimos 100 concursos
+                            </div>
                         </div>
                     </div>
                     
@@ -1218,13 +1237,25 @@
                             Afinidades entre Números
                         </h5>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div class="p-3 bg-gray-800/50 rounded-lg">
-                                <div class="text-xs text-gray-400">Duplas mais frequentes</div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg group relative">
+                                <div class="text-xs text-gray-400 flex items-center gap-1">
+                                    Duplas mais frequentes
+                                    <i class="fas fa-info-circle text-blue-400 cursor-help" title="Pares de números que mais saíram juntos"></i>
+                                </div>
                                 <div class="text-sm font-medium" id="duplasFrequentes">-</div>
+                                <div class="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                    Pares de números que mais apareceram juntos nos últimos 100 concursos
+                                </div>
                             </div>
-                            <div class="p-3 bg-gray-800/50 rounded-lg">
-                                <div class="text-xs text-gray-400">Ternas mais frequentes</div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg group relative">
+                                <div class="text-xs text-gray-400 flex items-center gap-1">
+                                    Ternas mais frequentes
+                                    <i class="fas fa-info-circle text-blue-400 cursor-help" title="Grupos de 3 números que mais saíram juntos"></i>
+                                </div>
                                 <div class="text-sm font-medium" id="ternasFrequentes">-</div>
+                                <div class="absolute bottom-full left-0 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                    Grupos de 3 números que mais apareceram juntos nos últimos 100 concursos
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1235,21 +1266,45 @@
                             Padrões Geométricos
                         </h5>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
-                                <div class="text-xs text-gray-400">Cantos</div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center group relative">
+                                <div class="text-xs text-gray-400 flex items-center justify-center gap-1">
+                                    Cantos
+                                    <i class="fas fa-info-circle text-blue-400 cursor-help" title="Números dos cantos do volante: 1, 10, 71, 80"></i>
+                                </div>
                                 <div class="text-sm font-bold text-green-400" id="padroesCantos">-</div>
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                    Quantos números dos cantos do volante (1, 10, 71, 80) saíram
+                                </div>
                             </div>
-                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
-                                <div class="text-xs text-gray-400">Bordas</div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center group relative">
+                                <div class="text-xs text-gray-400 flex items-center justify-center gap-1">
+                                    Bordas
+                                    <i class="fas fa-info-circle text-blue-400 cursor-help" title="Números das bordas do volante"></i>
+                                </div>
                                 <div class="text-sm font-bold text-green-400" id="padroesBordas">-</div>
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                    Quantos números das bordas (terminados em 1 ou 0, ou nas linhas extremas) saíram
+                                </div>
                             </div>
-                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
-                                <div class="text-xs text-gray-400">Centro</div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center group relative">
+                                <div class="text-xs text-gray-400 flex items-center justify-center gap-1">
+                                    Centro
+                                    <i class="fas fa-info-circle text-blue-400 cursor-help" title="Números do centro do volante"></i>
+                                </div>
                                 <div class="text-sm font-bold text-green-400" id="padroesCentro">-</div>
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                    Quantos números do centro do volante (21-60) saíram
+                                </div>
                             </div>
-                            <div class="p-3 bg-gray-800/50 rounded-lg text-center">
-                                <div class="text-xs text-gray-400">Linhas</div>
+                            <div class="p-3 bg-gray-800/50 rounded-lg text-center group relative">
+                                <div class="text-xs text-gray-400 flex items-center justify-center gap-1">
+                                    Linhas
+                                    <i class="fas fa-info-circle text-blue-400 cursor-help" title="Linha do volante com mais números"></i>
+                                </div>
                                 <div class="text-sm font-bold text-green-400" id="padroesLinhas">-</div>
+                                <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                                    Qual linha do volante (1-8) teve mais números sorteados
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1263,7 +1318,6 @@
                         <i class="fas fa-calculator text-blue-400 mr-2"></i>
                         Estatísticas Avançadas
                     </h3>
-                    <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
                 
                 <div class="space-y-4">
@@ -1623,9 +1677,9 @@
         function atualizarEstatisticasGerais(dados) {
             console.log('Atualizando estatísticas gerais...', dados); // DEBUG
             
-            // Atualizar total de concursos - CORRIGIDO
+            // Atualizar total de concursos analisados - CORRIGIDO
             if (dados.periodo_analisado && dados.periodo_analisado.total_concursos) {
-                const totalConcursos = document.querySelector('.text-2xl.font-bold.text-blue-400');
+                const totalConcursos = document.getElementById('totalConcursosAnalisados');
                 if (totalConcursos) {
                     totalConcursos.textContent = dados.periodo_analisado.total_concursos;
                     console.log('Total de concursos atualizado:', dados.periodo_analisado.total_concursos); // DEBUG
@@ -1656,7 +1710,7 @@
         function atualizarNumerosQuentesFrios(dados) {
             console.log('Atualizando números quentes e frios...', dados.numeros_quentes_frios); // DEBUG
             
-            // Atualizar números quentes - CORRIGIDO PARA FORMATO [[numero, freq], ...]
+            // Atualizar números quentes - VOLTANDO AO QUE FUNCIONAVA
             if (dados.numeros_quentes_frios && dados.numeros_quentes_frios.numeros_quentes) {
                 const numerosQuentes = dados.numeros_quentes_frios.numeros_quentes.slice(0, 6);
                 console.log('Números quentes:', numerosQuentes); // DEBUG
@@ -1672,7 +1726,7 @@
                 });
             }
             
-            // Atualizar números frios - CORRIGIDO PARA FORMATO [[numero, freq], ...]
+            // Atualizar números frios - VOLTANDO AO QUE FUNCIONAVA
             if (dados.numeros_quentes_frios && dados.numeros_quentes_frios.numeros_frios) {
                 const numerosFrios = dados.numeros_quentes_frios.numeros_frios.slice(0, 6);
                 console.log('Números frios:', numerosFrios); // DEBUG
@@ -1698,21 +1752,56 @@
             }
             
             const combinacoes = dados.analise_combinacoes;
+            console.log('Dados de combinações:', combinacoes); // DEBUG
             
             // Atualizar métricas básicas
             if (combinacoes.padroes_geometricos) {
                 const padroes = combinacoes.padroes_geometricos;
+                console.log('Padrões geométricos:', padroes); // DEBUG
                 
-                // Atualizar padrões geométricos
-                document.getElementById('padroesCantos').textContent = padroes.cantos || '-';
-                document.getElementById('padroesBordas').textContent = padroes.bordas || '-';
-                document.getElementById('padroesCentro').textContent = padroes.centro || '-';
-                document.getElementById('padroesLinhas').textContent = padroes.linhas || '-';
+                // Atualizar padrões geométricos - CORRIGIDO para processar Counter objects
+                const cantos = padroes.cantos;
+                const bordas = padroes.bordas;
+                const centro = padroes.centro;
+                const linhas = padroes.linhas;
+                
+                // Processar cantos (mais comum)
+                if (cantos && typeof cantos === 'object') {
+                    const cantosMaisComum = Object.keys(cantos).reduce((a, b) => cantos[a] > cantos[b] ? a : b);
+                    document.getElementById('padroesCantos').textContent = cantosMaisComum || '-';
+                } else {
+                    document.getElementById('padroesCantos').textContent = cantos || '-';
+                }
+                
+                // Processar bordas (mais comum)
+                if (bordas && typeof bordas === 'object') {
+                    const bordasMaisComum = Object.keys(bordas).reduce((a, b) => bordas[a] > bordas[b] ? a : b);
+                    document.getElementById('padroesBordas').textContent = bordasMaisComum || '-';
+                } else {
+                    document.getElementById('padroesBordas').textContent = bordas || '-';
+                }
+                
+                // Processar centro (mais comum)
+                if (centro && typeof centro === 'object') {
+                    const centroMaisComum = Object.keys(centro).reduce((a, b) => centro[a] > centro[b] ? a : b);
+                    document.getElementById('padroesCentro').textContent = centroMaisComum || '-';
+                } else {
+                    document.getElementById('padroesCentro').textContent = centro || '-';
+                }
+                
+                // Processar linhas (mais comum)
+                if (linhas && typeof linhas === 'object') {
+                    const linhasMaisComum = Object.keys(linhas).reduce((a, b) => linhas[a] > linhas[b] ? a : b);
+                    document.getElementById('padroesLinhas').textContent = linhasMaisComum || '-';
+                } else {
+                    document.getElementById('padroesLinhas').textContent = linhas || '-';
+                }
             }
             
             // Atualizar afinidades
             if (combinacoes.afinidade_entre_numeros) {
                 const afinidade = combinacoes.afinidade_entre_numeros;
+                console.log('Afinidades:', afinidade); // DEBUG
                 
                 // Duplas mais frequentes
                 if (afinidade.pares_com_maior_afinidade && afinidade.pares_com_maior_afinidade.length > 0) {
@@ -1720,21 +1809,81 @@
                         `${par[0]}-${par[1]}`
                     ).join(', ');
                     document.getElementById('duplasFrequentes').textContent = duplas;
+                } else {
+                    document.getElementById('duplasFrequentes').textContent = '-';
                 }
                 
                 // Ternas mais frequentes
                 if (combinacoes.combinacoes_frequentes && combinacoes.combinacoes_frequentes.ternas) {
-                    const ternas = combinacoes.combinacoes_frequentes.ternas.slice(0, 2).map(terna => 
-                        `${terna[0]}-${terna[1]}-${terna[2]}`
-                    ).join(', ');
-                    document.getElementById('ternasFrequentes').textContent = ternas;
+                    const ternas = combinacoes.combinacoes_frequentes.ternas;
+                    console.log('Ternas disponíveis:', ternas); // DEBUG
+                    
+                    if (ternas && Object.keys(ternas).length > 0) {
+                        // Pegar as 2 ternas mais frequentes
+                        const ternasOrdenadas = Object.entries(ternas)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 2);
+                        
+                        const ternasFormatadas = ternasOrdenadas.map(([terna, freq]) => 
+                            `${terna} (${freq}x)`
+                        ).join(', ');
+                        
+                        document.getElementById('ternasFrequentes').textContent = ternasFormatadas;
+                    } else {
+                        document.getElementById('ternasFrequentes').textContent = 'Nenhuma terna consecutiva nos últimos 100 concursos';
+                    }
+                } else {
+                    document.getElementById('ternasFrequentes').textContent = 'Nenhuma terna consecutiva nos últimos 100 concursos';
                 }
             }
             
-            // Atualizar métricas de pares/ímpares (se disponível)
-            if (combinacoes.sequencias_aritmeticas) {
-                // Aqui podemos adicionar lógica para calcular pares/ímpares se necessário
-                // Por enquanto, vamos manter os valores padrão
+            // Atualizar métricas de pares/ímpares (sempre calcular, independente de sequencias_aritmeticas)
+            console.log('Calculando métricas de pares/ímpares...'); // DEBUG
+            
+            // Calcular métricas básicas dos últimos concursos
+            if (dados.concursos_para_matriz && dados.concursos_para_matriz.length > 0) {
+                console.log('Dados de concursos encontrados:', dados.concursos_para_matriz.length); // DEBUG
+                
+                let paresConsecutivos = 0;
+                let numerosPares = 0;
+                let numerosImpares = 0;
+                let somaTotal = 0;
+                let totalConcursos = dados.concursos_para_matriz.length;
+                
+                dados.concursos_para_matriz.forEach(concurso => {
+                    if (concurso.numeros && concurso.numeros.length === 5) {
+                        const numeros = concurso.numeros;
+                        
+                        // Contar pares e ímpares
+                        numeros.forEach(num => {
+                            if (num % 2 === 0) {
+                                numerosPares++;
+                            } else {
+                                numerosImpares++;
+                            }
+                            somaTotal += num;
+                        });
+                        
+                        // Verificar pares consecutivos
+                        for (let i = 0; i < numeros.length - 1; i++) {
+                            if (Math.abs(numeros[i] - numeros[i + 1]) === 1) {
+                                paresConsecutivos++;
+                            }
+                        }
+                    }
+                });
+                
+                const somaMedia = totalConcursos > 0 ? (somaTotal / totalConcursos).toFixed(1) : '0';
+                
+                console.log('Métricas calculadas:', { paresConsecutivos, numerosPares, numerosImpares, somaMedia }); // DEBUG
+                
+                // Atualizar campos
+                document.getElementById('paresConsecutivos').textContent = paresConsecutivos.toString();
+                document.getElementById('numerosPares').textContent = numerosPares.toString();
+                document.getElementById('numerosImpares').textContent = numerosImpares.toString();
+                document.getElementById('somaTotalMedia').textContent = somaMedia;
+            } else {
+                console.log('❌ Dados de concursos não encontrados'); // DEBUG
             }
         }
         
@@ -1772,8 +1921,6 @@
                 }
                 return;
             }
-            
-            const temporal = dados.analise_temporal;
             
             // Processar dados temporais por períodos
             if (temporal.length > 0) {
@@ -1925,7 +2072,7 @@
             
             const frequencyCtx = frequencyCanvas.getContext('2d');
             
-        // Preparar dados de frequência - CORRIGIDO PARA LISTA DE OBJETOS
+        // Preparar dados de frequência - VOLTANDO AO QUE FUNCIONAVA
         let frequenciaData = [];
         console.log('Dados de frequência:', dados.frequencia_absoluta_numeros); // DEBUG
         console.log('Tipo dos dados:', typeof dados.frequencia_absoluta_numeros); // DEBUG
@@ -1947,12 +2094,6 @@
                 frequenciaData.push(Math.floor(Math.random() * 20) + 1);
             }
         }
-        
-        // Garantir que temos exatamente 80 valores
-        while (frequenciaData.length < 80) {
-            frequenciaData.push(0);
-        }
-        frequenciaData = frequenciaData.slice(0, 80);
             
             console.log('Criando gráfico de frequência com dados:', frequenciaData.length, 'pontos'); // DEBUG
             

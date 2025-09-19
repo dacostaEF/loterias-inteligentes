@@ -1717,23 +1717,33 @@ def get_analise_frequencia_quina():
             resultado['analise_temporal'] = {}
         
         # Adicionar análise de combinações (versão simplificada)
+        print("🔍 DEBUG: Iniciando análise de combinações...")
         try:
             from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
+            print("✅ DEBUG: Importação da função OK")
             
             # Análise de combinações simplificada
+            print(f"🔍 DEBUG: Chamando analisar_combinacoes_quina com qtd_concursos={qtd_concursos}")
             combinacoes = analisar_combinacoes_quina(df_quina, qtd_concursos=qtd_concursos)
+            print(f"✅ DEBUG: Função executada. Tipo: {type(combinacoes)}")
+            
             if combinacoes:
+                print(f"✅ DEBUG: Combinacoes não vazio. Chaves: {list(combinacoes.keys())}")
                 # Extrair apenas dados essenciais para evitar problemas de serialização
                 resultado['analise_combinacoes'] = {
                     'padroes_geometricos': combinacoes.get('padroes_geometricos', {}),
                     'afinidade_entre_numeros': combinacoes.get('afinidade_entre_numeros', {}),
                     'combinacoes_frequentes': combinacoes.get('combinacoes_frequentes', {})
                 }
+                print("✅ DEBUG: analise_combinacoes adicionado ao resultado")
             else:
+                print("❌ DEBUG: Combinacoes vazio")
                 resultado['analise_combinacoes'] = {}
                 
         except Exception as e:
-            print(f"⚠️ Erro ao carregar combinações: {e}")
+            print(f"❌ DEBUG: Erro ao carregar combinações: {e}")
+            import traceback
+            traceback.print_exc()
             resultado['analise_combinacoes'] = {}
 
         # Preparar dados dos concursos individuais para a matriz visual
@@ -1760,6 +1770,13 @@ def get_analise_frequencia_quina():
         
         print(f"🔍 Debug: Total de concursos para matriz={len(concursos_para_matriz)}")
 
+        # Log final para verificar o que está sendo retornado
+        print(f"🔍 DEBUG: Resultado final. Chaves: {list(resultado.keys())}")
+        if 'analise_combinacoes' in resultado:
+            print("✅ DEBUG: analise_combinacoes presente no resultado final")
+        else:
+            print("❌ DEBUG: analise_combinacoes NÃO presente no resultado final")
+
         return jsonify({
             'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
             'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
@@ -1767,7 +1784,8 @@ def get_analise_frequencia_quina():
             'analise_temporal': resultado['analise_temporal'],
             'periodo_analisado': resultado['periodo_analisado'],
             'concursos_para_matriz': concursos_para_matriz,  # Dados para a matriz visual
-            'ultimos_concursos': resultado.get('ultimos_concursos', [])  # Dados para o grid
+            'ultimos_concursos': resultado.get('ultimos_concursos', []),  # Dados para o grid
+            'analise_combinacoes': resultado.get('analise_combinacoes', {})  # Dados de combinações
         })
     except Exception as e:
         print(f"❌ Erro na API de frequência Quina: {e}")
