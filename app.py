@@ -127,7 +127,8 @@ class UserPermissions:
         '/dashboard_megasena',  # Mega Sena (alias)
         '/dashboard_lotofacil',  # Lotofácil (liberado para freemium)
         '/upgrade_plans',
-        '/checkout'
+        '/checkout',
+        '/api/quina/dados-reais'  # API de dados da Quina
     }
     
     # Rotas PREMIUM (requer assinatura)
@@ -4611,13 +4612,15 @@ def painel_analises_estatisticas_quina():
     return render_template('painel_analises_estatisticas_quina.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/api/quina/dados-reais')
-@verificar_acesso_universal
 def api_quina_dados_reais():
     """
     API que retorna dados reais da Quina para o painel de análises estatísticas.
     Conecta com as funções reais que leem o Excel da Quina.
     """
     try:
+        # Importar pandas diretamente para evitar problemas de escopo
+        import pandas as pd
+        
         # Importar as funções reais da Quina
         from funcoes.quina.QuinaFuncaCarregaDadosExcel_quina import carregar_dados_quina
         from funcoes.quina.funcao_analise_de_frequencia_quina import analise_frequencia_quina
@@ -4658,15 +4661,13 @@ def api_quina_dados_reais():
             }
         }
         
-        # Processar dados de frequência para o gráfico
-        if 'frequencia_absoluta' in analise_freq:
-            freq_abs = analise_freq['frequencia_absoluta']
-            for num in range(1, 81):
-                dados_graficos['frequencia_numeros'].append(freq_abs.get(num, 0))
+        # Processar dados de frequência para o gráfico - CORRIGIDO conforme sua análise
+        freq_abs = (analise_freq.get('frequencia_absoluta') or {}).get('numeros', {})
+        dados_graficos['frequencia_numeros'] = [int(freq_abs.get(num, 0)) for num in range(1, 81)]
         
-        # Processar dados de distribuição para o gráfico
-        if 'distribuicao_faixas' in analise_dist:
-            dist_faixas = analise_dist['distribuicao_faixas']
+        # Processar dados de distribuição para o gráfico - CORRIGIDO
+        if 'distribuicao_por_faixa' in analise_dist:
+            dist_faixas = analise_dist['distribuicao_por_faixa']
             dados_graficos['distribuicao_faixas'] = [
                 dist_faixas.get('1-16', 0),
                 dist_faixas.get('17-32', 0),
@@ -4675,16 +4676,33 @@ def api_quina_dados_reais():
                 dist_faixas.get('65-80', 0)
             ]
         
-        # Adicionar números quentes e frios
-        if 'numeros_quentes' in analise_freq:
-            dados_graficos['numeros_quentes'] = analise_freq['numeros_quentes'][:10]
-        
-        if 'numeros_frios' in analise_freq:
-            dados_graficos['numeros_frios'] = analise_freq['numeros_frios'][:10]
+        # Adicionar números quentes, frios e secos - CORRIGIDO conforme sua análise
+        nqf = analise_freq.get('numeros_quentes_frios', {})
+        dados_graficos['numeros_quentes'] = nqf.get('numeros_quentes', [])[:10]
+        dados_graficos['numeros_frios'] = nqf.get('numeros_frios', [])[:10]
+        dados_graficos['numeros_secos'] = nqf.get('numeros_secos', [])[:10]
         
         # Adicionar análise avançada
         if analise_avancada and 'distribuicao_numeros' in analise_avancada:
             dados_graficos['analise_avancada'] = analise_avancada
+        
+        # Incluir padrões e sequências - ADICIONADO conforme sua sugestão
+        try:
+            from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analise_padroes_sequencias_quina
+            from funcoes.quina.calculos_quina import calcular_seca_numeros_quina
+            
+            # Análise de padrões e sequências
+            padroes = analise_padroes_sequencias_quina(dados_sorteios) or {}
+            dados_graficos['padroes_sequencias'] = padroes
+            
+            # Análise de seca
+            seca = calcular_seca_numeros_quina(df_quina, qtd_concursos=100) or {}
+            dados_graficos['seca_numeros'] = seca
+            
+        except Exception as e:
+            logger.error(f"Erro ao carregar padrões e seca: {e}")
+            dados_graficos['padroes_sequencias'] = {}
+            dados_graficos['seca_numeros'] = {}
         
         return jsonify(dados_graficos)
         
