@@ -1377,6 +1377,12 @@ from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_distribui
 from funcoes.megasena.funcao_analise_de_combinacoes_MS import analise_combinacoes_megasena
 from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
 
+# Importações da Quina
+from funcoes.quina.funcao_analise_de_distribuicao_quina import analisar_distribuicao_quina
+from funcoes.quina.funcao_analise_de_combinacoes_quina import analisar_combinacoes_quina
+from funcoes.quina.funcao_analise_de_padroes_sequencia_quina import analisar_padroes_sequencias_quina
+from funcoes.quina.analise_estatistica_avancada_quina import AnaliseEstatisticaAvancadaQuina
+
 # Variáveis globais para armazenar os DataFrames (como estava no backup)
 df_milionaria = None
 df_megasena = None
