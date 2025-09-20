@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, session
+from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, session, Response
 from functools import wraps
 import os
 import sys
@@ -9,6 +9,9 @@ import math
 from datetime import datetime, date, timedelta
 import json
 import logging
+
+# Analytics imports
+from analytics_models import db, Event
 
 # ============================================================================
 # 🔐 SISTEMA SIMPLES DE AUTENTICAÇÃO
@@ -539,6 +542,23 @@ app.config.update(
     REMEMBER_COOKIE_SAMESITE='Lax',
     PERMANENT_SESSION_LIFETIME=timedelta(hours=2),  # Alinhado com remember=False
 )
+
+# ============================================================================
+# 📊 CONFIGURAÇÃO DO ANALYTICS
+# ============================================================================
+
+# Carregar configurações do arquivo
+if os.path.exists('config.env'):
+    with open('config.env', 'r') as f:
+        for line in f:
+            if line.strip() and not line.startswith('#'):
+                key, value = line.strip().split('=', 1)
+                os.environ[key] = value
+
+# Configurar banco de dados para analytics
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///li.db")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+db.init_app(app)
 
 # ============================================================================
 # 🔧 CONFIGURAÇÃO DO FLASK-LOGIN (ÚNICA VERSÃO)
@@ -5216,6 +5236,102 @@ def api_megasena_dados_reais():
 def painel_analises_estatisticas_lotofacil():
     """Renderiza o painel de análises estatísticas da Lotofácil."""
     return render_template('painel_analises_estatisticas_lotofacil.html', is_logged_in=verificar_usuario_logado())
+
+# ============================================================================
+# 📊 ENDPOINTS DO ANALYTICS
+# ============================================================================
+
+# JavaScript coletor servido pelo próprio app
+ANALYTICS_JS = r"""
+(function(){
+  try{
+    const LS_KEY='li_vid';
+    let vid = localStorage.getItem(LS_KEY);
+    if(!vid){ vid=crypto.randomUUID(); localStorage.setItem(LS_KEY, vid); }
+    let sid = sessionStorage.getItem('li_sid');
+    if(!sid){ sid = crypto.randomUUID(); sessionStorage.setItem('li_sid', sid); }
+
+    let lastPing = Date.now();
+    function payload(evt, extra){
+      const u = new URL(location.href);
+      return {
+        event: evt,
+        path: location.pathname,
+        ref: document.referrer || '',
+        utm_source: u.searchParams.get('utm_source') || '',
+        utm_medium: u.searchParams.get('utm_medium') || '',
+        utm_campaign: u.searchParams.get('utm_campaign') || '',
+        session_id: sid,
+        visitor_id: vid,
+        duration_ms: Date.now() - lastPing,
+        device: (/Mobi|Android/i.test(navigator.userAgent)?'mobile':'desktop'),
+        ...extra
+      };
+    }
+    function send(data){
+      navigator.sendBeacon('/api/track', JSON.stringify(data));
+      lastPing = Date.now();
+    }
+
+    // pageview
+    send(payload('pageview'));
+    // tempo na página
+    setInterval(()=>send(payload('hb')), 15000);
+    // cliques marcados
+    document.addEventListener('click', (e)=>{
+      const el = e.target.closest('[data-analytics]');
+      if(!el) return;
+      send(payload('click', {label: el.getAttribute('data-analytics')||'click'}));
+    });
+    // ao esconder/fechar
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState==='hidden') send(payload('hb'));
+    });
+  }catch(e){}
+})();
+"""
+
+@app.get("/a.js")
+def analytics_js():
+    return Response(ANALYTICS_JS, mimetype="application/javascript")
+
+@app.post("/api/track")
+def track():
+    try:
+      if request.content_length and request.content_length > 50000:  # proteção
+          return "", 204
+      data = request.get_json(silent=True) or {}
+      ua = request.headers.get("User-Agent","")
+      # filtro simples de bots
+      low = ua.lower()
+      if any(b in low for b in ["bot","spider","crawler","monitor","uptime"]):
+          return "", 204
+      ev = Event(
+          ts=datetime.utcnow(),
+          event=(data.get("event") or "")[:32],
+          label=(data.get("label") or "")[:128],        # <-- salvar label
+          path=(data.get("path") or "")[:255],
+          referrer=(data.get("ref") or "")[:255],
+          utm_source=(data.get("utm_source") or "")[:80],
+          utm_medium=(data.get("utm_medium") or "")[:80],
+          utm_campaign=(data.get("utm_campaign") or "")[:80],
+          session_id=(data.get("session_id") or "")[:64],
+          visitor_id=(data.get("visitor_id") or "")[:64],
+          duration_ms=int(data.get("duration_ms") or 0),
+          ua=ua[:200],
+          country=(request.headers.get("CF-IPCountry") or "")[:2],
+          device=(data.get("device") or "")[:32],
+          props=data.get("props") or None,              # <-- extras (se mandar)
+      )
+      db.session.add(ev)
+      db.session.commit()
+      return "", 204
+    except Exception:
+      return "", 204
+
+# Registrar blueprint do admin
+from routes_admin import bp_admin
+app.register_blueprint(bp_admin)
 
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================
