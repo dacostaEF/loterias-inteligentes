@@ -115,9 +115,9 @@ class AnaliseEstatisticaAvancadaLotofacil:
         
         # Calcular estatísticas
         valores = list(frequencias.values())
-        media = np.mean(valores)
-        desvio_padrao = np.std(valores)
-        variancia = np.var(valores)
+        media = float(np.mean(valores))
+        desvio_padrao = float(np.std(valores))
+        variancia = float(np.var(valores))
         coeficiente_variacao = (desvio_padrao / media) * 100 if media > 0 else 0
         
         # Ordenar números por variabilidade
@@ -173,7 +173,7 @@ class AnaliseEstatisticaAvancadaLotofacil:
             pares = sum(1 for num in numeros if num % 2 == 0)
             pares_por_sorteio.append(pares)
         
-        media_pares = np.mean(pares_por_sorteio)
+        media_pares = float(np.mean(pares_por_sorteio))
         # Em 15 números, esperamos em média 7.5 pares
         aleatorio_paridade = abs(media_pares - 7.5) < 1.0
         
@@ -290,11 +290,11 @@ class AnaliseEstatisticaAvancadaLotofacil:
             resultados_clusters[f'cluster_{i}'] = numeros_cluster
             
             # Calcular estatísticas do cluster
-            freq_media = np.mean([dados_cluster[num-1][0] for num in numeros_cluster])
-            freq_recente = np.mean([dados_cluster[num-1][1] for num in numeros_cluster])
-            ultima_aparicao = np.mean([dados_cluster[num-1][2] for num in numeros_cluster])
-            score_atraso = np.mean([dados_cluster[num-1][3] for num in numeros_cluster])
-            tendencia = np.mean([dados_cluster[num-1][4] for num in numeros_cluster])
+            freq_media = float(np.mean([dados_cluster[num-1][0] for num in numeros_cluster]))
+            freq_recente = float(np.mean([dados_cluster[num-1][1] for num in numeros_cluster]))
+            ultima_aparicao = float(np.mean([dados_cluster[num-1][2] for num in numeros_cluster]))
+            score_atraso = float(np.mean([dados_cluster[num-1][3] for num in numeros_cluster]))
+            tendencia = float(np.mean([dados_cluster[num-1][4] for num in numeros_cluster]))
             
             # Classificar cluster
             tipo = self._classificar_cluster_avancado(
@@ -414,7 +414,7 @@ class AnaliseEstatisticaAvancadaLotofacil:
             correlacoes_negativas = [(num1, num2, corr) for num1, num2, corr in pares_correlacionados if corr < -0.1][:10]
             
             # Calcular correlação média
-            correlacao_media = np.mean([corr for _, _, corr in pares_correlacionados]) if pares_correlacionados else 0.0
+            correlacao_media = float(np.mean([corr for _, _, corr in pares_correlacionados])) if pares_correlacionados else 0.0
             
             return {
                 'correlacoes_positivas': correlacoes_positivas,

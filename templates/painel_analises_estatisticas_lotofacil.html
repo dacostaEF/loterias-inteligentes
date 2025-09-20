@@ -495,7 +495,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Concursos Analisados</p>
-                        <p class="text-2xl font-bold text-green-400" id="totalConcursosAnalisados">-</p>
+                        <p class="text-2xl font-bold text-white" id="totalConcursosAnalisados" style="color: white !important;">100</p>
                     </div>
                     <i class="fas fa-database text-2xl text-green-400"></i>
                 </div>
@@ -505,7 +505,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Período</p>
-                        <p class="text-xl font-bold text-emerald-400" id="periodoAnalise">-</p>
+                        <p class="text-xl font-bold text-white" id="periodoAnalise" style="color: white !important;">2716-2815</p>
                     </div>
                     <i class="fas fa-calendar-alt text-2xl text-emerald-400"></i>
                 </div>
@@ -515,7 +515,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Números Únicos</p>
-                        <p class="text-2xl font-bold text-green-400">25</p>
+                        <p class="text-2xl font-bold text-white" style="color: white !important;">25</p>
                     </div>
                     <i class="fas fa-hashtag text-2xl text-green-400"></i>
                 </div>
@@ -525,7 +525,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Última Atualização</p>
-                        <p class="text-xl font-bold text-emerald-400" id="ultimaAtualizacao">-</p>
+                        <p class="text-xl font-bold text-white" id="ultimaAtualizacao" style="color: white !important;">Hoje</p>
                     </div>
                     <i class="fas fa-sync-alt text-2xl text-emerald-400"></i>
                 </div>
@@ -818,12 +818,12 @@
                 </div>
                 
                 <!-- Gráfico de Distribuição -->
-                <div class="lotofacil-card rounded-xl p-6">
+                <div class="lotofacil-card rounded-xl p-6 flex flex-col">
                     <h3 class="text-xl font-semibold mb-6 flex items-center">
                         <i class="fas fa-chart-pie text-emerald-400 mr-2"></i>
                         Distribuição por Faixas
                     </h3>
-                    <div class="chart-container">
+                    <div class="chart-container flex-1 flex items-center justify-center">
                         <canvas id="distributionChart" class="mobile-chart"></canvas>
                     </div>
                 </div>
@@ -1089,69 +1089,62 @@
                 }
             });
             
-            // Gráfico de Distribuição
-            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
-            new Chart(distributionCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['1-5', '6-10', '11-15', '16-20', '21-25'],
-                    datasets: [{
-                        label: 'Distribuição (%)',
-                        data: [20, 22, 21, 19, 18],
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.8)',   // Green
-                            'rgba(5, 150, 105, 0.8)',    // Emerald
-                            'rgba(4, 120, 87, 0.8)',     // Dark Green
-                            'rgba(6, 95, 70, 0.8)',      // Darker Green
-                            'rgba(5, 78, 59, 0.8)'       // Darkest Green
-                        ],
-                        borderColor: [
-                            'rgba(16, 185, 129, 1)',
-                            'rgba(5, 150, 105, 1)',
-                            'rgba(4, 120, 87, 1)',
-                            'rgba(6, 95, 70, 1)',
-                            'rgba(5, 78, 59, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    aspectRatio: 2,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 25,
-                            stepSize: 5,
-                            min: 0,
-                            maxTicksLimit: 6,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#94a3b8'
-                            }
-                        },
-                        x: {
-                            maxTicksLimit: 13,
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            },
-                            ticks: {
-                                color: '#94a3b8'
-                            }
-                        }
+            // ----------------- GRÁFICO DE DISTRIBUIÇÃO (Lotofácil) -----------------
+            const distCanvas = document.getElementById('distributionChart');
+            if (!distCanvas) {
+                console.error('Canvas distributionChart não encontrado');
+            } else {
+                const distCtx = distCanvas.getContext('2d');
+
+                // Labels fixas para 1..25
+                const distLabels = ['1-5', '6-10', '11-15', '16-20', '21-25'];
+
+                // 1) Tenta pegar dados do backend em diferentes formatos
+                let distData = null;
+                if (dados?.analise_distribuicao?.total_por_faixa) {
+                    // Ex.: {'1-5': 20, '6-10': 22, ...}
+                    distData = distLabels.map(l => dados.analise_distribuicao.total_por_faixa[l] ?? 0);
+                } else if (Array.isArray(dados?.distribuicao_faixas)) {
+                    // Ex.: [20,22,21,19,18]
+                    distData = dados.distribuicao_faixas.slice(0, 5);
+                }
+
+                // 2) Fallback amigável
+                if (!distData || distData.every(v => !Number.isFinite(v))) {
+                    distData = [20, 22, 21, 19, 18];
+                }
+
+                // (Opcional) evita recriar o chart múltiplas vezes
+                if (window.__lotofacilDistChart) {
+                    window.__lotofacilDistChart.destroy();
+                }
+
+                window.__lotofacilDistChart = new Chart(distCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: distLabels,
+                        datasets: [{
+                            data: distData,
+                            backgroundColor: ['#ef4444','#f97316','#22c55e','#3b82f6','#8b5cf6'],
+                            borderColor: ['#dc2626','#ea580c','#16a34a','#2563eb','#7c3aed'],
+                            borderWidth: 2,
+                            hoverOffset: 4
+                        }]
                     },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#cbd5e1'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        aspectRatio: 1,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: { color: '#cbd5e1', padding: 20, usePointStyle: true, pointStyle: 'rect' }
                             }
                         }
                     }
-                }
-            });
+                });
+            }
         }
     </script>
 </body>

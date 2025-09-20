@@ -494,7 +494,7 @@ def analisar_padroes_sequencias_lotofacil(df_lotofacil=None, qtd_concursos=50):
         if df_lotofacil is None:
             df_lotofacil = carregar_dados_lotofacil()
 
-        if df_lotofacil is None or getattr(df_lotofacil, 'empty', True):
+        if df_lotofacil is None or (hasattr(df_lotofacil, 'empty') and df_lotofacil.empty):
             return {'erro': 'Dados da Lotofácil não disponíveis'}
 
         df_filtrado = df_lotofacil.tail(qtd_concursos).copy() if (qtd_concursos and qtd_concursos > 0) else df_lotofacil.copy()

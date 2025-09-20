@@ -125,8 +125,8 @@ def analise_de_distribuicao_lotofacil(dados_sorteios, qtd_concursos=None):
             paridade_stats['numeros_principais']['distribuicao'][f'{pares_num}P-{impares_num}I'] += 1
         
         # Estatísticas descritivas
-        paridade_stats['numeros_principais']['media_pares'] = np.mean(pares_numeros_por_concurso) if pares_numeros_por_concurso else 0
-        paridade_stats['numeros_principais']['media_impares'] = np.mean(impares_numeros_por_concurso) if impares_numeros_por_concurso else 0
+        paridade_stats['numeros_principais']['media_pares'] = float(np.mean(pares_numeros_por_concurso)) if pares_numeros_por_concurso else 0
+        paridade_stats['numeros_principais']['media_impares'] = float(np.mean(impares_numeros_por_concurso)) if impares_numeros_por_concurso else 0
         paridade_stats['numeros_principais']['moda_pares'] = Counter(pares_numeros_por_concurso).most_common(1)[0][0] if pares_numeros_por_concurso else None
         paridade_stats['numeros_principais']['moda_impares'] = Counter(impares_numeros_por_concurso).most_common(1)[0][0] if impares_numeros_por_concurso else None
         
@@ -153,7 +153,7 @@ def analise_de_distribuicao_lotofacil(dados_sorteios, qtd_concursos=None):
             numeros_por_faixa_por_concurso.append(sum(contagem_faixa_concurso.values()))
         
         # Estatísticas
-        media_por_faixa = np.mean(numeros_por_faixa_por_concurso) if numeros_por_faixa_por_concurso else 0
+        media_por_faixa = float(np.mean(numeros_por_faixa_por_concurso)) if numeros_por_faixa_por_concurso else 0
         moda_por_faixa = Counter(numeros_por_faixa_por_concurso).most_common(1)[0][0] if numeros_por_faixa_por_concurso else None
         
         return {
@@ -180,7 +180,7 @@ def analise_de_distribuicao_lotofacil(dados_sorteios, qtd_concursos=None):
         if somas_numeros:
             soma_stats['numeros_principais']['min'] = min(somas_numeros)
             soma_stats['numeros_principais']['max'] = max(somas_numeros)
-            soma_stats['numeros_principais']['media'] = np.mean(somas_numeros)
+            soma_stats['numeros_principais']['media'] = float(np.mean(somas_numeros))
             soma_stats['numeros_principais']['moda'] = Counter(somas_numeros).most_common(1)[0][0]
             soma_stats['numeros_principais']['somas'] = somas_numeros  # Lista de todas as somas para o gráfico
         else:
@@ -203,7 +203,7 @@ def analise_de_distribuicao_lotofacil(dados_sorteios, qtd_concursos=None):
             return {
                 'min': min(amplitudes),
                 'max': max(amplitudes),
-                'media': np.mean(amplitudes),
+                'media': float(np.mean(amplitudes)),
                 'moda': Counter(amplitudes).most_common(1)[0][0],
                 'amplitudes': amplitudes  # Lista de todas as amplitudes para o gráfico
             }
