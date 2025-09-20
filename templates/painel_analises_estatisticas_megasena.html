@@ -97,6 +97,8 @@
             display: flex;
             gap: 2rem;
             align-items: center;
+            justify-content: flex-end;
+            margin-left: auto;
         }
 
         .desktop-nav-links a {
@@ -334,6 +336,14 @@
                 </div>
             </div>
             <div class="dropdown">
+                <a href="#" class="dropdown-toggle active"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+                <div class="dropdown-content">
+                    <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/painel_analises_estatisticas_megasena" class="active"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
+                    <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                </div>
+            </div>
+            <div class="dropdown">
                 <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
                 <div class="dropdown-content">
                     <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
@@ -353,15 +363,15 @@
                 <div class="dropdown-content">
                     <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
                     <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                    <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
                 </div>
             </div>
-            <a href="#" class="active"><i class="fa fa-circle"></i> Mega Sena</a>
             <a href="/boloes_loterias"><i class="fa fa-users"></i> Bolões</a>
         </div>
     </nav>
 
     <!-- Breadcrumbs - IDENTIDADE MEGA SENA -->
-    <div class="breadcrumbs-container" style="margin-top: 60px;">
+    <div class="breadcrumbs-container" style="margin-top: 88px;">
         <nav class="breadcrumbs" aria-label="Breadcrumb">
             <ol class="breadcrumb-list">
                 <li class="breadcrumb-item">
@@ -375,13 +385,38 @@
     </div>
 
     <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center">
-                <i class="fas fa-chart-line text-primary mr-3"></i>
-                Painel de Análises Estatísticas
-            </h1>
-            <p class="text-gray-400 text-lg">Mega Sena - Análise de Dados</p>
+        <!-- Header com logos -->
+        <div class="mb-8">
+            <!-- Header com logos -->
+            <header class="flex justify-between items-center mb-6">
+                <!-- Logo da Mega Sena centralizado -->
+                <div class="flex-1 text-center">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex justify-center items-center">
+                        <img src="/static/img/MegaSena.png" alt="Mega Sena" class="max-w-[240px] min-w-[96px] h-auto object-contain">
+                    </h1>
+                </div>
+                
+                <!-- Logo no lado direito -->
+                <div class="flex justify-end items-center">
+                    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
+                </div>
+            </header>
+            
+            <!-- Subtítulo centralizado -->
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-semibold" style="color: #9ACD32;">
+                    📈 Painel de Análises Estatísticas
+                </h2>
+            </div>
+            
+            <!-- Texto de apresentação -->
+            <div class="max-w-4xl mx-auto mb-8">
+                <div class="bg-gradient-to-r from-green-500/10 to-yellow-500/10 backdrop-blur-sm rounded-lg border border-[#9ACD32]/30 p-4">
+                    <p class="text-center text-gray-300 text-sm leading-relaxed">
+                        Os estudos desta página trazem painéis com análises práticas e visuais para apostar; eles se complementam com a seção Inteligências Estatísticas, onde ficam os estudos científicos mais profundos (desvio-padrão, aleatoriedade, clusters e correlações). Juntas, essas camadas formam um sistema completo de análise. 🚀
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Stats Overview - Grid responsivo -->
@@ -390,7 +425,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Concursos Analisados</p>
-                        <p class="text-2xl font-bold text-green-400">2,847</p>
+                        <p class="text-2xl font-bold text-green-400" id="totalConcursosAnalisados">-</p>
                     </div>
                     <i class="fas fa-database text-2xl text-green-400"></i>
                 </div>
@@ -400,7 +435,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Período</p>
-                        <p class="text-xl font-bold text-blue-400">1996-2024</p>
+                        <p class="text-xl font-bold text-blue-400" id="periodoAnalise">-</p>
                     </div>
                     <i class="fas fa-calendar-alt text-2xl text-blue-400"></i>
                 </div>
@@ -420,7 +455,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Última Atualização</p>
-                        <p class="text-xl font-bold text-yellow-400">Hoje</p>
+                        <p class="text-xl font-bold text-yellow-400" id="ultimaAtualizacao">-</p>
                     </div>
                     <i class="fas fa-sync-alt text-2xl text-yellow-400"></i>
                 </div>
@@ -436,9 +471,7 @@
                         <i class="fas fa-list text-green-400 mr-2"></i>
                         Análise de Frequência
                     </h3>
-                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
-                
                 
                 <div class="space-y-6">
                     <!-- Números Quentes -->
@@ -447,13 +480,8 @@
                             <i class="fas fa-fire text-orange-500 mr-2"></i>
                             Números Quentes (Mais Frequentes)
                         </h4>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">10</span>
-                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">23</span>
-                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">44</span>
-                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">05</span>
-                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">33</span>
-                            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">42</span>
+                        <div class="flex flex-wrap gap-2" id="numeros-quentes">
+                            <span class="text-gray-500">Carregando...</span>
                         </div>
                     </div>
                     
@@ -463,13 +491,8 @@
                             <i class="fas fa-snowflake text-blue-400 mr-2"></i>
                             Números Frios (Menos Frequentes)
                         </h4>
-                        <div class="flex flex-wrap gap-2">
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">16</span>
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">29</span>
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">37</span>
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">51</span>
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">58</span>
-                            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">12</span>
+                        <div class="flex flex-wrap gap-2" id="numeros-frios">
+                            <span class="text-gray-500">Carregando...</span>
                         </div>
                     </div>
                 </div>
@@ -482,7 +505,6 @@
                         <i class="fas fa-chart-pie text-purple-400 mr-2"></i>
                         Análise de Distribuição
                     </h3>
-                    <span class="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">Ativo</span>
                 </div>
                 
                 
@@ -771,18 +793,88 @@
             initCharts();
         });
         
-        function initCharts() {
-            // Gráfico de Frequência
+        // Função para carregar dados reais da Megasena
+        async function carregarDadosReaisMegasena() {
+            try {
+                const response = await fetch('/api/megasena/dados-reais');
+                const dados = await response.json();
+                
+                if (dados.erro) {
+                    console.error('Erro ao carregar dados:', dados.erro);
+                    return null;
+                }
+                
+                return dados;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                return null;
+            }
+        }
+
+        // Função para atualizar estatísticas gerais
+        function atualizarEstatisticasGerais(dados) {
+            if (dados.estatisticas_gerais) {
+                const stats = dados.estatisticas_gerais;
+                
+                const totalConcursos = document.getElementById('totalConcursosAnalisados');
+                const periodo = document.getElementById('periodoAnalise');
+                const ultimaAtualizacao = document.getElementById('ultimaAtualizacao');
+                
+                if (totalConcursos) totalConcursos.textContent = stats.total_concursos || '-';
+                if (periodo) periodo.textContent = stats.periodo_analise || '-';
+                if (ultimaAtualizacao) ultimaAtualizacao.textContent = stats.ultima_atualizacao || '-';
+            }
+        }
+
+        // Função para atualizar números quentes e frios
+        function atualizarNumerosQuentesFrios(dados) {
+            if (dados.numeros_quentes && dados.numeros_frios) {
+                // Números quentes
+                const containerQuentes = document.getElementById('numeros-quentes');
+                if (containerQuentes) {
+                    containerQuentes.innerHTML = dados.numeros_quentes.slice(0, 10).map(num => 
+                        `<span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
+                    ).join('');
+                }
+                
+                // Números frios
+                const containerFrios = document.getElementById('numeros-frios');
+                if (containerFrios) {
+                    containerFrios.innerHTML = dados.numeros_frios.slice(0, 10).map(num => 
+                        `<span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
+                    ).join('');
+                }
+            }
+        }
+        
+        async function initCharts() {
+            // Carregar dados reais
+            const dados = await carregarDadosReaisMegasena();
+            
+            if (!dados) {
+                console.error('Não foi possível carregar dados reais, usando dados de fallback');
+                // Usar dados estáticos como fallback
+                initChartsFallback();
+                return;
+            }
+            
+            // Atualizar estatísticas gerais
+            atualizarEstatisticasGerais(dados);
+            
+            // Atualizar números quentes e frios
+            atualizarNumerosQuentesFrios(dados);
+            
+            // Gráfico de Frequência com dados reais
             const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
             new Chart(frequencyCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50', '51', '52', '53', '54', '55', '56', '57', '58', '59', '60'],
+                    labels: Array.from({length: 60}, (_, i) => (i + 1).toString()),
                     datasets: [{
                         label: 'Frequência',
-                        data: [12, 8, 15, 9, 8, 11, 13, 7, 14, 12, 10, 6, 11, 13, 15, 9, 10, 8, 16, 11, 9, 7, 17, 12, 10, 6, 9, 13, 8, 10, 12, 14, 15, 9, 8, 11, 6, 13, 9, 12, 14, 11, 8, 18, 10, 7, 12, 10, 8, 11, 5, 15, 9, 13, 14, 10, 7, 6, 10, 9],
-                        backgroundColor: 'rgba(139, 92, 246, 0.8)',
-                        borderColor: 'rgba(139, 92, 246, 1)',
+                        data: dados.frequencia_numeros || Array(60).fill(0),
+                        backgroundColor: 'rgba(154, 205, 50, 0.8)',
+                        borderColor: 'rgba(154, 205, 50, 1)',
                         borderWidth: 1
                     }]
                 },
@@ -793,10 +885,10 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: 20,
-                            stepSize: 4,
+                            max: Math.max(...(dados.frequencia_numeros || [0])) + 10,
+                            stepSize: 10,
                             min: 0,
-                            maxTicksLimit: 6,
+                            maxTicksLimit: 7,
                             grid: {
                                 color: 'rgba(255, 255, 255, 0.1)'
                             },
@@ -824,7 +916,7 @@
                 }
             });
             
-            // Gráfico de Distribuição
+            // Gráfico de Distribuição com dados reais
             const distributionCtx = document.getElementById('distributionChart').getContext('2d');
             new Chart(distributionCtx, {
                 type: 'bar',
@@ -832,7 +924,7 @@
                     labels: ['1-10', '11-20', '21-30', '31-40', '41-50', '51-60'],
                     datasets: [{
                         label: 'Distribuição (%)',
-                        data: [17, 20, 19, 18, 12, 9],
+                        data: dados.distribuicao_faixas || [17, 20, 19, 18, 12, 9],
                         backgroundColor: [
                             'rgba(239, 68, 68, 0.8)',   // Red
                             'rgba(249, 115, 22, 0.8)',  // Orange
@@ -889,6 +981,26 @@
                     }
                 }
             });
+        }
+
+        // Função de fallback com dados estáticos
+        function initChartsFallback() {
+            // Atualizar com dados estáticos
+            document.getElementById('totalConcursosAnalisados').textContent = '2,847';
+            document.getElementById('periodoAnalise').textContent = '1996-2024';
+            document.getElementById('ultimaAtualizacao').textContent = 'Hoje';
+            
+            // Números quentes estáticos
+            const numerosQuentes = [10, 23, 44, 5, 33, 42, 17, 29, 37, 51];
+            document.getElementById('numeros-quentes').innerHTML = numerosQuentes.map(num => 
+                `<span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
+            ).join('');
+            
+            // Números frios estáticos
+            const numerosFrios = [16, 29, 37, 51, 58, 12, 8, 25, 36, 49];
+            document.getElementById('numeros-frios').innerHTML = numerosFrios.map(num => 
+                `<span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
+            ).join('');
         }
     </script>
 </body>

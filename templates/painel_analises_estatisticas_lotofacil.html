@@ -97,6 +97,8 @@
             display: flex;
             gap: 2rem;
             align-items: center;
+            justify-content: flex-end;
+            margin-left: auto;
         }
 
         .desktop-nav-links a {
@@ -334,6 +336,14 @@
                 </div>
             </div>
             <div class="dropdown">
+                <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
+                <div class="dropdown-content">
+                    <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/painel_analises_estatisticas_megasena"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
+                    <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                </div>
+            </div>
+            <div class="dropdown">
                 <a href="#" class="dropdown-toggle"><i class="fa fa-hashtag"></i> Quina ▼</a>
                 <div class="dropdown-content">
                     <a href="/dashboard_quina"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
@@ -348,12 +358,13 @@
                     <a href="/analise_estatistica_avancada_lotomania"><i class="fa fa-chart-bar"></i> Inteligência Estatística</a>
                 </div>
             </div>
-            <a href="#" class="active"><i class="fa fa-dice"></i> Lotofácil</a>
             <div class="dropdown">
-                <a href="#" class="dropdown-toggle"><i class="fa fa-circle"></i> Mega Sena ▼</a>
+                <a href="#" class="dropdown-toggle active"><i class="fa fa-dice"></i> Lotofácil ▼</a>
                 <div class="dropdown-content">
-                    <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
-                    <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                    <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/painel_analises_estatisticas_lotofacil" class="active"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
+                    <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
+                    <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
                 </div>
             </div>
             <a href="/boloes_loterias"><i class="fa fa-users"></i> Bolões</a>
@@ -361,7 +372,7 @@
     </nav>
 
     <!-- Breadcrumbs - IDENTIDADE LOTOFÁCIL -->
-    <div class="breadcrumbs-container" style="margin-top: 60px;">
+    <div class="breadcrumbs-container" style="margin-top: 88px;">
         <nav class="breadcrumbs" aria-label="Breadcrumb">
             <ol class="breadcrumb-list">
                 <li class="breadcrumb-item">
@@ -375,13 +386,38 @@
     </div>
 
     <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold mb-4 flex items-center justify-center">
-                <i class="fas fa-chart-line text-primary mr-3"></i>
-                Painel de Análises Estatísticas
-            </h1>
-            <p class="text-gray-400 text-lg">Lotofácil - Análise de Dados</p>
+        <!-- Header com logos -->
+        <div class="mb-8">
+            <!-- Header com logos -->
+            <header class="flex justify-between items-center mb-6">
+                <!-- Logo da Lotofácil centralizada -->
+                <div class="flex-1 text-center">
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2 flex justify-center items-center">
+                        <img src="/static/img/Lotofacil.png" alt="Lotofácil" class="max-w-[240px] min-w-[96px] h-auto object-contain">
+                    </h1>
+                </div>
+                
+                <!-- Logo no lado direito -->
+                <div class="flex justify-end items-center">
+                    <img src="/static/img/Logo_LoteriasIntelitente.png" alt="Logo Loterias Inteligente" class="max-w-[120px] sm:max-w-[150px] md:max-w-[180px]">
+                </div>
+            </header>
+            
+            <!-- Subtítulo centralizado -->
+            <div class="text-center mb-6">
+                <h2 class="text-2xl md:text-3xl font-semibold" style="color: #10B981;">
+                    📈 Painel de Análises Estatísticas
+                </h2>
+            </div>
+            
+            <!-- Texto de apresentação -->
+            <div class="max-w-4xl mx-auto mb-8">
+                <div class="bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-sm rounded-lg border border-[#10B981]/30 p-4">
+                    <p class="text-center text-gray-300 text-sm leading-relaxed">
+                        Os estudos desta página trazem painéis com análises práticas e visuais para apostar; eles se complementam com a seção Inteligências Estatísticas, onde ficam os estudos científicos mais profundos (desvio-padrão, aleatoriedade, clusters e correlações). Juntas, essas camadas formam um sistema completo de análise. 🚀
+                    </p>
+                </div>
+            </div>
         </div>
 
         <!-- Stats Overview - Grid responsivo -->
@@ -390,7 +426,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Concursos Analisados</p>
-                        <p class="text-2xl font-bold text-green-400">3,247</p>
+                        <p class="text-2xl font-bold text-green-400" id="totalConcursosAnalisados">-</p>
                     </div>
                     <i class="fas fa-database text-2xl text-green-400"></i>
                 </div>
@@ -400,7 +436,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Período</p>
-                        <p class="text-xl font-bold text-emerald-400">2003-2024</p>
+                        <p class="text-xl font-bold text-emerald-400" id="periodoAnalise">-</p>
                     </div>
                     <i class="fas fa-calendar-alt text-2xl text-emerald-400"></i>
                 </div>
@@ -420,7 +456,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Última Atualização</p>
-                        <p class="text-xl font-bold text-emerald-400">Hoje</p>
+                        <p class="text-xl font-bold text-emerald-400" id="ultimaAtualizacao">-</p>
                     </div>
                     <i class="fas fa-sync-alt text-2xl text-emerald-400"></i>
                 </div>
