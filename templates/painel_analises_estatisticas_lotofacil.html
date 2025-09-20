@@ -6,8 +6,8 @@
     <title>Painel de Análises Estatísticas - Lotofácil | Loterias Inteligentes</title>
     
     <!-- Meta tags para colorir a status bar dos dispositivos móveis -->
-    <meta name="theme-color" content="#10B981">
-    <meta name="msapplication-navbutton-color" content="#10B981">
+    <meta name="theme-color" content="#930089">
+    <meta name="msapplication-navbutton-color" content="#930089">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
@@ -31,12 +31,12 @@
             theme: {
                 extend: {
                     colors: {
-                        'primary': '#10B981',
+                        'primary': '#930089',
                         'secondary': '#8B5CF6',
                         'background': '#000000',
                         'card': '#1A1D25',
                         'surface': '#2E303A',
-                        'lotofacil': '#10B981'
+                        'lotofacil': '#930089'
                     }
                 }
             }
@@ -49,10 +49,78 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #000000 0%, #1A1D25 50%, #064E3B 100%);
+            background: #000000;
             min-height: 100vh;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+        }
+        
+        /* CSS do Rodapé */
+        .site-footer{
+            background: linear-gradient(135deg, rgba(30,27,41,.95), rgba(42,35,64,.95));
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 16px;
+            font-size:.84rem;
+            color:#cbd5e1;
+            margin-top: auto;
+        }
+        .site-footer .footer-row{
+            max-width:1200px;
+            margin:0 auto;
+            display:grid;
+            grid-template-columns:1fr auto;
+            gap:10px;
+            align-items:center;
+        }
+        .site-footer strong{
+            color:#A855F7;
+            font-weight:700;
+        }
+        .site-footer a{
+            color:#10b981;
+            text-decoration:none;
+            border-bottom:1px dotted rgba(16,185,129,.35);
+        }
+        .site-footer a:hover{
+            color:#059669;
+            border-bottom-color:transparent;
+        }
+        .footer-meta{
+            opacity:.9;
+        }
+        .footer-toggle{
+            background:transparent;
+            border:1px solid rgba(168,85,247,.6);
+            color:#A855F7;
+            font-weight:600;
+            padding:6px 10px;
+            border-radius:8px;
+            cursor:pointer;
+            transition:transform .15s ease,background .2s,border-color .2s;
+        }
+        .footer-toggle:hover{
+            transform:translateY(-1px);
+            background:rgba(168,85,247,.1);
+        }
+        
+        @media (max-width: 768px) {
+            .site-footer{
+                padding:10px 12px;
+                font-size:.8rem;
+            }
+            .site-footer .footer-row{
+                grid-template-columns:1fr;
+                gap:6px;
+            }
+            .footer-meta{
+                font-size:.78rem;
+            }
         }
         
         /* Animações */
@@ -112,15 +180,15 @@
         }
 
         .desktop-nav-links a:hover {
-            color: #10B981;
-            background: rgba(16, 185, 129, 0.1);
+            color: #930089;
+            background: rgba(147, 0, 137, 0.1);
             transform: translateY(-1px);
         }
 
         .desktop-nav-links a.active {
-            color: #10B981 !important;
-            background: rgba(16, 185, 129, 0.15) !important;
-            border: 1px solid rgba(16, 185, 129, 0.3) !important;
+            color: #930089 !important;
+            background: rgba(147, 0, 137, 0.15) !important;
+            border: 1px solid rgba(147, 0, 137, 0.3) !important;
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
         }
@@ -160,8 +228,8 @@
         }
 
         .dropdown-content a:hover {
-            background: rgba(16, 185, 129, 0.1);
-            color: #10B981;
+            background: rgba(147, 0, 137, 0.1);
+            color: #930089;
         }
 
         .dropdown-content a:last-child {
@@ -213,12 +281,12 @@
         }
         
         .breadcrumb-item:not(.active) .breadcrumb-link:hover {
-            color: #10B981;
-            background: rgba(16, 185, 129, 0.1);
+            color: #930089;
+            background: rgba(147, 0, 137, 0.1);
         }
         
         .breadcrumb-item.active .breadcrumb-link {
-            color: #10B981;
+            color: #930089;
             font-weight: 600;
         }
 
@@ -298,21 +366,21 @@
         /* Cards com identidade Lotofácil */
         .lotofacil-card {
             background: #1A1D25;
-            border: 2px solid #10B981;
-            box-shadow: 0 0 8px rgba(16, 185, 129, 0.85), 0 0 16px rgba(16, 185, 129, 0.55), 0 0 24px rgba(16, 185, 129, 0.35), 0 12px 28px rgba(0,0,0,0.6);
+            border: 2px solid #930089;
+            box-shadow: 0 0 8px rgba(147, 0, 137, 0.85), 0 0 16px rgba(147, 0, 137, 0.55), 0 0 24px rgba(147, 0, 137, 0.35), 0 12px 28px rgba(0,0,0,0.6);
         }
 
         .lotofacil-button {
-            background: linear-gradient(135deg, #10B981, #059669);
+            background: linear-gradient(135deg, #930089, #7A006B);
             color: #ffffff;
             font-weight: 600;
             transition: all 0.3s ease;
         }
 
         .lotofacil-button:hover {
-            background: linear-gradient(135deg, #059669, #10B981);
+            background: linear-gradient(135deg, #7A006B, #930089);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 12px rgba(147, 0, 137, 0.4);
         }
 
         /* Touch-friendly elements */
@@ -323,6 +391,7 @@
     </style>
 </head>
 <body class="text-white">
+    <div class="main-content">
     <!-- Menu Desktop - IDENTIDADE LOTOFÁCIL -->
     <nav class="desktop-nav">
         <div class="desktop-nav-links">
@@ -405,14 +474,14 @@
             
             <!-- Subtítulo centralizado -->
             <div class="text-center mb-6">
-                <h2 class="text-2xl md:text-3xl font-semibold" style="color: #10B981;">
+                <h2 class="text-2xl md:text-3xl font-semibold" style="color: #930089;">
                     📈 Painel de Análises Estatísticas
                 </h2>
             </div>
             
             <!-- Texto de apresentação -->
             <div class="max-w-4xl mx-auto mb-8">
-                <div class="bg-gradient-to-r from-green-500/10 to-emerald-500/10 backdrop-blur-sm rounded-lg border border-[#10B981]/30 p-4">
+                <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 backdrop-blur-sm rounded-lg border border-[#930089]/30 p-4">
                     <p class="text-center text-gray-300 text-sm leading-relaxed">
                         Os estudos desta página trazem painéis com análises práticas e visuais para apostar; eles se complementam com a seção Inteligências Estatísticas, onde ficam os estudos científicos mais profundos (desvio-padrão, aleatoriedade, clusters e correlações). Juntas, essas camadas formam um sistema completo de análise. 🚀
                     </p>
@@ -422,7 +491,7 @@
 
         <!-- Stats Overview - Grid responsivo -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#10B981]/30 lotofacil-card w-full min-w-0">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#930089]/30 lotofacil-card w-full min-w-0">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Concursos Analisados</p>
@@ -432,7 +501,7 @@
                 </div>
             </div>
             
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#10B981]/30 lotofacil-card w-full min-w-0">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#930089]/30 lotofacil-card w-full min-w-0">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Período</p>
@@ -442,7 +511,7 @@
                 </div>
             </div>
             
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#10B981]/30 lotofacil-card w-full min-w-0">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#930089]/30 lotofacil-card w-full min-w-0">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Números Únicos</p>
@@ -452,7 +521,7 @@
                 </div>
             </div>
             
-            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#10B981]/30 lotofacil-card w-full min-w-0">
+            <div class="bg-white/10 backdrop-blur-sm rounded-lg mobile-card mobile-stats-card border border-[#930089]/30 lotofacil-card w-full min-w-0">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-400 text-sm mb-1">Última Atualização</p>
@@ -761,23 +830,176 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="text-center mt-8">
-            <button class="lotofacil-button px-8 py-3 rounded-lg mr-4 touch-target">
-                <i class="fas fa-download mr-2"></i>
-                Exportar Relatório
-            </button>
-            <button class="lotofacil-button px-8 py-3 rounded-lg touch-target">
-                <i class="fas fa-refresh mr-2"></i>
-                Atualizar Dados
-            </button>
-        </div>
     </div>
+    </div>
+
+    <!-- Rodapé com Disclaimer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-row">
+            <div class="footer-text">
+                <strong>Política de Honestidade & Jogo Responsável.</strong>
+                Loterias Inteligentes é uma plataforma independente de análise estatística,
+                sem vínculo com a Caixa Econômica Federal. Nossas ferramentas oferecem
+                insights baseados em dados, mas loterias envolvem sorte e aleatoriedade —
+                não há garantias de ganhos. Jogue com responsabilidade.
+            </div>
+            <div class="footer-actions">
+                <button class="footer-toggle" id="footerToggle" onclick="openFooterModal()">
+                    Ver detalhes
+                </button>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Simulação de dados dinâmicos
         console.log('Painel de Análises Estatísticas - Lotofácil carregado');
         
+        // Função para abrir modal do rodapé
+        function openFooterModal() {
+            alert('Política de Honestidade & Jogo Responsável\n\n' +
+                  'Loterias Inteligentes é uma plataforma independente de análise estatística, ' +
+                  'sem vínculo com a Caixa Econômica Federal. Nossas ferramentas oferecem ' +
+                  'insights baseados em dados, mas loterias envolvem sorte e aleatoriedade — ' +
+                  'não há garantias de ganhos. Jogue com responsabilidade.');
+        }
+
+        // Função para carregar dados reais da Lotofácil
+        async function carregarDadosReaisLotofacil() {
+            try {
+                console.log('Carregando dados da API /api/analise-frequencia-lotofacil-completa...');
+                const response = await fetch('/api/analise-frequencia-lotofacil-completa?qtd_concursos=100');
+                console.log('Response status:', response.status);
+                
+                const dados = await response.json();
+                console.log('Dados recebidos:', dados);
+                
+                if (dados.error) {
+                    console.error('Erro ao carregar dados:', dados.error);
+                    return null;
+                }
+                
+                console.log('Dados carregados com sucesso!');
+                return dados;
+            } catch (error) {
+                console.error('Erro na requisição:', error);
+                return null;
+            }
+        }
+
+        // Função para atualizar estatísticas gerais
+        function atualizarEstatisticasGerais(dados) {
+            console.log('Atualizando estatísticas gerais...', dados);
+            
+            // Atualizar total de concursos analisados
+            if (dados.periodo_analisado && dados.periodo_analisado.total_concursos) {
+                const totalConcursos = document.getElementById('totalConcursosAnalisados');
+                if (totalConcursos) {
+                    totalConcursos.textContent = dados.periodo_analisado.total_concursos;
+                    console.log('Total de concursos atualizado:', dados.periodo_analisado.total_concursos);
+                }
+            }
+            
+            // Atualizar período de análise
+            if (dados.periodo_analisado && dados.periodo_analisado.periodo) {
+                const periodoAnalise = document.getElementById('periodoAnalise');
+                if (periodoAnalise) {
+                    periodoAnalise.textContent = dados.periodo_analisado.periodo;
+                    console.log('Período atualizado:', dados.periodo_analisado.periodo);
+                }
+            }
+            
+            // Atualizar última atualização
+            if (dados.periodo_analisado && dados.periodo_analisado.ultima_atualizacao) {
+                const ultimaAtualizacao = document.getElementById('ultimaAtualizacao');
+                if (ultimaAtualizacao) {
+                    ultimaAtualizacao.textContent = dados.periodo_analisado.ultima_atualizacao;
+                    console.log('Última atualização:', dados.periodo_analisado.ultima_atualizacao);
+                }
+            }
+        }
+
+        // Função para atualizar números quentes e frios
+        function atualizarNumerosQuentesFrios(dados) {
+            console.log('Atualizando números quentes e frios...', dados);
+            
+            if (dados.numeros_quentes_frios) {
+                // Números quentes
+                if (dados.numeros_quentes_frios.numeros_quentes) {
+                    const containerQuentes = document.getElementById('numeros-quentes');
+                    if (containerQuentes) {
+                        containerQuentes.innerHTML = dados.numeros_quentes_frios.numeros_quentes.slice(0, 10).map(num => 
+                            `<span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
+                        ).join('');
+                        console.log('Números quentes atualizados:', dados.numeros_quentes_frios.numeros_quentes.slice(0, 10));
+                    }
+                }
+                
+                // Números frios
+                if (dados.numeros_quentes_frios.numeros_frios) {
+                    const containerFrios = document.getElementById('numeros-frios');
+                    if (containerFrios) {
+                        containerFrios.innerHTML = dados.numeros_quentes_frios.numeros_frios.slice(0, 10).map(num => 
+                            `<span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
+                        ).join('');
+                        console.log('Números frios atualizados:', dados.numeros_quentes_frios.numeros_frios.slice(0, 10));
+                    }
+                }
+            }
+        }
+
+        // Função de fallback com dados estáticos
+        function initChartsFallback() {
+            console.log('Usando dados de fallback...');
+            
+            // Gráfico de Frequência
+            const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
+            new Chart(frequencyCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25'],
+                    datasets: [{
+                        label: 'Frequência',
+                        data: [65, 58, 72, 61, 68, 55, 62, 59, 64, 67, 56, 53, 60, 63, 66, 49, 57, 54, 69, 61, 59, 47, 74, 62, 60],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: 'rgba(16, 185, 129, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 2,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'white'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'white'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         // Adicionar animações de entrada
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.lotofacil-card');
@@ -795,7 +1017,26 @@
             initCharts();
         });
         
-        function initCharts() {
+        async function initCharts() {
+            console.log('Iniciando initCharts...');
+            // Carregar dados reais
+            const dados = await carregarDadosReaisLotofacil();
+            
+            if (!dados) {
+                console.error('Não foi possível carregar dados reais, usando dados de fallback');
+                // Usar dados estáticos como fallback
+                initChartsFallback();
+                return;
+            }
+            
+            console.log('Dados carregados, atualizando interface...');
+            
+            // Atualizar estatísticas gerais
+            atualizarEstatisticasGerais(dados);
+            
+            // Atualizar números quentes e frios
+            atualizarNumerosQuentesFrios(dados);
+            
             // Gráfico de Frequência
             const frequencyCtx = document.getElementById('frequencyChart').getContext('2d');
             new Chart(frequencyCtx, {

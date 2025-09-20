@@ -626,23 +626,24 @@
       /* Células com tamanho fixo no mobile */
       .celula-numero {
         flex-shrink: 0 !important;
-        min-width: 20px !important; /* Ligeiramente menor no mobile */
-        max-width: 20px !important;
-        height: 20px !important;
-        font-size: 8px !important;
+        min-width: 24px !important; /* Aumentado para mobile */
+        max-width: 24px !important;
+        height: 24px !important;
+        font-size: 9px !important;
       }
     }
 
 
 
     .linha-concurso {
-      display: grid; /* Preenche toda a largura do container */
-      grid-template-columns: repeat(25, 1fr); /* 25 colunas iguais (1-25) */
-      gap: 4px;
-      padding: 2px 0;
-      width: 100%;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      transition: background-color 0.2s ease;
+      display: flex; /* Mantém as células lado a lado */
+      gap: 3px;
+      padding: 1px 0; /* Reduzido de 2px para 1px - menos espaço interno */
+      flex-shrink: 0; /* Para garantir que não haja encolhimento das células */
+      justify-content: center; /* Centraliza a linha no container */
+      /* Melhorias para muitos concursos */
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03); /* Linha mais sutil */
+      transition: background-color 0.2s ease; /* Transição suave */
     }
 
     /* Hover effect para melhor identificação das linhas */
@@ -722,21 +723,20 @@
     }
 
     .celula-numero {
-      font-size: clamp(8px, 0.8vw, 12px) !important;
+      font-size: 11px !important;
       font-family: 'Inter', sans-serif;
+      line-height: 28px;
       text-align: center;
-      width: 100% !important;
-      min-width: 0 !important;
-      max-width: none !important;
-      height: auto !important;
-      aspect-ratio: 1 / 1; /* Mantém quadrado e usa 100% da coluna */
-      line-height: 1; /* Evita estourar verticalmente */
+      min-width: 28px;
+      max-width: 28px;
+      height: 28px;
       border-radius: 4px;
       background-color: #222;
       color: #eee;
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-shrink: 0; /* IMPEDE QUE A CÉLULA ENCOLHA */
     }
 
     .celula-numero.sorteado {
@@ -1395,6 +1395,7 @@
         <a href="#" class="dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
         <div class="dropdown-content">
           <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/painel_analises_estatisticas_megasena"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
           <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
         </div>
       </div>
@@ -1417,6 +1418,7 @@
         <a href="#" class="dropdown-toggle active"><i class="fa fa-dice"></i> Lotofácil ▼</a>
         <div class="dropdown-content">
           <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/painel_analises_estatisticas_lotofacil"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
           <a href="/aposta_inteligente_premium_lotofacil" class="active"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>
@@ -1457,6 +1459,7 @@
         <a href="#" class="mobile-dropdown-toggle"><i class="fa fa-bullseye"></i> Mega Sena ▼</a>
         <div class="mobile-dropdown">
           <a href="/dashboard_MS"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/painel_analises_estatisticas_megasena"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
           <a href="/aposta_inteligente_premium_MS"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
         </div>
       </li>
@@ -1479,6 +1482,7 @@
         <a href="#" class="mobile-dropdown-toggle active"><i class="fa fa-dice"></i> Lotofácil ▼</a>
         <div class="mobile-dropdown">
           <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+          <a href="/painel_analises_estatisticas_lotofacil"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
           <a href="/aposta_inteligente_premium_lotofacil" class="active"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
           <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
         </div>

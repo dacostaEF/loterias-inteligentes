@@ -49,10 +49,78 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #000000 0%, #1A1D25 50%, #2D1B69 100%);
+            background: #000000;
             min-height: 100vh;
             margin: 0;
             padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+        }
+        
+        /* CSS do Rodapé */
+        .site-footer{
+            background: linear-gradient(135deg, rgba(30,27,41,.95), rgba(42,35,64,.95));
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 16px;
+            font-size:.84rem;
+            color:#cbd5e1;
+            margin-top: auto;
+        }
+        .site-footer .footer-row{
+            max-width:1200px;
+            margin:0 auto;
+            display:grid;
+            grid-template-columns:1fr auto;
+            gap:10px;
+            align-items:center;
+        }
+        .site-footer strong{
+            color:#A855F7;
+            font-weight:700;
+        }
+        .site-footer a{
+            color:#10b981;
+            text-decoration:none;
+            border-bottom:1px dotted rgba(16,185,129,.35);
+        }
+        .site-footer a:hover{
+            color:#059669;
+            border-bottom-color:transparent;
+        }
+        .footer-meta{
+            opacity:.9;
+        }
+        .footer-toggle{
+            background:transparent;
+            border:1px solid rgba(168,85,247,.6);
+            color:#A855F7;
+            font-weight:600;
+            padding:6px 10px;
+            border-radius:8px;
+            cursor:pointer;
+            transition:transform .15s ease,background .2s,border-color .2s;
+        }
+        .footer-toggle:hover{
+            transform:translateY(-1px);
+            background:rgba(168,85,247,.1);
+        }
+        
+        @media (max-width: 768px) {
+            .site-footer{
+                padding:10px 12px;
+                font-size:.8rem;
+            }
+            .site-footer .footer-row{
+                grid-template-columns:1fr;
+                gap:6px;
+            }
+            .footer-meta{
+                font-size:.78rem;
+            }
         }
         
         /* Animações */
@@ -323,6 +391,7 @@
     </style>
 </head>
 <body class="text-white">
+    <div class="main-content">
     <!-- Menu Desktop - IDENTIDADE MEGA SENA -->
     <nav class="desktop-nav">
         <div class="desktop-nav-links">
@@ -362,6 +431,7 @@
                 <a href="#" class="dropdown-toggle"><i class="fa fa-dice"></i> Lotofácil ▼</a>
                 <div class="dropdown-content">
                     <a href="/dashboard_lotofacil"><i class="fa fa-bullseye"></i> Palpite da Sorte</a>
+                    <a href="/painel_analises_estatisticas_lotofacil"><i class="fa fa-chart-bar"></i> Análises Estatísticas</a>
                     <a href="/aposta_inteligente_premium_lotofacil"><i class="fa fa-chart-line"></i> Inteligência Estatística</a>
                     <a href="/lotofacil_laboratorio"><i class="fa fa-flask"></i> Laboratório de Simulação</a>
                 </div>
@@ -759,23 +829,40 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="text-center mt-8">
-            <button class="megasena-button px-8 py-3 rounded-lg mr-4 touch-target">
-                <i class="fas fa-download mr-2"></i>
-                Exportar Relatório
-            </button>
-            <button class="megasena-button px-8 py-3 rounded-lg touch-target">
-                <i class="fas fa-refresh mr-2"></i>
-                Atualizar Dados
-            </button>
-        </div>
     </div>
+    </div>
+
+    <!-- Rodapé com Disclaimer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-row">
+            <div class="footer-text">
+                <strong>Política de Honestidade & Jogo Responsável.</strong>
+                Loterias Inteligentes é uma plataforma independente de análise estatística,
+                sem vínculo com a Caixa Econômica Federal. Nossas ferramentas oferecem
+                insights baseados em dados, mas loterias envolvem sorte e aleatoriedade —
+                não há garantias de ganhos. Jogue com responsabilidade.
+            </div>
+            <div class="footer-actions">
+                <button class="footer-toggle" id="footerToggle" onclick="openFooterModal()">
+                    Ver detalhes
+                </button>
+            </div>
+        </div>
+    </footer>
 
     <script>
         // Simulação de dados dinâmicos
         console.log('Painel de Análises Estatísticas - Mega Sena carregado');
         
+        // Função para abrir modal do rodapé
+        function openFooterModal() {
+            alert('Política de Honestidade & Jogo Responsável\n\n' +
+                  'Loterias Inteligentes é uma plataforma independente de análise estatística, ' +
+                  'sem vínculo com a Caixa Econômica Federal. Nossas ferramentas oferecem ' +
+                  'insights baseados em dados, mas loterias envolvem sorte e aleatoriedade — ' +
+                  'não há garantias de ganhos. Jogue com responsabilidade.');
+        }
+
         // Adicionar animações de entrada
         document.addEventListener('DOMContentLoaded', function() {
             const cards = document.querySelectorAll('.megasena-card');
@@ -796,14 +883,19 @@
         // Função para carregar dados reais da Megasena
         async function carregarDadosReaisMegasena() {
             try {
-                const response = await fetch('/api/megasena/dados-reais');
-                const dados = await response.json();
+                console.log('Carregando dados da API /api/analise-frequencia-megasena...');
+                const response = await fetch('/api/analise-frequencia-megasena?qtd_concursos=100');
+                console.log('Response status:', response.status);
                 
-                if (dados.erro) {
-                    console.error('Erro ao carregar dados:', dados.erro);
+                const dados = await response.json();
+                console.log('Dados recebidos:', dados);
+                
+                if (dados.error) {
+                    console.error('Erro ao carregar dados:', dados.error);
                     return null;
                 }
                 
+                console.log('Dados carregados com sucesso!');
                 return dados;
             } catch (error) {
                 console.error('Erro na requisição:', error);
@@ -813,41 +905,67 @@
 
         // Função para atualizar estatísticas gerais
         function atualizarEstatisticasGerais(dados) {
-            if (dados.estatisticas_gerais) {
-                const stats = dados.estatisticas_gerais;
-                
+            console.log('Atualizando estatísticas gerais...', dados);
+            
+            // Atualizar total de concursos analisados
+            if (dados.periodo_analisado && dados.periodo_analisado.total_concursos) {
                 const totalConcursos = document.getElementById('totalConcursosAnalisados');
-                const periodo = document.getElementById('periodoAnalise');
+                if (totalConcursos) {
+                    totalConcursos.textContent = dados.periodo_analisado.total_concursos;
+                    console.log('Total de concursos atualizado:', dados.periodo_analisado.total_concursos);
+                }
+            }
+            
+            // Atualizar período de análise
+            if (dados.periodo_analisado && dados.periodo_analisado.periodo) {
+                const periodoAnalise = document.getElementById('periodoAnalise');
+                if (periodoAnalise) {
+                    periodoAnalise.textContent = dados.periodo_analisado.periodo;
+                    console.log('Período atualizado:', dados.periodo_analisado.periodo);
+                }
+            }
+            
+            // Atualizar última atualização
+            if (dados.periodo_analisado && dados.periodo_analisado.ultima_atualizacao) {
                 const ultimaAtualizacao = document.getElementById('ultimaAtualizacao');
-                
-                if (totalConcursos) totalConcursos.textContent = stats.total_concursos || '-';
-                if (periodo) periodo.textContent = stats.periodo_analise || '-';
-                if (ultimaAtualizacao) ultimaAtualizacao.textContent = stats.ultima_atualizacao || '-';
+                if (ultimaAtualizacao) {
+                    ultimaAtualizacao.textContent = dados.periodo_analisado.ultima_atualizacao;
+                    console.log('Última atualização:', dados.periodo_analisado.ultima_atualizacao);
+                }
             }
         }
 
         // Função para atualizar números quentes e frios
         function atualizarNumerosQuentesFrios(dados) {
-            if (dados.numeros_quentes && dados.numeros_frios) {
+            console.log('Atualizando números quentes e frios...', dados);
+            
+            if (dados.numeros_quentes_frios) {
                 // Números quentes
-                const containerQuentes = document.getElementById('numeros-quentes');
-                if (containerQuentes) {
-                    containerQuentes.innerHTML = dados.numeros_quentes.slice(0, 10).map(num => 
-                        `<span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
-                    ).join('');
+                if (dados.numeros_quentes_frios.numeros_quentes) {
+                    const containerQuentes = document.getElementById('numeros-quentes');
+                    if (containerQuentes) {
+                        containerQuentes.innerHTML = dados.numeros_quentes_frios.numeros_quentes.slice(0, 10).map(num => 
+                            `<span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">${Array.isArray(num) ? num[0] : num}</span>`
+                        ).join('');
+                        console.log('Números quentes atualizados:', dados.numeros_quentes_frios.numeros_quentes.slice(0, 10));
+                    }
                 }
                 
                 // Números frios
-                const containerFrios = document.getElementById('numeros-frios');
-                if (containerFrios) {
-                    containerFrios.innerHTML = dados.numeros_frios.slice(0, 10).map(num => 
-                        `<span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">${num}</span>`
-                    ).join('');
+                if (dados.numeros_quentes_frios.numeros_frios) {
+                    const containerFrios = document.getElementById('numeros-frios');
+                    if (containerFrios) {
+                        containerFrios.innerHTML = dados.numeros_quentes_frios.numeros_frios.slice(0, 10).map(num => 
+                            `<span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">${Array.isArray(num) ? num[0] : num}</span>`
+                        ).join('');
+                        console.log('Números frios atualizados:', dados.numeros_quentes_frios.numeros_frios.slice(0, 10));
+                    }
                 }
             }
         }
         
         async function initCharts() {
+            console.log('Iniciando initCharts...');
             // Carregar dados reais
             const dados = await carregarDadosReaisMegasena();
             
@@ -857,6 +975,8 @@
                 initChartsFallback();
                 return;
             }
+            
+            console.log('Dados carregados, atualizando interface...');
             
             // Atualizar estatísticas gerais
             atualizarEstatisticasGerais(dados);
@@ -872,7 +992,7 @@
                     labels: Array.from({length: 60}, (_, i) => (i + 1).toString()),
                     datasets: [{
                         label: 'Frequência',
-                        data: dados.frequencia_numeros || Array(60).fill(0),
+                        data: dados.frequencia_absoluta?.numeros ? Object.values(dados.frequencia_absoluta.numeros) : Array(60).fill(0),
                         backgroundColor: 'rgba(154, 205, 50, 0.8)',
                         borderColor: 'rgba(154, 205, 50, 1)',
                         borderWidth: 1
@@ -885,7 +1005,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            max: Math.max(...(dados.frequencia_numeros || [0])) + 10,
+                            max: Math.max(...(dados.frequencia_absoluta?.numeros ? Object.values(dados.frequencia_absoluta.numeros) : [0])) + 10,
                             stepSize: 10,
                             min: 0,
                             maxTicksLimit: 7,
@@ -924,7 +1044,7 @@
                     labels: ['1-10', '11-20', '21-30', '31-40', '41-50', '51-60'],
                     datasets: [{
                         label: 'Distribuição (%)',
-                        data: dados.distribuicao_faixas || [17, 20, 19, 18, 12, 9],
+                        data: dados.analise_distribuicao?.distribuicao_por_faixa?.total_por_faixa ? Object.values(dados.analise_distribuicao.distribuicao_por_faixa.total_por_faixa) : [17, 20, 19, 18, 12, 9],
                         backgroundColor: [
                             'rgba(239, 68, 68, 0.8)',   // Red
                             'rgba(249, 115, 22, 0.8)',  // Orange

@@ -1601,64 +1601,6 @@ def get_analise_frequencia_nova():
         print(f"❌ Erro na API de frequência: {e}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/analise-frequencia-MS')
-def get_analise_frequencia_megasena():
-    """Nova rota para análise de frequência da Mega Sena com dados reais dos últimos 50 concursos."""
-    try:
-        # print("🔍 Iniciando API de frequência Mega Sena...")  # DEBUG - COMENTADO
-        
-        # Usar a função da Mega Sena
-        from funcoes.megasena.funcao_analise_de_frequencia_MS import analisar_frequencia
-        
-        # Obter parâmetro de quantidade de concursos (padrão: 50)
-        qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
-        # print(f"🔍 qtd_concursos: {qtd_concursos}")  # DEBUG - COMENTADO
-        
-        # Executar análise com dados reais da Mega Sena
-        # print("🔍 Chamando analisar_frequencia Mega Sena...")  # DEBUG - COMENTADO
-        df_megasena = carregar_dados_da_loteria("megasena")
-        if df_megasena is None or df_megasena.empty:
-            return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
-        resultado = analisar_frequencia(df_megasena=df_megasena, qtd_concursos=qtd_concursos)
-        # print(f"🔍 Resultado tipo: {type(resultado)}")  # DEBUG - COMENTADO
-        # print(f"🔍 Resultado: {resultado}")  # DEBUG - COMENTADO
-        
-        if not resultado or resultado == {}:
-            print("❌ Resultado vazio ou None")
-            return jsonify({'error': 'Erro ao carregar dados de frequência da Mega Sena.'}), 500
-
-        # Preparar dados dos concursos individuais para a matriz visual
-        concursos_para_matriz = []
-        if 'periodo_analisado' in resultado and 'concursos_do_periodo' in resultado['periodo_analisado']:
-            # Converter dados do DataFrame para formato da matriz
-            # Se qtd_concursos for None (todos os concursos), limitar a 300 para evitar loop
-            limite_efetivo = qtd_concursos if qtd_concursos else 300
-            df_megasena = carregar_dados_da_loteria("megasena")
-            if df_megasena is None or df_megasena.empty:
-                return jsonify({"error": "Dados da Mega Sena não carregados."}), 500
-            df_filtrado = df_megasena.tail(limite_efetivo)
-            # Importar pandas para uso local
-            pd = _lazy_import_pandas()
-            
-            for _, row in df_filtrado.iterrows():
-                if not pd.isna(row['Concurso']):
-                    concursos_para_matriz.append({
-                        'concurso': int(row['Concurso']),
-                        'numeros': [int(row['Bola1']), int(row['Bola2']), int(row['Bola3']), 
-                                   int(row['Bola4']), int(row['Bola5']), int(row['Bola6'])]
-                    })
-
-        return jsonify({
-            'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_absoluta']['numeros'].items())],
-            'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado['frequencia_relativa']['numeros'].items())],
-            'numeros_quentes_frios': resultado['numeros_quentes_frios'],
-            'analise_temporal': resultado['analise_temporal'],
-            'periodo_analisado': resultado['periodo_analisado'],
-            'concursos_para_matriz': concursos_para_matriz  # Dados para a matriz visual
-        })
-    except Exception as e:
-        print(f"❌ Erro na API de frequência Mega Sena: {e}")
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/analise_padroes_sequencias', methods=['GET'])
 def get_analise_padroes_sequencias():
@@ -2463,6 +2405,7 @@ def gerar_aposta_aleatoria_lotofacil_api():
         if qtde_num > 20:
             qtde_num = 20
 
+        from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosL_lotofacil import gerar_aposta_aleatoria_lotofacil
         numeros = gerar_aposta_aleatoria_lotofacil(qtde_num)
         return jsonify({
             'numeros': numeros,
@@ -3066,8 +3009,13 @@ def gerar_aposta_lotofacil_api():
         else:
             preferencias_backend = None
         
+        # Importar a função de geração de aposta da Lotofácil
+        from funcoes.lotofacil.gerarCombinacao_numeros_aleatoriosL_lotofacil import gerar_aposta_personalizada_lotofacil
+        
         # Chama a função principal de geração de aposta com quantidade e preferências
+        logger.info(f"Gerando aposta Lotofácil: quantidade={quantidade}, preferencias={preferencias_backend}")
         numeros = gerar_aposta_personalizada_lotofacil(quantidade, preferencias_backend)
+        logger.info(f"Aposta gerada: {numeros}")
         
         # Tabela de valores da Lotofácil
         valores_lotofacil = {
@@ -4978,6 +4926,342 @@ def api_milionaria_dados_reais():
         
     except Exception as e:
         logger.error(f"Erro ao carregar dados reais da Milionária: {e}")
+        return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
+
+@app.route('/api/analise-frequencia-MS')
+def get_analise_frequencia_MS():
+    """API específica para o dashboard da Megasena - retorna dados no formato esperado pelo JavaScript."""
+    try:
+        # Usar a função da Megasena
+        from funcoes.megasena.funcao_analise_de_frequencia_MS import analise_frequencia
+        
+        # Obter parâmetro de quantidade de concursos (padrão: 50 para dashboard)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=50)
+        
+        # Carregar dados da Megasena usando lazy loading
+        df_megasena = carregar_dados_da_loteria("megasena")
+        
+        # Importar pandas para usar pd.notna
+        import pandas as pd
+        
+        # Converter DataFrame para formato esperado pelas funções
+        dados_sorteios = []
+        for _, row in df_megasena.iterrows():
+            concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+            bolas = [int(row[f'Bola{i}']) for i in range(1, 7) if pd.notna(row[f'Bola{i}'])]
+            if len(bolas) == 6:  # Megasena tem 6 bolas
+                dados_sorteios.append([concurso] + bolas)
+        
+        # Executar análise com dados reais da Megasena
+        resultado = analise_frequencia(dados_sorteios, qtd_concursos)
+        
+        if not resultado or resultado == {}:
+            print("❌ Resultado vazio ou None")
+            return jsonify({'error': 'Erro ao carregar dados de frequência da Megasena.'}), 500
+        
+        # Retornar dados no formato esperado pelo dashboard
+        return jsonify({
+            'numeros_quentes_frios': resultado.get('numeros_quentes_frios', {}),
+            'frequencia_absoluta_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado.get('frequencia_absoluta', {}).get('numeros', {}).items())],
+            'frequencia_relativa_numeros': [{'numero': k, 'frequencia': v} for k, v in sorted(resultado.get('frequencia_relativa', {}).get('numeros', {}).items())],
+            'analise_temporal': resultado.get('analise_temporal', []),
+            'periodo_analisado': resultado.get('periodo_analisado', {})
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro na API de frequência da Megasena: {e}")
+        return jsonify({'error': f'Erro interno: {str(e)}'}), 500
+
+@app.route('/api/analise-frequencia-megasena')
+def get_analise_frequencia_megasena():
+    """Nova rota para análise de frequência da Megasena com dados reais dos últimos 100 concursos."""
+    try:
+        # Usar a função da Megasena
+        from funcoes.megasena.funcao_analise_de_frequencia_MS import analise_frequencia
+        
+        # Obter parâmetro de quantidade de concursos (padrão: 100)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=100)
+        
+        # Carregar dados da Megasena usando lazy loading
+        df_megasena = carregar_dados_da_loteria("megasena")
+        
+        # Importar pandas para usar pd.notna
+        import pandas as pd
+        
+        # Converter DataFrame para formato esperado pelas funções
+        dados_sorteios = []
+        for _, row in df_megasena.iterrows():
+            concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+            bolas = [int(row[f'Bola{i}']) for i in range(1, 7) if pd.notna(row[f'Bola{i}'])]
+            if len(bolas) == 6:  # Megasena tem 6 bolas
+                dados_sorteios.append([concurso] + bolas)
+        
+        # Executar análise com dados reais da Megasena
+        resultado = analise_frequencia(dados_sorteios, qtd_concursos)
+        
+        if not resultado or resultado == {}:
+            print("❌ Resultado vazio ou None")
+            return jsonify({'error': 'Erro ao carregar dados de frequência da Megasena.'}), 500
+        
+        # Adicionar análises temporais ao resultado
+        try:
+            from funcoes.megasena.funcao_analise_de_frequencia_MS import analise_frequencia_temporal_estruturada
+            
+            # Análise temporal
+            analise_temporal = analise_frequencia_temporal_estruturada(dados_sorteios, 'meses', qtd_concursos)
+            resultado['analise_temporal'] = analise_temporal
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise temporal: {e}")
+            resultado['analise_temporal'] = {}
+        
+        # Adicionar análise de combinações
+        try:
+            from funcoes.megasena.funcao_analise_de_combinacoes_MS import analise_combinacoes_megasena
+            
+            analise_comb = analise_combinacoes_megasena(df_megasena, qtd_concursos)
+            resultado['analise_combinacoes'] = analise_comb
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise de combinações: {e}")
+            resultado['analise_combinacoes'] = {}
+        
+        # Adicionar análise de distribuição
+        try:
+            from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_de_distribuicao
+            
+            analise_dist = analise_de_distribuicao(dados_sorteios, qtd_concursos)
+            resultado['analise_distribuicao'] = analise_dist
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise de distribuição: {e}")
+            resultado['analise_distribuicao'] = {}
+        
+        # Adicionar análise de padrões
+        try:
+            from funcoes.megasena.funcao_analise_de_padroes_sequencia_MS import analise_padroes_sequencias_megasena
+            
+            analise_padroes = analise_padroes_sequencias_megasena(df_megasena, qtd_concursos)
+            resultado['analise_padroes'] = analise_padroes
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise de padrões: {e}")
+            resultado['analise_padroes'] = {}
+        
+        # Adicionar análise estatística avançada
+        try:
+            from funcoes.megasena.analise_estatistica_avancada_MS import realizar_analise_estatistica_avancada_megasena
+            
+            analise_avancada = realizar_analise_estatistica_avancada_megasena(df_megasena, qtd_concursos)
+            resultado['analise_avancada'] = analise_avancada
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise avançada: {e}")
+            resultado['analise_avancada'] = {}
+        
+        print(f"✅ Análise completa da Megasena concluída para {qtd_concursos} concursos")
+        return jsonify(resultado)
+        
+    except Exception as e:
+        print(f"❌ Erro na análise de frequência da Megasena: {e}")
+        return jsonify({'error': f'Erro interno: {str(e)}'}), 500
+
+@app.route('/api/analise-frequencia-lotofacil-completa')
+def get_analise_frequencia_lotofacil_completa():
+    """Nova rota para análise de frequência da Lotofácil com dados reais dos últimos 100 concursos."""
+    try:
+        # Usar a função da Lotofácil
+        from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import obter_estatisticas_rapidas_lotofacil
+        
+        # Obter parâmetro de quantidade de concursos (padrão: 100)
+        qtd_concursos = request.args.get('qtd_concursos', type=int, default=100)
+        
+        # Carregar dados da Lotofácil usando lazy loading
+        df_lotofacil = carregar_dados_da_loteria("lotofacil")
+        
+        # Importar pandas para usar pd.notna
+        import pandas as pd
+        
+        # Executar análise com dados reais da Lotofácil
+        resultado = obter_estatisticas_rapidas_lotofacil()
+        
+        if not resultado or resultado == {}:
+            print("❌ Resultado vazio ou None")
+            return jsonify({'error': 'Erro ao carregar dados de frequência da Lotofácil.'}), 500
+        
+        # Adicionar análises temporais ao resultado
+        try:
+            from funcoes.lotofacil.funcao_analise_de_frequencia_lotofacil import analise_frequencia_temporal_estruturada_lotofacil
+            
+            # Converter DataFrame para formato esperado pelas funções temporais
+            dados_sorteios = []
+            for _, row in df_lotofacil.iterrows():
+                concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+                bolas = [int(row[f'Bola{i}']) for i in range(1, 16) if pd.notna(row[f'Bola{i}'])]
+                if len(bolas) == 15:  # Lotofácil tem 15 bolas
+                    dados_sorteios.append([concurso] + bolas)
+            
+            # Análise temporal
+            analise_temporal = analise_frequencia_temporal_estruturada_lotofacil(dados_sorteios, 'meses', qtd_concursos)
+            resultado['analise_temporal'] = analise_temporal
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise temporal: {e}")
+            resultado['analise_temporal'] = {}
+        
+        # Adicionar análise de combinações
+        try:
+            from funcoes.lotofacil.funcao_analise_de_combinacoes_lotofacil import analise_combinacoes_lotofacil
+            
+            analise_comb = analise_combinacoes_lotofacil(df_lotofacil, qtd_concursos)
+            resultado['analise_combinacoes'] = analise_comb
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise de combinações: {e}")
+            resultado['analise_combinacoes'] = {}
+        
+        # Adicionar análise de distribuição
+        try:
+            from funcoes.lotofacil.funcao_analise_de_distribuicao_lotofacil import analise_de_distribuicao_lotofacil
+            
+            # Converter para formato esperado
+            dados_sorteios = []
+            for _, row in df_lotofacil.iterrows():
+                concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+                bolas = [int(row[f'Bola{i}']) for i in range(1, 16) if pd.notna(row[f'Bola{i}'])]
+                if len(bolas) == 15:
+                    dados_sorteios.append([concurso] + bolas)
+            
+            analise_dist = analise_de_distribuicao_lotofacil(dados_sorteios, qtd_concursos)
+            resultado['analise_distribuicao'] = analise_dist
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise de distribuição: {e}")
+            resultado['analise_distribuicao'] = {}
+        
+        # Adicionar análise de padrões
+        try:
+            from funcoes.lotofacil.funcao_analise_de_padroes_sequencia_lotofacil import analise_padroes_sequencias_lotofacil
+            
+            analise_padroes = analise_padroes_sequencias_lotofacil(df_lotofacil, qtd_concursos)
+            resultado['analise_padroes'] = analise_padroes
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise de padrões: {e}")
+            resultado['analise_padroes'] = {}
+        
+        # Adicionar análise estatística avançada
+        try:
+            from funcoes.lotofacil.analise_estatistica_avancada_lotofacil import realizar_analise_estatistica_avancada_lotofacil
+            
+            analise_avancada = realizar_analise_estatistica_avancada_lotofacil(df_lotofacil, qtd_concursos)
+            resultado['analise_avancada'] = analise_avancada
+            
+        except Exception as e:
+            print(f"⚠️ Erro na análise avançada: {e}")
+            resultado['analise_avancada'] = {}
+        
+        print(f"✅ Análise completa da Lotofácil concluída para {qtd_concursos} concursos")
+        return jsonify(resultado)
+        
+    except Exception as e:
+        print(f"❌ Erro na análise de frequência da Lotofácil: {e}")
+        return jsonify({'error': f'Erro interno: {str(e)}'}), 500
+
+@app.route('/api/megasena/dados-reais')
+# @verificar_acesso_universal  # Temporariamente comentado para funcionar sem login
+def api_megasena_dados_reais():
+    """
+    API que retorna dados reais da Megasena para o painel de análises estatísticas.
+    Conecta com as funções reais que leem o Excel da Megasena.
+    """
+    try:
+        # Importar pandas diretamente para evitar problemas de escopo
+        import pandas as pd
+        
+        # Importar as funções reais da Megasena
+        from funcoes.megasena.MegasenaFuncaCarregaDadosExcel_MS import carregar_dados_megasena
+        from funcoes.megasena.funcao_analise_de_frequencia_MS import analise_frequencia
+        from funcoes.megasena.funcao_analise_de_distribuicao_MS import analise_de_distribuicao
+        from funcoes.megasena.analise_estatistica_avancada_MS import realizar_analise_estatistica_avancada_megasena
+        
+        # Carregar dados reais da Megasena
+        df_megasena = carregar_dados_megasena()
+        
+        if df_megasena is None or df_megasena.empty:
+            return jsonify({'erro': 'Não foi possível carregar os dados da Megasena'}), 500
+        
+        # Converter DataFrame para formato esperado pelas funções
+        dados_sorteios = []
+        for _, row in df_megasena.iterrows():
+            concurso = int(row['Concurso']) if pd.notna(row['Concurso']) else 0
+            bolas = [int(row[f'Bola{i}']) for i in range(1, 7) if pd.notna(row[f'Bola{i}'])]
+            if len(bolas) == 6:  # Megasena tem apenas 6 bolas, sem trevos
+                dados_sorteios.append([concurso] + bolas)
+        
+        # Análise de frequência (últimos 100 concursos)
+        analise_freq = analise_frequencia(dados_sorteios, qtd_concursos=100)
+        
+        # Análise de distribuição (últimos 100 concursos)
+        analise_dist = analise_de_distribuicao(dados_sorteios, qtd_concursos=100)
+        
+        # Análise estatística avançada (últimos 100 concursos)
+        analise_avancada = realizar_analise_estatistica_avancada_megasena(df_megasena, qtd_concursos=100)
+        
+        # Calcular período para exatamente 100 concursos (últimos 100)
+        if dados_sorteios:
+            # Pegar apenas os últimos 100 concursos
+            ultimos_100 = dados_sorteios[-100:] if len(dados_sorteios) >= 100 else dados_sorteios
+            primeiro_concurso = ultimos_100[0][0] if ultimos_100 else 0
+            ultimo_concurso = ultimos_100[-1][0] if ultimos_100 else 0
+            periodo_analise = f"Concursos {primeiro_concurso} a {ultimo_concurso}"
+        else:
+            periodo_analise = 'Nenhum concurso encontrado'
+        
+        # Preparar dados para os gráficos
+        dados_graficos = {
+            'frequencia_numeros': [],
+            'distribuicao_faixas': [],
+            'estatisticas_gerais': {
+                'total_concursos': 100,  # Fixo em 100 como solicitado
+                'periodo_analise': periodo_analise,
+                'ultima_atualizacao': datetime.now().strftime('%d/%m/%Y %H:%M')
+            }
+        }
+        
+        # Processar dados de frequência dos números (1-60)
+        if 'frequencia_absoluta' in analise_freq and 'numeros' in analise_freq['frequencia_absoluta']:
+            freq_numeros = analise_freq['frequencia_absoluta']['numeros']
+            for num in range(1, 61):  # Megasena: números de 1 a 60
+                dados_graficos['frequencia_numeros'].append(freq_numeros.get(num, 0))
+        
+        # Processar dados de distribuição por faixas (1-10, 11-20, 21-30, 31-40, 41-50, 51-60)
+        if 'distribuicao_por_faixa' in analise_dist:
+            dist_faixas = analise_dist['distribuicao_por_faixa']
+            if 'total_por_faixa' in dist_faixas:
+                dados_graficos['distribuicao_faixas'] = [
+                    dist_faixas['total_por_faixa'].get('1-10', 0),
+                    dist_faixas['total_por_faixa'].get('11-20', 0),
+                    dist_faixas['total_por_faixa'].get('21-30', 0),
+                    dist_faixas['total_por_faixa'].get('31-40', 0),
+                    dist_faixas['total_por_faixa'].get('41-50', 0),
+                    dist_faixas['total_por_faixa'].get('51-60', 0)
+                ]
+        
+        # Adicionar números quentes e frios
+        if 'numeros_quentes_frios' in analise_freq:
+            numeros_quentes_frios = analise_freq['numeros_quentes_frios']
+            dados_graficos['numeros_quentes'] = numeros_quentes_frios.get('numeros_quentes', [])[:10]
+            dados_graficos['numeros_frios'] = numeros_quentes_frios.get('numeros_frios', [])[:10]
+        
+        # Adicionar análise avançada
+        if analise_avancada:
+            dados_graficos['analise_avancada'] = analise_avancada
+        
+        return jsonify(dados_graficos)
+        
+    except Exception as e:
+        logger.error(f"Erro ao carregar dados reais da Megasena: {e}")
         return jsonify({'erro': f'Erro interno: {str(e)}'}), 500
 
 @app.route('/painel_analises_estatisticas_lotofacil')
