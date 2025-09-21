@@ -267,6 +267,8 @@
             right: 20px;
             z-index: 1002;
             display: none;
+            max-height: 80vh; /* Limita altura máxima */
+            overflow-y: auto; /* Adiciona scroll vertical */
         }
 
         .hamburger-icon {
@@ -363,10 +365,11 @@
 
         .nav-panel a {
             display: block;
-            padding: 15px 20px;
+            padding: 12px 20px; /* REDUZIDO: era 15px 20px, agora 12px 20px */
             color: #ffffff;
             text-decoration: none;
             transition: all 0.3s ease;
+            font-size: 0.9rem; /* REDUZIDO: era padrão, agora 0.9rem */
         }
 
         .nav-panel a:hover {
@@ -390,8 +393,8 @@
         }
 
         .mobile-dropdown a {
-            padding-left: 40px;
-            font-size: 0.9rem;
+            padding: 8px 20px 8px 35px; /* REDUZIDO: era 10px 20px 10px 40px, agora 8px 20px 8px 35px */
+            font-size: 0.8rem; /* REDUZIDO: era 0.9rem, agora 0.8rem */
         }
 
         .mobile-dropdown-toggle::after {
@@ -402,6 +405,21 @@
 
         .mobile-dropdown-toggle.open::after {
             transform: rotate(180deg);
+        }
+
+        /* Ajustes específicos para landscape */
+        @media (max-height: 580px) and (orientation: landscape) {
+            .nav-panel {
+                width: 260px; /* Largura reduzida para landscape */
+            }
+            .nav-panel a {
+                padding: 8px 15px; /* Espaçamento ainda menor */
+                font-size: 0.85rem; /* Fonte ainda menor */
+            }
+            .mobile-dropdown a {
+                padding: 6px 15px 6px 30px; /* Espaçamento reduzido */
+                font-size: 0.75rem; /* Fonte menor para submenus */
+            }
         }
 
         /* Estilos para Breadcrumbs */
@@ -551,6 +569,30 @@
         }
 
         /* Responsividade */
+        /* 🔧 Sempre usar hambúrguer em telas menores, touch ou com pouca ALTURA (landscape) */
+        @media (max-width: 1024px),
+               (max-height: 580px) and (orientation: landscape),
+               (hover: none) and (pointer: coarse) {
+            .desktop-nav { display: none !important; }
+            .hamburger-menu {
+                display: block !important;
+                position: fixed !important;
+                top: 0.75rem !important;
+                right: 0.75rem !important;
+                z-index: 10050 !important; /* acima do nav e breadcrumbs */
+            }
+        }
+
+        /* 🚫 Nunca deixe o menu desktop aparecer quando a altura é muito baixa */
+        @media (max-height: 480px) {
+            .desktop-nav { display: none !important; }
+        }
+
+        /* Evitar conflitos com o "LOGGED IN" badge */
+        @media (max-width: 1024px) {
+            .logged-in-badge { right: 60px; top: 56px; }
+        }
+
         @media (max-width: 768px) {
             .desktop-nav {
                 display: none;
@@ -2575,6 +2617,16 @@
             if (event.key === 'Escape') {
                 closeFooterModal();
             }
+        });
+    </script>
+
+    <!-- Reset do menu ao trocar orientação -->
+    <script>
+        window.addEventListener('orientationchange', () => {
+            document.getElementById('hamburgerIcon')?.classList.remove('open');
+            document.getElementById('navPanel')?.classList.remove('open');
+            document.getElementById('navOverlay')?.classList.remove('open');
+            document.body.style.overflow = '';
         });
     </script>
 </body>

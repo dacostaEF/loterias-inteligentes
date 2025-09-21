@@ -658,15 +658,69 @@
        display: flex;
      }
 
-     /* Esconder menu desktop apenas em mobile */
-    @media (max-width: 768px) {
+     /* Esconder menu desktop em mobile (qualquer orientação) */
+    @media (max-width: 900px) {
       .desktop-nav {
-        display: none;
+        display: none !important;
        }
        
-       /* Mostrar menu hambúrguer em mobile */
+       /* Mostrar menu hambúrguer em mobile (qualquer orientação) */
        .hamburger-menu {
          display: block !important;
+      }
+    }
+    
+    /* 🔧 Sempre usar hambúrguer em telas menores, touch ou com pouca ALTURA (landscape) */
+    @media (max-width: 1024px),
+           (max-height: 580px) and (orientation: landscape),
+           (hover: none) and (pointer: coarse) {
+      .desktop-nav { display: none !important; }
+      .hamburger-menu {
+        display: block !important;
+        position: fixed !important;
+        top: 0.75rem !important;
+        left: 0.75rem !important;
+        z-index: 10050 !important; /* acima do nav e breadcrumbs */
+      }
+    }
+    
+    /* 🚫 Nunca deixe o menu desktop aparecer quando a altura é muito baixa */
+    @media (max-height: 480px) {
+      .desktop-nav { display: none !important; }
+    }
+    
+    /* Evitar conflitos com o "LOGGED IN" badge */
+    @media (max-width: 1024px) {
+      .logged-in-badge { left: 60px; top: 56px; }
+    }
+    
+    /* Ajustes específicos para landscape em mobile */
+    @media (max-height: 580px) and (orientation: landscape) {
+      .nav-panel {
+        width: 260px; /* Largura reduzida para landscape */
+      }
+      
+      .nav-panel a {
+        padding: 8px 15px; /* Espaçamento ainda menor */
+        font-size: 0.85rem; /* Fonte ainda menor */
+      }
+      
+      .mobile-dropdown a {
+        padding: 6px 15px 6px 30px; /* Espaçamento reduzido */
+        font-size: 0.75rem; /* Fonte menor para submenus */
+      }
+      
+      .nav-header {
+        padding: 10px 15px; /* Header mais compacto */
+      }
+      
+      .nav-header h3 {
+        font-size: 0.9rem; /* Título menor */
+      }
+      
+      .nav-logo {
+        width: 120px; /* Logo menor */
+        margin-bottom: 5px;
       }
     }
 
@@ -701,10 +755,12 @@
       top: 1.5rem;
       left: 1.5rem; /* Mudou de right para left */
       z-index: 1000;
-      display: none; /* Oculto por padrão */
-      background: rgba(0, 0, 0, 0.8);
+      display: none; /* Oculto por padrão - será sobrescrito por media queries */
+      background: rgba(0, 0, 0, 0.9);
       border-radius: 8px;
       padding: 8px;
+      max-height: 80vh; /* Limita altura máxima */
+      overflow-y: auto; /* Adiciona scroll vertical */
     }
 
     .hamburger-icon {
@@ -760,6 +816,8 @@
       z-index: 999;
       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
       border-right: 1px solid rgba(168, 85, 247, 0.2);
+      overflow-y: auto; /* Adiciona scroll vertical */
+      max-height: 100vh; /* Garante que não ultrapasse a altura da tela */
     }
 
     .nav-panel.open {
@@ -768,7 +826,7 @@
 
     /* Header do sidebar */
     .nav-header {
-      padding: 20px 25px;
+      padding: 15px 20px; /* REDUZIDO: era 20px 25px, agora 15px 20px */
       border-bottom: 1px solid rgba(168, 85, 247, 0.2);
       text-align: center;
       background: rgba(168, 85, 247, 0.05);
@@ -785,7 +843,7 @@
     .nav-header h3 {
       color: #A855F7;
       margin: 0;
-      font-size: 1.2rem;
+      font-size: 1rem; /* REDUZIDO: era 1.2rem, agora 1rem */
       font-weight: 600;
     }
 
@@ -804,10 +862,10 @@
     .nav-panel a {
       color: #ffffff;
       text-decoration: none;
-      font-size: 1.1rem;
+      font-size: 0.9rem; /* REDUZIDO: era 1.1rem, agora 0.9rem */
       font-weight: 500;
       transition: all 0.3s ease;
-      padding: 20px 25px;
+      padding: 12px 20px; /* REDUZIDO: era 20px 25px, agora 12px 20px */
       display: block;
       border-left: 3px solid transparent;
     }
@@ -894,8 +952,8 @@
     }
 
     .mobile-dropdown a {
-      padding: 10px 20px 10px 40px;
-      font-size: 0.875rem; /* REDUZIDO: era 0.9rem (14.4px), agora 0.875rem (14px) */
+      padding: 8px 20px 8px 35px; /* REDUZIDO: era 10px 20px 10px 40px, agora 8px 20px 8px 35px */
+      font-size: 0.8rem; /* REDUZIDO: era 0.875rem, agora 0.8rem */
       color: #cbd5e1;
     }
 
@@ -1164,9 +1222,12 @@
         display: block !important;
         visibility: visible !important;
       }
-
+    }
+    
+    /* Menu hambúrguer em mobile (qualquer orientação) */
+    @media (max-width: 900px) {
       .hamburger-menu {
-        display: block !important; /* Mostra o menu hambúrguer em telas menores */
+        display: block !important; /* Mostra o menu hambúrguer em mobile */
         position: fixed !important;
         top: 1rem !important;
         left: 1rem !important;
@@ -1528,6 +1589,14 @@
           }
         });
       }
+    });
+    
+    // Fechar o painel ao girar a tela (evitar layout travado)
+    window.addEventListener('orientationchange', () => {
+      document.getElementById('hamburgerIcon')?.classList.remove('open');
+      document.getElementById('navPanel')?.classList.remove('open');
+      document.getElementById('navOverlay')?.classList.remove('open');
+      document.body.style.overflow = '';
     });
   </script>
 
