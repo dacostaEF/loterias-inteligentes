@@ -69,6 +69,11 @@ class ModalLoginCadastro {
                     
                     <!-- ABA CADASTRO -->
                     <div class="tab-content" id="tab-cadastro">
+                        <!-- 🚧 TARJA DE AJUSTES FINAIS -->
+                        <div class="tarja-ajustes">
+                            Estamos nos ajustes finais. Espere só mais um pouco para acessar um sistema completo de análises estatísticas, com painéis práticos e inteligências avançadas.
+                        </div>
+                        
                         <button class="btn-secondary" id="btn-google-cadastro">
                             <svg width="20" height="20" viewBox="0 0 24 24">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -798,6 +803,15 @@ class ModalLoginCadastro {
             window.location.href = '/upgrade_plans';
         }
     }
+
+    // 🚧 Remover tarja de ajustes finais (quando estiver pronto)
+    removerTarjaAjustes() {
+        const tarja = document.querySelector('.tarja-ajustes');
+        if (tarja) {
+            tarja.style.display = 'none';
+            console.log('✅ Tarja de ajustes removida - sistema liberado!');
+        }
+    }
 }
 
 // Inicializar quando o DOM estiver pronto
@@ -823,4 +837,14 @@ function alterarDadosCadastro() {
     
     // Abrir modal de cadastro novamente
     openModalLogin('cadastro');
+}
+
+// 🚧 Função global para remover tarja de ajustes (quando estiver pronto)
+function liberarSistemaCadastro() {
+    if (window.modalLoginCadastro) {
+        window.modalLoginCadastro.removerTarjaAjustes();
+        console.log('🎉 Sistema de cadastro liberado!');
+    } else {
+        console.error('❌ Modal não encontrado');
+    }
 }
