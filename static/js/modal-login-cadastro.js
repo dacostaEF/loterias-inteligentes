@@ -137,6 +137,18 @@ class ModalLoginCadastro {
                             <div class="error-message" id="cadastro-senha-error"></div>
                         </div>
                         
+                        <div class="form-group">
+                            <label class="form-label" for="cadastro-plano">Plano Selecionado</label>
+                            <select class="form-input" id="cadastro-plano" onchange="atualizarPrecoPlano()">
+                                <option value="daily">Plano Diário - R$ 5,00/dia</option>
+                                <option value="monthly" selected>Plano Mensal - R$ 29,90/mês</option>
+                                <option value="semestral">Plano Semestral - R$ 149,90/6 meses</option>
+                                <option value="annual">Plano Anual - R$ 269,90/ano</option>
+                                <option value="lifetime">Plano Vitalício - R$ 997,00/pagamento único</option>
+                            </select>
+                            <div class="error-message" id="cadastro-plano-error"></div>
+                        </div>
+                        
                         <div class="checkbox-group">
                             <input type="checkbox" class="checkbox-input" id="termos-uso" required>
                             <label class="checkbox-label" for="termos-uso">
@@ -620,6 +632,10 @@ class ModalLoginCadastro {
         
         // Configurar botões de confirmação (inicialmente ocultos)
         this.setupConfirmacaoButtons(formData);
+        
+        // Inicializar cronômetro (será iniciado quando o código for enviado)
+        this.cronometro = null;
+        this.tempoRestante = 600; // 10 minutos em segundos
     }
 
     // 🔧 Configurar inputs do código de confirmação
@@ -671,6 +687,94 @@ class ModalLoginCadastro {
             this.enviarCodigo(formData, tipoEnvio);
         });
     }
+    
+    // ⏰ Iniciar cronômetro
+    iniciarCronometro() {
+        console.log('⏰ Iniciando cronômetro...');
+        
+        // Parar cronômetro anterior se existir
+        if (this.cronometro) {
+            clearInterval(this.cronometro);
+        }
+        
+        // Resetar tempo
+        this.tempoRestante = 600; // 10 minutos em segundos
+        
+        // Atualizar display inicial
+        this.atualizarCronometro();
+        
+        // Iniciar contador
+        this.cronometro = setInterval(() => {
+            this.tempoRestante--;
+            this.atualizarCronometro();
+            
+            // Verificar se expirou
+            if (this.tempoRestante <= 0) {
+                this.cronometroExpirado();
+            }
+        }, 1000);
+    }
+    
+    // ⏰ Atualizar display do cronômetro
+    atualizarCronometro() {
+        const elemento = document.getElementById('cronometro-tempo');
+        if (!elemento) return;
+        
+        const minutos = Math.floor(this.tempoRestante / 60);
+        const segundos = this.tempoRestante % 60;
+        const tempoFormatado = `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+        
+        elemento.textContent = tempoFormatado;
+        
+        // Remover classes anteriores
+        elemento.classList.remove('urgente', 'expirado');
+        
+        // Adicionar classe de urgência se restam menos de 2 minutos
+        if (this.tempoRestante <= 120) {
+            elemento.classList.add('urgente');
+        }
+        
+        // Adicionar classe de expirado se restam menos de 30 segundos
+        if (this.tempoRestante <= 30) {
+            elemento.classList.add('expirado');
+        }
+    }
+    
+    // ⏰ Cronômetro expirado
+    cronometroExpirado() {
+        console.log('⏰ Cronômetro expirado!');
+        
+        // Parar cronômetro
+        if (this.cronometro) {
+            clearInterval(this.cronometro);
+            this.cronometro = null;
+        }
+        
+        // Atualizar display
+        const elemento = document.getElementById('cronometro-tempo');
+        if (elemento) {
+            elemento.textContent = '00:00';
+            elemento.classList.add('expirado');
+        }
+        
+        // Mostrar mensagem de expiração
+        this.showConfirmacaoMessage('⏰ Código expirado! Clique em "Reenviar Código" para obter um novo.', 'error');
+        
+        // Desabilitar botão de confirmar
+        const btnConfirmar = document.getElementById('btn-confirmar-codigo');
+        if (btnConfirmar) {
+            btnConfirmar.disabled = true;
+            btnConfirmar.textContent = 'Código Expirado';
+        }
+    }
+    
+    // ⏰ Parar cronômetro
+    pararCronometro() {
+        if (this.cronometro) {
+            clearInterval(this.cronometro);
+            this.cronometro = null;
+        }
+    }
 
     // 🔧 Configurar botões do modal de confirmação
     setupConfirmacaoButtons(formData) {
@@ -685,6 +789,11 @@ class ModalLoginCadastro {
         // Botão reenviar código
         btnReenviar.addEventListener('click', () => {
             const tipoEnvio = document.querySelector('input[name="tipo-envio"]:checked').value;
+            
+            // ⏰ PARAR CRONÔMETRO ANTERIOR
+            this.pararCronometro();
+            
+            // Reenviar código (que iniciará novo cronômetro)
             this.enviarCodigo(formData, tipoEnvio);
         });
     }
@@ -717,6 +826,9 @@ class ModalLoginCadastro {
             
             if (data.success) {
                 this.showConfirmacaoMessage('✅ Cadastro confirmado com sucesso! Bem-vindo ao Loterias Inteligentes!', 'success');
+                
+                // ⏰ PARAR CRONÔMETRO
+                this.pararCronometro();
                 
                 console.log('🎯 Código confirmado com sucesso! Iniciando sequência...');
                 
@@ -766,6 +878,9 @@ class ModalLoginCadastro {
                 document.querySelector('.codigo-container').style.display = 'block';
                 document.querySelector('.confirmacao-actions').style.display = 'block';
                 document.querySelector('.escolha-envio').style.display = 'none';
+                
+                // ⏰ INICIAR CRONÔMETRO
+                this.iniciarCronometro();
                 
             } else {
                 this.showConfirmacaoMessage('❌ Erro ao enviar código. Tente novamente.', 'error');
@@ -826,8 +941,34 @@ function openModalLogin(tab = 'login') {
     }
 }
 
+// 🎯 Função para atualizar preço do plano
+function atualizarPrecoPlano() {
+    const planoSelect = document.getElementById('cadastro-plano');
+    const planoId = planoSelect.value;
+    
+    // Mapear IDs dos planos para dados
+    const planosData = {
+        'daily': { nome: 'Plano Diário', preco: 5.00, periodo: 'dia' },
+        'monthly': { nome: 'Plano Mensal', preco: 29.90, periodo: 'mês' },
+        'semestral': { nome: 'Plano Semestral', preco: 149.90, periodo: '6 meses' },
+        'annual': { nome: 'Plano Anual', preco: 269.90, periodo: 'ano' },
+        'lifetime': { nome: 'Plano Vitalício', preco: 997.00, periodo: 'pagamento único' }
+    };
+    
+    const plano = planosData[planoId];
+    if (plano) {
+        console.log('🎯 Plano selecionado:', plano.nome, 'R$', plano.preco);
+        // Aqui você pode adicionar lógica para mostrar o preço em algum lugar
+    }
+}
+
 // 🎯 Funções globais para o modal de confirmação
 function closeModalConfirmacao() {
+    // ⏰ PARAR CRONÔMETRO se existir
+    if (window.modalLoginCadastro && window.modalLoginCadastro.pararCronometro) {
+        window.modalLoginCadastro.pararCronometro();
+    }
+    
     document.getElementById('modal-confirmacao').style.display = 'none';
 }
 

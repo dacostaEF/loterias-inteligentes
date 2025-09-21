@@ -1788,7 +1788,13 @@
         </div>
         
         <div class="codigo-container" style="display: none;">
-          <label for="codigo-confirmacao">Código de Confirmação:</label>
+          <div class="codigo-header">
+            <label for="codigo-confirmacao">Código de Confirmação:</label>
+            <div class="cronometro-container">
+              <span class="cronometro-label">⏰ Tempo restante:</span>
+              <span id="cronometro-tempo" class="cronometro-tempo">10:00</span>
+            </div>
+          </div>
           <div class="codigo-inputs">
             <input type="text" class="codigo-input" maxlength="1" data-index="0" />
             <input type="text" class="codigo-input" maxlength="1" data-index="1" />
@@ -1836,6 +1842,40 @@
       else alert('Área premium: faça login/upgrade.');
     }
   }
+  </script>
+
+  <!-- Script para detectar parâmetros de plano e abrir modal -->
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Verificar parâmetros da URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const plano = urlParams.get('plano');
+    const abrir = urlParams.get('abrir');
+    
+    // Se tem plano e deve abrir cadastro
+    if (plano && abrir === 'cadastro') {
+      console.log('🎯 Plano selecionado:', plano);
+      
+      // Aguardar o modal estar carregado
+      setTimeout(() => {
+        // Abrir modal de cadastro
+        if (typeof openModalLogin === 'function') {
+          openModalLogin('cadastro');
+          
+          // Pré-selecionar plano se existir campo
+          setTimeout(() => {
+            const campoPlano = document.getElementById('cadastro-plano');
+            if (campoPlano) {
+              campoPlano.value = plano;
+              
+              // Disparar evento de mudança para atualizar preço
+              campoPlano.dispatchEvent(new Event('change'));
+            }
+          }, 500);
+        }
+      }, 1000);
+    }
+  });
   </script>
   </div> <!-- Fim do main-content -->
   
@@ -1971,6 +2011,89 @@
       }
     });
   </script>
+  
+  <!-- 🎯 CSS para o cronômetro do modal de confirmação -->
+  <style>
+    /* Estilos para o cronômetro */
+    .codigo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .cronometro-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .cronometro-label {
+      font-size: 14px;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+    
+    .cronometro-tempo {
+      font-size: 16px;
+      font-weight: bold;
+      color: #10b981;
+      font-family: 'Courier New', monospace;
+      min-width: 50px;
+      text-align: center;
+    }
+    
+    /* Animação quando tempo está acabando */
+    .cronometro-tempo.urgente {
+      color: #ef4444;
+      animation: pulse 1s infinite;
+    }
+    
+    .cronometro-tempo.expirado {
+      color: #ef4444;
+      animation: shake 0.5s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      75% { transform: translateX(2px); }
+    }
+    
+    /* Responsividade para mobile */
+    @media (max-width: 768px) {
+      .codigo-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .cronometro-container {
+        align-self: flex-end;
+        padding: 6px 10px;
+      }
+      
+      .cronometro-label {
+        font-size: 12px;
+      }
+      
+      .cronometro-tempo {
+        font-size: 14px;
+        min-width: 45px;
+      }
+    }
+  </style>
   
 </body>
 </html>
