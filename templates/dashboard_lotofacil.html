@@ -1651,22 +1651,25 @@
           
           console.log('Dados carregados:', { numerosQuentes, numerosFrios, numerosSecos });
 
-          // Números quentes (top 20)
+          // Números quentes (top 20) - ordenados crescentemente
           document.getElementById('numeros-quentes').innerHTML = 
             numerosQuentes.slice(0, 20)
+              .sort((a, b) => a[0] - b[0])
               .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
 
-          // Números frios (top 20)
+          // Números frios (top 20) - ordenados crescentemente
           document.getElementById('numeros-frios').innerHTML = 
             numerosFrios.slice(0, 20)
+              .sort((a, b) => a[0] - b[0])
               .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
 
-          // Números secos (top 20)
+          // Números secos (top 20) - ordenados crescentemente
           if (numerosSecos.length > 0) {
             document.getElementById('numeros-secos').innerHTML = 
               numerosSecos.slice(0, 20)
+                .sort((a, b) => a[0] - b[0])
                 .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
                 .join('');
           } else {
@@ -1681,18 +1684,24 @@
         numerosFrios = [21, 22, 23, 24, 25, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].map(n => [n, 0]);
         numerosSecos = [5, 10, 15, 20, 25, 1, 6, 11, 16, 21, 2, 7, 12, 17, 22, 3, 8, 13, 18, 23].map(n => [n, 0]);
         
-        document.getElementById('numeros-quentes').innerHTML = numerosQuentes.map(n => 
-          `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
-        ).join('');
+        document.getElementById('numeros-quentes').innerHTML = numerosQuentes
+          .sort((a, b) => a[0] - b[0])
+          .map(n => 
+            `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+          ).join('');
         
-        document.getElementById('numeros-frios').innerHTML = numerosFrios.map(n => 
-          `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
-        ).join('');
+        document.getElementById('numeros-frios').innerHTML = numerosFrios
+          .sort((a, b) => a[0] - b[0])
+          .map(n => 
+            `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+          ).join('');
         
         if (numerosSecos.length > 0) {
-          document.getElementById('numeros-secos').innerHTML = numerosSecos.map(n => 
-            `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
-          ).join('');
+          document.getElementById('numeros-secos').innerHTML = numerosSecos
+            .sort((a, b) => a[0] - b[0])
+            .map(n => 
+              `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`
+            ).join('');
         } else {
           document.getElementById('numeros-secos').innerHTML = 
             '<div class="text-center py-2"><span class="text-green-400 text-sm">🎉 Todos os números apareceram recentemente!</span><br><span class="text-gray-400 text-xs">Loteria bem distribuída nos últimos 25 concursos</span></div>';

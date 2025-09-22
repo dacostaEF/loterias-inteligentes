@@ -2187,24 +2187,27 @@
         const dados = await response.json();
         
         if (dados && dados.numeros_quentes_frios) {
-          // Números quentes (top 10)
+          // Números quentes (top 10) - ordenados crescentemente
           const numerosQuentes = dados.numeros_quentes_frios.numeros_quentes || [];
           document.getElementById('numeros-quentes').innerHTML = 
             numerosQuentes.slice(0, 10)
+              .sort((a, b) => a[0] - b[0])
               .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
 
-          // Números frios (top 10)
+          // Números frios (top 10) - ordenados crescentemente
           const numerosFrios = dados.numeros_quentes_frios.numeros_frios || [];
           document.getElementById('numeros-frios').innerHTML = 
             numerosFrios.slice(0, 10)
+              .sort((a, b) => a[0] - b[0])
               .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
 
-          // Números secos (top 10)
+          // Números secos (top 10) - ordenados crescentemente
           const numerosSecos = dados.numeros_quentes_frios.numeros_secos || [];
           document.getElementById('numeros-secos').innerHTML = 
             numerosSecos.slice(0, 10)
+              .sort((a, b) => a[0] - b[0])
               .map(n => `<span class="bg-orange-500 text-white px-1 py-0.5 rounded text-xs mr-1">${n[0]}</span>`)
               .join('');
         }

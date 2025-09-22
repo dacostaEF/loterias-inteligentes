@@ -361,7 +361,17 @@
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-100%); /* ⚡ CORRIGIDO: Move toda a largura para loop perfeito */
+        transform: translateX(-33.33%); /* ⚡ CORRIGIDO: Move 33.33% para loop perfeito com triplicação */
+    }
+}
+
+/* ⚡ NOVO: Animação alternativa para garantir continuidade perfeita */
+@keyframes scrollLeftPerfect {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-33.33%);
     }
 }
 

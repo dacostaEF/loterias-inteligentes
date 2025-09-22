@@ -55,6 +55,7 @@ class CarrosselLoterias {
         const slidesContainer = document.createElement('div');
         slidesContainer.className = 'carousel-slides';
         slidesContainer.style.animation = 'scrollLeft 15s linear infinite'; // ⚡ ACELERADO: 30s → 15s
+        slidesContainer.style.willChange = 'transform'; // ⚡ NOVO: Otimiza a animação
         
         // Renderiza cada slide
         this.data.forEach((item, index) => {
@@ -62,7 +63,13 @@ class CarrosselLoterias {
             slidesContainer.appendChild(slide);
         });
         
-        // Duplica os slides para movimento infinito
+        // Duplica os slides para movimento infinito (2x)
+        this.data.forEach((item, index) => {
+            const slide = this.createSlide(item, index);
+            slidesContainer.appendChild(slide);
+        });
+        
+        // Triplica os slides para garantir continuidade perfeita (3x total)
         this.data.forEach((item, index) => {
             const slide = this.createSlide(item, index);
             slidesContainer.appendChild(slide);
@@ -221,6 +228,18 @@ class CarrosselLoterias {
     startAutoPlay() {
         // Movimento contínuo automático - sem intervalos
         // A animação CSS cuida de tudo
+        this.ensureAnimation();
+    }
+    
+    // ⚡ NOVO: Garantir que a animação esteja funcionando
+    ensureAnimation() {
+        const slidesContainer = this.container.querySelector('.carousel-slides');
+        if (slidesContainer) {
+            // Força a re-aplicação da animação
+            slidesContainer.style.animation = 'none';
+            slidesContainer.offsetHeight; // Trigger reflow
+            slidesContainer.style.animation = 'scrollLeft 15s linear infinite';
+        }
     }
 
     stopAutoPlay() {

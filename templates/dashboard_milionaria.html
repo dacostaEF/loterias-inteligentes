@@ -2290,15 +2290,17 @@
           trevosFrequentes
         });
         
-        // Renderizar números quentes
+        // Renderizar números quentes - ordenados crescentemente
         document.getElementById('numeros-quentes').innerHTML = 
           numerosQuentes
+            .sort((a, b) => a - b)
             .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
             .join('');
 
-        // Renderizar números frios
+        // Renderizar números frios - ordenados crescentemente
         document.getElementById('numeros-frios').innerHTML = 
           numerosFrios
+            .sort((a, b) => a - b)
             .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
             .join('');
 
@@ -2318,11 +2320,13 @@
         try {
           document.getElementById('numeros-quentes').innerHTML = 
             dadosMilionaria.frequencia.numeros.quentes.slice(0, 10)
+              .sort((a, b) => a - b)
               .map(n => `<span class="bg-[#00E38C] text-black px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
               .join('');
 
           document.getElementById('numeros-frios').innerHTML = 
             dadosMilionaria.frequencia.numeros.frios.slice(0, 10)
+              .sort((a, b) => a - b)
               .map(n => `<span class="bg-gray-600 text-white px-1 py-0.5 rounded text-xs mr-1">${n}</span>`)
               .join('');
 
