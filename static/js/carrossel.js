@@ -54,7 +54,7 @@ class CarrosselLoterias {
         // Container dos slides com movimento dinâmico
         const slidesContainer = document.createElement('div');
         slidesContainer.className = 'carousel-slides';
-        slidesContainer.style.animation = 'scrollLeft 30s linear infinite'; // Movimento contínuo como filme
+        slidesContainer.style.animation = 'scrollLeft 15s linear infinite'; // ⚡ ACELERADO: 30s → 15s
         
         // Renderiza cada slide
         this.data.forEach((item, index) => {

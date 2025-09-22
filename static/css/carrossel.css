@@ -42,14 +42,14 @@
 .carousel-slides {
     display: flex;
     gap: 10px; /* ⚡ REDUZIDO AO MÁXIMO: 20px → 10px */
-    overflow-x: auto;
+    overflow-x: hidden; /* ⚡ MUDADO: hidden para permitir animação */
     scroll-behavior: smooth;
     padding: 0; /* PADDING ZERO - sem espaços vazios */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
-    /* ⚡ NOVO: Prevenir extensão horizontal */
-    max-width: 100vw !important;
-    width: 100% !important;
+    /* ⚡ NOVO: Permitir animação infinita */
+    width: max-content; /* Permite que o conteúdo se estenda para animação */
+    will-change: transform; /* Otimiza a animação */
 }
 
 .carousel-slides::-webkit-scrollbar {
@@ -212,6 +212,26 @@
     height: auto !important; /* ⚡ FORÇA altura automática */
     min-height: 0 !important; /* ⚡ SEM altura mínima */
   }
+  
+  /* ⚡ NOVO: Garantir que a animação funcione no mobile */
+  .carousel-slides {
+    animation: scrollLeft 12s linear infinite !important; /* ⚡ MAIS RÁPIDO no mobile */
+    width: max-content !important; /* ⚡ FORÇA largura para animação */
+    overflow-x: hidden !important; /* ⚡ ESCONDE overflow */
+  }
+  
+  /* ⚡ NOVO: Garantir que o container do carrossel não ultrapasse os limites */
+  #carousel-container {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
+  
+  .carousel-wrapper {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
 
   /* ⚡ NOVO: Eliminar espaçamento do breadcrumb */
   .breadcrumbs-container {
@@ -278,6 +298,26 @@
     height: auto !important; /* ⚡ FORÇA altura automática */
     min-height: 0 !important; /* ⚡ SEM altura mínima */
   }
+  
+  /* ⚡ NOVO: Garantir que a animação funcione no mobile pequeno */
+  .carousel-slides {
+    animation: scrollLeft 10s linear infinite !important; /* ⚡ AINDA MAIS RÁPIDO no mobile pequeno */
+    width: max-content !important; /* ⚡ FORÇA largura para animação */
+    overflow-x: hidden !important; /* ⚡ ESCONDE overflow */
+  }
+  
+  /* ⚡ NOVO: Garantir que o container do carrossel não ultrapasse os limites no mobile pequeno */
+  #carousel-container {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
+  
+  .carousel-wrapper {
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+    position: relative !important;
+  }
 
   /* ⚡ NOVO: Eliminar espaçamento do breadcrumb */
   .breadcrumbs-container {
@@ -321,7 +361,7 @@
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-50%); /* Move metade da largura para movimento infinito */
+        transform: translateX(-100%); /* ⚡ CORRIGIDO: Move toda a largura para loop perfeito */
     }
 }
 
@@ -331,8 +371,10 @@
 
 /* Container dos slides com movimento contínuo */
 .carousel-slides {
-    animation: scrollLeft 30s linear infinite;
+    animation: scrollLeft 15s linear infinite; /* ⚡ ACELERADO: 30s → 15s */
     width: max-content; /* Permite que o conteúdo se estenda */
+    /* ⚡ NOVO: Garantir que a animação funcione */
+    will-change: transform;
 }
 
 /* TRANSPARÊNCIA TOTAL - caixas principais sem cores */

@@ -72,6 +72,33 @@
       max-width: 100vw !important;
     }
     
+    /* ⚡ NOVO: Garantir que todos os elementos respeitem os limites */
+    .container, .container-fluid, .row, .col, [class*="col-"] {
+      max-width: 100% !important;
+      overflow-x: hidden !important;
+    }
+    
+    /* ⚡ NOVO: Prevenir overflow em elementos específicos */
+    .main-content, .hero-section, .features-section {
+      max-width: 100vw !important;
+      overflow-x: hidden !important;
+    }
+    
+    /* ⚡ NOVO: Regra ULTRA ESPECÍFICA para mobile - prevenir qualquer overflow */
+    @media (max-width: 768px) {
+      body, html, .main-content, .hero-section, .features-section,
+      #carousel-container, .carousel-wrapper, .carousel-slides {
+        max-width: 100vw !important;
+        overflow-x: hidden !important;
+        position: relative !important;
+      }
+      
+      /* ⚡ NOVO: Garantir que elementos com largura fixa não causem overflow */
+      * {
+        max-width: 100% !important;
+      }
+    }
+    
     .main-content {
       flex: 1;
     }
