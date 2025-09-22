@@ -28,10 +28,12 @@
     }
     
     .carousel-slide {
-        min-width: 140px;
+        min-width: 100px; /* ⚡ REDUZIDO: 140px → 100px para evitar overflow */
+        max-width: 120px; /* ⚡ NOVO: Largura máxima */
         height: 140px; /* ⚡ AUMENTADO: 120px → 140px para mais espaço */
         padding: 10px; /* ⚡ REDUZIDO: 15px → 10px */
         border-radius: 12px;
+        flex-shrink: 1; /* ⚡ NOVO: Permite encolher se necessário */
     }
     
     .main-value {
@@ -69,10 +71,12 @@
     }
     
     .carousel-slide {
-        min-width: 120px;
+        min-width: 90px; /* ⚡ REDUZIDO: 120px → 90px para mobile pequeno */
+        max-width: 110px; /* ⚡ NOVO: Largura máxima */
         height: 120px; /* ⚡ AUMENTADO: 100px → 120px para mais espaço */
         padding: 8px; /* ⚡ REDUZIDO: 12px → 8px */
         border-radius: 10px;
+        flex-shrink: 1; /* ⚡ NOVO: Permite encolher se necessário */
     }
     
     .main-value {
@@ -108,9 +112,11 @@
     }
     
     .carousel-slide {
-        min-width: 100px;
+        min-width: 80px; /* ⚡ REDUZIDO: 100px → 80px para mobile muito pequeno */
+        max-width: 100px; /* ⚡ NOVO: Largura máxima */
         height: 110px; /* ⚡ AUMENTADO: 90px → 110px para mais espaço */
         padding: 6px; /* ⚡ REDUZIDO: 8px → 6px */
+        flex-shrink: 1; /* ⚡ NOVO: Permite encolher se necessário */
     }
     
     .main-value {

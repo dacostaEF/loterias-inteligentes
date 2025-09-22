@@ -16,11 +16,14 @@
     min-height: 0 !important; /* ⚡ SEM altura mínima */
     display: flex !important; /* ⚡ FLEX para ajustar altura */
     flex-direction: column !important; /* ⚡ COLUNA para empilhar */
+    /* ⚡ NOVO: Prevenir overflow horizontal */
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
 }
 
 .carousel-wrapper {
     width: 100%;
-    max-width: none; /* REMOVIDO LIMITE DE LARGURA */
+    max-width: 100vw; /* ⚡ NOVO: Limitar largura máxima */
     margin: 0; /* SEM CENTRALIZAÇÃO */
     padding: 0; /* PADDING ZERO - sem espaços vazios */
     background: transparent; /* 100% TRANSPARENTE */
@@ -31,6 +34,8 @@
     /* POSICIONAMENTO COMO HEADER DA PÁGINA */
     position: relative;
     z-index: 999; /* Abaixo do menu (que tem z-index: 1000) */
+    /* ⚡ NOVO: Prevenir overflow horizontal */
+    overflow-x: hidden !important;
 }
 
 /* Container dos slides */
@@ -42,6 +47,9 @@
     padding: 0; /* PADDING ZERO - sem espaços vazios */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
+    /* ⚡ NOVO: Prevenir extensão horizontal */
+    max-width: 100vw !important;
+    width: 100% !important;
 }
 
 .carousel-slides::-webkit-scrollbar {
@@ -221,9 +229,11 @@
     }
     
     .carousel-slide {
-        min-width: 160px;
+        min-width: 120px; /* ⚡ REDUZIDO: 160px → 120px para mobile */
+        max-width: 140px; /* ⚡ NOVO: Largura máxima para evitar overflow */
         height: 70px; /* ⚡ REDUZIDO AO MÁXIMO: 100px → 70px para eliminar espaço */
         padding: 6px 6px 3px 6px; /* ⚡ REDUZIDO AO MÁXIMO: 8px → 6px, base 4px → 3px */
+        flex-shrink: 1; /* ⚡ NOVO: Permite encolher se necessário */
     }
     
     .main-value {
@@ -276,9 +286,11 @@
   }
 
     .carousel-slide {
-        min-width: 140px;
+        min-width: 100px; /* ⚡ REDUZIDO: 140px → 100px para mobile pequeno */
+        max-width: 120px; /* ⚡ NOVO: Largura máxima para evitar overflow */
         height: 60px; /* ⚡ REDUZIDO AO MÁXIMO: 80px → 60px para eliminar espaço */
         padding: 4px 4px 2px 4px; /* ⚡ REDUZIDO AO MÁXIMO: 6px → 4px, base 3px → 2px */
+        flex-shrink: 1; /* ⚡ NOVO: Permite encolher se necessário */
     }
     
     .main-value {
