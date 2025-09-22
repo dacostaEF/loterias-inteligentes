@@ -5265,7 +5265,7 @@ ANALYTICS_JS = r"""
         visitor_id: vid,
         duration_ms: Date.now() - lastPing,
         device: (/Mobi|Android/i.test(navigator.userAgent)?'mobile':'desktop'),
-        ...extra
+        ...(extra || {})
       };
     }
     function send(data){
@@ -5299,12 +5299,14 @@ def analytics_js():
 def track():
     try:
       if request.content_length and request.content_length > 50000:  # proteção
+          logger.warning("Analytics: Payload muito grande rejeitado")
           return "", 204
       data = request.get_json(silent=True) or {}
       ua = request.headers.get("User-Agent","")
       # filtro simples de bots
       low = ua.lower()
       if any(b in low for b in ["bot","spider","crawler","monitor","uptime"]):
+          logger.debug("Analytics: Bot detectado e ignorado")
           return "", 204
       ev = Event(
           ts=datetime.utcnow(),
@@ -5325,8 +5327,10 @@ def track():
       )
       db.session.add(ev)
       db.session.commit()
+      logger.debug(f"Analytics: Evento salvo - {data.get('event', 'unknown')} em {data.get('path', 'unknown')}")
       return "", 204
-    except Exception:
+    except Exception as e:
+      logger.error(f"Analytics: Erro ao salvar evento - {str(e)}")
       return "", 204
 
 # Registrar blueprint do admin

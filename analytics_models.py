@@ -27,4 +27,4 @@ class Event(db.Model):
     ua          = db.Column(db.String(200))
     country     = db.Column(db.String(2))
     device      = db.Column(db.String(32))
-    props       = db.Column(db.Text)                     # <-- OPCIONAL: extras em JSON (SQLite)
+    props       = db.Column(JSONType)                    # <-- OPCIONAL: extras em JSON (SQLite/Postgres)
