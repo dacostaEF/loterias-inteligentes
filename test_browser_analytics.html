@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Analytics - Browser</title>
+</head>
+<body>
+    <h1>🧪 Teste de Analytics no Browser</h1>
+    
+    <div>
+        <h2>1. Teste Manual do JavaScript Analytics</h2>
+        <button onclick="testAnalytics()">🔍 Testar Analytics</button>
+        <div id="result"></div>
+    </div>
+    
+    <div>
+        <h2>2. Teste de Envio de Dados</h2>
+        <button onclick="testSendData()">📤 Enviar Dados de Teste</button>
+        <div id="sendResult"></div>
+    </div>
+    
+    <div>
+        <h2>3. Verificar se Analytics está Carregado</h2>
+        <button onclick="checkAnalytics()">✅ Verificar Analytics</button>
+        <div id="checkResult"></div>
+    </div>
+
+    <script>
+        function testAnalytics() {
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>🔄 Testando...</p>';
+            
+            try {
+                // Simular o que o analytics.js faz
+                const LS_KEY = 'li_vid';
+                let vid = localStorage.getItem(LS_KEY);
+                if (!vid) { 
+                    vid = crypto.randomUUID(); 
+                    localStorage.setItem(LS_KEY, vid); 
+                }
+                
+                let sid = sessionStorage.getItem('li_sid');
+                if (!sid) { 
+                    sid = crypto.randomUUID(); 
+                    sessionStorage.setItem('li_sid, sid); 
+                }
+                
+                const payload = {
+                    event: 'test',
+                    path: location.pathname,
+                    ref: document.referrer || '',
+                    session_id: sid,
+                    visitor_id: vid,
+                    device: (/Mobi|Android/i.test(navigator.userAgent) ? 'mobile' : 'desktop')
+                };
+                
+                result.innerHTML = `
+                    <p>✅ Analytics funcionando!</p>
+                    <p><strong>Visitor ID:</strong> ${vid}</p>
+                    <p><strong>Session ID:</strong> ${sid}</p>
+                    <p><strong>Payload:</strong> ${JSON.stringify(payload, null, 2)}</p>
+                `;
+                
+            } catch (error) {
+                result.innerHTML = `<p>❌ Erro: ${error.message}</p>`;
+            }
+        }
+        
+        function testSendData() {
+            const result = document.getElementById('sendResult');
+            result.innerHTML = '<p>🔄 Enviando dados...</p>';
+            
+            const testData = {
+                event: 'test_manual',
+                path: '/test',
+                session_id: 'test-session-' + Date.now(),
+                visitor_id: 'test-visitor-' + Date.now(),
+                device: 'desktop'
+            };
+            
+            // Usar fetch em vez de sendBeacon para ver a resposta
+            fetch('/api/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(testData)
+            })
+            .then(response => {
+                result.innerHTML = `
+                    <p>✅ Dados enviados!</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Dados enviados:</strong> ${JSON.stringify(testData, null, 2)}</p>
+                `;
+            })
+            .catch(error => {
+                result.innerHTML = `<p>❌ Erro ao enviar: ${error.message}</p>`;
+            });
+        }
+        
+        function checkAnalytics() {
+            const result = document.getElementById('checkResult');
+            
+            // Verificar se o script analytics está carregado
+            const scripts = Array.from(document.scripts);
+            const analyticsScript = scripts.find(script => script.src.includes('/a.js'));
+            
+            if (analyticsScript) {
+                result.innerHTML = `
+                    <p>✅ Script analytics encontrado!</p>
+                    <p><strong>URL:</strong> ${analyticsScript.src}</p>
+                    <p><strong>Carregado:</strong> ${analyticsScript.readyState}</p>
+                `;
+            } else {
+                result.innerHTML = '<p>❌ Script analytics NÃO encontrado!</p>';
+            }
+        }
+        
+        // Auto-executar verificação ao carregar
+        window.addEventListener('load', () => {
+            checkAnalytics();
+        });
+    </script>
+</body>
+</html>

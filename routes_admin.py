@@ -56,7 +56,7 @@ def top_pages():
     except Exception as e:
         from flask import current_app
         current_app.logger.exception("TOP-PAGES ERROR")
-        return jsonify({"error":"top_pages_failed","detail":str(e)}), 500
+        return jsonify([])  # Retorna array vazio para não quebrar o front
 
 @bp_admin.get("/daily")
 def daily():
@@ -73,7 +73,7 @@ def daily():
     except Exception as e:
         from flask import current_app
         current_app.logger.exception("DAILY ERROR")
-        return jsonify({"error":"daily_failed","detail":str(e)}), 500
+        return jsonify({"labels": [], "pageviews": []})  # Retorna estrutura consistente
 
 @bp_admin.get("/top-events")
 def top_events():
@@ -154,7 +154,18 @@ async function load(){
   const k = await fetch('kpis' + location.search).then(r=>r.json());
   pv.textContent=k.pageviews_24h; vis.textContent=k.visitors_24h; ses.textContent=k.sessions_24h; avg.textContent=k.avg_time_per_view_s;
 
-  const top = await fetch('top-pages' + location.search).then(r=>r.json());
+  const topRes = await fetch('top-pages' + location.search);
+  if (!topRes.ok) {
+    console.error('HTTP error', topRes.status);
+    return;
+  }
+  let topData;
+  try { topData = await topRes.json(); } catch { topData = []; }
+  const top = Array.isArray(topData) ? topData : [];
+  if (!Array.isArray(top)) {
+    console.error('Payload inesperado:', topData);
+    return;
+  }
   new Chart(document.getElementById('topPages'), {
     type:'bar',
     data:{labels: top.map(t=>t.path), datasets:[{label:'Pageviews', data: top.map(t=>t.pageviews)}]},
