@@ -5301,13 +5301,28 @@ def track():
       if request.content_length and request.content_length > 50000:  # proteção
           logger.warning("Analytics: Payload muito grande rejeitado")
           return "", 204
+      
+      # ⚡ DEBUG: Log do payload recebido
+      raw_data = request.get_data()
+      logger.info(f"Analytics: Payload recebido - {len(raw_data)} bytes")
+      logger.info(f"Analytics: Raw data: {raw_data.decode('utf-8', errors='ignore')[:200]}")
+      
       data = request.get_json(silent=True) or {}
+      logger.info(f"Analytics: JSON parseado: {data}")
+      
       ua = request.headers.get("User-Agent","")
       # filtro simples de bots
       low = ua.lower()
       if any(b in low for b in ["bot","spider","crawler","monitor","uptime"]):
           logger.debug("Analytics: Bot detectado e ignorado")
           return "", 204
+      
+      # ⚡ DEBUG: Log dos campos antes de salvar
+      logger.info(f"Analytics: Event: '{data.get('event')}'")
+      logger.info(f"Analytics: Path: '{data.get('path')}'")
+      logger.info(f"Analytics: Session ID: '{data.get('session_id')}'")
+      logger.info(f"Analytics: Visitor ID: '{data.get('visitor_id')}'")
+      
       ev = Event(
           ts=datetime.utcnow(),
           event=(data.get("event") or "")[:32],
@@ -5327,10 +5342,11 @@ def track():
       )
       db.session.add(ev)
       db.session.commit()
-      logger.debug(f"Analytics: Evento salvo - {data.get('event', 'unknown')} em {data.get('path', 'unknown')}")
+      logger.info(f"Analytics: Evento salvo com sucesso - {data.get('event', 'unknown')} em {data.get('path', 'unknown')}")
       return "", 204
     except Exception as e:
       logger.error(f"Analytics: Erro ao salvar evento - {str(e)}")
+      logger.error(f"Analytics: Traceback: {str(e)}")
       return "", 204
 
 # Registrar blueprint do admin
