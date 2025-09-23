@@ -5306,9 +5306,26 @@ def track():
       raw_data = request.get_data()
       logger.info(f"Analytics: Payload recebido - {len(raw_data)} bytes")
       logger.info(f"Analytics: Raw data: {raw_data.decode('utf-8', errors='ignore')[:200]}")
+      logger.info(f"Analytics: Content-Type: {request.headers.get('content-type')}")
+      logger.info(f"Analytics: Method: {request.method}")
       
-      data = request.get_json(silent=True) or {}
-      logger.info(f"Analytics: JSON parseado: {data}")
+      # ⚡ CORREÇÃO: Tentar diferentes formas de parsear os dados
+      data = {}
+      content_type = request.headers.get('content-type', '')
+      
+      if 'application/json' in content_type:
+        data = request.get_json(silent=True) or {}
+        logger.info(f"Analytics: JSON parseado: {data}")
+      else:
+        # Tentar parsear como texto simples
+        try:
+          text_data = raw_data.decode('utf-8')
+          logger.info(f"Analytics: Texto recebido: {text_data[:200]}")
+          data = json.loads(text_data)
+          logger.info(f"Analytics: JSON parseado do texto: {data}")
+        except Exception as parse_error:
+          logger.error(f"Analytics: Erro ao parsear dados: {parse_error}")
+          data = {}
       
       ua = request.headers.get("User-Agent","")
       # filtro simples de bots
