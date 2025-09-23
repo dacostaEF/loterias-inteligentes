@@ -560,6 +560,14 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///li.
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
+# Criar tabelas automaticamente
+with app.app_context():
+    try:
+        db.create_all()
+        logger.info("✅ Tabelas do banco criadas com sucesso!")
+    except Exception as e:
+        logger.error(f"❌ Erro ao criar tabelas: {e}")
+
 # ============================================================================
 # 🔧 CONFIGURAÇÃO DO FLASK-LOGIN (ÚNICA VERSÃO)
 # ============================================================================
