@@ -4,13 +4,6 @@ Esta pasta contém scripts utilitários para gerenciamento e manutenção do sis
 
 ## Estrutura
 
-### `teste/`
-Scripts de teste e verificação:
-- `verificar_usuarios_master.py` - Verifica usuários master no banco
-- `verificar_usuarios.py` - Verifica usuários gerais
-- `gerenciar_usuarios_confianca.py` - Gerenciamento de usuários de confiança
-- `teste_pix.py` - Teste de integração PIX
-
 ### `diagnostico/`
 Scripts de diagnóstico do sistema:
 - `lotofacil_distribuicao.py` - Análise de distribuição Lotofácil
@@ -25,8 +18,9 @@ Script para limpeza e reset do banco de dados, mantendo apenas os usuários mast
 # Limpar banco de dados
 python scripts/limpar_dados_DB.py
 
-# Verificar usuários master
-python scripts/teste/verificar_usuarios_master.py
+# Executar diagnósticos
+python scripts/diagnostico/lotofacil_distribuicao.py
+python scripts/diagnostico/lotofacil_estatisticas_avancadas.py
 ```
 
 
