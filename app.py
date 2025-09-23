@@ -5340,6 +5340,16 @@ def track():
       logger.info(f"Analytics: Session ID: '{data.get('session_id')}'")
       logger.info(f"Analytics: Visitor ID: '{data.get('visitor_id')}'")
       
+      # ⚡ CORREÇÃO: Tratamento seguro de dados antes de criar Event
+      try:
+        duration_ms = data.get("duration_ms")
+        if duration_ms is None or duration_ms == "":
+          duration_ms = 0
+        else:
+          duration_ms = int(duration_ms)
+      except (ValueError, TypeError):
+        duration_ms = 0
+      
       ev = Event(
           ts=datetime.utcnow(),
           event=(data.get("event") or "")[:32],
@@ -5351,7 +5361,7 @@ def track():
           utm_campaign=(data.get("utm_campaign") or "")[:80],
           session_id=(data.get("session_id") or "")[:64],
           visitor_id=(data.get("visitor_id") or "")[:64],
-          duration_ms=int(data.get("duration_ms") or 0),
+          duration_ms=duration_ms,  # ⚡ CORRIGIDO: tratamento seguro
           ua=ua[:200],
           country=(request.headers.get("CF-IPCountry") or "")[:2],
           device=(data.get("device") or "")[:32],
@@ -5363,7 +5373,12 @@ def track():
       return "", 204
     except Exception as e:
       logger.error(f"Analytics: Erro ao salvar evento - {str(e)}")
-      logger.error(f"Analytics: Traceback: {str(e)}")
+      logger.error(f"Analytics: Traceback completo: {str(e)}")
+      # ⚡ CORREÇÃO: Sempre retornar 204 mesmo com erro para evitar 500
+      try:
+        db.session.rollback()  # Rollback em caso de erro
+      except:
+        pass
       return "", 204
 
 # Registrar blueprint do admin
