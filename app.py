@@ -5295,6 +5295,11 @@ ANALYTICS_JS = r"""
 def analytics_js():
     return Response(ANALYTICS_JS, mimetype="application/javascript")
 
+# 🎨 FAVICON ENDPOINT
+@app.get("/favicon.ico")
+def favicon():
+    return send_file("static/img/Favicon_LI.png", mimetype="image/png")
+
 @app.post("/api/track")
 def track():
     try:
