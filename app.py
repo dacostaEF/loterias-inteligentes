@@ -3113,6 +3113,11 @@ def bolao_interesse():
 
     return jsonify({"message": "Interesse registrado com sucesso! Entraremos em contato."}), 200
 
+@app.route('/termos-uso')
+def termos_uso():
+    """Renderiza o modal de termos de uso e condições de assinatura."""
+    return render_template('modal_cadastro_assinatura.html')
+
 @app.route('/boloes_loterias')
 @verificar_acesso_universal
 def boloes_loterias():

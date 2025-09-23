@@ -10,6 +10,7 @@ class ModalLoginCadastro {
         this.createModal();
         this.bindEvents();
         this.setupValidation();
+        this.setupTermosIntegration();
     }
 
     createModal() {
@@ -150,13 +151,6 @@ class ModalLoginCadastro {
                         </div>
                         
                         <div class="checkbox-group">
-                            <input type="checkbox" class="checkbox-input" id="termos-uso" required>
-                            <label class="checkbox-label" for="termos-uso">
-                                Li e aceito os <a href="#" target="_blank">termos de uso</a>.
-                            </label>
-                        </div>
-                        
-                        <div class="checkbox-group">
                             <input type="checkbox" class="checkbox-input" id="receber-email" checked>
                             <label class="checkbox-label" for="receber-email">
                                 Aceito receber e-mails do Loterias Inteligentes
@@ -170,7 +164,14 @@ class ModalLoginCadastro {
                             </label>
                         </div>
                         
-                        <button class="btn-primary" id="btn-cadastrar">CRIAR CONTA</button>
+                        <div class="checkbox-group termos-obrigatorio">
+                            <input type="checkbox" class="checkbox-input" id="termos-uso" required>
+                            <label class="checkbox-label termos-label" for="termos-uso">
+                                <span class="termos-texto">É obrigatório ler os <a href="/termos-uso" class="termos-link" onclick="abrirTermos(event)">termos de uso</a> antes de continuar</span>
+                            </label>
+                        </div>
+                        
+                        <button class="btn-primary btn-cadastrar-disabled" id="btn-cadastrar" disabled>CRIAR CONTA</button>
                     </div>
                 </div>
             </div>
@@ -224,6 +225,14 @@ class ModalLoginCadastro {
         });
 
         document.getElementById('btn-cadastrar').addEventListener('click', () => {
+            const btnCadastrar = document.getElementById('btn-cadastrar');
+            
+            // Verificar se o botão está habilitado
+            if (btnCadastrar.disabled || btnCadastrar.classList.contains('btn-cadastrar-disabled')) {
+                this.showMessage('⚠️ Você deve aceitar os termos de uso antes de continuar!', 'error');
+                return;
+            }
+            
             this.handleCadastro();
         });
 
@@ -482,7 +491,7 @@ class ModalLoginCadastro {
         }
 
         if (!termos) {
-            alert('Você deve aceitar os termos de uso');
+            this.showError('termos-uso', '⚠️ É OBRIGATÓRIO ler e aceitar os termos de uso antes de continuar!');
             isValid = false;
         }
 
@@ -905,6 +914,60 @@ class ModalLoginCadastro {
         }, 5000);
     }
 
+    // 🔗 Integração com modal de termos
+    setupTermosIntegration() {
+        // Escutar evento de termos aceitos
+        window.addEventListener('termosAceitos', (event) => {
+            console.log('✅ Termos aceitos recebidos:', event.detail);
+            this.processarTermosAceitos(event.detail);
+        });
+        
+        // Escutar mensagem de iframe (caso termos estejam em iframe)
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'termosAceitos') {
+                console.log('✅ Termos aceitos via postMessage:', event.data.data);
+                this.processarTermosAceitos(event.data.data);
+            }
+        });
+    }
+    
+    // 📋 Processar aceite dos termos
+    processarTermosAceitos(dataAceite) {
+        console.log('🎯 Processando aceite dos termos...');
+        
+        // Marcar checkbox de termos de uso
+        const termosCheckbox = document.getElementById('termos-uso');
+        if (termosCheckbox) {
+            termosCheckbox.checked = true;
+            termosCheckbox.dispatchEvent(new Event('change'));
+            console.log('✅ Checkbox de termos marcado automaticamente');
+        }
+        
+        // Habilitar botão de cadastrar
+        const btnCadastrar = document.getElementById('btn-cadastrar');
+        if (btnCadastrar) {
+            btnCadastrar.disabled = false;
+            btnCadastrar.classList.remove('btn-cadastrar-disabled');
+            btnCadastrar.classList.add('btn-cadastrar-enabled');
+            console.log('✅ Botão de cadastrar habilitado');
+        }
+        
+        // VOLTAR PARA O MODAL DE CADASTRO
+        this.switchTab('cadastro');
+        
+        // Mostrar mensagem de sucesso
+        this.showMessage('✅ Termos aceitos! Agora você pode criar sua conta.', 'success');
+        
+        // Focar no botão de cadastrar após um pequeno delay
+        setTimeout(() => {
+            if (btnCadastrar) {
+                btnCadastrar.focus();
+                btnCadastrar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                console.log('🎯 Foco no botão CRIAR CONTA');
+            }
+        }, 500);
+    }
+
     // 💎 Abrir modal de planos após confirmação
     abrirModalPlanos() {
         // Abrir modal de planos
@@ -988,4 +1051,39 @@ function liberarSistemaCadastro() {
     } else {
         console.error('❌ Modal não encontrado');
     }
+}
+
+// 📋 Função para abrir termos de uso
+function abrirTermos(event) {
+    event.preventDefault();
+    
+    // Criar iframe para mostrar termos
+    const iframe = document.createElement('iframe');
+    iframe.src = '/termos-uso';
+    iframe.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+        z-index: 10000;
+        background: white;
+    `;
+    
+    // Adicionar ao body
+    document.body.appendChild(iframe);
+    
+    // Escutar mensagens do iframe
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'termosAceitos') {
+            // Remover iframe
+            document.body.removeChild(iframe);
+            
+            // Processar aceite dos termos
+            if (window.modalLoginCadastro) {
+                window.modalLoginCadastro.processarTermosAceitos(event.data.data);
+            }
+        }
+    });
 }

@@ -201,10 +201,12 @@
         }
         
         .checkbox-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             cursor: pointer;
             margin-top: 2px;
+            accent-color: #10b981;
+            transform: scale(1.2);
         }
         
         .checkbox-label {
@@ -212,6 +214,14 @@
             font-weight: 600;
             font-size: 1rem;
             cursor: pointer;
+            user-select: none;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .checkbox-label:hover {
+            background-color: rgba(16, 185, 129, 0.1);
         }
         
         .actions {
@@ -398,9 +408,9 @@
                 </ul>
             </div>
 
-            <div class="checkbox-container" onclick="toggleCheckbox()">
+            <div class="checkbox-container">
                 <input type="checkbox" id="acceptTerms" onchange="toggleButton()">
-                <label for="acceptTerms" class="checkbox-label">
+                <label for="acceptTerms" class="checkbox-label" onclick="toggleCheckbox()">
                     Li e aceito os Termos e Condições de Assinatura
                 </label>
             </div>
@@ -470,25 +480,41 @@
             
             localStorage.setItem('termosAssinaturaAceitos', JSON.stringify(dataAceite));
             
-            // Confirmar ação
-            if (confirm('✅ Termos aceitos! Prosseguir com o cadastro?')) {
-                // Aqui você pode redirecionar para o formulário de cadastro
-                // ou abrir o próximo step do processo
-                alert('Redirecionando para o cadastro...');
-                
-                // Exemplo de redirecionamento:
-                // window.location.href = '/cadastro';
-                // ou
-                // abrirFormularioCadastro();
+            // Fechar modal de termos (sem perguntar confirmação)
+            fecharModal(false);
+            
+            // Comunicar com o formulário de cadastro
+            if (window.parent && window.parent !== window) {
+                // Se estiver em iframe, comunicar com parent
+                window.parent.postMessage({
+                    type: 'termosAceitos',
+                    data: dataAceite
+                }, '*');
+            } else {
+                // Se estiver na mesma janela, usar evento customizado
+                window.dispatchEvent(new CustomEvent('termosAceitos', {
+                    detail: dataAceite
+                }));
             }
         }
 
         // Fechar modal
-        function fecharModal() {
-            if (confirm('Tem certeza que deseja sair? Você precisará aceitar os termos novamente.')) {
-                // Aqui você pode implementar a lógica para fechar o modal
-                // Por exemplo, redirecionando ou escondendo o modal
-                window.location.href = '/'; // Voltar ao início
+        function fecharModal(confirmar = true) {
+            if (confirmar && !document.getElementById('acceptTerms').checked) {
+                if (confirm('Tem certeza que deseja sair? Você precisará aceitar os termos novamente.')) {
+                    // Fechar modal sem redirecionar - deixar o JavaScript do modal de cadastro controlar
+                    const modalContainer = document.querySelector('.modal-container');
+                    if (modalContainer) {
+                        modalContainer.style.display = 'none';
+                    }
+                }
+            } else {
+                // Fechar sem perguntar (quando termos foram aceitos)
+                // NÃO redirecionar - apenas fechar o modal
+                const modalContainer = document.querySelector('.modal-container');
+                if (modalContainer) {
+                    modalContainer.style.display = 'none';
+                }
             }
         }
 
