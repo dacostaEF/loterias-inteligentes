@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro e Adesão - Loterias Inteligente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.8);
+            color: #e2e8f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .modal-container {
+            max-width: 800px;
+            width: 100%;
+            background: #1e1b29;
+            border-radius: 20px;
+            border: 2px solid rgba(168, 85, 247, 0.3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #A855F7, #7C3AED);
+            padding: 25px 30px;
+            border-radius: 18px 18px 0 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-header h1 {
+            color: white;
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .modal-header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+        }
+        
+        .modal-content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            color: #A855F7;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .highlight-box {
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 10px;
+            padding: 18px;
+            margin: 15px 0;
+        }
+        
+        .warning-box {
+            background: rgba(239, 68, 68, 0.08);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 10px;
+            padding: 18px;
+            margin: 15px 0;
+        }
+        
+        .success-box {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 10px;
+            padding: 18px;
+            margin: 15px 0;
+        }
+        
+        .box-title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+        
+        .highlight-box .box-title {
+            color: #A855F7;
+        }
+        
+        .warning-box .box-title {
+            color: #ef4444;
+        }
+        
+        .success-box .box-title {
+            color: #10b981;
+        }
+        
+        ul {
+            margin: 10px 0 10px 20px;
+        }
+        
+        li {
+            margin-bottom: 6px;
+            color: #cbd5e1;
+        }
+        
+        strong {
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin: 25px 0;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox-container:hover {
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+        
+        .checkbox-label {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 25px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            min-width: 160px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            background: #6b7280;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+            box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+            background: linear-gradient(135deg, #4b5563, #374151);
+        }
+        
+        @media (max-width: 768px) {
+            .modal-container {
+                margin: 10px;
+                max-height: 95vh;
+            }
+            
+            .modal-header, .modal-content {
+                padding: 20px;
+            }
+            
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                min-width: 200px;
+            }
+        }
+        
+        .scroll-indicator {
+            position: sticky;
+            top: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #A855F7, #10b981);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="modal-container">
+        <div class="scroll-indicator" id="scrollIndicator"></div>
+        
+        <div class="modal-header">
+            <button class="close-btn" onclick="fecharModal()" title="Fechar">&times;</button>
+            <h1>Termos de Adesão</h1>
+            <p>Leia com atenção antes de confirmar sua assinatura</p>
+        </div>
+
+        <div class="modal-content">
+            <div class="section">
+                <h2 class="section-title">🎯 Nosso Serviço</h2>
+                
+                <div class="highlight-box">
+                    <div class="box-title">O que oferecemos:</div>
+                    <p>Ferramentas de análise estatística para loterias, geradores de jogos e bolões baseados em padrões matemáticos. Nosso objetivo é apoiar suas decisões com dados históricos.</p>
+                </div>
+                
+                <div class="warning-box">
+                    <div class="box-title">O que NÃO oferecemos:</div>
+                    <p><strong>Não vendemos sorte nem garantimos prêmios.</strong> Loterias são jogos de azar. Nossas análises podem orientar estratégias, mas o resultado sempre depende da aleatoriedade do sorteio.</p>
+                </div>
+                
+                <p><strong>Independência:</strong> Não temos vínculo com a Caixa Econômica Federal. Somos uma ferramenta independente de análise.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔄 Sua Assinatura</h2>
+                <ul>
+                    <li><strong>Acesso contínuo:</strong> Enquanto sua assinatura estiver ativa, você tem acesso total às ferramentas do seu plano</li>
+                    <li><strong>Renovação automática:</strong> Sua assinatura renova automaticamente no mesmo dia do próximo período (mensal, semestral ou anual)</li>
+                    <li><strong>Reajustes:</strong> Caso necessário, avisaremos sobre mudanças de preço com 30 dias de antecedência</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">❌ Cancelamento e Reembolso</h2>
+                
+                <div class="success-box">
+                    <div class="box-title">Cancelamento fácil:</div>
+                    <p>Cancele a renovação <strong>a qualquer momento</strong> sem burocracia. Você mantém acesso até o fim do período já pago.</p>
+                </div>
+                
+                <ul>
+                    <li><strong>Direito de arrependimento:</strong> 7 dias para reembolso total na primeira compra (CDC)</li>
+                    <li><strong>Após 7 dias:</strong> Valores pagos não são reembolsáveis, mesmo sem uso do serviço</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">👥 Bolões Inteligentes</h2>
+                
+                <div class="highlight-box">
+                    <div class="box-title">Como funcionam:</div>
+                    <ul>
+                        <li>Jogos coletivos com mais números por custo menor</li>
+                        <li>Bolão confirmado apenas quando todas as cotas são vendidas</li>
+                        <li>Números apostados ficam visíveis para todos os participantes</li>
+                        <li>Prêmios divididos igualmente entre as cotas</li>
+                    </ul>
+                </div>
+                
+                <p><strong>Nossas responsabilidades:</strong> Organizar grupos, aplicar estratégia estatística, registrar apostas e fazer rateio de prêmios.</p>
+                <p><strong>Sua responsabilidade:</strong> Adquirir sua cota e aguardar os resultados.</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">🔒 Uso da Plataforma</h2>
+                <ul>
+                    <li><strong>Acesso pessoal:</strong> Sua assinatura é intransferível. Não compartilhe login/senha</li>
+                    <li><strong>Propriedade intelectual:</strong> Análises, gráficos e ferramentas são para seu uso pessoal, não para revenda</li>
+                </ul>
+            </div>
+
+            <div class="checkbox-container" onclick="toggleCheckbox()">
+                <input type="checkbox" id="acceptTerms" onchange="toggleButton()">
+                <label for="acceptTerms" class="checkbox-label">
+                    Li e aceito os Termos e Condições de Assinatura
+                </label>
+            </div>
+
+            <div class="actions">
+                <button class="btn btn-primary" id="confirmBtn" onclick="confirmarAdesao()" disabled>
+                    ✅ Confirmar Adesão
+                </button>
+                <button class="btn btn-secondary" onclick="fecharModal()">
+                    ← Voltar ao Início
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Indicador de scroll
+        window.addEventListener('scroll', function() {
+            const container = document.querySelector('.modal-container');
+            const indicator = document.getElementById('scrollIndicator');
+            
+            if (container) {
+                const scrollTop = container.scrollTop;
+                const scrollHeight = container.scrollHeight - container.clientHeight;
+                const scrollPercent = scrollTop / scrollHeight;
+                
+                indicator.style.transform = `scaleX(${Math.min(scrollPercent, 1)})`;
+            }
+        });
+
+        // Toggle checkbox
+        function toggleCheckbox() {
+            const checkbox = document.getElementById('acceptTerms');
+            checkbox.checked = !checkbox.checked;
+            toggleButton();
+        }
+
+        // Habilitar/desabilitar botão baseado no checkbox
+        function toggleButton() {
+            const checkbox = document.getElementById('acceptTerms');
+            const button = document.getElementById('confirmBtn');
+            
+            if (checkbox.checked) {
+                button.disabled = false;
+                button.textContent = '✅ Confirmar Adesão';
+            } else {
+                button.disabled = true;
+                button.textContent = '❌ Aceite os termos primeiro';
+            }
+        }
+
+        // Confirmar adesão
+        function confirmarAdesao() {
+            const checkbox = document.getElementById('acceptTerms');
+            
+            if (!checkbox.checked) {
+                alert('❌ Você precisa aceitar os termos para continuar.');
+                return;
+            }
+            
+            // Salvar aceite dos termos
+            const dataAceite = {
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                aceito: true
+            };
+            
+            localStorage.setItem('termosAssinaturaAceitos', JSON.stringify(dataAceite));
+            
+            // Confirmar ação
+            if (confirm('✅ Termos aceitos! Prosseguir com o cadastro?')) {
+                // Aqui você pode redirecionar para o formulário de cadastro
+                // ou abrir o próximo step do processo
+                alert('Redirecionando para o cadastro...');
+                
+                // Exemplo de redirecionamento:
+                // window.location.href = '/cadastro';
+                // ou
+                // abrirFormularioCadastro();
+            }
+        }
+
+        // Fechar modal
+        function fecharModal() {
+            if (confirm('Tem certeza que deseja sair? Você precisará aceitar os termos novamente.')) {
+                // Aqui você pode implementar a lógica para fechar o modal
+                // Por exemplo, redirecionando ou escondendo o modal
+                window.location.href = '/'; // Voltar ao início
+            }
+        }
+
+        // Fechar modal com tecla ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                fecharModal();
+            }
+        });
+
+        // Verificar se usuário já aceitou os termos (opcional)
+        window.onload = function() {
+            const termosAceitos = localStorage.getItem('termosAssinaturaAceitos');
+            
+            if (termosAceitos) {
+                const data = JSON.parse(termosAceitos);
+                console.log('Termos já aceitos em:', data.timestamp);
+                
+                // Opcional: Se já aceitou, pode pré-marcar o checkbox
+                // document.getElementById('acceptTerms').checked = true;
+                // toggleButton();
+            }
+        }
+    </script>
+</body>
+</html>
