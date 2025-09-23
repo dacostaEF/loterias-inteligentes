@@ -563,10 +563,31 @@ db.init_app(app)
 # Criar tabelas automaticamente
 with app.app_context():
     try:
-        db.create_all()
-        logger.info("✅ Tabelas do banco criadas com sucesso!")
+        # Verificar se a tabela existe antes de criar
+        inspector = db.inspect(db.engine)
+        has_table = inspector.has_table("li_events")
+        logger.info(f"📊 Tabela li_events existe: {has_table}")
+        
+        if not has_table:
+            logger.info("🔨 Criando tabela li_events...")
+            db.create_all()
+            logger.info("✅ Tabela li_events criada com sucesso!")
+        else:
+            logger.info("✅ Tabela li_events já existe!")
+            
+        # Verificar novamente
+        inspector = db.inspect(db.engine)
+        has_table = inspector.has_table("li_events")
+        logger.info(f"📊 Tabela li_events existe após criação: {has_table}")
+        
+        # Contar eventos
+        count = db.session.query(db.func.count(Event.id)).scalar()
+        logger.info(f"📈 Total de eventos: {count}")
+        
     except Exception as e:
         logger.error(f"❌ Erro ao criar tabelas: {e}")
+        import traceback
+        logger.error(f"❌ Traceback: {traceback.format_exc()}")
 
 # ============================================================================
 # 🔧 CONFIGURAÇÃO DO FLASK-LOGIN (ÚNICA VERSÃO)
