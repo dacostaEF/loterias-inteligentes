@@ -1,6 +1,6 @@
 # routes_admin.py
 from flask import Blueprint, jsonify, render_template_string, request
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, inspect
 from datetime import datetime, timedelta
 from analytics_models import db, Event
 import os
@@ -14,35 +14,66 @@ def guard():
     if KEY and request.args.get("key") != KEY:
         return "unauthorized", 401
 
+# 🔍 DIAGNÓSTICO INSTANTÂNEO
+@bp_admin.get("/_diag")
+def diag():
+    out = {}
+    try:
+        insp = inspect(db.engine)
+        out["db_url_ok"] = True
+        out["has_table_li_events"] = insp.has_table("li_events")
+        out["events_count"] = (db.session.query(func.count(Event.id)).scalar()
+                               if out["has_table_li_events"] else None)
+        return jsonify(out)
+    except Exception as e:
+        out["db_url_ok"] = False
+        out["error"] = str(e)
+        return jsonify(out), 500
+
 @bp_admin.get("/kpis")
 def kpis():
-    since = datetime.utcnow() - timedelta(days=1)
-    pv = db.session.query(func.count(Event.id)).filter(Event.ts>=since, Event.event=='pageview').scalar() or 0
-    vis = db.session.query(func.count(func.distinct(Event.visitor_id))).filter(Event.ts>=since).scalar() or 0
-    ses = db.session.query(func.count(func.distinct(Event.session_id))).filter(Event.ts>=since).scalar() or 0
-    total_ms = db.session.query(func.coalesce(func.sum(Event.duration_ms),0)).filter(Event.ts>=since, Event.event=='hb').scalar() or 0
-    avg = round((total_ms/1000)/max(pv,1), 1)
-    return jsonify({"pageviews_24h": pv, "visitors_24h": vis, "sessions_24h": ses, "avg_time_per_view_s": avg})
+    try:
+        since = datetime.utcnow() - timedelta(days=1)
+        pv = db.session.query(func.count(Event.id)).filter(Event.ts>=since, Event.event=='pageview').scalar() or 0
+        vis = db.session.query(func.count(func.distinct(Event.visitor_id))).filter(Event.ts>=since).scalar() or 0
+        ses = db.session.query(func.count(func.distinct(Event.session_id))).filter(Event.ts>=since).scalar() or 0
+        total_ms = db.session.query(func.coalesce(func.sum(Event.duration_ms),0)).filter(Event.ts>=since, Event.event=='hb').scalar() or 0
+        avg = round((total_ms/1000)/max(pv,1), 1)
+        return jsonify({"pageviews_24h": pv, "visitors_24h": vis, "sessions_24h": ses, "avg_time_per_view_s": avg})
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.exception("KPIS ERROR")
+        return jsonify({"error":"kpis_failed","detail":str(e)}), 500
 
 @bp_admin.get("/top-pages")
 def top_pages():
-    since = datetime.utcnow() - timedelta(days=7)
-    rows = (db.session.query(Event.path, func.count(Event.id).label("pv"))
-            .filter(Event.ts>=since, Event.event=='pageview')
-            .group_by(Event.path).order_by(desc("pv")).limit(20).all())
-    return jsonify([{"path": p, "pageviews": int(pv)} for p, pv in rows])
+    try:
+        since = datetime.utcnow() - timedelta(days=7)
+        rows = (db.session.query(Event.path, func.count(Event.id).label("pv"))
+                .filter(Event.ts>=since, Event.event=='pageview')
+                .group_by(Event.path).order_by(desc("pv")).limit(20).all())
+        return jsonify([{"path": p, "pageviews": int(pv)} for p, pv in rows])
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.exception("TOP-PAGES ERROR")
+        return jsonify({"error":"top_pages_failed","detail":str(e)}), 500
 
 @bp_admin.get("/daily")
 def daily():
-    days = int(request.args.get('days') or 14)
-    since = datetime.utcnow() - timedelta(days=days)
-    date_expr = func.date(Event.ts)
-    rows = (db.session.query(date_expr.label('d'), func.count(Event.id))
-            .filter(Event.ts>=since, Event.event=='pageview')
-            .group_by('d').order_by('d').all())
-    labels = [str(d) for d,_ in rows]
-    pv = [int(c) for _,c in rows]
-    return jsonify({"labels": labels, "pageviews": pv})
+    try:
+        days = int(request.args.get('days') or 14)
+        since = datetime.utcnow() - timedelta(days=days)
+        date_expr = func.date(Event.ts)
+        rows = (db.session.query(date_expr.label('d'), func.count(Event.id))
+                .filter(Event.ts>=since, Event.event=='pageview')
+                .group_by('d').order_by('d').all())
+        labels = [str(d) for d,_ in rows]
+        pv = [int(c) for _,c in rows]
+        return jsonify({"labels": labels, "pageviews": pv})
+    except Exception as e:
+        from flask import current_app
+        current_app.logger.exception("DAILY ERROR")
+        return jsonify({"error":"daily_failed","detail":str(e)}), 500
 
 @bp_admin.get("/top-events")
 def top_events():
