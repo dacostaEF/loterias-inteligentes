@@ -754,6 +754,58 @@ def verificar_usuario_logado() -> bool:
     except Exception:
         return False
 
+def buscar_plano_usuario() -> str:
+    """Busca o plano do usuário logado para exibir no badge."""
+    try:
+        logger.info("🔍 BADGE - Iniciando busca do plano do usuário")
+        
+        if not verificar_usuario_logado():
+            logger.info("🔍 BADGE - Usuário não está logado")
+            return None
+            
+        from flask_login import current_user
+        logger.info(f"🔍 BADGE - Current user ID: {getattr(current_user, 'id', 'SEM_ID')}")
+        
+        if hasattr(current_user, 'id') and current_user.id:
+            # Buscar diretamente no banco usando conexão SQL
+            try:
+                conn = get_db_connection()
+                if not conn:
+                    logger.error("🔍 BADGE - Não foi possível conectar ao banco")
+                    return None
+                    
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT tipo_plano 
+                    FROM usuarios 
+                    WHERE id = ?
+                """, (current_user.id,))
+                
+                resultado = cur.fetchone()
+                conn.close()
+                
+                if resultado and resultado[0]:
+                    plano = resultado[0]
+                    logger.info(f"🎯 BADGE - Plano encontrado no banco: '{plano}'")
+                    return plano
+                else:
+                    logger.warning("⚠️ BADGE - Usuário sem plano definido no banco")
+                    return "Free"  # Default
+                    
+            except Exception as db_e:
+                logger.error(f"❌ BADGE - Erro ao consultar banco: {db_e}")
+                return None
+        else:
+            logger.warning("⚠️ BADGE - Current user sem ID válido")
+            
+    except Exception as e:
+        logger.error(f"❌ BADGE - Erro ao buscar plano: {e}")
+        import traceback
+        logger.error(f"❌ BADGE - Traceback: {traceback.format_exc()}")
+    
+    logger.info("🔍 BADGE - Retornando None (sem plano)")
+    return None
+
 def verificar_acesso_universal(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -3122,7 +3174,174 @@ def termos_uso():
 @verificar_acesso_universal
 def boloes_loterias():
     """Renderiza a página de bolões de loterias."""
-    return render_template('boloes_loterias.html', is_logged_in=verificar_usuario_logado())
+    usuario_logado = verificar_usuario_logado()
+    plano_display = buscar_plano_usuario()
+    
+    logger.info(f"🎯 ROTA boloes_loterias - Usuario logado: {usuario_logado}")
+    logger.info(f"🎯 ROTA boloes_loterias - Plano display: '{plano_display}'")
+    
+    # Verificar se usuário aceitou termos (temporariamente false, será implementado)
+    termos_boloes_aceitos = False  # TODO: implementar verificação no banco
+    
+    return render_template('boloes_loterias.html', 
+                         is_logged_in=usuario_logado,
+                         plano_display=plano_display,
+                         termos_boloes_aceitos=termos_boloes_aceitos)
+
+@app.route('/api/verificar-acesso-boloes')
+def verificar_acesso_boloes():
+    """API para verificar acesso às loterias baseado no plano do usuário."""
+    try:
+        logger.info("🔍 API verificar-acesso-boloes iniciada")
+        from config.mercadopago_config import get_loterias_permitidas, get_loterias_bloqueadas, ACESSO_POR_PLANO
+        
+        usuario_logado = verificar_usuario_logado()
+        logger.info(f"🔍 Usuario logado: {usuario_logado}")
+        plano_usuario = 'Free'  # Default
+        
+        # Buscar plano do usuário se estiver logado
+        if usuario_logado:
+            try:
+                from flask_login import current_user
+                logger.info(f"🔍 Current user: {current_user}")
+                logger.info(f"🔍 Current user ID: {getattr(current_user, 'id', 'SEM_ID')}")
+                
+                # Buscar no banco loterias_simples.db usando o ID do current_user
+                if hasattr(current_user, 'id') and current_user.id:
+                    logger.info(f"🔍 Buscando dados do usuário {current_user.id} no banco...")
+                    
+                    # Buscar diretamente no banco usando conexão SQL
+                    conn = get_db_connection()
+                    if conn:
+                        cur = conn.cursor()
+                        cur.execute("""
+                            SELECT tipo_plano 
+                            FROM usuarios 
+                            WHERE id = ?
+                        """, (current_user.id,))
+                        
+                        resultado = cur.fetchone()
+                        conn.close()
+                        
+                        if resultado and resultado[0]:
+                            plano_bd = resultado[0]
+                            logger.info(f"🔍 Plano no banco de dados: '{plano_bd}'")
+                            
+                            # Mapear planos do banco para nossa configuração
+                            mapeamento_planos = {
+                                'Free': 'Free',
+                                'Diário': 'daily',
+                                'Mensal': 'monthly', 
+                                'Semestral': 'semiannual',
+                                'Anual': 'annual',
+                                'Vitalício': 'lifetime'
+                            }
+                            
+                            plano_usuario = mapeamento_planos.get(plano_bd, 'Free')
+                            logger.info(f"🎯 API - Usuário {current_user.id} - Plano BD: '{plano_bd}' → Mapeado: '{plano_usuario}'")
+                        else:
+                            logger.warning(f"⚠️ API - Usuário {current_user.id} sem plano definido no banco")
+                    else:
+                        logger.warning("⚠️ API - Não foi possível conectar ao banco")
+                else:
+                    logger.warning("⚠️ API - current_user sem ID válido")
+            except Exception as e:
+                logger.error(f"❌ API - Erro ao buscar plano do usuário: {e}")
+                import traceback
+                logger.error(f"❌ API - Traceback: {traceback.format_exc()}")
+        
+        # Buscar informações de acesso
+        logger.info(f"🔍 Buscando permissões para plano: {plano_usuario}")
+        loterias_permitidas = get_loterias_permitidas(plano_usuario)
+        loterias_bloqueadas = get_loterias_bloqueadas(plano_usuario)
+        info_plano = ACESSO_POR_PLANO.get(plano_usuario, ACESSO_POR_PLANO['Free'])
+        
+        # Log final para debug
+        logger.info(f"🎯 API RESULTADO - Usuário: {usuario_logado}, Plano: {plano_usuario}")
+        logger.info(f"✅ API Loterias permitidas: {loterias_permitidas}")
+        logger.info(f"❌ API Loterias bloqueadas: {loterias_bloqueadas}")
+        logger.info(f"📋 API Info plano: {info_plano}")
+        logger.info(f"🔍 API Configuração ACESSO_POR_PLANO[{plano_usuario}]: {ACESSO_POR_PLANO.get(plano_usuario, 'NAO_ENCONTRADO')}")
+        
+        return jsonify({
+            'success': True,
+            'usuario_logado': usuario_logado,
+            'plano_usuario': plano_usuario,
+            'loterias_permitidas': loterias_permitidas,
+            'loterias_bloqueadas': loterias_bloqueadas,
+            'info_plano': info_plano
+        })
+        
+    except Exception as e:
+        logger.error(f"❌ API verificar-acesso-boloes - Erro geral: {e}")
+        import traceback
+        logger.error(f"❌ API - Traceback completo: {traceback.format_exc()}")
+        
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'usuario_logado': False,
+            'plano_usuario': 'Free',
+            'loterias_permitidas': [],
+            'loterias_bloqueadas': ['quina', 'lotofacil', 'megasena', 'milionaria'],
+            'info_plano': {'nome_display': 'Erro'}
+        }), 500
+
+@app.route('/debug/usuario-atual')
+def debug_usuario_atual():
+    """Rota de debug para verificar usuário logado e seu plano."""
+    try:
+        from flask_login import current_user
+        usuario_logado = verificar_usuario_logado()
+        
+        info_debug = {
+            'usuario_logado': usuario_logado,
+            'current_user_authenticated': getattr(current_user, 'is_authenticated', False),
+            'current_user_id': getattr(current_user, 'id', None),
+        }
+        
+        if usuario_logado and hasattr(current_user, 'id') and current_user.id:
+            user_data = get_user_by_id(current_user.id)
+            info_debug.update({
+                'user_data_raw': user_data,
+                'email': user_data[1] if user_data and len(user_data) > 1 else None,
+                'tipo_plano_bd': user_data[2] if user_data and len(user_data) > 2 else None,
+            })
+            
+            if user_data and len(user_data) >= 3:
+                plano_bd = user_data[2]
+                mapeamento_planos = {
+                    'Free': 'Free',
+                    'Diário': 'daily',
+                    'Mensal': 'monthly', 
+                    'Semestral': 'semiannual',
+                    'Anual': 'annual',
+                    'Vitalício': 'lifetime'
+                }
+                plano_mapeado = mapeamento_planos.get(plano_bd, 'Free')
+                info_debug.update({
+                    'plano_mapeado': plano_mapeado,
+                    'mapeamento_disponivel': mapeamento_planos
+                })
+        
+        # Testar a função buscar_plano_usuario
+        plano_teste = buscar_plano_usuario()
+        info_debug['plano_teste_funcao'] = plano_teste
+        
+        return f"""
+        <h1>🔍 Debug - Usuário Atual</h1>
+        <h2>Função buscar_plano_usuario(): {plano_teste}</h2>
+        <pre>{info_debug}</pre>
+        <h3>🧪 Teste do Badge:</h3>
+        <div style="background: #10B981; color: white; padding: 8px 12px; border-radius: 4px; display: inline-block;">
+            🔓 LOGGED IN
+            {f'<div style="margin-top: 4px; font-size: 10px; background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 8px;">📋 {plano_teste}</div>' if plano_teste else '<div style="margin-top: 4px; font-size: 10px; color: red;">❌ SEM PLANO</div>'}
+        </div>
+        <p><a href="/boloes_loterias">← Voltar para Bolões</a></p>
+        """
+        
+    except Exception as e:
+        return f"<h1>❌ Erro: {e}</h1>"
 
 # --- Rotas da Mega Sena ---
 @app.route('/dashboard_MS')
@@ -5420,9 +5639,12 @@ def track():
         pass
       return "", 204
 
-# Registrar blueprint do admin
+# Registrar blueprints
 from routes_admin import bp_admin
+from routes_boloes import bp_boloes
+
 app.register_blueprint(bp_admin)
+app.register_blueprint(bp_boloes)
 
 # 🚀 INICIALIZAÇÃO DO SERVIDOR
 # ============================================================================

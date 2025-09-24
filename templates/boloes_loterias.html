@@ -17,8 +17,8 @@
   <script>
     // Verificar se usuário está logado
     function verificarAcesso() {
-      // Simular verificação de login (você pode implementar uma verificação real)
-      const usuarioLogado = false; // Aqui você pode verificar se há sessão ativa
+      // Verificar se usuário está realmente logado usando a variável global do Flask
+      const usuarioLogado = window.isLoggedIn || false;
       
       if (!usuarioLogado) {
         // Bloquear funcionalidades para usuários não logados
@@ -79,6 +79,20 @@
       }
     }
     
+    // Definir status de login global baseado no Flask
+    window.isLoggedIn = {% if is_logged_in %}true{% else %}false{% endif %};
+    
+    // Estado dos termos (vindo do Flask ou localStorage)
+    window.termosAceitos = {{ 'true' if termos_boloes_aceitos else 'false' }};
+    console.log('🔐 Login:', window.isLoggedIn, '• Termos:', window.termosAceitos);
+    console.log('🔐 Status de login (verificação inicial):', window.isLoggedIn);
+    console.log('🔐 Flask is_logged_in value:', '{{ is_logged_in }}');
+    
+    // 🔐 Controle de Acesso por Plano (será preenchido via API)
+    window.planoUsuario = null;
+    window.loteriasPermitidas = [];
+    window.loteriasBloqueadas = [];
+    window.infoPlano = null;
     
     // Executar verificação
     verificarAcesso();
@@ -357,6 +371,16 @@
       border-radius: 4px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       border: 2px solid white;
+      min-width: 120px;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
     
     /* Responsividade para mobile */
@@ -590,8 +614,160 @@
     }
 
     .status.almost {
-                      background-color: #00E38C;
+      background-color: #00E38C;
       color: white;
+    }
+
+    .status.closed {
+      background-color: #dc2626;
+      color: white;
+    }
+
+    /* === BARRA DE PROGRESSO === */
+    .progress-bar {
+      position: relative;
+      width: 100%;
+      height: 20px;
+      background-color: #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981, #059669);
+      border-radius: 10px;
+      transition: width 0.3s ease;
+      position: relative;
+    }
+
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #374151;
+      z-index: 1;
+    }
+
+    /* === BOTÕES DE AÇÃO === */
+    .bolao-actions {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-participar {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .btn-participar:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-detalhes {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .btn-detalhes:hover {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .btn-login:hover {
+      background: linear-gradient(135deg, #d97706, #b45309);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-disabled {
+      background: #9ca3af;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: not-allowed;
+      opacity: 0.6;
+      width: 100%;
+    }
+
+    /* === ESTADO SEM BOLÕES === */
+    .no-boloes {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .no-boloes p {
+      margin: 10px 0;
+      color: #6b7280;
+      font-size: 1.1rem;
+    }
+
+    /* === HOVER EFFECTS === */
+    .bolao-card.hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* === RESPONSIVIDADE === */
+    @media (max-width: 768px) {
+      .bolao-actions {
+        flex-direction: column;
+      }
+
+      .btn-participar,
+      .btn-detalhes {
+        width: 100%;
+      }
+
+      .progress-bar {
+        height: 16px;
+      }
+
+      .progress-text {
+        font-size: 0.7rem;
+      }
     }
 
     /* Estilos para o menu hambúrguer */
@@ -1072,6 +1248,16 @@
       border-radius: 4px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       border: 2px solid white;
+      min-width: 120px;
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
     
     /* Responsividade para mobile */
@@ -1094,6 +1280,352 @@
         font-size: 10px; /* Fonte ainda menor */
       }
     }
+
+    /* === MODAL DE TERMOS DE BOLÕES === */
+    .modal-termos-boloes {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .modal-termos-boloes.show {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .modal-termos-content {
+      background: linear-gradient(135deg, #1e1b29, #2a2340);
+      border-radius: 15px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      position: relative;
+    }
+
+    .modal-termos-header {
+      padding: 25px 30px 20px;
+      border-bottom: 1px solid rgba(168, 85, 247, 0.2);
+      text-align: center;
+    }
+
+    .modal-termos-header h2 {
+      color: #A855F7;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 10px 0;
+    }
+
+    .modal-termos-header p {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .modal-termos-body {
+      padding: 25px 30px;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    .modal-termos-highlight {
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+
+    .modal-termos-highlight .title {
+      color: #A855F7;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .modal-termos-warning {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      margin: 25px 0;
+    }
+
+    .modal-termos-warning .title {
+      color: #ef4444;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+
+    .modal-termos-body h3 {
+      color: #A855F7;
+      font-size: 1.2rem;
+      margin: 25px 0 15px 0;
+      font-weight: 600;
+      border-left: 4px solid #A855F7;
+      padding-left: 15px;
+    }
+
+    .modal-termos-body ul {
+      margin: 10px 0 10px 20px;
+    }
+
+    .modal-termos-body li {
+      margin-bottom: 8px;
+      color: #e2e8f0;
+    }
+
+    .modal-termos-actions {
+      display: flex;
+      gap: 20px;
+      margin-top: 30px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 0 0 10px 0;
+    }
+
+    .btn-termos {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 25px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+      min-width: 150px;
+    }
+
+    .btn-termos-accept {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-termos-accept:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-termos-cancel {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: white;
+      box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-termos-cancel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(107, 114, 128, 0.4);
+      background: linear-gradient(135deg, #4b5563, #374151);
+    }
+
+    @media (max-width: 768px) {
+      .modal-termos-content {
+        margin: 10px;
+        max-height: 95vh;
+      }
+      
+      .modal-termos-header,
+      .modal-termos-body {
+        padding: 20px 25px;
+      }
+      
+      .modal-termos-actions {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn-termos {
+        min-width: 200px;
+      }
+    }
+
+    /* === NOVOS ESTILOS VISUAIS MELHORADOS === */
+    .bolao-codigo {
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      color: #A855F7;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .bolao-probabilidade {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .probabilidade-alta {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .probabilidade-media {
+      background-color: #f59e0b;
+      color: white;
+    }
+
+    .probabilidade-baixa {
+      background-color: #ef4444;
+      color: white;
+    }
+
+    .bolao-valor {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #10b981;
+    }
+
+    .bolao-participantes {
+      color: #94a3b8;
+      font-size: 0.9rem;
+    }
+
+    .bolao-tempo-restante {
+      color: #f59e0b;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .bolao-numeros {
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #A855F7;
+    }
+
+    .bolao-numeros span {
+      display: inline-block;
+      color: white;
+      padding: 0.2rem 0.4rem;
+      margin: 0.1rem;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    
+    .bolao-numeros .numero-principal {
+      background: linear-gradient(135deg, #7C3AED, #A855F7);
+      box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3);
+    }
+    
+    .bolao-numeros .numero-trevo {
+      background: linear-gradient(135deg, #10B981, #34D399);
+      box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+      border: 2px solid #059669;
+      font-size: 0.8em;
+      padding: 0.15rem 0.3rem;
+    }
+    
+    /* 🔐 Estilos de Controle de Acesso */
+    .loteria-bloqueada {
+      position: relative;
+      filter: grayscale(70%);
+    }
+    
+    .overlay-upgrade {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      border-radius: 12px;
+    }
+    
+    .upgrade-content {
+      background: linear-gradient(135deg, #1F2937, #374151);
+      border: 2px solid #7C3AED;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+      color: white;
+      max-width: 300px;
+      box-shadow: 0 10px 30px rgba(124, 58, 237, 0.3);
+    }
+    
+    .upgrade-content h3 {
+      margin: 0 0 1rem 0;
+      color: #A855F7;
+      font-size: 1.2rem;
+    }
+    
+    .upgrade-content p {
+      margin: 0.5rem 0;
+      color: #D1D5DB;
+      font-size: 0.9rem;
+    }
+    
+    .btn-upgrade {
+      background: linear-gradient(135deg, #7C3AED, #A855F7);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      margin-top: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+    
+    .btn-upgrade:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+    }
+    
+    /* CSS para badge do plano */
+    .plano-badge {
+      margin-top: 6px;
+      font-size: 11px;
+      opacity: 1;
+      font-weight: 600;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 4px 8px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      width: 100%;
+      box-sizing: border-box;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Responsividade adicional para o plano */
+    @media (max-width: 768px) {
+      .plano-badge {
+        font-size: 9px;
+        padding: 2px 4px;
+        margin-top: 4px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1101,8 +1633,15 @@
 
   {% if is_logged_in %}
   <!-- Indicador Visual de Status de Login (apenas para usuários logados) -->
-  <div class="logged-in-badge">
+  <div class="logged-in-badge" style="min-width: 120px; height: auto; display: flex; flex-direction: column; align-items: center; text-align: center;">
     🔓 LOGGED IN
+    <div style="margin-top: 6px; font-size: 11px; background: rgba(255,255,255,0.3); padding: 4px 8px; border-radius: 10px; width: 100%; box-sizing: border-box; text-align: center;">
+      {% if plano_display %}
+        📋 {{ plano_display }}
+      {% else %}
+        ⚠️ DEBUG: plano_display = {{ plano_display|default('None') }}
+      {% endif %}
+    </div>
   </div>
   {% endif %}
   
@@ -1235,7 +1774,7 @@
       <div class="tabs">
         <button class="tab active" onclick="abrirAba(event, 'por-que')">Por que jogar em grupo?</button>
         <button class="tab" onclick="abrirAba(event, 'como-funciona')">Como funcionam nossos bolões</button>
-        <button class="tab" onclick="abrirAba(event, 'loterias')">Loterias</button>
+        <button class="tab" onclick="acessoBoloes(event, 'loterias')">Loterias</button>
       </div>
 
       <div id="por-que" class="tab-content active">
@@ -1432,9 +1971,74 @@
   
   
   
+
   <!-- 🔐 MODAL LOGIN/CADASTRO JAVASCRIPT -->
   <script src="{{ url_for('static', filename='js/modal-login-cadastro.js') }}" defer></script>
   </div> <!-- Fim do main-content -->
+
+  <!-- MODAL DE TERMOS DE BOLÕES -->
+  <div id="modalTermosBoloes" class="modal-termos-boloes">
+    <div class="modal-termos-content">
+      <div class="modal-termos-header">
+        <h2>Loterias Inteligente</h2>
+        <p>Termos de Participação em Bolões</p>
+      </div>
+
+      <div class="modal-termos-body">
+        <div class="modal-termos-highlight">
+          <div class="title">🎯 O que são nossos bolões?</div>
+          <p>Bolões são apostas coletivas onde várias pessoas se unem para jogar com mais números, dividindo custos e eventuais premiações. Utilizamos análise estatística para orientar a seleção de números.</p>
+        </div>
+
+        <h3>Como Funciona</h3>
+        <ul>
+          <li><strong>Você paga sua cota</strong> e participa de apostas maiores com outros jogadores</li>
+          <li><strong>Usamos análise de dados</strong> históricos para orientar a escolha dos números</li>
+          <li><strong>Compramos os jogos oficialmente</strong> na Caixa Econômica Federal</li>
+          <li><strong>Compartilhamos comprovantes</strong> de todas as apostas realizadas</li>
+          <li><strong>Dividimos prêmios</strong> proporcionalmente entre os participantes</li>
+        </ul>
+
+        <div class="modal-termos-warning">
+          <div class="title">⚠️ IMPORTANTE - Leia com atenção</div>
+          <p><strong>Loterias são jogos de sorte.</strong> Nossa análise estatística não garante resultados. Você pode perder todo o dinheiro investido.</p>
+          <p><strong>Invista apenas o que pode perder</strong> sem comprometer suas finanças pessoais ou familiares.</p>
+        </div>
+
+        <h3>Suas Responsabilidades</h3>
+        <ul>
+          <li>Pagar sua cota antes do fechamento do bolão</li>
+          <li>Fornecer dados corretos para contato e eventual pagamento de prêmios</li>
+          <li>Jogar com responsabilidade financeira</li>
+          <li>Entender que não há garantia de ganhos</li>
+        </ul>
+
+        <h3>Nossas Responsabilidades</h3>
+        <ul>
+          <li>Comprar os jogos oficialmente na Caixa Econômica Federal</li>
+          <li>Enviar comprovantes das apostas para todos os participantes</li>
+          <li>Divulgar resultados de forma transparente</li>
+          <li>Distribuir prêmios proporcionalmente em até 5 dias úteis</li>
+          <li>Manter seus dados seguros conforme LGPD</li>
+        </ul>
+
+        <h3>Cancelamentos e Reembolsos</h3>
+        <p>Você pode desistir em até <strong>2 horas após o pagamento</strong>, desde que o bolão ainda não tenha sido efetivado. Após a compra dos jogos, não há possibilidade de reembolso.</p>
+
+        <h3>Taxas e Custos</h3>
+        <p>Cobramos uma taxa administrativa de <strong>10% sobre o valor arrecadado</strong> para cobrir custos operacionais, tecnologia e atendimento.</p>
+
+        <div class="modal-termos-actions">
+          <button class="btn-termos btn-termos-accept" onclick="aceitarTermosBoloes()">
+            ✅ Li e Aceito os Termos
+          </button>
+          <button class="btn-termos btn-termos-cancel" onclick="cancelarTermosBoloes()">
+            ← Voltar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- RODAPÉ -->
   <footer class="site-footer" role="contentinfo">
@@ -1565,6 +2169,809 @@
     document.addEventListener('keydown', function(event) {
       if (event.key === 'Escape') {
         closeFooterModal();
+      }
+    });
+
+    // 🎯 SISTEMA DINÂMICO DE BOLÕES
+    class BolaoManager {
+      constructor() {
+        this.boloes = {};
+        this.usuarioLogado = this.verificarStatusLogin(); // Verificar login real
+        this.init();
+      }
+
+      async init() {
+        console.log('🚀 Inicializando sistema de bolões...');
+        console.log('🔐 Status de login inicial:', this.usuarioLogado);
+        console.log('🔐 window.isLoggedIn na inicialização:', window.isLoggedIn);
+        
+        // 🔐 Aplicar controle de acesso por plano
+        this.aplicarControleAcesso();
+        
+        await this.carregarBoloes();
+        this.atualizarInterface();
+        this.configurarEventos();
+      }
+      
+      aplicarControleAcesso() {
+        console.log('🔐 Aplicando controle de acesso por plano...');
+        
+        // Se não tem loterias permitidas, bloquear tudo
+        if (!window.loteriasPermitidas || window.loteriasPermitidas.length === 0) {
+          this.bloquearTodasLoterias();
+          return;
+        }
+        
+        // Bloquear loterias específicas baseado no plano
+        const mapeamentoLoterias = {
+          'milionaria': 'milionaria',
+          'lotofacil': 'lotofacil', 
+          'megasena': 'megasena',
+          'quina': 'quina'
+        };
+        
+        Object.keys(mapeamentoLoterias).forEach(loteria => {
+          const container = document.getElementById(loteria);
+          if (container) {
+            if (window.loteriasPermitidas.includes(mapeamentoLoterias[loteria])) {
+              this.liberarLoteria(loteria, container);
+            } else {
+              this.bloquearLoteria(loteria, container);
+            }
+          }
+        });
+      }
+      
+      liberarLoteria(loteria, container) {
+        container.style.opacity = '1';
+        container.style.pointerEvents = 'auto';
+        container.classList.remove('loteria-bloqueada');
+        console.log(`✅ Loteria ${loteria} liberada`);
+      }
+      
+      bloquearLoteria(loteria, container) {
+        container.style.opacity = '0.5';
+        container.style.pointerEvents = 'none';
+        container.classList.add('loteria-bloqueada');
+        
+        // Adicionar overlay de upgrade
+        this.adicionarOverlayUpgrade(loteria, container);
+        console.log(`❌ Loteria ${loteria} bloqueada`);
+      }
+      
+      bloquearTodasLoterias() {
+        const loterias = ['milionaria', 'lotofacil', 'megasena', 'quina'];
+        loterias.forEach(loteria => {
+          const container = document.getElementById(loteria);
+          if (container) {
+            this.bloquearLoteria(loteria, container);
+          }
+        });
+      }
+      
+      liberarTodasLoterias() {
+        console.log('✅ LIBERANDO TODAS AS LOTERIAS - Bypass para usuário premium');
+        const loterias = ['milionaria', 'lotofacil', 'megasena', 'quina'];
+        loterias.forEach(loteria => {
+          const container = document.getElementById(loteria);
+          if (container) {
+            this.liberarLoteria(loteria, container);
+          }
+        });
+      }
+      
+      adicionarOverlayUpgrade(loteria, container) {
+        // Remover overlay existente se houver
+        const overlayExistente = container.querySelector('.overlay-upgrade');
+        if (overlayExistente) {
+          overlayExistente.remove();
+        }
+        
+        const nomesLoterias = {
+          'milionaria': '+Milionária',
+          'lotofacil': 'Lotofácil',
+          'megasena': 'Mega Sena',
+          'quina': 'Quina'
+        };
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay-upgrade';
+        overlay.innerHTML = `
+          <div class="upgrade-content">
+            <h3>🔒 ${nomesLoterias[loteria] || loteria}</h3>
+            <p>Upgrade necessário para acessar esta loteria</p>
+            <p><strong>Seu plano:</strong> ${window.infoPlano?.nome_display || 'Gratuito'}</p>
+            <button class="btn-upgrade" onclick="window.location.href='/upgrade_plans'">
+              🚀 Fazer Upgrade
+            </button>
+          </div>
+        `;
+        
+        container.appendChild(overlay);
+      }
+
+      // Método para atualizar status de login dinamicamente
+      atualizarStatusLogin() {
+        const novoStatus = this.verificarStatusLogin();
+        if (novoStatus !== this.usuarioLogado) {
+          console.log('🔄 Status de login alterado:', this.usuarioLogado, '→', novoStatus);
+          this.usuarioLogado = novoStatus;
+          this.atualizarInterface(); // Atualizar interface com novo status
+        }
+        return novoStatus;
+      }
+
+      async carregarBoloes() {
+        try {
+          console.log('📡 Carregando bolões da API...');
+          
+          // Carregar bolões por loteria
+          const loterias = ['milionaria', 'lotofacil', 'megasena', 'quina'];
+          
+          for (const loteria of loterias) {
+            const response = await fetch(`/api/boloes/listar?loteria=${loteria}`);
+            const data = await response.json();
+            
+            if (data.success) {
+              this.boloes[loteria] = data.boloes;
+              console.log(`✅ ${loteria}: ${data.boloes.length} bolões carregados`);
+            } else {
+              console.error(`❌ Erro ao carregar ${loteria}:`, data.error);
+              this.boloes[loteria] = [];
+            }
+          }
+          
+        } catch (error) {
+          console.error('❌ Erro ao carregar bolões:', error);
+          // Fallback para dados estáticos
+          this.carregarDadosFallback();
+        }
+      }
+
+      carregarDadosFallback() {
+        console.log('🔄 Carregando dados fallback...');
+        this.boloes = {
+          milionaria: [
+            {
+              codigo: 'MM-LDO-01',
+              nome: 'Grupo MM-LDO-01',
+              valor_cota: 10.00,
+              total_cotas: 15,
+              cotas_vendidas: 7,
+              status: 'forming',
+              probabilidade: 'Alta'
+            },
+            {
+              codigo: 'MM-LDO-02',
+              nome: 'Grupo MM-LDO-02',
+              valor_cota: 12.00,
+              total_cotas: 15,
+              cotas_vendidas: 12,
+              status: 'almost',
+              probabilidade: 'Boa'
+            }
+          ],
+          lotofacil: [
+            {
+              codigo: 'LF-LDO-01',
+              nome: 'Grupo LF-LDO-01',
+              valor_cota: 8.00,
+              total_cotas: 25,
+              cotas_vendidas: 18,
+              status: 'almost',
+              probabilidade: 'Muito Alta'
+            }
+          ],
+          megasena: [
+            {
+              codigo: 'MS-LDO-01',
+              nome: 'Grupo MS-LDO-01',
+              valor_cota: 20.00,
+              total_cotas: 15,
+              cotas_vendidas: 8,
+              status: 'forming',
+              probabilidade: 'Média'
+            }
+          ],
+          quina: [
+            {
+              codigo: 'QN-LDO-01',
+              nome: 'Grupo QN-LDO-01',
+              valor_cota: 6.00,
+              total_cotas: 20,
+              cotas_vendidas: 15,
+              status: 'forming',
+              probabilidade: 'Alta'
+            }
+          ]
+        };
+      }
+
+      atualizarInterface() {
+        console.log('🎨 Atualizando interface com dados dinâmicos...');
+        
+        // Atualizar cada seção de loteria
+        Object.keys(this.boloes).forEach(loteria => {
+          this.atualizarSecaoLoteria(loteria);
+        });
+      }
+
+      atualizarSecaoLoteria(loteria) {
+        const container = document.getElementById(loteria);
+        if (!container) return;
+
+        const boloes = this.boloes[loteria];
+        if (!boloes || boloes.length === 0) {
+          container.innerHTML = `
+            <h3>Bolões ${this.formatarNomeLoteria(loteria)}</h3>
+            <div class="no-boloes">
+              <p>📭 Nenhum bolão disponível no momento.</p>
+              <p>Volte em breve para novas oportunidades!</p>
+            </div>
+          `;
+          return;
+        }
+
+        let html = `<h3>Bolões ${this.formatarNomeLoteria(loteria)}</h3>`;
+        
+        boloes.forEach(bolao => {
+          html += this.criarCardBolao(bolao);
+        });
+
+        container.innerHTML = html;
+      }
+
+      criarCardBolao(bolao) {
+        const cotasRestantes = bolao.total_cotas - bolao.cotas_vendidas;
+        const percentualPreenchido = Math.round((bolao.cotas_vendidas / bolao.total_cotas) * 100);
+        
+        let statusClass = 'forming';
+        let statusText = '🔄 Em formação';
+        let statusIcon = '🔄';
+
+        if (bolao.status === 'almost') {
+          statusClass = 'almost';
+          statusText = '⚡ Quase fechado';
+          statusIcon = '⚡';
+        } else if (bolao.status === 'closed') {
+          statusClass = 'closed';
+          statusText = '🔒 Fechado';
+          statusIcon = '🔒';
+        }
+
+        // Gerar código único baseado na loteria
+        const codigoUnico = this.gerarCodigoUnico(bolao);
+        
+        // Determinar classe da probabilidade
+        const classProbabilidade = this.obterClasseProbabilidade(bolao.probabilidade);
+        
+        // Gerar números de exemplo (ou usar os reais se disponível)
+        const numerosApostados = this.gerarNumerosExemplo(bolao);
+        
+        // Calcular tempo restante estimado
+        const tempoRestante = this.calcularTempoRestante(bolao);
+
+        return `
+          <div class="bolao-card" data-bolao-id="${bolao.id || bolao.codigo}">
+            <div class="bolao-codigo">${codigoUnico}</div>
+            <h3>${bolao.nome.replace(/Grupo\s+/, 'Grupo Inteligente ')}</h3>
+            <div class="bolao-probabilidade ${classProbabilidade}">Probabilidade: ${bolao.probabilidade}</div>
+            <p class="bolao-valor">Valor da cota: R$ ${bolao.valor_cota.toFixed(2).replace('.', ',')}</p>
+            <p class="bolao-participantes">Participantes: ${bolao.cotas_vendidas} / ${bolao.total_cotas}</p>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: ${percentualPreenchido}%"></div>
+              <span class="progress-text">${percentualPreenchido}%</span>
+            </div>
+            <p class="bolao-tempo-restante">${tempoRestante}</p>
+            <div class="bolao-numeros">${numerosApostados}</div>
+            <span class="status ${statusClass}">${statusText}</span>
+            ${this.criarBotoesAcao(bolao)}
+          </div>
+        `;
+      }
+
+      criarBotoesAcao(bolao) {
+        // Verificar status de login atualizado
+        this.atualizarStatusLogin();
+        
+        if (!this.usuarioLogado) {
+          return `
+            <div class="bolao-actions">
+              <button class="btn-login" onclick="bolaoManager.solicitarLogin()">
+                🔒 Fazer Login para Participar
+              </button>
+            </div>
+          `;
+        }
+
+        if (bolao.status === 'closed') {
+          return `
+            <div class="bolao-actions">
+              <button class="btn-disabled" disabled>
+                🔒 Bolão Fechado
+              </button>
+            </div>
+          `;
+        }
+
+        const cotasRestantes = bolao.total_cotas - bolao.cotas_vendidas;
+        
+        return `
+          <div class="bolao-actions">
+            <button class="btn-participar" onclick="bolaoManager.participarBolao('${bolao.codigo}')">
+              🎯 Participar (${cotasRestantes} cotas restantes)
+            </button>
+            <button class="btn-detalhes" onclick="bolaoManager.verDetalhes('${bolao.codigo}')">
+              📊 Ver Detalhes
+            </button>
+          </div>
+        `;
+      }
+
+      formatarNomeLoteria(loteria) {
+        const nomes = {
+          'milionaria': '+Milionária',
+          'lotofacil': 'Lotofácil',
+          'megasena': 'Mega Sena',
+          'quina': 'Quina'
+        };
+        return nomes[loteria] || loteria;
+      }
+
+      gerarCodigoUnico(bolao) {
+        // Gerar códigos únicos baseados na loteria
+        const prefixos = {
+          'milionaria': 'LI-MF',
+          'lotofacil': 'LI-LF',
+          'megasena': 'LI-MS',
+          'quina': 'LI-QN'
+        };
+        
+        // Usar ID ou código existente para manter consistência
+        const id = bolao.id || bolao.codigo || '001';
+        const numeroFormatado = String(id).padStart(3, '0');
+        
+        // Determinar prefixo baseado no nome do bolão ou loteria
+        let prefixo = 'LI-XX';
+        if (bolao.nome && bolao.nome.includes('MM-')) prefixo = 'LI-MF';
+        else if (bolao.nome && bolao.nome.includes('LF-')) prefixo = 'LI-LF';
+        else if (bolao.nome && bolao.nome.includes('MS-')) prefixo = 'LI-MS';
+        else if (bolao.nome && bolao.nome.includes('QN-')) prefixo = 'LI-QN';
+        else if (bolao.loteria) prefixo = prefixos[bolao.loteria] || 'LI-XX';
+        
+        return `${prefixo}-${numeroFormatado}`;
+      }
+
+      obterClasseProbabilidade(probabilidade) {
+        if (!probabilidade) return 'probabilidade-media';
+        
+        const prob = probabilidade.toLowerCase();
+        if (prob.includes('alta') || prob.includes('muito')) return 'probabilidade-alta';
+        if (prob.includes('média') || prob.includes('boa')) return 'probabilidade-media';
+        if (prob.includes('baixa')) return 'probabilidade-baixa';
+        
+        return 'probabilidade-media';
+      }
+
+      gerarNumerosExemplo(bolao) {
+        // 🎯 PRIORIDADE 1: Números reais do banco de dados
+        if (bolao.numeros_escolhidos) {
+          let html = '';
+          
+          // Números principais
+          if (bolao.numeros_escolhidos.numeros && Array.isArray(bolao.numeros_escolhidos.numeros)) {
+            html += bolao.numeros_escolhidos.numeros.map(num => 
+              `<span class="numero-principal">${String(num).padStart(2, '0')}</span>`
+            ).join('');
+          }
+          
+          // Trevos da sorte (apenas para Milionária)
+          if (bolao.numeros_escolhidos.trevos && Array.isArray(bolao.numeros_escolhidos.trevos)) {
+            html += bolao.numeros_escolhidos.trevos.map(trevo => 
+              `<span class="numero-trevo">🍀${String(trevo).padStart(2, '0')}</span>`
+            ).join('');
+          }
+          
+          if (html) return html;
+        }
+        
+        // 🎯 PRIORIDADE 2: Números apostados (campo alternativo)
+        if (bolao.numeros_apostados && Array.isArray(bolao.numeros_apostados)) {
+          return bolao.numeros_apostados.map(num => 
+            `<span class="numero-principal">${String(num).padStart(2, '0')}</span>`
+          ).join('');
+        }
+        
+        // 🎯 FALLBACK: Gerar números de exemplo baseados na loteria
+        let numeros = [];
+        const nome = bolao.nome || '';
+        const codigo = bolao.codigo || '';
+        
+        if (nome.includes('MF-') || codigo.includes('MF-')) {
+          // Milionária: 6 números + 2 trevos
+          numeros = [3, 7, 15, 23, 35, 42];
+          const trevos = [2, 5];
+          const numerosHtml = numeros.map(num => `<span class="numero-principal">${String(num).padStart(2, '0')}</span>`).join('');
+          const trevosHtml = trevos.map(trevo => `<span class="numero-trevo">🍀${String(trevo).padStart(2, '0')}</span>`).join('');
+          return numerosHtml + trevosHtml;
+        } else if (nome.includes('LF-') || codigo.includes('LF-')) {
+          // Lotofácil: 15 números
+          numeros = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25];
+        } else if (nome.includes('MS-') || codigo.includes('MS-')) {
+          // Mega Sena: 6 números
+          numeros = [7, 14, 23, 35, 42, 58];
+        } else if (nome.includes('QN-') || codigo.includes('QN-')) {
+          // Quina: 5 números
+          numeros = [12, 23, 34, 45, 67];
+        } else {
+          // Padrão genérico
+          numeros = [1, 5, 10, 15, 20, 25];
+        }
+        
+        return numeros.map(num => `<span class="numero-principal">${String(num).padStart(2, '0')}</span>`).join('');
+      }
+
+      calcularTempoRestante(bolao) {
+        // Simular tempo restante baseado no status
+        if (bolao.status === 'almost') {
+          const tempos = ['⏰ Fecha em 3 horas', '⏰ Fecha em 1 dia', '⏰ Fecha em 6 horas'];
+          return tempos[Math.floor(Math.random() * tempos.length)];
+        } else if (bolao.status === 'forming') {
+          const tempos = ['⏰ Fecha em 2 dias', '⏰ Fecha em 5 dias', '⏰ Fecha em 3 dias'];
+          return tempos[Math.floor(Math.random() * tempos.length)];
+        } else {
+          return '⏰ Fechado';
+        }
+      }
+
+      verificarStatusLogin() {
+        console.log('🔍 Verificando status de login...');
+        console.log('🔍 window.isLoggedIn:', window.isLoggedIn);
+        
+        // Verificar variável global do Flask (PRIMEIRA verificação, mais confiável)
+        if (typeof window.isLoggedIn !== 'undefined' && window.isLoggedIn) {
+          console.log('✅ Usuário logado detectado via variável global Flask');
+          return true;
+        }
+        
+        // Verificar se o badge de login está presente na página
+        const badgeLogin = document.querySelector('.logged-in-badge');
+        if (badgeLogin) {
+          console.log('✅ Usuário logado detectado via badge');
+          return true;
+        }
+        
+        // Verificar localStorage (backup)
+        const loginToken = localStorage.getItem('userToken') || localStorage.getItem('loginStatus');
+        if (loginToken) {
+          console.log('✅ Usuário logado detectado via localStorage');
+          return true;
+        }
+        
+        console.log('❌ Usuário não logado - todas as verificações falharam');
+        return false;
+      }
+
+      configurarEventos() {
+        // Eventos de hover nos cards
+        document.addEventListener('mouseover', (e) => {
+          if (e.target.closest('.bolao-card')) {
+            e.target.closest('.bolao-card').classList.add('hover');
+          }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+          if (e.target.closest('.bolao-card')) {
+            e.target.closest('.bolao-card').classList.remove('hover');
+          }
+        });
+      }
+
+      solicitarLogin() {
+        alert('🔒 Para participar dos bolões, você precisa fazer login primeiro!\n\nClique em "Entrar" no menu superior.');
+        // Em produção, abrir modal de login
+      }
+
+      async participarBolao(codigoBolao) {
+        // Verificar login em tempo real
+        this.atualizarStatusLogin();
+        
+        if (!this.usuarioLogado) {
+          this.solicitarLogin();
+          return;
+        }
+
+        try {
+          console.log(`🎯 Participando do bolão ${codigoBolao}...`);
+          
+          const response = await fetch('/api/boloes/participar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              bolao_id: codigoBolao,
+              usuario_id: 1, // Em produção, pegar da sessão
+              quantidade_cotas: 1,
+              metodo_pagamento: 'pix'
+            })
+          });
+
+          const data = await response.json();
+          
+          if (data.success) {
+            alert(`✅ Participação realizada com sucesso!\n\nValor: R$ ${data.valor_total.toFixed(2).replace('.', ',')}\n\nVocê receberá instruções de pagamento por email.`);
+            // Recarregar dados
+            await this.carregarBoloes();
+            this.atualizarInterface();
+          } else {
+            alert(`❌ Erro: ${data.error}`);
+          }
+          
+        } catch (error) {
+          console.error('❌ Erro ao participar do bolão:', error);
+          alert('❌ Erro ao participar do bolão. Tente novamente.');
+        }
+      }
+
+      async verDetalhes(codigoBolao) {
+        try {
+          console.log(`📊 Visualizando detalhes do bolão ${codigoBolao}...`);
+          
+          // Em produção, abrir modal com detalhes
+          alert(`📊 Detalhes do Bolão ${codigoBolao}\n\nFuncionalidade em desenvolvimento...`);
+          
+        } catch (error) {
+          console.error('❌ Erro ao carregar detalhes:', error);
+        }
+      }
+    }
+
+    // Inicializar sistema de bolões
+    window.bolaoManager = null; // Declarar como global
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('🚀 Criando BolaoManager...');
+      window.bolaoManager = new BolaoManager();
+      console.log('✅ BolaoManager criado:', !!window.bolaoManager);
+    });
+
+    // === CONTROLE DE ACESSO AOS BOLÕES ===
+    function acessoBoloes(evt, nomeAba) {
+      evt.preventDefault();
+      
+      const logado = window.isLoggedIn || false;
+      const termosOk = (window.termosAceitos === true) || (localStorage.getItem('boloes_termos_ok') === '1');
+      
+      console.log('🔐 Verificando acesso aos bolões:', {logado, termosOk});
+      
+      if (!logado) {
+        alert('🔒 Faça login para acessar os bolões.');
+        return false;
+      }
+      
+      if (!termosOk) {
+        console.log('📋 Mostrando modal de termos...');
+        const modal = document.getElementById('modalTermosBoloes');
+        if (modal) {
+          modal.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+        return false;
+      }
+      
+      // OK, pode abrir a aba
+      console.log('✅ Abrindo aba dos bolões...');
+      abrirAba(evt, nomeAba);
+      return true;
+    }
+    
+    // === BYPASS TEMPORÁRIO (MANTER PARA REFERÊNCIA) ===
+    function acessoBypass(evt, nomeAba) {
+      evt.preventDefault();
+      
+      console.log('🚀 BYPASS - Iniciado para usuário:', '{{ plano_display|default("Sem plano") }}');
+      
+      // 1. Verificar termos primeiro (FORÇAR MODAL PARA TESTE)
+      console.log('🔍 Verificando localStorage termosBoloesAceitos:', localStorage.getItem('termosBoloesAceitos'));
+      
+      // TEMPORÁRIO: Limpar termos para forçar modal
+      // localStorage.removeItem('termosBoloesAceitos'); // Descomente para forçar modal
+      
+      const termosAceitos = localStorage.getItem('termosBoloesAceitos');
+      
+      if (termosAceitos !== 'true') {
+        console.log('📋 Mostrando modal de termos...');
+        mostrarModalTermos();
+        return;
+      }
+      
+      console.log('✅ Termos já aceitos, prosseguindo...');
+      
+      // 2. Para usuário Vitalício, liberar direto
+      const planoAtual = '{{ plano_display|default("") }}';
+      
+      if (planoAtual === 'Vitalício' || planoAtual === 'Anual') {
+        console.log('✅ BYPASS - Liberando acesso total para plano:', planoAtual);
+        
+        // Configurar variáveis globais
+        window.planoUsuario = 'lifetime';
+        window.loteriasPermitidas = ['quina', 'lotofacil', 'megasena', 'milionaria'];
+        window.loteriasBloqueadas = [];
+        
+        // Abrir aba
+        abrirAba(evt, nomeAba);
+        
+        // Liberar todos os painéis
+        if (window.bolaoManager) {
+          window.bolaoManager.liberarTodasLoterias();
+        }
+        
+        return;
+      }
+      
+      // 3. Para outros planos, mostrar upgrade
+      console.log('❌ Plano insuficiente:', planoAtual);
+      mostrarModalUpgrade();
+    }
+    
+    // === SISTEMA DE TERMOS DE BOLÕES (ORIGINAL) ===
+    async function verificarTermosEAbrirAba(evt, nomeAba) {
+      evt.preventDefault(); // Sempre prevenir o comportamento padrão
+      
+      // 1. Verificar se o usuário já aceitou os termos
+      const termosAceitos = localStorage.getItem('termosBoloesAceitos');
+      
+      if (termosAceitos !== 'true') {
+        // Se não aceitou os termos, mostrar o modal de termos primeiro
+        mostrarModalTermos();
+        return;
+      }
+      
+      // 2. Se aceitou os termos, verificar acesso por plano
+      try {
+        console.log('🔐 Verificando acesso por plano...');
+        const response = await fetch('/api/verificar-acesso-boloes', {
+          credentials: 'same-origin'  // Incluir cookies de sessão
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          // Atualizar variáveis globais
+          window.planoUsuario = data.plano_usuario;
+          window.loteriasPermitidas = data.loterias_permitidas;
+          window.loteriasBloqueadas = data.loterias_bloqueadas;
+          window.infoPlano = data.info_plano;
+          
+          console.log('🎯 Dados de acesso recebidos:', data);
+          console.log('🔍 DEBUG - loterias_permitidas:', data.loterias_permitidas);
+          console.log('🔍 DEBUG - Array.isArray:', Array.isArray(data.loterias_permitidas));
+          console.log('🔍 DEBUG - length:', data.loterias_permitidas?.length);
+          
+          // Verificar se usuário tem acesso a alguma loteria
+          if (!data.loterias_permitidas || data.loterias_permitidas.length === 0) {
+            // Usuário não tem acesso a nenhuma loteria
+            console.log('❌ ENTRANDO NO MODAL DE UPGRADE - Motivo: sem loterias permitidas');
+            mostrarModalUpgrade();
+            return;
+          }
+          
+          console.log('✅ USUÁRIO TEM ACESSO - Continuando...');
+          
+          // 3. Se tem acesso, abrir a aba e aplicar controle
+          abrirAba(evt, nomeAba);
+          
+          // Aplicar controle de acesso aos painéis
+          if (window.bolaoManager) {
+            window.bolaoManager.aplicarControleAcesso();
+          }
+          
+        } else {
+          console.error('❌ Erro na resposta da API:', data);
+          alert('Erro ao verificar acesso. Tente novamente.');
+        }
+        
+      } catch (error) {
+        console.error('❌ Erro ao verificar acesso:', error);
+        alert('Erro de conexão. Tente novamente.');
+      }
+    }
+
+    function mostrarModalTermos() {
+      const modal = document.getElementById('modalTermosBoloes');
+      if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevenir scroll
+      }
+    }
+
+    function aceitarTermosBoloes() {
+      if (confirm('Confirma que leu e aceita todos os termos de participação nos bolões?')) {
+        // Salvar aceite no localStorage
+        localStorage.setItem('termosBoloesAceitos', 'true');
+        localStorage.setItem('dataAceiteTermosBoloes', new Date().toISOString());
+        
+        // Fechar modal
+        fecharModalTermos();
+        
+        // 🔧 CORREÇÃO: Liberar acesso às loterias
+        console.log('🔧 Liberando acesso às loterias após aceitar termos...');
+        
+        // Definir loterias permitidas para usuário Vitalício
+        const planoAtual = '{{ plano_display|default("") }}';
+        if (planoAtual === 'Vitalício' || planoAtual === 'Anual') {
+          window.loteriasPermitidas = ['quina', 'lotofacil', 'megasena', 'milionaria'];
+          window.planoUsuario = 'lifetime';
+        } else {
+          // Para outros planos, definir acesso básico
+          window.loteriasPermitidas = ['quina'];
+          window.planoUsuario = 'daily';
+        }
+        
+        // Liberar visualmente todas as loterias
+        if (window.bolaoManager) {
+          console.log('🔧 Chamando liberarTodasLoterias...');
+          window.bolaoManager.liberarTodasLoterias();
+        }
+        
+        // Mostrar mensagem de sucesso
+        alert('✅ Termos aceitos com sucesso!\n\nAgora você pode acessar a seção de loterias.');
+        
+        // Abrir a aba de loterias
+        const abaLoterias = document.querySelector('button[onclick*="loterias"]');
+        if (abaLoterias) {
+          // Simular clique na aba (removendo a verificação temporariamente)
+          abaLoterias.onclick = function(evt) { abrirAba(evt, 'loterias'); };
+          abaLoterias.click();
+        }
+      }
+    }
+
+    function cancelarTermosBoloes() {
+      fecharModalTermos();
+      
+      // Voltar para a primeira aba
+      const primeiraAba = document.querySelector('.tab');
+      if (primeiraAba) {
+        primeiraAba.click();
+      }
+    }
+
+    function fecharModalTermos() {
+      const modal = document.getElementById('modalTermosBoloes');
+      if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto'; // Restaurar scroll
+      }
+    }
+    
+    function mostrarModalUpgrade() {
+      const planoAtual = window.infoPlano?.nome_display || 'Gratuito';
+      
+      alert(`🔒 Acesso Restrito\n\n` +
+            `Seu plano atual (${planoAtual}) não permite acesso aos bolões.\n\n` +
+            `Faça upgrade para participar dos bolões inteligentes!`);
+      
+      // Redirecionar para página de upgrade após um delay
+      setTimeout(() => {
+        window.location.href = '/upgrade_plans';
+      }, 2000);
+    }
+
+    // Fechar modal ao clicar fora dele
+    document.addEventListener('click', function(event) {
+      const modal = document.getElementById('modalTermosBoloes');
+      if (event.target === modal) {
+        cancelarTermosBoloes();
+      }
+    });
+
+    // Fechar modal com tecla ESC
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        const modal = document.getElementById('modalTermosBoloes');
+        if (modal && modal.classList.contains('show')) {
+          cancelarTermosBoloes();
+        }
       }
     });
   </script>

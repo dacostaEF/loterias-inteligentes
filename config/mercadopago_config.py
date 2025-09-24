@@ -6,10 +6,10 @@ Configuração do Mercado Pago
 """
 
 import os
-from dotenv import load_dotenv
+# from dotenv import load_dotenv  # Comentado pois não temos essa dependência
 
 # Carregar variáveis de ambiente
-load_dotenv()
+# load_dotenv()  # Comentado pois não temos essa dependência
 
 # ============================================================================
 # 🔑 CONFIGURAÇÕES MERCADO PAGO
@@ -50,6 +50,40 @@ FROM_EMAIL = os.getenv('FROM_EMAIL', 'dacosta_ef@hotmail.com')
 # ============================================================================
 # 🎯 CONFIGURAÇÕES DOS PLANOS
 # ============================================================================
+
+# 🔐 CONTROLE DE ACESSO POR PLANO
+ACESSO_POR_PLANO = {
+    'Free': {
+        'loterias': [],  # Usuário free não acessa bolões
+        'limite_apostas': 0,
+        'nome_display': 'Gratuito'
+    },
+    'daily': {
+        'loterias': ['quina'],  # Acesso apenas à Quina
+        'limite_apostas': 5,
+        'nome_display': 'Diário'
+    },
+    'monthly': {
+        'loterias': ['quina', 'lotofacil'],  # Acesso à Quina e Lotofácil
+        'limite_apostas': 20,
+        'nome_display': 'Mensal'
+    },
+    'semiannual': {
+        'loterias': ['quina', 'lotofacil', 'megasena'],  # Sem Milionária
+        'limite_apostas': 50,
+        'nome_display': 'Semestral'
+    },
+    'annual': {
+        'loterias': ['quina', 'lotofacil', 'megasena', 'milionaria'],  # Todas
+        'limite_apostas': 100,
+        'nome_display': 'Anual'
+    },
+    'lifetime': {
+        'loterias': ['quina', 'lotofacil', 'megasena', 'milionaria'],  # Todas + benefícios
+        'limite_apostas': -1,  # Ilimitado
+        'nome_display': 'Vitalício'
+    }
+}
 
 PLANOS_MERCADOPAGO = {
     'daily': {
@@ -166,6 +200,57 @@ def get_config_info():
         'webhook_url': MERCADOPAGO_WEBHOOK_URL
     }
 
+# ============================================================================
+# 🔐 FUNÇÕES DE CONTROLE DE ACESSO
+# ============================================================================
+
+def verificar_acesso_loteria(plano_usuario, loteria):
+    """Verifica se o usuário tem acesso a uma loteria específica."""
+    if not plano_usuario:
+        plano_usuario = 'Free'
+    
+    permissoes = ACESSO_POR_PLANO.get(plano_usuario, ACESSO_POR_PLANO['Free'])
+    return loteria in permissoes['loterias']
+
+def get_loterias_permitidas(plano_usuario):
+    """Retorna a lista de loterias que o usuário pode acessar."""
+    if not plano_usuario:
+        plano_usuario = 'Free'
+    
+    permissoes = ACESSO_POR_PLANO.get(plano_usuario, ACESSO_POR_PLANO['Free'])
+    return permissoes['loterias']
+
+def get_loterias_bloqueadas(plano_usuario):
+    """Retorna a lista de loterias que o usuário NÃO pode acessar."""
+    todas_loterias = ['quina', 'lotofacil', 'megasena', 'milionaria']
+    permitidas = get_loterias_permitidas(plano_usuario)
+    return [lot for lot in todas_loterias if lot not in permitidas]
+
+def get_proximo_plano_para_loteria(loteria, plano_atual='Free'):
+    """Retorna o próximo plano que dá acesso a uma loteria específica."""
+    planos_ordem = ['daily', 'monthly', 'semiannual', 'annual', 'lifetime']
+    
+    for plano in planos_ordem:
+        if verificar_acesso_loteria(plano, loteria):
+            return plano
+    
+    return 'annual'  # Fallback para plano que tem tudo
+
+def get_info_upgrade_loteria(loteria, plano_atual='Free'):
+    """Retorna informações sobre upgrade necessário para acessar uma loteria."""
+    if verificar_acesso_loteria(plano_atual, loteria):
+        return None  # Já tem acesso
+    
+    proximo_plano = get_proximo_plano_para_loteria(loteria, plano_atual)
+    
+    return {
+        'loteria': loteria,
+        'plano_atual': plano_atual,
+        'plano_necessario': proximo_plano,
+        'info_plano': PLANOS_MERCADOPAGO.get(proximo_plano, {}),
+        'acesso_plano': ACESSO_POR_PLANO.get(proximo_plano, {})
+    }
+
 if __name__ == "__main__":
     print("🔧 Configuração do Mercado Pago")
     print("=" * 50)
@@ -182,3 +267,10 @@ if __name__ == "__main__":
     info = get_config_info()
     for key, value in info.items():
         print(f"   {key}: {value}")
+    
+    print("\n🔐 Teste de Acesso por Plano:")
+    for plano in ['Free', 'daily', 'monthly', 'annual']:
+        print(f"\n   {plano}: {get_loterias_permitidas(plano)}")
+        for loteria in ['quina', 'lotofacil', 'megasena', 'milionaria']:
+            acesso = "✅" if verificar_acesso_loteria(plano, loteria) else "❌"
+            print(f"     {loteria}: {acesso}")
