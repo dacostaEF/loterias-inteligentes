@@ -142,11 +142,17 @@ def detalhes_bolao(bolao_id):
 def participar_bolao():
     """Permite que um usuário participe de um bolão"""
     try:
-        data = request.get_json()
+        # 🚧 PROTEÇÃO TEMPORÁRIA - SISTEMA EM DESENVOLVIMENTO
+        return jsonify({
+            'success': False,
+            'error': '🚧 Sistema em desenvolvimento\n\nA funcionalidade de participação está sendo finalizada.\nEm breve estará disponível!'
+        }), 503
         
-        bolao_id = data.get('bolao_id')
-        usuario_id = data.get('usuario_id')  # Em produção, pegar da sessão
-        quantidade_cotas = data.get('quantidade_cotas', 1)
+        # CÓDIGO ORIGINAL (COMENTADO TEMPORARIAMENTE)
+        # data = request.get_json()
+        # bolao_id = data.get('bolao_id')
+        # usuario_id = data.get('usuario_id')  # Em produção, pegar da sessão
+        # quantidade_cotas = data.get('quantidade_cotas', 1)
         
         if not bolao_id or not usuario_id:
             return jsonify({

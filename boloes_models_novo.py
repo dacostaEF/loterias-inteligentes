@@ -28,7 +28,6 @@ class Bolao(db.Model):
     
     # STATUS E DATAS
     status = db.Column(db.String(20), default='aberto')  # aberto, fechado, jogado, premiado
-    probabilidade = db.Column(db.String(20), default='Média')  # Muito Alta, Alta, Média, Baixa
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
     data_fechamento = db.Column(db.DateTime, nullable=True)
     data_sorteio = db.Column(db.DateTime, nullable=True)
@@ -74,11 +73,6 @@ class Bolao(db.Model):
     def valor_arrecadado(self):
         """Valor total arrecadado"""
         return self.valor_cota * self.cotas_vendidas
-    
-    @property
-    def valor_total(self):
-        """Valor total do bolão (todas as cotas)"""
-        return self.valor_cota * self.total_cotas
     
     @property
     def pode_fechar(self):
@@ -238,83 +232,3 @@ def criar_bolao_inteligente(loteria, nivel, nome, valor_cota, total_cotas, cotas
     # Outros mapeamentos de datas...
     
     return bolao
-
-
-# FUNÇÕES DE CRIAÇÃO ESPECÍFICAS POR LOTERIA
-
-def criar_bolao_milionaria(nivel='basico', nome=None, valor_cota=15.00, total_cotas=20, cotas_minimas=15):
-    """Cria bolão específico da Milionária"""
-    numeros = [7, 15, 23, 31, 42, 49]  # Exemplo
-    trevos = [2, 5]
-    
-    if not nome:
-        nome = f"Grupo Inteligente {gerar_codigo_bolao('milionaria', nivel)}"
-    
-    return criar_bolao_inteligente(
-        loteria='milionaria',
-        nivel=nivel,
-        nome=nome,
-        valor_cota=valor_cota,
-        total_cotas=total_cotas,
-        cotas_minimas=cotas_minimas,
-        numeros=numeros,
-        trevos=trevos,
-        estrategia="Análise IA + Padrões Matemáticos"
-    )
-
-
-def criar_bolao_lotofacil(nivel='basico', nome=None, valor_cota=10.00, total_cotas=25, cotas_minimas=20):
-    """Cria bolão específico da Lotofácil"""
-    numeros = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]  # Exemplo
-    
-    if not nome:
-        nome = f"Grupo Inteligente {gerar_codigo_bolao('lotofacil', nivel)}"
-    
-    return criar_bolao_inteligente(
-        loteria='lotofacil',
-        nivel=nivel,
-        nome=nome,
-        valor_cota=valor_cota,
-        total_cotas=total_cotas,
-        cotas_minimas=cotas_minimas,
-        numeros=numeros,
-        estrategia="Sequência Otimizada"
-    )
-
-
-def criar_bolao_megasena(nivel='basico', nome=None, valor_cota=12.00, total_cotas=18, cotas_minimas=15):
-    """Cria bolão específico da Mega Sena"""
-    numeros = [9, 18, 27, 35, 42, 58]  # Exemplo
-    
-    if not nome:
-        nome = f"Grupo Inteligente {gerar_codigo_bolao('megasena', nivel)}"
-    
-    return criar_bolao_inteligente(
-        loteria='megasena',
-        nivel=nivel,
-        nome=nome,
-        valor_cota=valor_cota,
-        total_cotas=total_cotas,
-        cotas_minimas=cotas_minimas,
-        numeros=numeros,
-        estrategia="Análise Estatística Avançada"
-    )
-
-
-def criar_bolao_quina(nivel='basico', nome=None, valor_cota=8.00, total_cotas=30, cotas_minimas=25):
-    """Cria bolão específico da Quina"""
-    numeros = [12, 23, 34, 45, 67]  # Exemplo
-    
-    if not nome:
-        nome = f"Grupo Inteligente {gerar_codigo_bolao('quina', nivel)}"
-    
-    return criar_bolao_inteligente(
-        loteria='quina',
-        nivel=nivel,
-        nome=nome,
-        valor_cota=valor_cota,
-        total_cotas=total_cotas,
-        cotas_minimas=cotas_minimas,
-        numeros=numeros,
-        estrategia="Padrões de Frequência"
-    )
