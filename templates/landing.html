@@ -430,7 +430,15 @@
     /* 📱 RESPONSIVO: Logo menor em smartphones */
     @media (max-width: 768px) {
       .logo {
-        max-width: 150px; /* Reduzido pela metade para smartphones */
+        max-width: 120px !important; /* Tamanho ajustado para proporcional ao texto */
+      }
+      
+      .logo-container .logo {
+        max-width: 120px !important;
+      }
+      
+      .logo-container img {
+        max-width: 120px !important;
       }
     }
 
@@ -1140,16 +1148,22 @@
          text-align: center; /* ⚡ CORRIGIDO: centraliza o breadcrumb no mobile */
        }
        
-       .auth-buttons-inline {
-         gap: 0.5rem;
-         justify-content: center; /* ⚡ NOVO: centraliza os botões no mobile */
-         width: 100%; /* ⚡ NOVO: ocupa toda a largura disponível */
-       }
-       
-       .auth-buttons-inline .auth-btn {
-         padding: 0.4rem 0.8rem;
-         font-size: 0.8rem;
-       }
+      .auth-buttons-inline {
+        gap: 0.4rem;
+        justify-content: flex-end !important; /* Alinha os botões à direita no mobile */
+        width: 100%; /* Ocupa toda a largura disponível */
+        padding-right: 0.5rem; /* Pequeno espaçamento da borda direita */
+      }
+      
+      .auth-buttons-inline .auth-btn {
+        padding: 0.32rem 0.64rem !important; /* Reduzido 20% */
+        font-size: 0.64rem !important; /* Reduzido 20% */
+        gap: 0.3rem !important; /* Ajusta espaço entre ícone e texto */
+      }
+      
+      .auth-buttons-inline .auth-btn i {
+        font-size: 0.64rem !important; /* Ícones também reduzidos 20% */
+      }
       
       .breadcrumb-list {
         font-size: 0.85rem;
@@ -1207,7 +1221,7 @@
       }
       
       .logo-container img {
-        max-width: 200px;
+        max-width: 120px !important;
         margin-bottom: 0.5rem;
         display: block;
         margin-left: auto;
@@ -1254,12 +1268,12 @@
       }
       
       .logo { 
-        max-width: 210px; 
+        max-width: 120px !important; 
       }
       
       /* Garantir que a logo seja exibida corretamente */
       .desktop-nav .logo {
-        max-width: 160px !important;
+        max-width: 120px !important;
         display: block !important;
         visibility: visible !important;
       }
@@ -1293,7 +1307,7 @@
       }
       
       .logo-container img {
-        max-width: 160px;
+        max-width: 120px !important;
         margin-bottom: 0.3rem;
         display: block;
         margin-left: auto;
@@ -1323,7 +1337,7 @@
       
       /* Garantir que a logo seja exibida em telas pequenas */
       .desktop-nav .logo {
-        max-width: 140px !important;
+        max-width: 120px !important;
         display: block !important;
         visibility: visible !important;
       }
