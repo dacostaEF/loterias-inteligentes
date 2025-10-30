@@ -54,26 +54,16 @@ class CarrosselLoterias {
         // Container dos slides com movimento dinâmico
         const slidesContainer = document.createElement('div');
         slidesContainer.className = 'carousel-slides';
-        slidesContainer.style.animation = 'scrollLeft 15s linear infinite'; // ⚡ ACELERADO: 30s → 15s
+        slidesContainer.style.animation = 'scrollLeft 25s linear infinite'; // Desktop mais lento: 25s
         slidesContainer.style.willChange = 'transform'; // ⚡ NOVO: Otimiza a animação
         
-        // Renderiza cada slide
-        this.data.forEach((item, index) => {
-            const slide = this.createSlide(item, index);
-            slidesContainer.appendChild(slide);
-        });
-        
-        // Duplica os slides para movimento infinito (2x)
-        this.data.forEach((item, index) => {
-            const slide = this.createSlide(item, index);
-            slidesContainer.appendChild(slide);
-        });
-        
-        // Triplica os slides para garantir continuidade perfeita (3x total)
-        this.data.forEach((item, index) => {
-            const slide = this.createSlide(item, index);
-            slidesContainer.appendChild(slide);
-        });
+        // Renderiza slides 5x para garantir movimento contínuo SEM áreas vazias
+        for (let i = 0; i < 5; i++) {
+            this.data.forEach((item, index) => {
+                const slide = this.createSlide(item, index);
+                slidesContainer.appendChild(slide);
+            });
+        }
         
         carouselWrapper.appendChild(slidesContainer);
         
@@ -90,11 +80,11 @@ class CarrosselLoterias {
             const isSmallMobile = window.innerWidth <= 480;
             
             if (isSmallMobile) {
-                slide.style.width = '140px';
-                slide.style.height = '60px'; /* ⚡ REDUZIDO: 140px → 60px para eliminar espaço */
+                slide.style.width = '70px'; /* ⚡ REDUZIDO 30%: 100px → 70px */
+                slide.style.height = '70px'; /* ⚡ REDUZIDO 30%: 100px → 70px */
             } else if (isMobile) {
-                slide.style.width = '160px';
-                slide.style.height = '70px'; /* ⚡ REDUZIDO: 160px → 70px para eliminar espaço */
+                slide.style.width = '84px'; /* ⚡ REDUZIDO 30%: 120px → 84px */
+                slide.style.height = '77px'; /* ⚡ REDUZIDO 30%: 110px → 77px */
             } else {
                 slide.style.width = '127px';
                 slide.style.height = '105px';
@@ -238,7 +228,7 @@ class CarrosselLoterias {
             // Força a re-aplicação da animação
             slidesContainer.style.animation = 'none';
             slidesContainer.offsetHeight; // Trigger reflow
-            slidesContainer.style.animation = 'scrollLeft 15s linear infinite';
+            slidesContainer.style.animation = 'scrollLeft 25s linear infinite'; // Desktop mais lento: 25s
         }
     }
 
@@ -261,11 +251,11 @@ class CarrosselLoterias {
             
             slides.forEach(slide => {
                 if (isSmallMobile) {
-                    slide.style.width = '140px';
-                    slide.style.height = '60px'; /* ⚡ REDUZIDO: 140px → 60px para eliminar espaço */
+                    slide.style.width = '70px'; /* ⚡ REDUZIDO 30%: 100px → 70px */
+                    slide.style.height = '70px'; /* ⚡ REDUZIDO 30%: 100px → 70px */
                 } else if (isMobile) {
-                    slide.style.width = '160px';
-                    slide.style.height = '70px'; /* ⚡ REDUZIDO: 160px → 70px para eliminar espaço */
+                    slide.style.width = '84px'; /* ⚡ REDUZIDO 30%: 120px → 84px */
+                    slide.style.height = '77px'; /* ⚡ REDUZIDO 30%: 110px → 77px */
                 } else {
                     slide.style.width = '127px';
                     slide.style.height = '105px';

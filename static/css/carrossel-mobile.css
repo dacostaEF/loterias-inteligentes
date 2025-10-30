@@ -5,15 +5,7 @@
  * Ajusta as dimensões das caixas para eliminar área vazia excessiva
  */
 
-/* ⚡ NOVO: Redução geral do carrossel no mobile */
-@media (max-width: 768px) {
-    .carousel-wrapper {
-        transform: scale(0.85); /* ⚡ REDUZIDO: escala geral para 85% */
-        transform-origin: center top; /* ⚡ CENTRALIZA a redução */
-        padding: 10px;
-        margin: 5px;
-    }
-}
+/* ⚡ REMOVIDO: transform scale que estava causando problemas */
 
 /* Media Query para Tablets e Mobile */
 @media (max-width: 768px) {
@@ -66,8 +58,7 @@
 /* Media Query para Mobile Pequeno */
 @media (max-width: 480px) {
     .carousel-wrapper {
-        transform: scale(0.75); /* ⚡ REDUZIDO: escala geral para 75% */
-        transform-origin: center top; /* ⚡ CENTRALIZA a redução */
+        /* Scale removido para evitar problemas visuais */
     }
     
     .carousel-slide {
@@ -107,8 +98,7 @@
 /* Media Query para Mobile Muito Pequeno */
 @media (max-width: 360px) {
     .carousel-wrapper {
-        transform: scale(0.65); /* ⚡ REDUZIDO: escala geral para 65% */
-        transform-origin: center top; /* ⚡ CENTRALIZA a redução */
+        /* Scale removido para evitar problemas visuais */
     }
     
     .carousel-slide {

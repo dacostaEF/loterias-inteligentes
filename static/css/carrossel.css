@@ -41,10 +41,10 @@
 /* Container dos slides */
 .carousel-slides {
     display: flex;
-    gap: 10px; /* ⚡ REDUZIDO AO MÁXIMO: 20px → 10px */
+    gap: 5px; /* ⚡ REDUZIDO AINDA MAIS: 10px → 5px para menos espaço vazio */
     overflow-x: hidden; /* ⚡ MUDADO: hidden para permitir animação */
     scroll-behavior: smooth;
-    padding: 0; /* PADDING ZERO - sem espaços vazios */
+    padding: 0; /* ⚡ ZERO PADDING - sem espaços vazios */
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
     /* ⚡ NOVO: Permitir animação infinita */
@@ -72,6 +72,9 @@
     border: 2px solid;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     flex-shrink: 0; /* Impede que as caixas encolham */
+    /* ⚡ NOVO: Garantir que a caixa seja sempre visível */
+    opacity: 1;
+    will-change: transform;
 }
 
 .carousel-slide:hover {
@@ -89,16 +92,16 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    justify-content: flex-start; /* MUDADO: começa do topo */
-    gap: 1px; /* REDUZIDO: menos espaçamento entre elementos */
-    padding-top: 0px; /* REMOVIDO: sem padding no topo */
+    justify-content: space-evenly; /* DISTRIBUI espaço uniformemente */
+    gap: 2px; /* PEQUENO espaçamento entre elementos */
+    padding: 2px 0; /* PEQUENO padding para folga */
 }
 
 /* Label superior (data/status) - TERCEIRA LINHA */
 .slide-label {
     background: rgba(255, 255, 255, 0.9);
     color: #1A1D25;
-    padding: 4px 8px; /* REDUZIDO padding vertical */
+    padding: 3px 6px; /* Padding com folga */
     border-radius: 8px; /* Ajustado */
     font-size: 10px; /* REDUZIDO 1px: 11px → 10px */
     font-weight: normal; /* REMOVIDO bold - texto normal */
@@ -109,12 +112,13 @@
     align-self: center; /* CENTRALIZADO */
     margin: 0 auto; /* CENTRALIZADO */
     order: 3; /* TERCEIRA LINHA */
+    line-height: 1.2;
 }
 
 /* Valor principal - SEGUNDA LINHA */
 .slide-value {
     text-align: center;
-    margin: 2px 0; /* REDUZIDO: menos espaço vertical */
+    margin: 2px 0; /* Espaço vertical para folga */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -127,7 +131,7 @@
     display: inline; /* MUDADO para inline para ficar na mesma linha */
     font-size: 10px; /* REDUZIDO 1px: 11px → 10px */
     font-weight: bold; /* ADICIONADO: valor em negrito para destaque */
-    line-height: 1;
+    line-height: 1.2;
     text-shadow: 0.6px 0.6px 1.2px rgba(0, 0, 0, 0.3);
 }
 
@@ -146,8 +150,8 @@
     font-weight: normal; /* REMOVIDO bold - texto normal */
     text-transform: uppercase; /* JÁ ESTÁ EM CAPSLOCK */
     letter-spacing: 0.3px; /* Ajustado para o novo tamanho */
-    line-height: 1.1;
-    padding: 2px 6px; /* REDUZIDO AINDA MAIS: padding vertical mínimo */
+    line-height: 1.2;
+    padding: 3px 6px; /* Padding com folga */
     background: rgba(255, 255, 255, 0.15); /* Fundo um pouco mais visível */
     border-radius: 6px; /* Ajustado proporcionalmente */
     backdrop-filter: blur(3px); /* Ajustado proporcionalmente */
@@ -215,9 +219,11 @@
   
   /* ⚡ NOVO: Garantir que a animação funcione no mobile */
   .carousel-slides {
-    animation: scrollLeft 12s linear infinite !important; /* ⚡ MAIS RÁPIDO no mobile */
+    animation: scrollLeft 8s linear infinite !important; /* ⚡ VELOCIDADE AUMENTADA: 12s → 8s */
     width: max-content !important; /* ⚡ FORÇA largura para animação */
     overflow-x: hidden !important; /* ⚡ ESCONDE overflow */
+    gap: 3px !important; /* ⚡ GAP MÍNIMO para menos espaço vazio */
+    padding: 0 !important; /* ⚡ ZERO PADDING */
   }
   
   /* ⚡ NOVO: Garantir que o container do carrossel não ultrapasse os limites */
@@ -231,6 +237,8 @@
     max-width: 100vw !important;
     overflow-x: hidden !important;
     position: relative !important;
+    padding: 0 !important; /* ⚡ ZERO PADDING */
+    margin: 0 !important; /* ⚡ ZERO MARGIN */
   }
 
   /* ⚡ NOVO: Eliminar espaçamento do breadcrumb */
@@ -238,35 +246,59 @@
     margin-top: -25px !important; /* ⚡ NEGATIVO MAIOR: puxa MUITO o breadcrumb para cima */
     padding-top: 0 !important;
   }
-    .carousel-wrapper {
-        padding: 2px; /* ⚡ REDUZIDO AO MÁXIMO: 15px → 2px */
-        margin: 2px; /* ⚡ REDUZIDO AO MÁXIMO: 10px → 2px */
-    }
-    
-    .carousel-slides {
-        gap: 8px; /* ⚡ REDUZIDO AO MÁXIMO: 15px → 8px */
-        padding: 2px 0; /* ⚡ REDUZIDO AO MÁXIMO: 15px → 2px */
-    }
     
     .carousel-slide {
-        min-width: 120px; /* ⚡ REDUZIDO: 160px → 120px para mobile */
-        max-width: 140px; /* ⚡ NOVO: Largura máxima para evitar overflow */
-        height: 70px; /* ⚡ REDUZIDO AO MÁXIMO: 100px → 70px para eliminar espaço */
-        padding: 6px 6px 3px 6px; /* ⚡ REDUZIDO AO MÁXIMO: 8px → 6px, base 4px → 3px */
-        flex-shrink: 1; /* ⚡ NOVO: Permite encolher se necessário */
+        min-width: 84px !important; /* ⚡ REDUZIDO 30%: 120px → 84px */
+        max-width: 98px !important; /* ⚡ REDUZIDO 30%: 140px → 98px */
+        height: 77px !important; /* ⚡ REDUZIDO 30%: 110px → 77px */
+        padding: 3px 3px 2px 3px !important; /* ⚡ REDUZIDO padding para comprimir */
+        flex-shrink: 1;
+    }
+    
+    .slide-content {
+        gap: 2px !important; /* ⚡ PEQUENO gap entre elementos para folga */
+        padding: 2px 0 !important; /* ⚡ PEQUENO padding para não grudar nas bordas */
+        height: 100% !important; /* ⚡ ALTURA TOTAL */
+        justify-content: space-evenly !important; /* ⚡ DISTRIBUI espaço uniformemente */
+        align-items: center !important; /* ⚡ CENTRALIZA horizontalmente */
     }
     
     .main-value {
-        font-size: 36px;
+        font-size: 14px !important; /* ⚡ REDUZIDO AINDA MAIS: 25px → 14px */
+        line-height: 1.1 !important; /* ⚡ Pouco espaço extra */
+        text-align: center !important; /* ⚡ CENTRALIZADO */
     }
     
     .unit {
-        font-size: 14px;
+        font-size: 8px !important; /* ⚡ REDUZIDO: 10px → 8px */
+        text-align: center !important; /* ⚡ CENTRALIZADO */
+    }
+    
+    .slide-value {
+        margin: 2px 0 !important; /* ⚡ MARGEM para folga */
+        gap: 2px !important; /* ⚡ Gap entre valor e unidade */
+        text-align: center !important; /* ⚡ CENTRALIZADO */
+        justify-content: center !important; /* ⚡ CENTRALIZA conteúdo */
+        align-items: center !important; /* ⚡ CENTRALIZA verticalmente */
+        width: 100% !important; /* ⚡ LARGURA TOTAL para centralizar */
     }
     
     .slide-name {
-        font-size: 12px;
-        padding: 8px;
+        font-size: 8px !important; /* ⚡ REDUZIDO 30%: 12px → 8px */
+        padding: 3px 4px !important; /* ⚡ PADDING vertical com folga */
+        margin: 0 auto !important; /* ⚡ CENTRALIZADO */
+        line-height: 1.2 !important;
+        text-align: center !important; /* ⚡ CENTRALIZADO */
+        align-self: center !important; /* ⚡ CENTRALIZA no flex */
+    }
+    
+    .slide-label {
+        font-size: 7px !important; /* ⚡ REDUZIDO 30%: 10px → 7px */
+        padding: 3px 4px !important; /* ⚡ PADDING vertical com folga */
+        margin: 0 auto !important; /* ⚡ CENTRALIZADO */
+        line-height: 1.2 !important;
+        text-align: center !important; /* ⚡ CENTRALIZADO */
+        align-self: center !important; /* ⚡ CENTRALIZA no flex */
     }
     
     .nav-btn {
@@ -301,9 +333,11 @@
   
   /* ⚡ NOVO: Garantir que a animação funcione no mobile pequeno */
   .carousel-slides {
-    animation: scrollLeft 10s linear infinite !important; /* ⚡ AINDA MAIS RÁPIDO no mobile pequeno */
+    animation: scrollLeft 6s linear infinite !important; /* ⚡ VELOCIDADE AUMENTADA: 10s → 6s */
     width: max-content !important; /* ⚡ FORÇA largura para animação */
     overflow-x: hidden !important; /* ⚡ ESCONDE overflow */
+    gap: 2px !important; /* ⚡ GAP MÍNIMO para menos espaço vazio */
+    padding: 0 !important; /* ⚡ ZERO PADDING */
   }
   
   /* ⚡ NOVO: Garantir que o container do carrossel não ultrapasse os limites no mobile pequeno */
@@ -317,6 +351,8 @@
     max-width: 100vw !important;
     overflow-x: hidden !important;
     position: relative !important;
+    padding: 0 !important; /* ⚡ ZERO PADDING */
+    margin: 0 !important; /* ⚡ ZERO MARGIN */
   }
 
   /* ⚡ NOVO: Eliminar espaçamento do breadcrumb */
@@ -326,20 +362,46 @@
   }
 
     .carousel-slide {
-        min-width: 100px; /* ⚡ REDUZIDO: 140px → 100px para mobile pequeno */
-        max-width: 120px; /* ⚡ NOVO: Largura máxima para evitar overflow */
-        height: 60px; /* ⚡ REDUZIDO AO MÁXIMO: 80px → 60px para eliminar espaço */
-        padding: 4px 4px 2px 4px; /* ⚡ REDUZIDO AO MÁXIMO: 6px → 4px, base 3px → 2px */
-        flex-shrink: 1; /* ⚡ NOVO: Permite encolher se necessário */
+        min-width: 70px !important; /* ⚡ REDUZIDO 30%: 100px → 70px */
+        max-width: 84px !important; /* ⚡ REDUZIDO 30%: 120px → 84px */
+        height: 70px !important; /* ⚡ REDUZIDO 30%: 100px → 70px */
+        padding: 2px 2px 1px 2px !important; /* ⚡ REDUZIDO para comprimir */
+        flex-shrink: 1;
+    }
+    
+    .slide-content {
+        gap: 2px !important; /* ⚡ PEQUENO gap entre elementos para folga */
+        padding: 2px 0 !important; /* ⚡ PEQUENO padding para não grudar nas bordas */
+        height: 100% !important; /* ⚡ ALTURA TOTAL */
+        justify-content: space-evenly !important; /* ⚡ DISTRIBUI espaço uniformemente */
     }
     
     .main-value {
-        font-size: 32px;
+        font-size: 12px !important; /* ⚡ REDUZIDO AINDA MAIS: 22px → 12px */
+        line-height: 1.1 !important; /* ⚡ Pouco espaço extra */
+    }
+    
+    .unit {
+        font-size: 7px !important; /* ⚡ REDUZIDO: 8px → 7px */
+    }
+    
+    .slide-value {
+        margin: 2px 0 !important; /* ⚡ MARGEM para folga */
+        gap: 2px !important; /* ⚡ Gap entre valor e unidade */
+    }
+    
+    .slide-name {
+        font-size: 7px !important; /* ⚡ REDUZIDO 30% */
+        padding: 2px 3px !important; /* ⚡ PADDING vertical com folga */
+        margin: 0px !important;
+        line-height: 1.2 !important;
     }
     
     .slide-label {
-        font-size: 10px;
-        padding: 6px 12px;
+        font-size: 6px !important; /* ⚡ REDUZIDO: 7px → 6px */
+        padding: 2px 3px !important; /* ⚡ PADDING vertical com folga */
+        margin: 0px !important;
+        line-height: 1.2 !important;
     }
 }
 
@@ -361,7 +423,7 @@
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-33.33%); /* ⚡ CORRIGIDO: Move 33.33% para loop perfeito com triplicação */
+        transform: translateX(-20%); /* ⚡ AJUSTADO: Move 20% para loop perfeito com 5x duplicação */
     }
 }
 
@@ -381,7 +443,7 @@
 
 /* Container dos slides com movimento contínuo */
 .carousel-slides {
-    animation: scrollLeft 15s linear infinite; /* ⚡ ACELERADO: 30s → 15s */
+    animation: scrollLeft 25s linear infinite; /* Desktop mais lento: 25s */
     width: max-content; /* Permite que o conteúdo se estenda */
     /* ⚡ NOVO: Garantir que a animação funcione */
     will-change: transform;

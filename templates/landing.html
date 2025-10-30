@@ -398,10 +398,10 @@
        background: transparent;
      }
      
-     /* ⚡ NOVO: Reduzir espaçamento do carrossel no mobile */
+     /* ⚡ NOVO: Espaçamento do carrossel no mobile */
      @media (max-width: 768px) {
        .carousel-section-top {
-         margin-bottom: 5px; /* ⚡ REDUZIDO: menos espaço entre carrossel e breadcrumb */
+         margin-bottom: 35px !important; /* ⚡ AUMENTADO: mais respiro entre carrossel e logo */
        }
      }
 
@@ -733,7 +733,7 @@
       .hamburger-menu {
         display: block !important;
         position: fixed !important;
-        top: 0.75rem !important;
+        top: 100px !important; /* ⚡ AJUSTADO: abaixo do carrossel */
         left: 0.75rem !important;
         z-index: 10050 !important; /* acima do nav e breadcrumbs */
       }
@@ -1132,9 +1132,7 @@
          /* Responsividade para breadcrumbs */
      @media (max-width: 768px) {
        .breadcrumbs-container {
-         padding: 3px 0; /* ⚡ REDUZIDO: 6px → 3px */
-         margin-bottom: 8px; /* ⚡ REDUZIDO: 15px → 8px */
-         margin-top: 0;
+         display: none !important; /* ⚡ OCULTA breadcrumb na landing em mobile */
        }
        
        .breadcrumbs-content {
@@ -1290,7 +1288,7 @@
       .hamburger-menu {
         display: block !important; /* Mostra o menu hambúrguer em mobile */
         position: fixed !important;
-        top: 1rem !important;
+        top: 100px !important; /* ⚡ AJUSTADO: abaixo do carrossel na landing */
         left: 1rem !important;
         z-index: 1001 !important;
       }
