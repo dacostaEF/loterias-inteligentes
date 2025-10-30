@@ -5,7 +5,19 @@ from flask import Flask, render_template, jsonify, request, send_file, redirect,
 from functools import wraps
 import os
 import sys
+import io
 import math
+
+# ============================================================================
+# 🔧 CONFIGURAÇÃO UTF-8 PARA WINDOWS
+# ============================================================================
+# Força o encoding UTF-8 para evitar erros com emojis no terminal do Windows
+if sys.platform == 'win32':
+    # Reconfigura stdout e stderr para UTF-8
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    # Define variável de ambiente
+    os.environ['PYTHONIOENCODING'] = 'utf-8'
 from datetime import datetime, date, timedelta
 import json
 import logging
@@ -20,14 +32,19 @@ from analytics_models import db, Event
 # Importações para Flask-Login
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 
-# Configuração do logger mais detalhada
+# Configuração do logger mais detalhada com UTF-8
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.setLevel(logging.INFO)
+stream_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+
+file_handler = logging.FileHandler('app.log', encoding='utf-8')
+file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.StreamHandler(),
-        logging.FileHandler('app.log')
-    ]
+    handlers=[stream_handler, file_handler]
 )
 logger = logging.getLogger(__name__)
 fp_log = logging.getLogger("fp")
@@ -3180,13 +3197,9 @@ def boloes_loterias():
     logger.info(f"🎯 ROTA boloes_loterias - Usuario logado: {usuario_logado}")
     logger.info(f"🎯 ROTA boloes_loterias - Plano display: '{plano_display}'")
     
-    # Verificar se usuário aceitou termos (temporariamente false, será implementado)
-    termos_boloes_aceitos = False  # TODO: implementar verificação no banco
-    
     return render_template('boloes_loterias.html', 
                          is_logged_in=usuario_logado,
-                         plano_display=plano_display,
-                         termos_boloes_aceitos=termos_boloes_aceitos)
+                         plano_display=plano_display)
 
 @app.route('/api/verificar-acesso-boloes')
 def verificar_acesso_boloes():

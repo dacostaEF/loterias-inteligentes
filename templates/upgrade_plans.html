@@ -13,83 +13,54 @@
             background: linear-gradient(135deg, #0f0f23, #1a1a2e);
             color: #ffffff;
             min-height: 100vh;
-            line-height: 1.6;
+            line-height: 1.4;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
+            padding: 1rem;
         }
 
         .container {
             max-width: 1200px;
             width: 100%;
             background-color: #1a1a2e;
-            border-radius: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            padding: 1rem;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #ffffff;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
         }
 
         .header p {
             color: #a0aec0;
-            font-size: 1.1rem;
+            font-size: 0.6rem;
         }
 
         .plans-grid {
             display: grid;
-            gap: 1.5rem;
+            gap: 0.75rem;
             grid-template-columns: repeat(3, 1fr);
-        }
-
-        /* Responsividade para mobile */
-        @media (max-width: 768px) {
-            .plans-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-            
-            .container {
-                padding: 1rem;
-                margin: 1rem;
-            }
-            
-            .plan-card {
-                padding: 1.5rem;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .plan-title {
-                font-size: 1.3rem;
-            }
-            
-            .plan-price {
-                font-size: 2rem;
-            }
         }
 
         .plan-card {
             background-color: #2d2d44;
-            border-radius: 1.5rem;
-            padding: 2rem;
+            border-radius: 0.75rem;
+            padding: 1rem;
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             border: 2px solid transparent;
-            min-height: 500px;
+            min-height: 250px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -116,61 +87,65 @@
         }
         
         .plan-title {
-            font-size: 1.5rem;
+            font-size: 0.75rem;
             font-weight: 700;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             color: #ffffff;
         }
 
         .plan-price {
-            font-size: 2.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             color: #ffffff;
         }
 
         .plan-price-details {
-            font-size: 1rem;
+            font-size: 0.5rem;
             color: #a0aec0;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
         
         .plan-features {
             list-style: none;
             padding: 0;
-            margin: 1.5rem 0;
+            margin: 0.75rem 0;
             text-align: left;
+            font-size: 0.5rem;
         }
 
         .plan-features li {
             display: flex;
             align-items: center;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.35rem;
             color: #d1d5db;
         }
 
         .plan-features li svg {
-            margin-right: 0.75rem;
+            margin-right: 0.35rem;
+            width: 0.6rem;
+            height: 0.6rem;
         }
 
         .plan-features li.sub-feature {
-            margin-left: 1.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
+            margin-left: 0.75rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.45rem;
             color: #cbd5e1;
         }
 
         .plan-features li.sub-feature svg {
-            margin-right: 0.5rem;
+            margin-right: 0.25rem;
         }
 
         .cta-button {
             display: inline-block;
             width: 100%;
-            padding: 0.75rem 1.5rem;
+            padding: 0.35rem 0.75rem;
             border-radius: 9999px;
             background-color: #6d28d9;
             color: #ffffff;
             font-weight: 700;
+            font-size: 0.5rem;
             text-decoration: none;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
@@ -220,14 +195,14 @@
         .lottery-buttons-grid {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1rem;
+            gap: 0.35rem;
+            margin-top: 0.5rem;
         }
 
         .lottery-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
+            gap: 0.35rem;
         }
 
         .empty-slot {
@@ -235,15 +210,15 @@
             display: block;
         }
 
-        /* Responsividade para mobile */
+        /* Botões loteria mobile - manter 2 colunas compactas */
         @media (max-width: 768px) {
             .lottery-row {
-                grid-template-columns: 1fr;
-                gap: 0.5rem;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.2rem;
             }
             
             .lottery-buttons-grid {
-                gap: 0.5rem;
+                gap: 0.2rem;
             }
         }
         
@@ -517,6 +492,103 @@
             max-width: 250px;
             padding: 12px 25px;
             font-size: 13px;
+        }
+    }
+
+    /* ========================================= */
+    /* RESPONSIVIDADE MOBILE - 2 COLUNAS */
+    /* ========================================= */
+    @media (max-width: 768px) {
+        body {
+            padding: 1rem 0 !important;
+            line-height: 1.25 !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            min-height: 100vh !important;
+        }
+        
+        .plans-grid {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 0.3rem !important;
+        }
+        
+        .container {
+            padding: 0.3rem !important;
+            margin: 0 auto !important;
+            border-radius: 0.5rem !important;
+            max-width: 95% !important;
+            width: 95% !important;
+            display: block !important;
+        }
+        
+        .header {
+            margin-bottom: 0.3rem !important;
+        }
+        
+        .header h1 {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.12rem !important;
+        }
+        
+        .header p {
+            font-size: 0.42rem !important;
+        }
+        
+        .plan-card {
+            padding: 0.35rem !important;
+            border-radius: 0.4rem !important;
+            min-height: 90px !important;
+        }
+        
+        .plan-title {
+            font-size: 0.52rem !important;
+            margin-bottom: 0.18rem !important;
+        }
+        
+        .plan-price {
+            font-size: 0.75rem !important;
+            margin-bottom: 0.1rem !important;
+        }
+        
+        .plan-price-details {
+            font-size: 0.38rem !important;
+            margin-bottom: 0.18rem !important;
+        }
+        
+        .plan-features {
+            margin: 0.25rem 0 !important;
+            font-size: 0.4rem !important;
+        }
+        
+        .plan-features li {
+            margin-bottom: 0.12rem !important;
+        }
+        
+        .plan-features li svg {
+            width: 0.48rem !important;
+            height: 0.48rem !important;
+            margin-right: 0.18rem !important;
+        }
+        
+        .plan-features li.sub-feature {
+            margin-left: 0.5rem !important;
+            margin-bottom: 0.1rem !important;
+            font-size: 0.36rem !important;
+        }
+        
+        .cta-button {
+            padding: 0.22rem 0.4rem !important;
+            font-size: 0.38rem !important;
+        }
+        
+        .lottery-buttons-grid {
+            gap: 0.18rem !important;
+            margin-top: 0.25rem !important;
+        }
+        
+        .lottery-row {
+            gap: 0.18rem !important;
         }
     }
   </style>
