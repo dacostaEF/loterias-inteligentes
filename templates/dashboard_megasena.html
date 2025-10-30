@@ -1332,6 +1332,10 @@
   <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
 </head>
 <body class="p-4 sm:p-6">
+  <script>
+    // Variável global para controle de acesso livre
+    window.freeAccessMode = {% if free_access_mode %}true{% else %}false{% endif %};
+  </script>
   <div class="main-content">
   {% if is_logged_in %}
   <!-- Indicador Visual de Status de Login (apenas para usuários logados) -->
@@ -6604,6 +6608,12 @@
 
     // Abre o modal de planos, se existir; senão, redireciona
     function openPlansModalOrRedirect(upgradeUrl = '/upgrade_plans') {
+      // Se estiver em modo de acesso livre, não mostrar modal
+      if (window.freeAccessMode) {
+        console.log('🎉 Modo de acesso livre ativo - sem restrições');
+        return;
+      }
+      
       console.log('🔓 Tentando abrir modal de planos...');
       
       // Tentar abrir modal elegante primeiro

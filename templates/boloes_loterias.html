@@ -81,6 +81,7 @@
     
     // Definir status de login global baseado no Flask
     window.isLoggedIn = {% if is_logged_in %}true{% else %}false{% endif %};
+    window.freeAccessMode = {% if free_access_mode %}true{% else %}false{% endif %};
     
     // Estado dos termos (vindo do Flask ou localStorage)
     window.termosAceitos = {{ 'true' if termos_boloes_aceitos else 'false' }};
@@ -2945,6 +2946,12 @@
     }
     
     function mostrarModalUpgrade() {
+      // Se estiver em modo de acesso livre, não mostrar modal
+      if (window.freeAccessMode) {
+        console.log('🎉 Modo de acesso livre ativo - sem restrições');
+        return;
+      }
+      
       const planoAtual = window.infoPlano?.nome_display || 'Gratuito';
       
       alert(`🔒 Acesso Restrito\n\n` +

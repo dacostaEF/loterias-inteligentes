@@ -645,6 +645,79 @@
        transform: translateY(-2px);
        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
      }
+     
+     /* ============================================================================
+      * 🎨 TOOLTIP ELEGANTE PARA MODO ACESSO LIVRE
+      * ============================================================================ */
+     .auth-btn-wrapper {
+       position: relative;
+       display: inline-block;
+     }
+     
+     .auth-btn-tooltip {
+       position: absolute;
+       top: calc(100% + 12px); /* ⚡ MUDADO: aparece ABAIXO do botão */
+       left: 50%;
+       transform: translateX(-50%);
+       background: rgba(26, 29, 37, 0.95);
+       backdrop-filter: blur(10px);
+       -webkit-backdrop-filter: blur(10px);
+       color: #00E38C;
+       padding: 12px 20px;
+       border-radius: 12px;
+       font-size: 0.85rem;
+       font-weight: 500;
+       white-space: nowrap;
+       z-index: 10000;
+       pointer-events: none;
+       opacity: 0;
+       transition: opacity 0.3s ease, transform 0.3s ease;
+       border: 1px solid rgba(0, 227, 140, 0.3);
+       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4),
+                   0 0 20px rgba(0, 227, 140, 0.15);
+       line-height: 1.4;
+       text-align: center;
+       max-width: 280px;
+       white-space: normal;
+     }
+     
+     .auth-btn-tooltip::after {
+       content: '';
+       position: absolute;
+       bottom: 100%; /* ⚡ MUDADO: seta no topo do tooltip */
+       left: 50%;
+       transform: translateX(-50%);
+       border: 8px solid transparent;
+       border-bottom-color: rgba(26, 29, 37, 0.95); /* ⚡ MUDADO: seta aponta para cima */
+     }
+     
+     .auth-btn-tooltip .emoji {
+       font-size: 1.1rem;
+       margin-right: 4px;
+     }
+     
+     .auth-btn-tooltip .main-text {
+       display: block;
+       font-weight: 600;
+       margin-bottom: 4px;
+     }
+     
+     .auth-btn-tooltip .sub-text {
+       display: block;
+       font-size: 0.75rem;
+       color: #94a3b8;
+       font-weight: 400;
+     }
+     
+     .auth-btn-wrapper:hover .auth-btn-tooltip {
+       opacity: 1;
+       transform: translateX(-50%) translateY(4px); /* ⚡ MUDADO: movimento para baixo */
+     }
+     
+     .auth-btn.disabled {
+       cursor: not-allowed;
+       opacity: 0.8;
+     }
 
      /* Responsividade para botões de auth */
      @media (max-width: 768px) {
@@ -1132,25 +1205,27 @@
          /* Responsividade para breadcrumbs */
      @media (max-width: 768px) {
        .breadcrumbs-container {
-         display: none !important; /* ⚡ OCULTA breadcrumb na landing em mobile */
+         padding: 3px 0; /* ⚡ REDUZIDO: 6px → 3px */
+         margin-bottom: 8px; /* ⚡ REDUZIDO: 15px → 8px */
+         margin-top: 0;
+       }
+       
+       /* ⚡ OCULTA apenas o breadcrumb "Início", mantém os botões */
+       .breadcrumbs {
+         display: none !important;
        }
        
        .breadcrumbs-content {
-         padding: 0 15px 0 60px;
-         flex-direction: column;
-         gap: 0.75rem;
-         align-items: center; /* ⚡ CORRIGIDO: centraliza no mobile */
-       }
-       
-       .breadcrumbs {
-         text-align: center; /* ⚡ CORRIGIDO: centraliza o breadcrumb no mobile */
+         padding: 0 15px;
+         flex-direction: row;
+         justify-content: center; /* ⚡ Centraliza os botões */
+         align-items: center;
        }
        
       .auth-buttons-inline {
-        gap: 0.4rem;
-        justify-content: flex-end !important; /* Alinha os botões à direita no mobile */
-        width: 100%; /* Ocupa toda a largura disponível */
-        padding-right: 0.5rem; /* Pequeno espaçamento da borda direita */
+        gap: 0.5rem;
+        justify-content: center !important; /* Centraliza os botões no mobile */
+        width: 100%;
       }
       
       .auth-buttons-inline .auth-btn {
@@ -1476,12 +1551,37 @@
                </ol>
            </nav>
            <div class="auth-buttons-inline">
+               {% if free_access_mode %}
+               <!-- Modo Acesso Livre - Botões com Tooltip -->
+               <div class="auth-btn-wrapper">
+                   <a href="#" class="auth-btn auth-btn-entrar disabled" onclick="return false;">
+                       <i class="fa fa-sign-in-alt"></i> Entrar
+                   </a>
+                   <div class="auth-btn-tooltip">
+                       <span class="emoji">🎉</span>
+                       <span class="main-text">Acesso livre por tempo limitado!</span>
+                       <span class="sub-text">Aproveite todas as análises sem cadastro.</span>
+                   </div>
+               </div>
+               <div class="auth-btn-wrapper">
+                   <a href="#" class="auth-btn auth-btn-cadastrar disabled" onclick="return false;">
+                       <i class="fa fa-user-plus"></i> Cadastrar-se
+                   </a>
+                   <div class="auth-btn-tooltip">
+                       <span class="emoji">🎉</span>
+                       <span class="main-text">Acesso livre por tempo limitado!</span>
+                       <span class="sub-text">Aproveite todas as análises sem cadastro.</span>
+                   </div>
+               </div>
+               {% else %}
+               <!-- Modo Normal - Botões Funcionais -->
                <a href="#" class="auth-btn auth-btn-entrar" onclick="openModalLogin('login'); return false;" data-analytics="li:home:cta:entrar">
                    <i class="fa fa-sign-in-alt"></i> Entrar
                </a>
                <a href="#" class="auth-btn auth-btn-cadastrar" onclick="openModalLogin('cadastro'); return false;" data-analytics="li:home:cta:cadastrar">
                    <i class="fa fa-user-plus"></i> Cadastrar-se
                </a>
+               {% endif %}
            </div>
        </div>
    </div>

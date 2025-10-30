@@ -22,6 +22,14 @@ from datetime import datetime, date, timedelta
 import json
 import logging
 
+# ============================================================================
+# 🎯 CONTROLE DE ACESSO - Modo Liberado Temporariamente
+# ============================================================================
+# Para habilitar planos pagos e restrições novamente, mude para False
+# True = Acesso 100% livre (sem modal de planos, sem restrições)
+# False = Sistema completo ativo (planos, cadastro, restrições)
+FREE_ACCESS_MODE = True
+
 # Analytics imports
 from analytics_models import db, Event
 
@@ -561,6 +569,16 @@ app.config.update(
 )
 
 # ============================================================================
+# 🌐 CONTEXT PROCESSOR - Variáveis Globais para Templates
+# ============================================================================
+@app.context_processor
+def inject_global_vars():
+    """Injeta variáveis globais em todos os templates automaticamente"""
+    return {
+        'free_access_mode': FREE_ACCESS_MODE,  # Controle de acesso livre
+    }
+
+# ============================================================================
 # 📊 CONFIGURAÇÃO DO ANALYTICS
 # ============================================================================
 
@@ -612,7 +630,11 @@ with app.app_context():
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'upgrade_plans'
+# 🎉 Em modo de acesso livre, não redirecionar para login
+if FREE_ACCESS_MODE:
+    login_manager.login_view = None  # Desabilita redirect automático
+else:
+    login_manager.login_view = 'upgrade_plans'
 
 # ============================================================================
 # 🛡️ GATE DE VERSÃO DE SESSÃO (ENTRADA SEGURA)
@@ -827,6 +849,10 @@ def verificar_acesso_universal(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         route = request.path
+        
+        # 🎉 MODO ACESSO LIVRE: Libera tudo sem verificações
+        if FREE_ACCESS_MODE:
+            return f(*args, **kwargs)
 
         # 1) FREE liberadas
         if UserPermissions.is_free_route(route):
@@ -889,9 +915,16 @@ def login():
                     'nivel_master': getattr(user, 'nivel_master', False)})
 
 @app.route('/logout')
-@login_required
 def logout():
     """Logout do usuário."""
+    # 🎉 Em modo de acesso livre, redirecionar para landing
+    if FREE_ACCESS_MODE:
+        return redirect(url_for('index'))
+    
+    # Verificar se está logado
+    if not current_user.is_authenticated:
+        return redirect(url_for('index'))
+    
     from flask_login import logout_user
     resp = redirect(url_for('landing_page'))
 
@@ -928,6 +961,9 @@ def debug_config_full():
 @app.route('/upgrade_plans')
 def upgrade_plans():
     """Página de planos premium."""
+    # Se estiver em modo de acesso livre, redirecionar para landing
+    if FREE_ACCESS_MODE:
+        return redirect(url_for('index'))
     return render_template('upgrade_plans.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/politica_cookies')
@@ -1160,9 +1196,16 @@ def premium_required():
     return render_template('premium_required.html', is_logged_in=verificar_usuario_logado())
 
 @app.route('/upgrade_plan', methods=['POST'])
-@login_required
 def upgrade_plan():
     """Processa upgrade de plano."""
+    # 🎉 Em modo de acesso livre, não permitir upgrade
+    if FREE_ACCESS_MODE:
+        return jsonify({'success': False, 'error': 'Funcionalidade desabilitada temporariamente'}), 403
+    
+    # Verificar se está logado
+    if not current_user.is_authenticated:
+        return jsonify({'success': False, 'error': 'Login necessário'}), 401
+    
     data = request.get_json()
     plan = data.get('plan')
     
@@ -1423,6 +1466,10 @@ def validar_codigo_confirmacao():
 
 @app.route('/check_access/<path:rota>')
 def check_access(rota):
+    # 🎉 MODO ACESSO LIVRE: Libera acesso a tudo
+    if FREE_ACCESS_MODE:
+        return jsonify({'has_access': True, 'reason': 'free_access_mode'})
+    
     route_path = '/' + rota if not rota.startswith('/') else rota
 
     if UserPermissions.is_free_route(route_path):
@@ -3207,6 +3254,22 @@ def verificar_acesso_boloes():
     try:
         logger.info("🔍 API verificar-acesso-boloes iniciada")
         from config.mercadopago_config import get_loterias_permitidas, get_loterias_bloqueadas, ACESSO_POR_PLANO
+        
+        # 🎉 MODO ACESSO LIVRE: Retorna acesso total
+        if FREE_ACCESS_MODE:
+            logger.info("🎉 MODO ACESSO LIVRE - Liberando todas as loterias")
+            todas_loterias = ['mega-sena', 'lotofacil', 'quina', 'lotomania', 'dupla-sena', 'dia-de-sorte', 'super-sete', 'loteca', 'timemania', '+milionaria']
+            return jsonify({
+                'success': True,
+                'usuario_logado': False,
+                'plano_usuario': 'Free Access',
+                'loterias_permitidas': todas_loterias,
+                'loterias_bloqueadas': [],
+                'info_plano': {
+                    'nome_display': 'Acesso Livre',
+                    'descricao': 'Acesso temporário a todas as funcionalidades'
+                }
+            })
         
         usuario_logado = verificar_usuario_logado()
         logger.info(f"🔍 Usuario logado: {usuario_logado}")
