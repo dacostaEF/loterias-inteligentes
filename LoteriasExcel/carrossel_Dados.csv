@@ -1,13 +1,13 @@
 loteria,texto_destaque,subtitulo,cor_fundo,cor_borda,cor_texto,valor,unidade,status,data_sorteio,link
 Lotofacil,HOJE,1.8 Milhao,#930089,#00E38C,#FFFFFF,1.8,Milhao,Proximo Sorteio,Hoje,/lotofacil
-Lotomania,ACUMULADA AMANHA,7.5 Milhoes,#FF8C00,#FF8C00,#FFFFFF,7.5,Milhoes,Acumulado,Amanha,/lotomania
-Quina,HOJE,31.5 Milhoes,#008B8B,#00E38C,#FFFFFF,31.5,Milhoes,Acumulado,Hoje,/quina
-Super Sete,ACUMULADA AMANHA,7.0 Milhoes,#32CD32,#32CD32,#FFFFFF,7,Milhoes,Acumulado,Amanha,/super-sete
-Mega-Sena,HOJE,20 Milhoes,#9ACD32,#00E38C,#FFFFFF,20,Milhoes,Acumulado,30-Jul,/megasena
-Mega Sena da Virada,31/12,1 Bilhao,#930089,#00E38C,#FFFFFF,1,Bilhao,31/12,31/12,/megasena virada
-Dupla Sena,ACUMULADA AMANHA,300 Mil,#FF6B6B,#FF6B6B,#FFFFFF,300,Mil,31/10,Amanha,/dupla-sena
-Loteria Federal,Quartas e Sabados,500 Mil,#4169E1,#4169E1,#FFFFFF,500,Mil,Proximo Sorteio,1-Nov,/loteria-federal
-Loteca,1-Nov,800 Mil,#FF69B4,#FF69B4,#FFFFFF,2,Milhoes,Final de Semana,1-Nov,/loteca
-Timemania,HOJE,41 Milhoes,#FFD700,#FFD700,#FFFFFF,41,Milhoes,Acumulado,30-Nov,/timemania
-Dia de Sorte,hoje,600 Mil,#DAA520,#DAA520,#FFFFFF,600,Mil,30/10,Amanha,/dia-de-sorte
-Milionaria,ACUMULADA 01/11,10 Milhoes,#3B82F6,#00E38C,#FFFFFF,10,Milhoes,Acumulado,1-Nov,/milionaria
+Lotomania,ACUMULADA 10/11, 2.0 Milhoes,#FF8C00,#FF8C00,#FFFFFF,2.0,Milhoes,Proximo Sorteio,10/11,/lotomania
+Quina,HOJE,5.2 Milhoes,#008B8B,#00E38C,#FFFFFF,5.2, Milhoes,Proximo Sorteio,Hoje,/quina
+Super Sete,ACUMULADA 10/11,4.2 Milhoes,#32CD32,#32CD32,#FFFFFF,4.2,Proximo Sorteio,10/11,/super-sete
+Mega-Sena,HOJE,55 Milhoes,#9ACD32,#00E38C,#FFFFFF,55,Milhoes,Proximo Sorteio,8/11,/megasena
+Mega Sena da Virada,31/12,1 Bilhao,#930089,#00E38C,#FFFFFF,1,Bilhao,Proximo Sorteio,31/12,/megasena virada
+Dupla Sena,ACUMULADA 10/11,1.0 Milhao,#FF6B6B,#FF6B6B,#FFFFFF,1.0,Milhao,Proximo Sorteio,10/11,/dupla-sena
+Loteria Federal,Quartas e Sabados,500 Mil,#4169E1,#4169E1,#FFFFFF,500,Mil,Proximo Sorteio,8/11,/loteria-federal
+Loteca,FNAL SEMANA,1 Milhao,#FF69B4,#FF69B4,#FFFFFF,12,Milhaos,Final de Semana,11-12/11,/loteca
+Timemania,HOJE,45 Milhoes,#FFD700,#FFD700,#FFFFFF,45,Milhoes,Proximo Sorteio,hoje,/timemania
+Dia de Sorte,HOJE,2.0 Milhoes,#DAA520,#DAA520,#FFFFFF,2.0 Milhoes,Proximo Sorteio,8/11,/dia-de-sorte
+Milionaria,ACUMULADA 05/11,10 Milhoes,#3B82F6,#00E38C,#FFFFFF,10,Milhoes,AProximo Sorteio,hoje,/milionaria

@@ -5599,6 +5599,9 @@
       trevosSelecionados = [];
       document.querySelectorAll('#trevos-container .trevo-icon-container').forEach(el => {
         el.classList.remove('selecionado');
+        // Restaurar cor original dos trevos (igual aos números)
+        el.style.setProperty('background-color', '#2E303A', 'important');
+        el.style.setProperty('color', '#FFFFFF', 'important');
       });
       
       // Atualizar displays
