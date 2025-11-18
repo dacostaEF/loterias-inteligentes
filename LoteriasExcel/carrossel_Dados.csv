@@ -1,13 +1,13 @@
 loteria,texto_destaque,subtitulo,cor_fundo,cor_borda,cor_texto,valor,unidade,status,data_sorteio,link
-Lotofacil,HOJE,1.8 Milhao,#930089,#00E38C,#FFFFFF,1.8,Milhao,Proximo Sorteio,Hoje,/lotofacil
-Lotomania,ACUMULADA 14/11, 3.5 Milhoes,#FF8C00,#FF8C00,#FFFFFF,3.5,Milhoes,Proximo Sorteio,14/11,/lotomania
-Quina,ACUMULADA 14/11,1.4 Milhoes,#008B8B,#00E38C,#FFFFFF,1.4, Milhoes,Proximo Sorteio,14/11,/quina
-Super Sete,ACUMULADA 14/11,4.6 Milhoes,#32CD32,#32CD32,#FFFFFF,4.6,Proximo Sorteio,14/11,/super-sete
-Mega-Sena,ACUMULADA 14/11,100 Milhoes,#9ACD32,#00E38C,#FFFFFF,100,Milhoes,Proximo Sorteio,14/11,/megasena
+Lotofacil,HOJE 18/11,1.8 Milhoes,#930089,#00E38C,#FFFFFF,1.8,Milhoes,Proximo Sorteio,18/11,/lotofacil
+Lotomania,HOJE 18/11, 500 Mil,#FF8C00,#FF8C00,#FFFFFF,500,Mils,Proximo Sorteio,18/11,/lotomania
+Quina,ACUMULADA 18/11,3.2 Milhoes,#008B8B,#00E38C,#FFFFFF,3.2, Milhoes,Proximo Sorteio,18/11,/quina
+Super Sete,ACUMULADA 19/11,5.0 Milhoes,#32CD32,#32CD32,#FFFFFF,5.0 Milhoes,Proximo Sorteio,19/11,/super-sete
+Mega-Sena,ACUMULADA 18/11,3.5 Milhoes,#9ACD32,#00E38C,#FFFFFF,3.5,Milhoes,Proximo Sorteio,18/11,/megasena
 Mega Sena da Virada,31/12,1 Bilhao,#930089,#00E38C,#FFFFFF,1,Bilhao,Proximo Sorteio,31/12,/megasena virada
-Dupla Sena,ACUMULADA 14/11,300 Mil,#FF6B6B,#FF6B6B,#FFFFFF,300 Mil,Proximo Sorteio,14/11,/dupla-sena
+Dupla Sena,ACUMULADA 19/11,600 Mil,#FF6B6B,#FF6B6B,#FFFFFF,600 Mil,Proximo Sorteio,19/11,/dupla-sena
 Loteria Federal,Quartas e Sabados,500 Mil,#4169E1,#4169E1,#FFFFFF,500,Mil,Proximo Sorteio,8/11,/loteria-federal
-Loteca,FNAL SEMANA,4 Milhao,#FF69B4,#FF69B4,#FFFFFF,4,Milhaos,Final de Semana,15-16/11,/loteca
-Timemania,ACUMULADA 18/11,49 Milhoes,#FFD700,#FFD700,#FFFFFF,49,Milhoes,Proximo Sorteio,14/11,/timemania
-Dia de Sorte,ACUMULADA 18/11,3.4 Milhoes,#DAA520,#DAA520,#FFFFFF,3.4 Milhoes,Proximo Sorteio,14/11,/dia-de-sorte
-Milionaria,ACUMULADA 14/11,10 Milhoes,#3B82F6,#00E38C,#FFFFFF,10,Milhoes,Proximo Sorteio,14/11,/milionaria
+Loteca,FNAL SEMANA,1 Milhao,#FF69B4,#FF69B4,#FFFFFF,1,Milhaos,Final de Semana,22-23/11,/loteca
+Timemania,ACUMULADA 18/11,49 Milhoes,#FFD700,#FFD700,#FFFFFF,49,Milhoes,Proximo Sorteio,18/11,/timemania
+Dia de Sorte,ACUMULADA 18/11,3.4 Milhoes,#DAA520,#DAA520,#FFFFFF,3.4 Milhoes,Proximo Sorteio,18/11,/dia-de-sorte
+Milionaria,ACUMULADA 19/11,10 Milhoes,#3B82F6,#00E38C,#FFFFFF,10,Milhoes,Proximo Sorteio,19/11,/milionaria
