@@ -3843,12 +3843,22 @@ def api_lotofacil_matriz():
         
         # Monta matriz de 26 colunas (0 = concurso, 1..25 = números)
         import numpy as np
+        pd = _lazy_import_pandas()
         matriz = []
         for _, row in fatia.iterrows():
             linha = [int(row["Concurso"])] + [0]*25
             for j in range(1,16):
-                n = int(row[f"Bola{j}"])
-                linha[n] = n
+                try:
+                    valor_bola = row[f"Bola{j}"]
+                    # Valida se não é NaN/None e está no range válido
+                    if pd.notna(valor_bola):
+                        n = int(valor_bola)
+                        # Valida se está no range 1-25 (índices válidos da lista)
+                        if 1 <= n <= 25:
+                            linha[n] = n
+                except (ValueError, TypeError):
+                    # Ignora valores inválidos e continua
+                    continue
             matriz.append(linha)
         
         # Último concurso completo (para o modal "Escolhidos × Próximo")
