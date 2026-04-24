@@ -1,13 +1,12 @@
 loteria,texto_destaque,subtitulo,cor_fundo,cor_borda,cor_texto,valor,unidade,status,data_sorteio,link
-Lotofacil,06/04,2.0 Milhoes,#930089,#00E38C,#FFFFFF,2.0,Milhoes,Proximo Sorteio,06/04,/lotofacil
-Lotomania,ACUMULADA 06/04, 13.0 Milhoes,#FF8C00,#FF8C00,#FFFFFF,13.0,Milhoes,Proximo Sorteio,06/04,/lotomania
-Quina,ACUMULADA 06/04,3.7 milhoes,#008B8B,#00E38C,#FFFFFF,3.7,Milhoes,Proximo Sorteio,06/04,/quina
-Super Sete,ACUMULADA 06/04,5.2 Milhoes,#32CD32,#32CD32,#FFFFFF,5.2, Milhoes,Proximo Sorteio,06/04,/super-sete
-Mega-Sena,ACUMULADA 07/04,15 Milhoes,#9ACD32,#00E38C,#FFFFFF,15,Milhoes,Proximo Sorteio,07/04,/megasena
-Dupla Sena,06/04,100 mil,#FF6B6B,#FF6B6B,#FFFFFF,100 Mil,Proximo Sorteio,06/04,/dupla-sena
-Dupla Sena da Pascoa,ACUMULADA 04/04,50.0 Milhoes,#FF6B6B,#FF6B6B,#FFFFFF,50.0 Milhoes,Proximo Sorteio,04/04,/dupla-sena-pascoa
-Loteria Federal,Quartas e Sabados,500 Mils,#4169E1,#4169E1,#FFFFFF,500,Mil,Proximo Sorteio,11/04,/loteria-federal
-Loteca,FINAL SEMANA,1.5 Milhoes,#FF69B4,#FF69B4,#FFFFFF,1.5,Milhoes,Final de Semana,11-12/04,/loteca
-Timemania,ACUMULADA 07/04,17.0 Milhoes,#FFD700,#FFD700,#FFFFFF,17.0,Milhoes,Proximo Sorteio,17/04,/timemania
-Dia de Sorte,07/04,150 Mil,#DAA520,#DAA520,#FFFFFF,150 Mil,Proximo Sorteio,07/04,/dia-de-sorte
-Milionaria,ACUMULADA 08/04,34.0 Milhoes,#3B82F6,#00E38C,#FFFFFF,34.0,Milhoes,Proximo Sorteio,08/04,/milionaria
+Lotofacil,24/04,2.0 Milhões,#930089,#00E38C,#FFFFFF,2.0,Milhões,Proximo Sorteio,24/04,/lotofacil
+Lotomania,ACUMULADA 24/04, 1.0 Milhão,#FF8C00,#FF8C00,#FFFFFF,1.0,Milhão,Proximo Sorteio,24/04,/lotomania
+Quina, 24/04,600 mil,#008B8B,#00E38C,#FFFFFF,600 Mil,Proximo Sorteio,24/04,/quina
+Super Sete,ACUMULADA 24/04,6.7 Milhões,#32CD32,#32CD32,#FFFFFF,6.7, Milhões,Proximo Sorteio,24/04,/super-sete
+Mega-Sena,ACUMULADA 25/04,100 Milhões,#9ACD32,#00E38C,#FFFFFF,100,Milhões,Proximo Sorteio,25/04,/megasena
+Dupla Sena,24/04,1.6 milhões,#FF6B6B,#FF6B6B,#FFFFFF,1.6, Milhões,Proximo Sorteio,24/04,/dupla-sena
+Loteria Federal,Quartas e Sabados,500 Mils,#4169E1,#4169E1,#FFFFFF,500,Mil,Proximo Sorteio,25/04 e 28/08,/loteria-federal
+Loteca,FINAL SEMANA,2.0 Milhões,#FF69B4,#FF69B4,#FFFFFF,2.0,Milhões,Final de Semana,25-26/04,/loteca
+Timemania,ACUMULADA 25/04,21.5 Milhões,#FFD700,#FFD700,#FFFFFF,21.5,Milhões,Proximo Sorteio,25/04,/timemania
+Dia de Sorte,25/04,2.5 Milhões,#DAA520,#DAA520,#FFFFFF,2.5 Milhões,Proximo Sorteio,25/04,/dia-de-sorte
+Milionaria,ACUMULADA 25/04,37.0 Milhões,#3B82F6,#00E38C,#FFFFFF,37.0,Milhões,Proximo Sorteio,25/04,/milionaria
