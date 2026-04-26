@@ -1572,6 +1572,7 @@ with app.app_context():
 # ============================================================================
 
 _data_cache = {}
+_data_cache_mtime = {}
 
 def _lazy_import_pandas():
     """Importa pandas apenas quando necessário."""
@@ -1583,12 +1584,48 @@ def _lazy_import_numpy():
     import numpy as np
     return np
 
+def _get_loteria_data_path(loteria):
+    """Retorna o caminho do arquivo base usado pela loteria."""
+    base_dir = os.path.join(os.path.dirname(__file__), "LoteriasExcel")
+    file_map = {
+        "mais_milionaria": "Milionária_edt.xlsx",
+        "megasena": "MegaSena_edt.xlsx",
+        "quina": "Quina_edt.xlsx",
+        "lotofacil": "Lotofacil_edt2.xlsx",
+        "lotomania": "Lotomania_edt.xlsx",
+    }
+    filename = file_map.get(loteria)
+    if not filename:
+        return None
+    return os.path.join(base_dir, filename)
+
+def _get_file_mtime_safe(path):
+    """Retorna mtime do arquivo ou None se indisponível."""
+    if not path or not os.path.exists(path):
+        return None
+    try:
+        return os.path.getmtime(path)
+    except Exception as exc:
+        logger.warning(f"Não foi possível obter mtime de {path}: {exc}")
+        return None
+
 def carregar_dados_da_loteria(loteria):
-    """Carrega dados da loteria especificada, se ainda não estiver em cache."""
-    global _data_cache
-    
-    if loteria not in _data_cache:
+    """Carrega dados da loteria com cache e invalidação automática por mtime."""
+    global _data_cache, _data_cache_mtime
+
+    data_path = _get_loteria_data_path(loteria)
+    current_mtime = _get_file_mtime_safe(data_path)
+    cached_mtime = _data_cache_mtime.get(loteria)
+    should_reload = (
+        loteria not in _data_cache
+        or cached_mtime is None
+        or current_mtime != cached_mtime
+    )
+
+    if should_reload:
         logger.info(f"Carregando dados da {loteria}...")
+        if data_path:
+            logger.info(f"Arquivo monitorado: {data_path} | mtime={current_mtime}")
         
         if loteria == "mais_milionaria":
             _data_cache[loteria] = carregar_dados_milionaria()
@@ -1603,8 +1640,7 @@ def carregar_dados_da_loteria(loteria):
         elif loteria == "lotomania":
             # Lazy import para lotomania
             pd = _lazy_import_pandas()
-            import os
-            excel_path = os.path.join(os.getcwd(), 'LoteriasExcel', 'Lotomania_edt.xlsx')
+            excel_path = _get_loteria_data_path("lotomania")
             logger.info(f"Tentando carregar Lotomania de: {excel_path}")
             if os.path.exists(excel_path):
                 _data_cache[loteria] = pd.read_excel(excel_path)
@@ -1615,6 +1651,7 @@ def carregar_dados_da_loteria(loteria):
         else:
             logger.error(f"Loteria desconhecida: {loteria}")
             return None
+        _data_cache_mtime[loteria] = current_mtime
     
     return _data_cache.get(loteria)
 
